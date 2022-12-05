@@ -60,12 +60,16 @@ buck-out
 .watchmanconfig
 
 # Android
-.idea
+android/*.iml
+android/.gradle
 .gradle
-local.properties
-*.iml
-/android/*
-!/android/README.md
+android/local.properties
+android/.idea/workspace.xml
+android/.idea/libraries
+android/build
+android/app/build
+android/captures
+android/.externalNativeBuild
 
 # Node
 node_modules
