@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from "react";
 import {
   SafeAreaView,
   ScrollView,
@@ -8,14 +8,12 @@ import {
   useColorScheme,
   PermissionsAndroid,
   View,
-  Button
-} from 'react-native';
-import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
-import RNFS from 'react-native-fs';
+  Button,
+} from "react-native";
+import { launchCamera, launchImageLibrary } from "react-native-image-picker";
+import RNFS from "react-native-fs";
 
-type PhotoGridProps = {
-
-}
+type PhotoGridProps = {};
 
 // async function selectPhoto(){
 
@@ -26,28 +24,28 @@ type PhotoGridProps = {
 //     console.log("result", result)
 // }
 
-export default function PhotoGrid(props: PhotoGridProps){
-    const [downloadsFolder, setDownloadsFolder] = useState('');
-    const [documentsFolder, setDocumentsFolder] = useState('');
-    const [externalDirectory, setExternalDirectory] = useState('');
+export default function PhotoGrid(props: PhotoGridProps) {
+  const [downloadsFolder, setDownloadsFolder] = useState("");
+  const [documentsFolder, setDocumentsFolder] = useState("");
+  const [externalDirectory, setExternalDirectory] = useState("");
 
-    useEffect(() => {
-      //get user's file paths from react-native-fs
-      setDownloadsFolder(RNFS.DownloadDirectoryPath);
-      setDocumentsFolder(RNFS.DocumentDirectoryPath); //alternative to MainBundleDirectory.
-      setExternalDirectory(RNFS.ExternalStorageDirectoryPath);
-    }, []);
+  useEffect(() => {
+    //get user's file paths from react-native-fs
+    setDownloadsFolder(RNFS.DownloadDirectoryPath);
+    setDocumentsFolder(RNFS.DocumentDirectoryPath); //alternative to MainBundleDirectory.
+    setExternalDirectory(RNFS.ExternalStorageDirectoryPath);
+  }, []);
 
-    return(
-        <View>
-            <Text>test</Text>
-            {/* <Button
+  return (
+    <View>
+      <Text>test</Text>
+      {/* <Button
                 title="select photo"
                 onPress={selectPhoto}
             /> */}
-            <Text> Downloads Folder: {downloadsFolder}</Text>
-            <Text>Documents folder: {documentsFolder}</Text>
-            <Text>External storage: {externalDirectory}</Text>
-        </View>
-    )
+      <Text> Downloads Folder: {downloadsFolder}</Text>
+      <Text>Documents folder: {documentsFolder}</Text>
+      <Text>External storage: {externalDirectory}</Text>
+    </View>
+  );
 }
