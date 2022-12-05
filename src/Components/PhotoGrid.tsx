@@ -43,7 +43,7 @@ const RenderItem = ({ item, index }: { item: any; index: number }) => (
   <View style={styles.itemStyle}>
     <Image
       source={{
-        uri: IMG,
+        uri: item.node.image.uri,
       }}
       style={styles.imageStyle}
       containerStyle={styles.imageContainerStyle}
@@ -52,7 +52,6 @@ const RenderItem = ({ item, index }: { item: any; index: number }) => (
 );
 
 export default function PhotoGrid(props: PhotoGridProps) {
-  const data = new Array(102).fill(null).map((v: number, i: number) => i);
   const [edges, setEdges] = useState<PhotoIdentifier[]>();
 
   async function getPermissions() {
@@ -82,9 +81,9 @@ export default function PhotoGrid(props: PhotoGridProps) {
       <Text>{edges?.length}</Text>
       <FlatList
         style={styles.flatListStyle}
-        data={data}
+        data={edges}
         renderItem={RenderItem}
-        keyExtractor={(item) => String(item)}
+        keyExtractor={(item) => item.node.image.uri}
         numColumns={3}
         ListHeaderComponent={() => (
           <Text style={styles.titleStyle}>{title}</Text>
