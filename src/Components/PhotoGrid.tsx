@@ -11,9 +11,29 @@ import {
   Button,
   FlatList,
   Dimensions,
-} from 'react-native';
-
+  Platform,
+} from "react-native";
+import { launchCamera, launchImageLibrary } from "react-native-image-picker";
+import {
+  CameraRoll,
+  Album,
+  PhotoIdentifier,
+} from "@react-native-camera-roll/camera-roll";
 import { Image } from 'react-native-elements';
+async function hasAndroidPermission() {
+  const permission = PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE;
+
+
+  const hasPermission = await PermissionsAndroid.check(permission);
+  if (hasPermission) {
+    return true;
+  }
+
+  const status = await PermissionsAndroid.request(permission);
+  return status === "granted";
+}
+
+
 
 import colors from '../colors';
 
@@ -35,11 +55,12 @@ const RenderItem = ({ item, index }: { item: any; index: number }) => (
 );
 
 export default function PhotoGrid(props: PhotoGridProps) {
-  const data = new Array(102).fill(null).map((v: number, i: number) => i);
+  const data = new Array(102).fill(null);
 
   const title = 'Mes photos';
   return (
     <View style={styles.viewStyle}>
+      <Text>{edges?.length}</Text>
       <FlatList
         style={styles.flatListStyle}
         data={data}
