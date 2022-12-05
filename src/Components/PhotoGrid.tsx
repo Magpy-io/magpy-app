@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   SafeAreaView,
   ScrollView,
@@ -19,10 +19,9 @@ import {
   Album,
   PhotoIdentifier,
 } from "@react-native-camera-roll/camera-roll";
-import { Image } from 'react-native-elements';
+import { Image } from "react-native-elements";
 async function hasAndroidPermission() {
   const permission = PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE;
-
 
   const hasPermission = await PermissionsAndroid.check(permission);
   if (hasPermission) {
@@ -33,12 +32,10 @@ async function hasAndroidPermission() {
   return status === "granted";
 }
 
-
-
-import colors from '../colors';
+import colors from "../colors";
 
 const IMG =
-  'https://media.istockphoto.com/id/1322277517/fr/photo/herbe-sauvage-dans-les-montagnes-au-coucher-du-soleil.jpg?s=612x612&w=0&k=20&c=tQ19uZQLlIFy8J6QWMyOL6lPt3pdSHBSDFHoXr1K_g0=';
+  "https://media.istockphoto.com/id/1322277517/fr/photo/herbe-sauvage-dans-les-montagnes-au-coucher-du-soleil.jpg?s=612x612&w=0&k=20&c=tQ19uZQLlIFy8J6QWMyOL6lPt3pdSHBSDFHoXr1K_g0=";
 
 type PhotoGridProps = {};
 
@@ -55,9 +52,31 @@ const RenderItem = ({ item, index }: { item: any; index: number }) => (
 );
 
 export default function PhotoGrid(props: PhotoGridProps) {
-  const data = new Array(102).fill(null);
+  const data = new Array(102).fill(null).map((v: number, i: number) => i);
+  const [edges, setEdges] = useState<PhotoIdentifier[]>();
 
-  const title = 'Mes photos';
+  async function getPermissions() {
+    if (Platform.OS === "android" && !(await hasAndroidPermission())) {
+      return;
+    }
+
+    CameraRoll.getPhotos({
+      first: 2000,
+      assetType: "All",
+    })
+      .then((r) => {
+        setEdges(r.edges);
+      })
+      .catch((err) => {
+        //Error Loading Images
+      });
+  }
+
+  useEffect(() => {
+    getPermissions();
+  });
+
+  const title = "Mes photos";
   return (
     <View style={styles.viewStyle}>
       <Text>{edges?.length}</Text>
@@ -81,9 +100,9 @@ const BORDER_RADIUS = 0;
 const styles = StyleSheet.create({
   titleStyle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     padding: 10,
-    textAlign: 'center',
+    textAlign: "center",
     color: colors.grey,
     paddingBottom: 15,
   },
@@ -96,14 +115,14 @@ const styles = StyleSheet.create({
     padding: MARGIN,
     flex: 1,
     aspectRatio: 1,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
-  itemTextStyle: { textAlign: 'center' },
+  itemTextStyle: { textAlign: "center" },
   imageStyle: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
     // resizeMode: 'cover',
     borderRadius: BORDER_RADIUS,
   },
-  imageContainerStyle: { overflow: 'hidden' },
+  imageContainerStyle: { overflow: "hidden" },
 });
