@@ -1,12 +1,11 @@
 import React, { type PropsWithChildren } from "react";
 import { SafeAreaView, StyleSheet } from "react-native";
-
-import PhotoGrid from "./src/Components/PhotoGrid";
+import PhotoGallery from "~/Components/PhotoGallery";
 
 const App = () => {
   return (
     <SafeAreaView style={styles.viewStyle}>
-      <PhotoGrid />
+      <PhotoGallery />
     </SafeAreaView>
   );
 };
