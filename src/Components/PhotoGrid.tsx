@@ -1,49 +1,16 @@
-import React, { useState, useEffect } from "react";
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  PermissionsAndroid,
-  View,
-  Button,
-  FlatList,
-  Dimensions,
-  Platform,
-} from "react-native";
-import { launchCamera, launchImageLibrary } from "react-native-image-picker";
-import {
-  CameraRoll,
-  Album,
-  PhotoIdentifier,
-} from "@react-native-camera-roll/camera-roll";
+import { StyleSheet, Text, View, FlatList } from "react-native";
+
 import { Image } from "react-native-elements";
-async function hasAndroidPermission() {
-  const permission = PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE;
 
-  const hasPermission = await PermissionsAndroid.check(permission);
-  if (hasPermission) {
-    return true;
-  }
+import colors from "~/colors";
 
-  const status = await PermissionsAndroid.request(permission);
-  return status === "granted";
-}
-
-import colors from "../colors";
-
-const IMG =
-  "https://media.istockphoto.com/id/1322277517/fr/photo/herbe-sauvage-dans-les-montagnes-au-coucher-du-soleil.jpg?s=612x612&w=0&k=20&c=tQ19uZQLlIFy8J6QWMyOL6lPt3pdSHBSDFHoXr1K_g0=";
-
-type PhotoGridProps = {};
+type PhotoGridProps = { uris?: Array<string>; title: string };
 
 const RenderItem = ({ item, index }: { item: any; index: number }) => (
   <View style={styles.itemStyle}>
     <Image
       source={{
-        uri: item.node.image.uri,
+        uri: item,
       }}
       style={styles.imageStyle}
       containerStyle={styles.imageContainerStyle}
@@ -52,41 +19,16 @@ const RenderItem = ({ item, index }: { item: any; index: number }) => (
 );
 
 export default function PhotoGrid(props: PhotoGridProps) {
-  const [edges, setEdges] = useState<PhotoIdentifier[]>();
-
-  async function getPermissions() {
-    if (Platform.OS === "android" && !(await hasAndroidPermission())) {
-      return;
-    }
-
-    CameraRoll.getPhotos({
-      first: 2000,
-      assetType: "All",
-    })
-      .then((r) => {
-        setEdges(r.edges);
-      })
-      .catch((err) => {
-        //Error Loading Images
-      });
-  }
-
-  useEffect(() => {
-    getPermissions();
-  });
-
-  const title = "Mes photos";
   return (
     <View style={styles.viewStyle}>
-      <Text>{edges?.length}</Text>
       <FlatList
         style={styles.flatListStyle}
-        data={edges}
+        data={props.uris}
         renderItem={RenderItem}
-        keyExtractor={(item) => item.node.image.uri}
+        keyExtractor={(item) => item}
         numColumns={3}
         ListHeaderComponent={() => (
-          <Text style={styles.titleStyle}>{title}</Text>
+          <Text style={styles.titleStyle}>{props.title}</Text>
         )}
       />
     </View>
