@@ -10,7 +10,6 @@ export default function PhotoGallery(props: PhotoGalleryProps) {
   useEffect(() => {
     fetch("http://192.168.0.21:8080/photo?id=1")
       .then((r) => {
-        console.log(r);
         return r.json();
       })
       .then((json) => {
