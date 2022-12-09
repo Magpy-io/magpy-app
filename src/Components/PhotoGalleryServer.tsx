@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { Platform } from "react-native";
 
 import PhotoGrid from "./PhotoGrid";
 

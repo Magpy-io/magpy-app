@@ -25,7 +25,7 @@ export default function PhotoGrid(props: PhotoGridProps) {
         style={styles.flatListStyle}
         data={props.uris}
         renderItem={RenderItem}
-        keyExtractor={(item) => item}
+        keyExtractor={(item, i) => String(i)}
         numColumns={3}
         ListHeaderComponent={() => (
           <Text style={styles.titleStyle}>{props.title}</Text>

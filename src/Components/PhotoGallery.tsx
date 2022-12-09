@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { Platform } from "react-native";
 
 import * as AndroidPermissions from "~/Components/GetPermissionsAndroid";
 
