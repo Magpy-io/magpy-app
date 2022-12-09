@@ -12,7 +12,7 @@ const RenderItem = ({ item, index }: { item: any; index: number }) => (
       source={{
         uri: item,
       }}
-      style={styles.imageStyle}
+      style={[styles.imageStyle, { width: "100%", height: "100%" }]}
       containerStyle={styles.imageContainerStyle}
     />
   </View>

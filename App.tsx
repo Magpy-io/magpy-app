@@ -1,15 +1,20 @@
-import React, { type PropsWithChildren } from "react";
+import React from "react";
 import { SafeAreaView, StyleSheet } from "react-native";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import Screens from "~/Components/Screens";
 import PhotoGalleryServer from "~/Components/PhotoGalleryServer";
-import PhotoGallery from "~/Components/PhotoGallery";
 
+const Stack = createNativeStackNavigator();
 const App = () => {
   return (
-    <SafeAreaView style={styles.viewStyle}>
-      <PhotoGalleryServer />
-    </SafeAreaView>
+    <NavigationContainer>
+      <Screens />
+    </NavigationContainer>
   );
 };
+
+export default App;
 
 const styles = StyleSheet.create({
   viewStyle: {
@@ -17,5 +22,3 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
 });
-
-export default App;
