@@ -8,14 +8,29 @@ export default function PhotoGallery(props: PhotoGalleryProps) {
   const [uris, setUris] = useState<string[]>([]);
 
   useEffect(() => {
-    fetch("http://192.168.0.21:8080/photo?id=1")
-      .then((r) => {
-        return r.json();
-      })
+    fetch("http://192.168.0.21:8000/photos")
+      .then((r) => r.json())
       .then((json) => {
-        setUris(new Array(100).fill(`data:image/jpg;base64,${json.image64}`));
+        return Promise.all(
+          json.photos.map((id: string) => {
+            return fetch("http://192.168.0.21:8000/photo/" + id);
+          })
+        );
       })
-      .catch((e) => console.log(e));
+      .then((values) => {
+        return Promise.all(
+          values.map((v) => {
+            return v.json();
+          })
+        );
+      })
+      .then((values) => {
+        setUris(
+          values.map((v: { image64: string }) => {
+            return "data:image/jpg;base64," + v.image64;
+          })
+        );
+      });
   });
 
   const title = "Mes photos";
