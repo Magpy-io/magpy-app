@@ -1,23 +1,33 @@
 import React from "react";
+import { Dimensions } from "react-native";
+
+import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
+
+import TopTabBar from "~/Navigation/TopTabBar";
+
+//Screens
 import PhotoGalleryServerScreen from "~/Navigation/Screens/PhotoGalleryServerScreen";
 import PhotoGalleryLocalScreen from "~/Navigation/Screens/PhotoGalleryLocalScreen";
 
+const Tab = createMaterialTopTabNavigator();
 const Stack = createNativeStackNavigator();
+const TabInitialLayout = {
+  width: Dimensions.get("window").width,
+};
 const Navigation = () => {
   return (
-    <Stack.Navigator initialRouteName="Page1">
-      <Stack.Screen
-        name="Page1"
-        component={PhotoGalleryServerScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="Page2"
-        component={PhotoGalleryLocalScreen}
-        options={{ headerShown: false }}
-      />
-    </Stack.Navigator>
+    <NavigationContainer>
+      <Tab.Navigator
+        initialRouteName="ServerPage"
+        initialLayout={TabInitialLayout}
+        tabBar={(props) => <TopTabBar {...props} />}
+      >
+        <Tab.Screen name="ServerPage" component={PhotoGalleryServerScreen} />
+        <Tab.Screen name="LocalPage" component={PhotoGalleryLocalScreen} />
+      </Tab.Navigator>
+    </NavigationContainer>
   );
 };
 
