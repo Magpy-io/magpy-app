@@ -1,32 +1,59 @@
-import { StyleSheet, Text, View, FlatList } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  FlatList,
+  TouchableWithoutFeedback,
+} from "react-native";
 
 import { Image } from "react-native-elements";
 
-import colors from "~/colors";
+type PhotoGridProps = {
+  uris?: Array<string>;
+  title?: string;
+  onPhotoClicked?: (index: number) => void;
+};
 
-type PhotoGridProps = { uris?: Array<string>; title?: string };
-
-const RenderItem = ({ item, index }: { item: any; index: number }) => (
-  <View style={styles.itemStyle}>
-    <Image
-      source={{
-        uri: item,
-      }}
-      height={"auto"}
-      width={"auto"}
-      style={[styles.imageStyle]}
-      containerStyle={styles.imageContainerStyle}
-    />
-  </View>
+const RenderItem = ({
+  item,
+  index,
+  onItemClicked,
+}: {
+  item: any;
+  index: number;
+  onItemClicked: (index: number) => void;
+}) => (
+  <TouchableWithoutFeedback
+    onPress={() => {
+      onItemClicked(index);
+    }}
+  >
+    <View style={styles.itemStyle}>
+      <Image
+        source={{
+          uri: item,
+        }}
+        height={"auto"}
+        width={"auto"}
+        style={[styles.imageStyle]}
+        containerStyle={styles.imageContainerStyle}
+      />
+    </View>
+  </TouchableWithoutFeedback>
 );
 
 export default function PhotoGrid(props: PhotoGridProps) {
+  const PhotoPressed = props.onPhotoClicked
+    ? props.onPhotoClicked
+    : (n: number) => {};
   return (
     <View style={styles.viewStyle}>
       <FlatList
         style={styles.flatListStyle}
         data={props.uris}
-        renderItem={RenderItem}
+        renderItem={({ item, index }) =>
+          RenderItem({ item, index, onItemClicked: PhotoPressed })
+        }
         keyExtractor={(item, i) => String(i)}
         numColumns={3}
         ListHeaderComponent={() =>
@@ -48,7 +75,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     padding: 10,
     textAlign: "center",
-    color: colors.grey,
+    color: "grey",
     paddingBottom: 15,
   },
   viewStyle: {

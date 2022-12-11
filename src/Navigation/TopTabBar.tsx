@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableWithoutFeedback } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 
 import { MaterialTopTabBarProps } from "@react-navigation/material-top-tabs";
 import colors from "~/colors";
@@ -34,7 +34,7 @@ function TopBarTab(props: {
   selected: boolean;
 }) {
   return (
-    <TouchableWithoutFeedback
+    <TouchableOpacity
       onPress={() => {
         props.onSelect(props.index);
       }}
@@ -42,7 +42,7 @@ function TopBarTab(props: {
       <Text style={[styles.tab, props.selected ? styles.tabSelected : {}]}>
         {props.title}
       </Text>
-    </TouchableWithoutFeedback>
+    </TouchableOpacity>
   );
 }
 
