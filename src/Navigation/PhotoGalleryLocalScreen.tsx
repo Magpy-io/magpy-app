@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
 
-import * as AndroidPermissions from "~/Components/GetPermissionsAndroid";
+import * as AndroidPermissions from "~/Helpers/GetPermissionsAndroid";
 
-import { GetPhotosUris } from "~/Components/GetGalleryPhotos";
+import GetPhotosUris from "~/Helpers/GetGalleryPhotos";
 
-import PhotoGrid from "./PhotoGrid";
+import PhotoGrid from "../Components/PhotoGrid";
 
 type PhotoGalleryProps = {};
 
-export default function PhotoGallery(props: PhotoGalleryProps) {
+export default function PhotoGalleryLocalScreen(props: PhotoGalleryProps) {
   const [uris, setUris] = useState<string[]>();
 
   async function getPermissionsThenGetPhotos() {

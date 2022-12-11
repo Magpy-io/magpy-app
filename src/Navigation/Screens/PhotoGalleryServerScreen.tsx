@@ -1,19 +1,20 @@
 import React, { useState, useEffect } from "react";
 
-import PhotoGrid from "./PhotoGrid";
+import PhotoGrid from "~/Components/PhotoGrid";
+
+import * as Queries from "~/Helpers/Queries";
 
 type PhotoGalleryProps = {};
 
-export default function PhotoGallery(props: PhotoGalleryProps) {
+export default function PhotoGalleryScreen(props: PhotoGalleryProps) {
   const [uris, setUris] = useState<string[]>([]);
 
   useEffect(() => {
-    fetch("http://192.168.0.21:8000/photos")
-      .then((r) => r.json())
+    Queries.getPhotosJson()
       .then((json) => {
         return Promise.all(
           json.photos.map((id: string) => {
-            return fetch("http://192.168.0.21:8000/photo/" + id);
+            return Queries.getPhoto(id);
           })
         );
       })
@@ -33,6 +34,5 @@ export default function PhotoGallery(props: PhotoGalleryProps) {
       });
   });
 
-  const title = "Mes photos";
-  return <PhotoGrid uris={uris} title={title} />;
+  return <PhotoGrid uris={uris} />;
 }

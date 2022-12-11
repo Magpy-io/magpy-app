@@ -9,4 +9,4 @@ function GetPhotosUris(n: number) {
   });
 }
 
-export { GetPhotosUris };
+export default GetPhotosUris;
