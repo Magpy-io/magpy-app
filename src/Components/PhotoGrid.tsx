@@ -7,6 +7,8 @@ import {
 } from "react-native";
 
 import { Image } from "react-native-elements";
+import { Button, Overlay } from 'react-native-elements';
+import { useNavigation } from '@react-navigation/native';
 
 type PhotoGridProps = {
   uris?: Array<string>;
@@ -14,24 +16,28 @@ type PhotoGridProps = {
   onPhotoClicked?: (index: number) => void;
 };
 
-const RenderItem = ({
-  item,
-  index,
-  onItemClicked,
-}: {
-  item: any;
-  index: number;
-  onItemClicked: (index: number) => void;
-}) => (
-  <TouchableWithoutFeedback
-    onPress={() => {
-      onItemClicked(index);
+type PhotoComponentProps = {
+  uri: string;
+  onPress: ()=>void;
+}
+
+function PhotoComponent(props: PhotoComponentProps){
+
+  const navigation = useNavigation();
+
+  return(
+    <TouchableWithoutFeedback
+    onPress={()=>{
+      // props?.onPress();
+      navigation.navigate('PhotoStackNavigator', { screen: 'PhotoPage', params: {
+        uri: props.uri
+      }});
     }}
   >
     <View style={styles.itemStyle}>
       <Image
         source={{
-          uri: item,
+          uri: props.uri,
         }}
         height={"auto"}
         width={"auto"}
@@ -40,7 +46,8 @@ const RenderItem = ({
       />
     </View>
   </TouchableWithoutFeedback>
-);
+  )
+}
 
 export default function PhotoGrid(props: PhotoGridProps) {
   const PhotoPressed = props.onPhotoClicked
@@ -51,9 +58,7 @@ export default function PhotoGrid(props: PhotoGridProps) {
       <FlatList
         style={styles.flatListStyle}
         data={props.uris}
-        renderItem={({ item, index }) =>
-          RenderItem({ item, index, onItemClicked: PhotoPressed })
-        }
+        renderItem={({item, index})=><PhotoComponent uri={item} onPress={()=>PhotoPressed(index)} />}
         keyExtractor={(item, i) => String(i)}
         numColumns={3}
         ListHeaderComponent={() =>
