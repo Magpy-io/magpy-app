@@ -20,5 +20,5 @@ export default function PhotoGalleryScreen(props: PhotoGalleryProps) {
       })
       .catch((err) => console.log("error", err));
   }, []);
-  return <PhotoGrid uris={[]} />;
+  return <PhotoGrid uris={uris} />;
 }

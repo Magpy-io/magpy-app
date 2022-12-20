@@ -17,8 +17,8 @@ type PropsPhotoScreen = NativeStackScreenProps<
   "PhotoPage"
 >;
 
-export default function PhotoScreen(propss: PropsPhotoScreen) {
-  const params = propss.route.params;
+export default function PhotoScreen(props: PropsPhotoScreen) {
+  const params = props.route.params;
   console.log("params", params);
   return (
     <SafeAreaView>
