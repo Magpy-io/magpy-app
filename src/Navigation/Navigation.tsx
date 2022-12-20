@@ -11,80 +11,93 @@ import TopTabBar from "~/Navigation/TopTabBar";
 import PhotoGalleryServerScreen from "~/Navigation/Screens/PhotoGalleryServerScreen";
 import PhotoGalleryLocalScreen from "~/Navigation/Screens/PhotoGalleryLocalScreen";
 import PhotoScreen from "~/Navigation/Screens/PhotoScreen";
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type {
-  CompositeScreenProps,
-  NavigatorScreenParams,
-} from '@react-navigation/native';
+
+import type { NavigatorScreenParams } from "@react-navigation/native";
 
 const TabInitialLayout = {
   width: Dimensions.get("window").width,
 };
 
 const PhotoStack = createNativeStackNavigator();
-function PhotoStackNavigator(){
+function PhotoStackNavigator() {
   return (
-    <PhotoStack.Navigator 
+    <PhotoStack.Navigator
       screenOptions={{
-        headerShown: false
+        headerShown: false,
       }}
     >
       <PhotoStack.Screen name="PhotoPage" component={PhotoScreen} />
     </PhotoStack.Navigator>
-  )
+  );
 }
 
 const ServerStack = createNativeStackNavigator();
-function ServerPhotosStackNavigator(){
+function ServerPhotosStackNavigator() {
   return (
-    <ServerStack.Navigator 
+    <ServerStack.Navigator
       screenOptions={{
-        headerShown: false
+        headerShown: false,
       }}
     >
-      <ServerStack.Screen name="ServerPage" component={PhotoGalleryServerScreen} />
+      <ServerStack.Screen
+        name="ServerPage"
+        component={PhotoGalleryServerScreen}
+      />
     </ServerStack.Navigator>
-  )
+  );
 }
 
 const LocalStack = createNativeStackNavigator();
-function LocalPhotosStackNavigator(){
+function LocalPhotosStackNavigator() {
   return (
-    <LocalStack.Navigator 
+    <LocalStack.Navigator
       screenOptions={{
-        headerShown: false
+        headerShown: false,
       }}
     >
-      <LocalStack.Screen name="LocalPage" component={PhotoGalleryLocalScreen}/>
+      <LocalStack.Screen name="LocalPage" component={PhotoGalleryLocalScreen} />
     </LocalStack.Navigator>
-  )
+  );
 }
 
 const Tab = createMaterialTopTabNavigator();
-function TabNavigator(){
-  return(
-      <Tab.Navigator
-        initialRouteName="ServerPage"
-        initialLayout={TabInitialLayout}
-        tabBar={(props) => <TopTabBar {...props} />}
-      >
-        <Tab.Screen name="ServerPhotosStackNavigator" component={ServerPhotosStackNavigator} />
-        <Tab.Screen name="LocalPhotosStackNavigator" component={LocalPhotosStackNavigator} />
-      </Tab.Navigator>
-  )
+function TabNavigator() {
+  return (
+    <Tab.Navigator
+      tabBarPosition="top"
+      initialRouteName="LocalPhotosStackNavigator"
+      initialLayout={TabInitialLayout}
+      tabBar={(props) => <TopTabBar {...props} />}
+      screenOptions={{
+        swipeEnabled: false,
+      }}
+    >
+      <Tab.Screen
+        name="ServerPhotosStackNavigator"
+        component={ServerPhotosStackNavigator}
+      />
+      <Tab.Screen
+        name="LocalPhotosStackNavigator"
+        component={LocalPhotosStackNavigator}
+      />
+    </Tab.Navigator>
+  );
 }
 
 const Stack = createNativeStackNavigator();
 const Navigation = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator 
+      <Stack.Navigator
         screenOptions={{
-          headerShown: false
+          headerShown: false,
         }}
       >
         <Stack.Screen name="Home" component={TabNavigator} />
-        <Stack.Screen name="PhotoStackNavigator" component={PhotoStackNavigator}/>
+        <Stack.Screen
+          name="PhotoStackNavigator"
+          component={PhotoStackNavigator}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -102,12 +115,12 @@ export type HomeStackParamList = {
 
 export type LocalStackParamList = {
   LocalPage: undefined;
-}
+};
 export type ServerStackParamList = {
-  ServerPage: undefined
-}
+  ServerPage: undefined;
+};
 export type PhotoStackParamList = {
-  PhotoPage: { uri: string }; 
-}
+  PhotoPage: { uri: string };
+};
 
 export default Navigation;

@@ -1,5 +1,11 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  TouchableHighlight,
+} from "react-native";
 
 import { MaterialTopTabBarProps } from "@react-navigation/material-top-tabs";
 import colors from "~/colors";
@@ -34,15 +40,18 @@ function TopBarTab(props: {
   selected: boolean;
 }) {
   return (
-    <TouchableOpacity
+    <TouchableHighlight
       onPress={() => {
         props.onSelect(props.index);
       }}
+      activeOpacity={0.6}
+      underlayColor="#DDDDDD"
+      style={styles.touchable}
     >
       <Text style={[styles.tab, props.selected ? styles.tabSelected : {}]}>
         {props.title}
       </Text>
-    </TouchableOpacity>
+    </TouchableHighlight>
   );
 }
 
@@ -58,6 +67,13 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   tabSelected: { color: colors.tabBarHighlight },
+  touchable: {
+    height: "100%",
+    flexDirection: "row",
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
 });
 
 export default TopTabBar;

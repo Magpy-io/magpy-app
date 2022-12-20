@@ -6,9 +6,40 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 
+import FastImage from "react-native-fast-image";
 import { Image } from "react-native-elements";
-import { Button, Overlay } from 'react-native-elements';
-import { useNavigation } from '@react-navigation/native';
+import { Button, Overlay } from "react-native-elements";
+import { useNavigation } from "@react-navigation/native";
+import { useEffect } from "react";
+
+type PhotoComponentProps = {
+  uri: string;
+  onPress: () => void;
+};
+
+function PhotoComponent(props: PhotoComponentProps) {
+  const navigation = useNavigation();
+  return (
+    <TouchableWithoutFeedback
+      onPress={() => {
+        props?.onPress();
+        /*navigation.navigate('PhotoStackNavigator', { screen: 'PhotoPage', params: {
+        uri: props.uri
+      }});*/
+      }}
+    >
+      <View style={styles.itemStyle}>
+        <FastImage
+          source={{
+            uri: props.uri,
+          }}
+          resizeMode={FastImage.resizeMode.cover}
+          style={[styles.imageStyle]}
+        />
+      </View>
+    </TouchableWithoutFeedback>
+  );
+}
 
 type PhotoGridProps = {
   uris?: Array<string>;
@@ -16,49 +47,28 @@ type PhotoGridProps = {
   onPhotoClicked?: (index: number) => void;
 };
 
-type PhotoComponentProps = {
-  uri: string;
-  onPress: ()=>void;
-}
-
-function PhotoComponent(props: PhotoComponentProps){
-
-  const navigation = useNavigation();
-
-  return(
-    <TouchableWithoutFeedback
-    onPress={()=>{
-      // props?.onPress();
-      navigation.navigate('PhotoStackNavigator', { screen: 'PhotoPage', params: {
-        uri: props.uri
-      }});
-    }}
-  >
-    <View style={styles.itemStyle}>
-      <Image
-        source={{
-          uri: props.uri,
-        }}
-        height={"auto"}
-        width={"auto"}
-        style={[styles.imageStyle]}
-        containerStyle={styles.imageContainerStyle}
-      />
-    </View>
-  </TouchableWithoutFeedback>
-  )
-}
-
 export default function PhotoGrid(props: PhotoGridProps) {
   const PhotoPressed = props.onPhotoClicked
     ? props.onPhotoClicked
     : (n: number) => {};
+
+  useEffect(() => {
+    FastImage.preload(
+      props.uris?.map((uri) => {
+        return { uri: uri };
+      }) ?? []
+    );
+  }, []);
+  console.log("Render PhotoGrid");
   return (
     <View style={styles.viewStyle}>
       <FlatList
         style={styles.flatListStyle}
         data={props.uris}
-        renderItem={({item, index})=><PhotoComponent uri={item} onPress={()=>PhotoPressed(index)} />}
+        renderItem={({ item, index }) => (
+          <PhotoComponent uri={item} onPress={() => PhotoPressed(index)} />
+        )}
+        onEndReachedThreshold={5}
         keyExtractor={(item, i) => String(i)}
         numColumns={3}
         ListHeaderComponent={() =>

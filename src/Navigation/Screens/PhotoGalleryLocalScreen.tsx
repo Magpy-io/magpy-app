@@ -22,19 +22,19 @@ export default function PhotoGalleryLocalScreen(props: PhotoGalleryProps) {
       return;
     }
 
-    GetPhotos(30).then((r) => setPhotos(r));
+    GetPhotos(200).then((r) => setPhotos(r));
   }
 
   useEffect(() => {
     getPermissionsThenGetPhotos();
-  });
-
+  }, []);
+  console.log("Render PhotoGalleryLocalScreen");
   return (
     <PhotoGrid
       uris={photos.map((photo) => photo.uri)}
       onPhotoClicked={(n) => {
         RNFS.readFile(photos[n].uri, "base64")
-          .then((res: any) => {
+          .then((res: string) => {
             let photo = photos[n];
             postPhoto({
               name: photo.filename,
