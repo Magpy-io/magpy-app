@@ -23,19 +23,21 @@ function PhotoComponent(props: PhotoComponentProps) {
   return (
     <TouchableWithoutFeedback
       onPress={() => {
-        // props?.onPress();
-        navigation.navigate("PhotoStackNavigator", {
+        props?.onPress();
+        /*navigation.navigate("PhotoStackNavigator", {
           screen: "PhotoPage",
           params: {
             photo: props.photo,
           },
-        });
+        });*/
       }}
     >
       <View style={styles.itemStyle}>
         <FastImage
           source={{
-            uri: props.photo.image.path,
+            uri: props.photo.image.base64
+              ? props.photo.image.base64
+              : props.photo.image.path,
           }}
           resizeMode={FastImage.resizeMode.cover}
           style={[styles.imageStyle]}

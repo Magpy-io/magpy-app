@@ -7,10 +7,11 @@ export type Photo = {
     height: number;
     width: number;
     path: string;
+    base64: string;
   };
   album: string;
-  created: number;
-  modified: number;
-  syncDate: string | null;
+  created: string;
+  modified: string;
+  syncDate: string;
   type: string; //JPEG PNG
 };
