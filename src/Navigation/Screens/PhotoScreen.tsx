@@ -22,22 +22,45 @@ type PropsPhotoScreen = NativeStackScreenProps<
 type ToolBarProps = {};
 
 const ICON_SIZE = 26;
+const TEXT_SIZE = 12;
+const TOOLBAR_COLOR = "white";
+const TOOL_COLOR = "black";
 
 type ToolComponentProps = {
   icon: string;
   text?: string;
+  textSize?: number;
 };
 
 function ToolComponent(props: ToolComponentProps) {
   return (
-    <View style={{ flex: 1, alignItems: "center" }}>
+    <View
+      style={{
+        flex: 1,
+        alignItems: "center",
+        // justifyContent: "center",
+      }}
+    >
       <Icon
         name={props.icon}
-        color="white"
+        color={TOOL_COLOR}
         size={ICON_SIZE}
         containerStyle={styles.iconContainerStyle}
       />
-      {props.text ? <Text style={{ color: "white" }}>{props.text}</Text> : null}
+      {props.text ? (
+        <Text
+          style={{
+            color: TOOL_COLOR,
+            paddingTop: 2,
+            maxWidth: 70,
+            fontSize: props.textSize ?? TEXT_SIZE,
+            fontWeight: "700",
+            textAlign: "center",
+          }}
+        >
+          {props.text}
+        </Text>
+      ) : null}
     </View>
   );
 }
@@ -46,12 +69,14 @@ function ToolBar(props: ToolBarProps) {
   return (
     <View style={styles.toolBarView}>
       <View style={styles.toolsView}>
-        <ToolComponent icon="mobile-off" text="delete" />
-        <ToolComponent icon="delete" text="delete" />
-
-        <ToolComponent icon="share" text="delete" />
-
-        <ToolComponent icon="more-vert" />
+        <ToolComponent
+          icon="mobile-off"
+          text="Delete from device"
+          textSize={10}
+        />
+        <ToolComponent icon="delete" text="Delete" />
+        <ToolComponent icon="share" text="Share" />
+        <ToolComponent icon="info" text="Details" />
       </View>
     </View>
   );
@@ -62,11 +87,39 @@ function BackButton() {
     <View style={styles.backButtonStyle}>
       <Icon
         name="arrow-back-ios"
-        reverse
-        color={colors.darkGreenTranslucide}
+        color={"black"}
         size={22}
         style={styles.backIconStyle}
       />
+    </View>
+  );
+}
+
+function StatusComponent(props: { icon: string; text: string }) {
+  return (
+    <View
+      style={{
+        flexDirection: "row",
+        alignItems: "center",
+        backgroundColor: colors.lightgrey,
+        padding: 5,
+        borderRadius: 20,
+        marginHorizontal: 3,
+      }}
+    >
+      <Icon name={props.icon} containerStyle={{ padding: 5 }} size={20} />
+      <Text style={{ paddingHorizontal: 3, fontWeight: "700" }}>
+        {props.text}
+      </Text>
+    </View>
+  );
+}
+
+function StatusBarComponent() {
+  return (
+    <View style={styles.statusBarComponentStyle}>
+      <StatusComponent icon="mobile-friendly" text="On device" />
+      <StatusComponent icon="cloud-done" text="Backed up" />
     </View>
   );
 }
@@ -82,14 +135,22 @@ export default function PhotoScreen(props: PropsPhotoScreen) {
         resizeMode="contain"
       />
       <BackButton />
+      <StatusBarComponent />
       <ToolBar />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  statusBarComponentStyle: {
+    margin: 20,
+    position: "absolute",
+    top: 0,
+    right: 0,
+    flexDirection: "row",
+  },
   backIconStyle: {
-    paddingLeft: 0,
+    padding: 15,
   },
   backButtonStyle: {
     margin: 10,
@@ -99,21 +160,20 @@ const styles = StyleSheet.create({
   },
   viewStyle: {
     flex: 1,
+    backgroundColor: "white",
   },
   toolBarView: {
     position: "absolute",
-    bottom: 30,
+    bottom: 15,
     width: "100%",
-    paddingHorizontal: 30,
+    paddingHorizontal: 0,
   },
   toolsView: {
-    backgroundColor: colors.greenTranslucide,
-    padding: 15,
-    borderRadius: 30,
+    backgroundColor: TOOLBAR_COLOR,
+    padding: 10,
+    borderRadius: 50,
     flex: 1,
     flexDirection: "row",
   },
-  iconContainerStyle: {
-    flex: 1,
-  },
+  iconContainerStyle: {},
 });
