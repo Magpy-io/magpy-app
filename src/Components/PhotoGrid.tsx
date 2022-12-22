@@ -11,9 +11,10 @@ import { Image } from "react-native-elements";
 import { Button, Overlay } from "react-native-elements";
 import { useNavigation } from "@react-navigation/native";
 import { useEffect, useState } from "react";
+import { Photo as PhotoType } from "~/Helpers/types";
 
 type PhotoComponentProps = {
-  uri: string;
+  photo: PhotoType;
   onPress: () => void;
 };
 
@@ -22,16 +23,19 @@ function PhotoComponent(props: PhotoComponentProps) {
   return (
     <TouchableWithoutFeedback
       onPress={() => {
-        props?.onPress();
-        /*navigation.navigate('PhotoStackNavigator', { screen: 'PhotoPage', params: {
-        uri: props.uri
-      }});*/
+        // props?.onPress();
+        navigation.navigate("PhotoStackNavigator", {
+          screen: "PhotoPage",
+          params: {
+            photo: props.photo,
+          },
+        });
       }}
     >
       <View style={styles.itemStyle}>
         <FastImage
           source={{
-            uri: props.uri,
+            uri: props.photo.image.path,
           }}
           resizeMode={FastImage.resizeMode.cover}
           style={[styles.imageStyle]}
@@ -42,7 +46,7 @@ function PhotoComponent(props: PhotoComponentProps) {
 }
 
 type PhotoGridProps = {
-  uris?: Array<{ uri: string; url: string }>;
+  photos?: Array<PhotoType>;
   title?: string;
   onPhotoClicked?: (index: number) => void;
 };
@@ -52,22 +56,21 @@ export default function PhotoGrid(props: PhotoGridProps) {
     ? props.onPhotoClicked
     : (n: number) => {};
 
-  useEffect(() => {}, []);
-
   console.log("Render PhotoGrid");
 
   return (
     <View style={styles.viewStyle}>
       <FlatList
         style={styles.flatListStyle}
-        data={props.uris}
+        data={props.photos}
         renderItem={({ item, index }) => (
-          <PhotoComponent uri={item.uri} onPress={() => PhotoPressed(index)} />
-          //<Text style={styles.itemStyle}>{"Hello"}</Text>
+          <PhotoComponent photo={item} onPress={() => PhotoPressed(index)} />
         )}
         maxToRenderPerBatch={500}
         initialNumToRender={500}
-        keyExtractor={(item, i) => String(i)}
+        keyExtractor={(item, index) =>
+          `Photo_${item.image.fileName}_index_${index}`
+        }
         numColumns={3}
         ListHeaderComponent={() =>
           props.title ? (

@@ -13,6 +13,7 @@ import PhotoGalleryLocalScreen from "~/Navigation/Screens/PhotoGalleryLocalScree
 import PhotoScreen from "~/Navigation/Screens/PhotoScreen";
 
 import type { NavigatorScreenParams } from "@react-navigation/native";
+import { Photo as PhotoType } from "~/Helpers/types";
 
 const TabInitialLayout = {
   width: Dimensions.get("window").width,
@@ -120,7 +121,7 @@ export type ServerStackParamList = {
   ServerPage: undefined;
 };
 export type PhotoStackParamList = {
-  PhotoPage: { uri: string };
+  PhotoPage: { photo: PhotoType };
 };
 
 export default Navigation;
