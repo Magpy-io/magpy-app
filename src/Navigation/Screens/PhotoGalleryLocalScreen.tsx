@@ -15,23 +15,27 @@ type PhotoGalleryProps = {};
 export default function PhotoGalleryLocalScreen(props: PhotoGalleryProps) {
   const [photos, setPhotos] = useState<any[]>([]);
 
-  async function getPermissionsThenGetPhotos() {
-    if (
-      !(await AndroidPermissions.hasAndroidPermissionWriteExternalStorage())
-    ) {
-      return;
-    }
-
-    GetPhotos(200).then((r) => setPhotos(r));
-  }
-
   useEffect(() => {
+    let getPermissionsThenGetPhotos = async () => {
+      if (
+        !(await AndroidPermissions.hasAndroidPermissionWriteExternalStorage())
+      ) {
+        return;
+      }
+
+      GetPhotos(100).then((r) => {
+        setPhotos(r);
+        console.log(r.length);
+      });
+    };
     getPermissionsThenGetPhotos();
   }, []);
   console.log("Render PhotoGalleryLocalScreen");
   return (
     <PhotoGrid
-      uris={photos.map((photo) => photo.uri)}
+      uris={photos.map((photo) => {
+        return { uri: photo.uri, url: "" };
+      })}
       onPhotoClicked={(n) => {
         RNFS.readFile(photos[n].uri, "base64")
           .then((res: string) => {

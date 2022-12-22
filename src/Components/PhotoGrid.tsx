@@ -10,7 +10,7 @@ import FastImage from "react-native-fast-image";
 import { Image } from "react-native-elements";
 import { Button, Overlay } from "react-native-elements";
 import { useNavigation } from "@react-navigation/native";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 type PhotoComponentProps = {
   uri: string;
@@ -42,7 +42,7 @@ function PhotoComponent(props: PhotoComponentProps) {
 }
 
 type PhotoGridProps = {
-  uris?: Array<string>;
+  uris?: Array<{ uri: string; url: string }>;
   title?: string;
   onPhotoClicked?: (index: number) => void;
 };
@@ -52,23 +52,21 @@ export default function PhotoGrid(props: PhotoGridProps) {
     ? props.onPhotoClicked
     : (n: number) => {};
 
-  useEffect(() => {
-    FastImage.preload(
-      props.uris?.map((uri) => {
-        return { uri: uri };
-      }) ?? []
-    );
-  }, []);
+  useEffect(() => {}, []);
+
   console.log("Render PhotoGrid");
+
   return (
     <View style={styles.viewStyle}>
       <FlatList
         style={styles.flatListStyle}
         data={props.uris}
         renderItem={({ item, index }) => (
-          <PhotoComponent uri={item} onPress={() => PhotoPressed(index)} />
+          <PhotoComponent uri={item.uri} onPress={() => PhotoPressed(index)} />
+          //<Text style={styles.itemStyle}>{"Hello"}</Text>
         )}
-        onEndReachedThreshold={5}
+        maxToRenderPerBatch={500}
+        initialNumToRender={500}
         keyExtractor={(item, i) => String(i)}
         numColumns={3}
         ListHeaderComponent={() =>
