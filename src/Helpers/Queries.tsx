@@ -1,20 +1,20 @@
-const HOST = "192.168.0.21";
+const HOST = "192.168.0.12";
 const PORT = "8000";
 const path = `http://${HOST}:${PORT}/`;
 
 const routes = {
-  photos: "photos/",
-  photo: "photo/",
+  getPhotosN: (count: number, offset: number) =>
+    path + `photos/${count}/${offset}`,
+  getPhotoId: (id: string) => path + `photo/${id}`,
+  postPhoto: () => path + `photo/`,
 };
 
 function getPhoto(id: string) {
-  const getPhotoPath = path + routes.photo + id;
-  return fetch(getPhotoPath);
+  return fetch(routes.getPhotoId(id)).then((r) => r.json());
 }
 
-function getPhotosJson() {
-  const getPhotosPath = path + routes.photos;
-  return fetch(getPhotosPath).then((r) => r.json());
+function getPhotosJson(count: number, offset: number = 0) {
+  return fetch(routes.getPhotosN(count, offset)).then((r) => r.json());
 }
 
 type PostPhotoFormat = {
@@ -28,9 +28,7 @@ type PostPhotoFormat = {
 };
 
 function postPhoto(photo: PostPhotoFormat) {
-  const postPhotoPath = path + routes.photo;
-  console.log(photo.name);
-  fetch(postPhotoPath, {
+  fetch(routes.postPhoto(), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

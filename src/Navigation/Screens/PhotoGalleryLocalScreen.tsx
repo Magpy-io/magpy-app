@@ -34,11 +34,12 @@ export default function PhotoGalleryLocalScreen(props: PhotoGalleryProps) {
               height: photo.image.height,
               width: photo.image.width,
               path: photo.image.uri,
+              base64: "",
             },
             album: photo.group_name,
-            created: photo.timestamp,
+            created: new Date(photo.timestamp).toJSON(),
             modified: photo.modified,
-            syncDate: null,
+            syncDate: "",
             type: photo.type,
           };
           return photoObject;
