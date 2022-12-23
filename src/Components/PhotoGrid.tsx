@@ -23,13 +23,13 @@ function PhotoComponent(props: PhotoComponentProps) {
   return (
     <TouchableWithoutFeedback
       onPress={() => {
-        props?.onPress();
-        /*navigation.navigate("PhotoStackNavigator", {
+        // props?.onPress();
+        navigation.navigate("PhotoStackNavigator", {
           screen: "PhotoPage",
           params: {
             photo: props.photo,
           },
-        });*/
+        });
       }}
     >
       <View style={styles.itemStyle}>
