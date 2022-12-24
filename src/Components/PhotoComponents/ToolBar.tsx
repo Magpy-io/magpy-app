@@ -4,6 +4,7 @@ import {
   Text,
   View,
   FlatList,
+  TouchableHighlight,
   TouchableWithoutFeedback,
   SafeAreaView,
   Image,
@@ -12,26 +13,80 @@ import {
 import { Icon } from "@rneui/themed";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import colors from "~/colors";
+import { Photo as PhotoType } from "~/Helpers/types";
+import { postPhoto } from "~/Helpers/Queries";
+import RNFS from "react-native-fs";
 
 const ICON_SIZE = 26;
 const TEXT_SIZE = 12;
 const TOOLBAR_COLOR = "white";
 const TOOL_COLOR = "black";
 
-type ToolBarProps = {};
+type ToolBarProps = {
+  photo: PhotoType;
+};
+
+function postPhotoMethod(photo: PhotoType) {
+  RNFS.readFile(photo.image.path, "base64")
+    .then((res: string) => {
+      postPhoto({
+        name: photo.image.fileName,
+        fileSize: photo.image.fileSize,
+        width: photo.image.width,
+        height: photo.image.height,
+        date: new Date(photo.created).toJSON(),
+        path: photo.image.path,
+        image64: res,
+      });
+    })
+    .catch((err: any) => console.log(err));
+}
 
 export default function ToolBar(props: ToolBarProps) {
+  const inDevice = props?.photo?.inDevice;
+  const inServer = props?.photo?.inServer;
+
+  function deleteFromDevice(photo: PhotoType) {}
+
+  function deleteFromServer(photo: PhotoType) {}
+
+  function saveToDevice(photo: PhotoType) {}
+
+  function addToServer(photo: PhotoType) {
+    postPhotoMethod(photo);
+  }
+
   return (
     <View style={styles.toolBarView}>
       <View style={styles.toolsView}>
-        <ToolComponent
-          icon="mobile-off"
-          text="Delete from device"
-          textSize={10}
-        />
-        <ToolComponent icon="delete" text="Delete" />
-        <ToolComponent icon="share" text="Share" />
-        <ToolComponent icon="info" text="Details" />
+        {inDevice ? (
+          <ToolComponent
+            icon="mobile-off"
+            text="Delete from device"
+            onPress={() => deleteFromDevice(props.photo)}
+          />
+        ) : (
+          <ToolComponent
+            icon="system-update"
+            text="Save to device"
+            onPress={() => saveToDevice(props.photo)}
+          />
+        )}
+        {inServer ? (
+          <ToolComponent
+            icon="delete"
+            text="Delete from server"
+            onPress={() => deleteFromServer(props.photo)}
+          />
+        ) : (
+          <ToolComponent
+            icon="backup"
+            text="Back up"
+            onPress={() => addToServer(props.photo)}
+          />
+        )}
+        <ToolComponent icon="share" text="Share" onPress={() => {}} />
+        <ToolComponent icon="info" text="Details" onPress={() => {}} />
       </View>
     </View>
   );
@@ -41,53 +96,62 @@ type ToolComponentProps = {
   icon: string;
   text?: string;
   textSize?: number;
+  onPress: () => void;
 };
 
 function ToolComponent(props: ToolComponentProps) {
   return (
-    <View
+    <TouchableHighlight
+      onPress={props.onPress}
       style={{
         flex: 1,
-        alignItems: "center",
-        // justifyContent: "center",
+        padding: 5,
+        paddingVertical: 20,
       }}
+      underlayColor={colors.underlayColor}
     >
-      <Icon
-        name={props.icon}
-        color={TOOL_COLOR}
-        size={ICON_SIZE}
-        containerStyle={styles.iconContainerStyle}
-      />
-      {props.text ? (
-        <Text
-          style={{
-            color: TOOL_COLOR,
-            paddingTop: 2,
-            maxWidth: 70,
-            fontSize: props.textSize ?? TEXT_SIZE,
-            fontWeight: "700",
-            textAlign: "center",
-          }}
-        >
-          {props.text}
-        </Text>
-      ) : null}
-    </View>
+      <View
+        style={{
+          flex: 1,
+          alignItems: "center",
+          // justifyContent: "center",
+        }}
+      >
+        <Icon
+          name={props.icon}
+          color={TOOL_COLOR}
+          size={ICON_SIZE}
+          containerStyle={styles.iconContainerStyle}
+        />
+        {props.text ? (
+          <Text
+            style={{
+              color: TOOL_COLOR,
+              paddingTop: 2,
+              maxWidth: 70,
+              fontSize: props.textSize ?? TEXT_SIZE,
+              fontWeight: "700",
+              textAlign: "center",
+            }}
+          >
+            {props.text}
+          </Text>
+        ) : null}
+      </View>
+    </TouchableHighlight>
   );
 }
 
 const styles = StyleSheet.create({
   toolBarView: {
     position: "absolute",
-    bottom: 10,
+    bottom: 0,
     width: "100%",
     paddingHorizontal: 0,
     backgroundColor: "white",
   },
   toolsView: {
     backgroundColor: TOOLBAR_COLOR,
-    padding: 5,
-    borderRadius: 50,
     flex: 1,
     flexDirection: "row",
   },

@@ -8,17 +8,27 @@ import {
   SafeAreaView,
   Image,
 } from "react-native";
-
+import { useNavigation } from "@react-navigation/native";
 import { Icon } from "@rneui/themed";
+import colors from "~/colors";
 
-export default function BackButton() {
+type BackButtonProps = {
+  style?: any;
+};
+
+export default function BackButton(props: BackButtonProps) {
+  const navigation = useNavigation();
   return (
-    <View style={styles.backButtonStyle}>
+    <View style={[styles.backButtonStyle, props.style]}>
       <Icon
         name="arrow-back-ios"
         color={"black"}
         size={22}
         style={styles.backIconStyle}
+        onPress={() => {
+          navigation.goBack();
+        }}
+        underlayColor={colors.underlayColor}
       />
     </View>
   );

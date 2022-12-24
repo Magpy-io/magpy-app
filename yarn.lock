@@ -5897,6 +5897,11 @@ react-native-image-picker@^4.10.2:
   resolved "https://registry.yarnpkg.com/react-native-image-picker/-/react-native-image-picker-4.10.2.tgz#75b356c9eea70c2c4f5c1089f8758e2fa32f88a8"
   integrity sha512-3h9PrA1dQ84rVeipzQE4eWTELvflSHNtJZN6rz7NkZyaxo9YZV8H/TswBpHwiS5YWlyu+zlLzSoWVa1opSu7GA==
 
+react-native-navigation-bar-color@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/react-native-navigation-bar-color/-/react-native-navigation-bar-color-2.0.1.tgz#ee2be25cc37105f7da355717b0a9a32c9c059ae6"
+  integrity sha512-1kE/oxWt+HYjRxdZdvke9tJ365xaee5n3+euOQA1En8zQuSbOxiE4SYEGM7TeaWnmLJ0l37mRnPHaB2H4mGh0A==
+
 react-native-pager-view@^6.1.2:
   version "6.1.2"
   resolved "https://registry.yarnpkg.com/react-native-pager-view/-/react-native-pager-view-6.1.2.tgz#3522079b9a9d6634ca5e8d153bc0b4d660254552"
