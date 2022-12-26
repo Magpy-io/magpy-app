@@ -3,57 +3,110 @@ import * as AndroidPermissions from "~/Helpers/GetPermissionsAndroid";
 import { PhotoIdentifier } from "@react-native-camera-roll/camera-roll";
 import RNFS from "react-native-fs";
 
+import { Text } from "react-native";
 import PhotoGrid from "~/Components/PhotoGrid";
 
 import GetPhotos from "~/Helpers/GetGalleryPhotos";
 import { postPhoto } from "~/Helpers/Queries";
-import { Photo as PhotoType } from "~/Helpers/types";
+import { PhotoType } from "~/Helpers/types";
+import * as Queries from "~/Helpers/Queries";
 
 type PhotoGalleryProps = {};
 
 export default function PhotoGalleryLocalScreen(props: PhotoGalleryProps) {
-  const [photos, setPhotos] = useState<PhotoType[]>([]);
+  const [hasPermissions, setHasPermissions] = useState<boolean>(false);
 
   useEffect(() => {
-    let getPermissionsThenGetPhotos = async () => {
-      if (
-        !(await AndroidPermissions.hasAndroidPermissionWriteExternalStorage())
-      ) {
-        return;
-      }
-
-      GetPhotos(100).then((cameraRollPhotos: PhotoIdentifier[]) => {
-        const photosObj = cameraRollPhotos.map((edge) => {
-          const photo = edge.node;
-          const photoObject: PhotoType = {
-            inDevice: true,
-            inServer: null, //TODO, see if photo is in Server
-            image: {
-              fileSize: photo.image.fileSize ?? 0,
-              fileName: photo.image.filename ?? "",
-              height: photo.image.height,
-              width: photo.image.width,
-              path: photo.image.uri,
-              base64: "",
-            },
-            album: photo.group_name,
-            created: new Date(photo.timestamp).toJSON(),
-            modified: photo.modified,
-            syncDate: "",
-            type: photo.type,
-          };
-          return photoObject;
-        });
-        setPhotos(photosObj);
-      });
+    let getPermissions = async () => {
+      const hasPermission =
+        await AndroidPermissions.hasAndroidPermissionWriteExternalStorage();
+      setHasPermissions(hasPermission);
     };
-    getPermissionsThenGetPhotos();
+    getPermissions();
   }, []);
 
-  function postPhotoMethod(n: number) {
-    RNFS.readFile(photos[n].image.path, "base64")
+  async function GetMorePhotos(n: number, offset: number) {
+    let foundAnyPhotoNotInServer = false;
+    let photosFromDevice = {
+      edges: new Array<PhotoIdentifier>(),
+      endReached: false,
+    };
+    let photosExistInServer: Array<{
+      exists: boolean;
+      path: string;
+      photo: any;
+    }>;
+
+    let totalOffset = offset;
+
+    while (!foundAnyPhotoNotInServer && !photosFromDevice.endReached) {
+      photosFromDevice = await GetPhotos(n, totalOffset);
+
+      photosExistInServer = (
+        await Queries.getPhotosExist(
+          photosFromDevice.edges.map((edge) => edge.node.image.uri)
+        )
+      ).data.photosExist;
+
+      if (
+        photosExistInServer.length != 0 &&
+        photosExistInServer.every((v) => v.exists)
+      ) {
+        console.log("not photos only in server");
+        totalOffset += n;
+      } else {
+        console.log("found some photos not in server");
+        foundAnyPhotoNotInServer = true;
+      }
+    }
+
+    if (!foundAnyPhotoNotInServer) {
+      return { photos: [], nextOffset: n + totalOffset, endReached: true };
+    }
+
+    console.log(photosFromDevice.edges.length);
+
+    const photosNotInServer = photosFromDevice.edges.filter((edge, index) => {
+      return !photosExistInServer[index].exists;
+    });
+
+    const photos = photosNotInServer.map((edge, index) => {
+      const photo = edge.node;
+      const photoObject: PhotoType = {
+        inDevice: true,
+        inServer: photosExistInServer[index].exists,
+        image: {
+          fileSize: photo.image.fileSize ?? 0,
+          fileName: photo.image.filename ?? "",
+          height: photo.image.height,
+          width: photo.image.width,
+          path: photo.image.uri,
+          image64: "",
+        },
+        id: photosExistInServer[index].exists
+          ? photosExistInServer[index].photo.id
+          : "",
+        album: photo.group_name,
+        created: new Date(photo.timestamp).toJSON(),
+        modified: (photo as any).modified,
+        syncDate: photosExistInServer[index].exists
+          ? photosExistInServer[index].photo.syncDate
+          : "",
+        type: photo.type,
+      };
+      return photoObject;
+    });
+
+    return {
+      photos: photos,
+      nextOffset: n + totalOffset,
+      endReached: photosFromDevice.endReached,
+    };
+  }
+
+  function postPhotoMethod(photo: PhotoType) {
+    RNFS.readFile(photo.image.path, "base64")
       .then((res: string) => {
-        let photo = photos[n];
         postPhoto({
           name: photo.image.fileName,
           fileSize: photo.image.fileSize,
@@ -69,5 +122,9 @@ export default function PhotoGalleryLocalScreen(props: PhotoGalleryProps) {
 
   console.log("Render PhotoGalleryLocalScreen");
 
-  return <PhotoGrid photos={photos} onPhotoClicked={postPhotoMethod} />;
+  return hasPermissions ? (
+    <PhotoGrid loadMore={GetMorePhotos} onPhotoClicked={postPhotoMethod} />
+  ) : (
+    <Text>Permissions needed</Text>
+  );
 }

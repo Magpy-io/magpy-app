@@ -1,4 +1,4 @@
-export type Photo = {
+type PhotoType = {
   inDevice: boolean | null;
   inServer: boolean | null;
   image: {
@@ -7,11 +7,14 @@ export type Photo = {
     height: number;
     width: number;
     path: string;
-    base64: string;
+    image64: string;
   };
+  id: string;
   album: string;
   created: string;
   modified: string;
   syncDate: string;
   type: string; //JPEG PNG
 };
+
+export type { PhotoType };
