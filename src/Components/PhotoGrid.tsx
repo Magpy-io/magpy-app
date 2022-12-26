@@ -1,3 +1,5 @@
+import { useEffect, useState, useCallback, useRef } from "react";
+
 import {
   StyleSheet,
   Text,
@@ -6,15 +8,154 @@ import {
   TouchableWithoutFeedback,
   Dimensions,
   BackHandler,
+  Modal,
+  StatusBar,
+  Button,
+  TouchableHighlight,
 } from "react-native";
 
 import FastImage from "react-native-fast-image";
 import { Image } from "react-native-elements";
-import { Button, Overlay } from "react-native-elements";
+import { Overlay } from "react-native-elements";
 import { useNavigation } from "@react-navigation/native";
-import { useEffect, useState, useCallback } from "react";
 import { useFocusEffect } from "@react-navigation/native";
 import { PhotoType } from "~/Helpers/types";
+import { IndexedAccessType } from "@babel/types";
+import changeNavigationBarColor, {
+  hideNavigationBar,
+  showNavigationBar,
+} from "react-native-navigation-bar-color";
+import SystemNavigationBar from "react-native-system-navigation-bar";
+
+const windowHeight = Dimensions.get("window").height;
+const windowWidth = Dimensions.get("window").width;
+
+type PhotoGridProps = {
+  loadMore: (
+    count: number,
+    offset: number
+  ) => Promise<{
+    photos: PhotoType[];
+    nextOffset: number;
+    endReached: boolean;
+  }>;
+  title?: string;
+  onPhotoClicked?: (index: PhotoType) => void;
+};
+
+const ItemsToLoadPerEndReached = 200;
+
+export default function PhotoGrid(props: PhotoGridProps) {
+  const [photos, setPhotos] = useState<PhotoType[]>([]);
+  const [nextOffset, setNextOffset] = useState<number>(0);
+  const [isFetching, setIsFetching] = useState<Boolean>(false);
+
+  const [pressedPhotoIndex, setPressedPhotoIndex] = useState<number>(0);
+  const [modalVisible, setModalVisible] = useState<Boolean>(false);
+
+  console.log("Render PhotoGrid");
+
+  useEffect(() => {
+    if (photos.length == 0) {
+      setIsFetching(true);
+      props.loadMore(ItemsToLoadPerEndReached, 0).then((newPhotos) => {
+        setPhotos(newPhotos.photos);
+        setNextOffset(newPhotos.nextOffset);
+        setIsFetching(false);
+      });
+    }
+  }, []);
+
+  const PhotoPressed = props.onPhotoClicked
+    ? props.onPhotoClicked
+    : (n: PhotoType) => {};
+
+  function onRefresh() {
+    if (!isFetching) {
+      setIsFetching(true);
+      props.loadMore(ItemsToLoadPerEndReached, 0).then((newPhotos) => {
+        setPhotos(newPhotos.photos);
+        setNextOffset(newPhotos.nextOffset);
+        setIsFetching(false);
+      });
+    }
+  }
+
+  function onGridEndReached() {
+    if (!isFetching) {
+      setIsFetching(true);
+      props.loadMore(ItemsToLoadPerEndReached, nextOffset).then((newPhotos) => {
+        setPhotos([...photos, ...newPhotos.photos]);
+        setNextOffset(newPhotos.nextOffset);
+        setIsFetching(false);
+      });
+    }
+  }
+
+  function onSliderEndReached() {
+    if (!isFetching) {
+      setIsFetching(true);
+      props.loadMore(ItemsToLoadPerEndReached, nextOffset).then((newPhotos) => {
+        setPhotos([...photos, ...newPhotos.photos]);
+        setNextOffset(newPhotos.nextOffset);
+        setIsFetching(false);
+      });
+    }
+  }
+
+  const renderItem = ({ item, index }: { item: PhotoType; index: number }) => (
+    <PhotoComponent
+      photo={item}
+      onPress={() => {
+        // PhotoPressed(photos[index])
+        setPressedPhotoIndex(index);
+        setModalVisible(true);
+      }}
+    />
+  );
+
+  return (
+    <>
+      <View style={styles.viewStyle}>
+        <FlatList
+          key={"flatList1"}
+          style={styles.flatListStyle}
+          data={photos}
+          renderItem={renderItem}
+          maxToRenderPerBatch={20}
+          initialNumToRender={20}
+          keyExtractor={(item, index) =>
+            `Photo_${item.image.fileName}_index_${index}`
+          }
+          onEndReachedThreshold={20}
+          onEndReached={onGridEndReached}
+          onRefresh={onRefresh}
+          refreshing={false}
+          numColumns={3}
+          ListHeaderComponent={() =>
+            props.title ? (
+              <Text style={styles.titleStyle}>{props.title}</Text>
+            ) : null
+          }
+        />
+
+        <Modal
+          animationType="slide"
+          visible={modalVisible}
+          onRequestClose={() => {
+            setModalVisible(!modalVisible);
+          }}
+        >
+          <PhotoSlider
+            photos={photos}
+            onEndReached={onSliderEndReached}
+            pressedPhotoIndex={pressedPhotoIndex}
+          />
+        </Modal>
+      </View>
+    </>
+  );
+}
 
 type PhotoComponentProps = {
   photo: PhotoType;
@@ -50,148 +191,40 @@ function PhotoComponent(props: PhotoComponentProps) {
   );
 }
 
-type PhotoGridProps = {
-  loadMore: (
-    count: number,
-    offset: number
-  ) => Promise<{
-    photos: PhotoType[];
-    nextOffset: number;
-    endReached: boolean;
-  }>;
-  title?: string;
-  onPhotoClicked?: (index: PhotoType) => void;
+type PhotoSliderProps = {
+  photos: PhotoType[];
+  onEndReached: () => void;
+  pressedPhotoIndex: number;
 };
 
-const ItemsToLoadPerEndReached = 200;
-
-export default function PhotoGrid(props: PhotoGridProps) {
-  const [photos, setPhotos] = useState<PhotoType[]>([]);
-  const [nextOffset, setNextOffset] = useState<number>(0);
-  const [isFetching, setIsFetching] = useState<Boolean>(false);
-  const [isPhotoSelected, setIsPhotoSelected] = useState<Boolean>(false);
-
-  useFocusEffect(
-    useCallback(() => {
-      const onBackPress = () => {
-        console.log("useFocusEffect");
-        if (true) {
-          setIsPhotoSelected((r) => !r);
-          return true;
-        } else {
-          return false;
-        }
-      };
-
-      const subscription = BackHandler.addEventListener(
-        "hardwareBackPress",
-        onBackPress
-      );
-
-      return () => subscription.remove();
-    }, [])
-  );
-
-  useEffect(() => {
-    if (photos.length == 0) {
-      setIsFetching(true);
-      props.loadMore(ItemsToLoadPerEndReached, 0).then((newPhotos) => {
-        setPhotos(newPhotos.photos);
-        setNextOffset(newPhotos.nextOffset);
-        setIsFetching(false);
-      });
-    }
-  }, []);
-
-  const PhotoPressed = props.onPhotoClicked
-    ? props.onPhotoClicked
-    : (n: PhotoType) => {};
-
-  console.log("Render PhotoGrid");
-
+function PhotoSlider(props: PhotoSliderProps) {
   return (
-    <View style={styles.viewStyle}>
-      {!isPhotoSelected ? (
-        <FlatList
-          key={"flatList1"}
-          style={styles.flatListStyle}
-          data={photos}
-          renderItem={({ item, index }) => (
-            <PhotoComponent
-              photo={item}
-              onPress={() => PhotoPressed(photos[index])}
-            />
-          )}
-          maxToRenderPerBatch={20}
-          initialNumToRender={20}
-          keyExtractor={(item, index) =>
-            `Photo_${item.image.fileName}_index_${index}`
-          }
-          onEndReachedThreshold={20}
-          onEndReached={() => {
-            if (!isFetching) {
-              setIsFetching(true);
-              props
-                .loadMore(ItemsToLoadPerEndReached, nextOffset)
-                .then((newPhotos) => {
-                  setPhotos([...photos, ...newPhotos.photos]);
-                  setNextOffset(newPhotos.nextOffset);
-                  setIsFetching(false);
-                });
-            }
-          }}
-          onRefresh={() => {
-            if (!isFetching) {
-              setIsFetching(true);
-              props.loadMore(ItemsToLoadPerEndReached, 0).then((newPhotos) => {
-                setPhotos(newPhotos.photos);
-                setNextOffset(newPhotos.nextOffset);
-                setIsFetching(false);
-              });
-            }
-          }}
-          refreshing={false}
-          numColumns={3}
-          ListHeaderComponent={() =>
-            props.title ? (
-              <Text style={styles.titleStyle}>{props.title}</Text>
-            ) : null
-          }
-        />
-      ) : (
-        <FlatList
-          key={"flatList2"}
-          style={styles.flatListStyle}
-          data={photos}
-          renderItem={({ item, index }) => (
-            <PhotoComponentHorizontal photo={item} />
-          )}
-          horizontal={true}
-          snapToAlignment="start"
-          disableIntervalMomentum={true}
-          decelerationRate={"normal"}
-          showsHorizontalScrollIndicator={false}
-          snapToInterval={Dimensions.get("screen").width}
-          keyExtractor={(item, index) =>
-            `Photo_${item.image.fileName}_index_${index}`
-          }
-          onEndReachedThreshold={20}
-          initialNumToRender={20}
-          onEndReached={() => {
-            if (!isFetching) {
-              setIsFetching(true);
-              props
-                .loadMore(ItemsToLoadPerEndReached, nextOffset)
-                .then((newPhotos) => {
-                  setPhotos([...photos, ...newPhotos.photos]);
-                  setNextOffset(newPhotos.nextOffset);
-                  setIsFetching(false);
-                });
-            }
-          }}
-        />
+    <FlatList
+      key={"flatList2"}
+      style={styles.flatListStyle}
+      data={props.photos}
+      renderItem={({ item, index }) => (
+        <PhotoComponentHorizontal photo={item} />
       )}
-    </View>
+      horizontal
+      snapToAlignment="start"
+      disableIntervalMomentum
+      decelerationRate={"normal"}
+      showsHorizontalScrollIndicator={false}
+      snapToInterval={Dimensions.get("screen").width}
+      keyExtractor={(item, index) =>
+        `Photo_${item.image.fileName}_index_${index}`
+      }
+      onEndReachedThreshold={20}
+      initialNumToRender={20}
+      onEndReached={props.onEndReached}
+      getItemLayout={(data, index) => ({
+        length: windowWidth,
+        offset: windowWidth * index,
+        index,
+      })}
+      initialScrollIndex={props.pressedPhotoIndex}
+    />
   );
 }
 
