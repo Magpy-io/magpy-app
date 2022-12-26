@@ -5951,11 +5951,6 @@ react-native-size-matters@^0.4.0:
   resolved "https://registry.yarnpkg.com/react-native-size-matters/-/react-native-size-matters-0.4.0.tgz#01bfd0d59454318f4e0b13fe9c1eb0523d70f2e0"
   integrity sha512-8/C0htHrFWeUm9N8JegmadovUfgTWkGBkDPZ1N3YkXtDWb+98Ya2gThiKcu445r8c7YhcrBfnHz/mYsXIusaOQ==
 
-react-native-system-navigation-bar@^2.1.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/react-native-system-navigation-bar/-/react-native-system-navigation-bar-2.1.0.tgz#dc054e5107cda400935eb8d376afe6cc5d215089"
-  integrity sha512-n/0wKeryPDVnxopyjuF4ine9ZWAr1jJFv5KL+PhK09AvHdqVirNQV6RXZKbkJeXNpRsCQCI6sPV2SiqlfU4QBg==
-
 react-native-tab-view@^3.3.3:
   version "3.3.3"
   resolved "https://registry.yarnpkg.com/react-native-tab-view/-/react-native-tab-view-3.3.3.tgz#33a94db2ccbe7fe8fff0c0e3f1da09cbd07edba7"
