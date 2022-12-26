@@ -52,10 +52,8 @@ export default function PhotoGalleryLocalScreen(props: PhotoGalleryProps) {
         photosExistInServer.length != 0 &&
         photosExistInServer.every((v) => v.exists)
       ) {
-        console.log("not photos only in server");
         totalOffset += n;
       } else {
-        console.log("found some photos not in server");
         foundAnyPhotoNotInServer = true;
       }
     }

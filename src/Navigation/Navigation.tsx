@@ -94,11 +94,7 @@ const Navigation = () => {
           headerShown: false,
         }}
       >
-        <Stack.Screen name="Home" component={TabNavigator} />
-        <Stack.Screen
-          name="PhotoStackNavigator"
-          component={PhotoStackNavigator}
-        />
+        <Stack.Screen name="Home" component={LocalPhotosStackNavigator} />
       </Stack.Navigator>
     </NavigationContainer>
   );
