@@ -54,6 +54,7 @@ export default function PhotoGalleryScreen(props: PhotoGalleryProps) {
           image64: filesExist[index]
             ? ""
             : `data:image/jpeg;base64,${images64Formated[index]}`,
+          image64Full: "",
         },
         id: photo.id,
         album: "",

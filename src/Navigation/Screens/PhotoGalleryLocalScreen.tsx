@@ -80,6 +80,7 @@ export default function PhotoGalleryLocalScreen(props: PhotoGalleryProps) {
           width: photo.image.width,
           path: photo.image.uri,
           image64: "",
+          image64Full: "",
         },
         id: photosExistInServer[index].exists
           ? photosExistInServer[index].photo.id

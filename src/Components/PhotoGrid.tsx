@@ -6,19 +6,29 @@ import {
   TouchableWithoutFeedback,
   Dimensions,
   BackHandler,
+  ViewToken,
 } from "react-native";
 
 import FastImage from "react-native-fast-image";
 import { Image } from "react-native-elements";
 import { Button, Overlay } from "react-native-elements";
 import { useNavigation } from "@react-navigation/native";
-import { useEffect, useState, useCallback } from "react";
+import {
+  useEffect,
+  useState,
+  useRef,
+  useCallback,
+  MutableRefObject,
+} from "react";
 import { useFocusEffect } from "@react-navigation/native";
 import { PhotoType } from "~/Helpers/types";
 
 type PhotoComponentProps = {
   photo: PhotoType;
   onPress: () => void;
+  index: number;
+  setInitialIndex: React.Dispatch<React.SetStateAction<number>>;
+  setIsPhotoSelected: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 function PhotoComponent(props: PhotoComponentProps) {
@@ -26,13 +36,9 @@ function PhotoComponent(props: PhotoComponentProps) {
   return (
     <TouchableWithoutFeedback
       onPress={() => {
-        props?.onPress();
-        // navigation.navigate("PhotoStackNavigator", {
-        //   screen: "PhotoPage",
-        //   params: {
-        //     photo: props.photo,
-        //   },
-        // });
+        //props?.onPress();
+        props.setIsPhotoSelected(true);
+        props.setInitialIndex(props.index);
       }}
     >
       <View style={styles.itemStyle}>
@@ -67,16 +73,22 @@ const ItemsToLoadPerEndReached = 200;
 
 export default function PhotoGrid(props: PhotoGridProps) {
   const [photos, setPhotos] = useState<PhotoType[]>([]);
-  const [nextOffset, setNextOffset] = useState<number>(0);
-  const [isFetching, setIsFetching] = useState<Boolean>(false);
-  const [isPhotoSelected, setIsPhotoSelected] = useState<Boolean>(false);
+  const [nextOffset, setNextOffset] = useState(0);
+  const [isFetching, setIsFetching] = useState(false);
+  const [isPhotoSelected, setIsPhotoSelected] = useState(false);
+  const flatListHorizontalIndexRef = useRef(0);
+  const flatListHorizontalRef = useRef<FlatList>(null);
+  const [flatListHorizontalInitialIndex, setFlatListHorizontalInitialIndex] =
+    useState(0);
+  const [lastVisibleIndex, setLastVisibleIndex] = useState(0);
+  const flatListVerticalRef = useRef<FlatList>(null);
 
   useFocusEffect(
     useCallback(() => {
       const onBackPress = () => {
         console.log("useFocusEffect");
         if (true) {
-          setIsPhotoSelected((r) => !r);
+          setIsPhotoSelected(false);
           return true;
         } else {
           return false;
@@ -103,25 +115,56 @@ export default function PhotoGrid(props: PhotoGridProps) {
     }
   }, []);
 
+  useEffect(() => {
+    setTimeout(() => {
+      if (flatListVerticalRef.current) {
+        console.log(lastVisibleIndex);
+        flatListVerticalRef.current.scrollToIndex({
+          index: lastVisibleIndex,
+          animated: false,
+        });
+      }
+    }, 0);
+  }, [lastVisibleIndex]);
+
+  useEffect(() => {
+    flatListHorizontalRef.current?.scrollToIndex({
+      index: flatListHorizontalInitialIndex,
+      animated: false,
+    });
+  }, [flatListHorizontalInitialIndex]);
+
   const PhotoPressed = props.onPhotoClicked
     ? props.onPhotoClicked
     : (n: PhotoType) => {};
 
   console.log("Render PhotoGrid");
 
+  const handleViewableItemsChanged = useCallback(
+    ({ viewableItems }: { viewableItems: Array<ViewToken> }) => {
+      setLastVisibleIndex(viewableItems[0].index ?? 0);
+    },
+    []
+  );
+
   return (
     <View style={styles.viewStyle}>
       {!isPhotoSelected ? (
         <FlatList
+          ref={flatListVerticalRef}
           key={"flatList1"}
           style={styles.flatListStyle}
           data={photos}
           renderItem={({ item, index }) => (
             <PhotoComponent
               photo={item}
+              setIsPhotoSelected={setIsPhotoSelected}
               onPress={() => PhotoPressed(photos[index])}
+              index={index}
+              setInitialIndex={setFlatListHorizontalInitialIndex}
             />
           )}
+          onViewableItemsChanged={handleViewableItemsChanged}
           maxToRenderPerBatch={20}
           initialNumToRender={20}
           keyExtractor={(item, index) =>
@@ -160,12 +203,27 @@ export default function PhotoGrid(props: PhotoGridProps) {
         />
       ) : (
         <FlatList
+          ref={flatListHorizontalRef}
+          //initialScrollIndex={flatListHorizontalInitialIndexRef.current}
+          getItemLayout={(data, index) => ({
+            length: Dimensions.get("screen").width,
+            offset: Dimensions.get("screen").width * index,
+            index,
+          })}
           key={"flatList2"}
           style={styles.flatListStyle}
           data={photos}
           renderItem={({ item, index }) => (
             <PhotoComponentHorizontal photo={item} />
           )}
+          onViewableItemsChanged={({ viewableItems, changed }) => {
+            if (viewableItems.length == 1) {
+              flatListHorizontalIndexRef.current = viewableItems[0].index ?? 0;
+            }
+          }}
+          viewabilityConfig={{
+            itemVisiblePercentThreshold: 90,
+          }}
           horizontal={true}
           snapToAlignment="start"
           disableIntervalMomentum={true}
@@ -176,13 +234,13 @@ export default function PhotoGrid(props: PhotoGridProps) {
             `Photo_${item.image.fileName}_index_${index}`
           }
           onEndReachedThreshold={20}
-          initialNumToRender={20}
           onEndReached={() => {
             if (!isFetching) {
               setIsFetching(true);
               props
                 .loadMore(ItemsToLoadPerEndReached, nextOffset)
                 .then((newPhotos) => {
+                  console.log("photos" + photos.length);
                   setPhotos([...photos, ...newPhotos.photos]);
                   setNextOffset(newPhotos.nextOffset);
                   setIsFetching(false);
@@ -195,7 +253,11 @@ export default function PhotoGrid(props: PhotoGridProps) {
   );
 }
 
-function PhotoComponentHorizontal(props: { photo: PhotoType }) {
+type PhotoComponentHorizontalProps = {
+  photo: PhotoType;
+};
+
+function PhotoComponentHorizontal(props: PhotoComponentHorizontalProps) {
   const navigation = useNavigation();
   return (
     <TouchableWithoutFeedback onPress={() => {}}>
