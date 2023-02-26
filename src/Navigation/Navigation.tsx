@@ -10,11 +10,9 @@ import { createDrawerNavigator } from "@react-navigation/drawer";
 //Screens
 import PhotoGalleryServerScreen from "~/Navigation/Screens/PhotoGalleryServerScreen";
 import PhotoGalleryLocalScreen from "~/Navigation/Screens/PhotoGalleryLocalScreen";
-import PhotoScreen from "~/Navigation/Screens/PhotoScreen";
 import TestScreen from "~/Navigation/Screens/Test";
 
 import type { NavigatorScreenParams } from "@react-navigation/native";
-import { PhotoType } from "~/Helpers/types";
 
 const Drawer = createDrawerNavigator();
 const Navigation = () => {

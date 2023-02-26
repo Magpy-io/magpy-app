@@ -1,27 +1,31 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import * as AndroidPermissions from "~/Helpers/GetPermissionsAndroid";
 import { PhotoIdentifier } from "@react-native-camera-roll/camera-roll";
 import RNFS from "react-native-fs";
 
 import { Text } from "react-native";
-import PhotoGrid from "~/Components/PhotoGrid";
+import PhotoGallery from "~/Components/PhotoGallery";
 
 import GetPhotos from "~/Helpers/GetGalleryPhotos";
 import { postPhoto } from "~/Helpers/Queries";
 import { PhotoType } from "~/Helpers/types";
 import * as Queries from "~/Helpers/Queries";
+import PhotoComponentForSlider from "~/Components/PhotoComponentForSlider";
 
 type PhotoGalleryProps = {};
 
 export default function PhotoGalleryLocalScreen(props: PhotoGalleryProps) {
-  const [hasPermissions, setHasPermissions] = useState<boolean>(false);
+  const [hasPermissions, setHasPermissions] = useState<boolean>(true);
+
+  let getPermissions = useCallback(async () => {
+    const hasPerm =
+      await AndroidPermissions.hasAndroidPermissionWriteExternalStorage();
+    if (!hasPerm) {
+      setHasPermissions(hasPerm);
+    }
+  }, []);
 
   useEffect(() => {
-    let getPermissions = async () => {
-      const hasPermission =
-        await AndroidPermissions.hasAndroidPermissionWriteExternalStorage();
-      setHasPermissions(hasPermission);
-    };
     getPermissions();
   }, []);
 
@@ -61,8 +65,6 @@ export default function PhotoGalleryLocalScreen(props: PhotoGalleryProps) {
     if (!foundAnyPhotoNotInServer) {
       return { photos: [], nextOffset: n + totalOffset, endReached: true };
     }
-
-    console.log(photosFromDevice.edges.length);
 
     const photosNotInServer = photosFromDevice.edges.filter((edge, index) => {
       return !photosExistInServer[index].exists;
@@ -122,7 +124,7 @@ export default function PhotoGalleryLocalScreen(props: PhotoGalleryProps) {
   console.log("Render PhotoGalleryLocalScreen");
 
   return hasPermissions ? (
-    <PhotoGrid loadMore={GetMorePhotos} onPhotoClicked={postPhotoMethod} />
+    <PhotoGallery loadMore={GetMorePhotos} />
   ) : (
     <Text>Permissions needed</Text>
   );

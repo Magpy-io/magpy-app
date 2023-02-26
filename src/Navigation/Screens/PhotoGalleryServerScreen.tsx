@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-import PhotoGrid from "~/Components/PhotoGrid";
+import PhotoGallery from "~/Components/PhotoGallery";
 
 import * as Queries from "~/Helpers/Queries";
 import { PhotoType } from "~/Helpers/types";
@@ -72,5 +72,5 @@ export default function PhotoGalleryScreen(props: PhotoGalleryProps) {
     };
   }
 
-  return <PhotoGrid loadMore={GetMorePhotos} />;
+  return <PhotoGallery loadMore={GetMorePhotos} />;
 }
