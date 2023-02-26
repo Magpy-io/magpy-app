@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-import PhotoGrid from "~/Components/PhotoGrid";
+import PhotoGallery from "~/Components/PhotoGallery";
 
 import * as Queries from "~/Helpers/Queries";
 import { PhotoType } from "~/Helpers/types";
@@ -54,6 +54,7 @@ export default function PhotoGalleryScreen(props: PhotoGalleryProps) {
           image64: filesExist[index]
             ? ""
             : `data:image/jpeg;base64,${images64Formated[index]}`,
+          image64Full: "",
         },
         id: photo.id,
         album: "",
@@ -71,5 +72,5 @@ export default function PhotoGalleryScreen(props: PhotoGalleryProps) {
     };
   }
 
-  return <PhotoGrid loadMore={GetMorePhotos} />;
+  return <PhotoGallery loadMore={GetMorePhotos} />;
 }
