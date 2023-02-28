@@ -52,7 +52,7 @@ export default function PhotoGrid(props: PropsType) {
       keyExtractor={(item, index) =>
         `Photo_${item.image.fileName}_index_${index}`
       }
-      onEndReachedThreshold={0.5}
+      onEndReachedThreshold={1}
       onEndReached={() => {
         console.log("PhotoGrid: onEndReached");
         props.onEndReached();

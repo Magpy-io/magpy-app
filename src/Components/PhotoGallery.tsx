@@ -24,7 +24,7 @@ type PropsType = {
   title?: string;
 };
 
-const ITEMS_TO_LOAD_PER_END_REACHED = 200;
+const ITEMS_TO_LOAD_PER_END_REACHED = 10;
 
 export default function PhotoGallery(props: PropsType) {
   console.log("PhotoGallery: Render");

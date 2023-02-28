@@ -4,9 +4,10 @@ import {
   FlatList,
   Dimensions,
   BackHandler,
+  ViewToken,
 } from "react-native";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { PhotoType } from "~/Helpers/types";
 import PhotoComponentForSlider from "./PhotoComponentForSlider";
 
@@ -23,6 +24,9 @@ type PropsType = {
 
 export default function PhotoGrid(props: PropsType) {
   console.log("PhotoSlider: Render");
+
+  const flatListCurrentIndexRef = useRef(0);
+
   const PhotoPressed = props.onPhotoClicked ?? ((photo: PhotoType) => {});
 
   const renderItem = useCallback(
@@ -38,7 +42,7 @@ export default function PhotoGrid(props: PropsType) {
 
   useEffect(() => {
     const backAction = () => {
-      props.onSwitchMode(0);
+      props.onSwitchMode(flatListCurrentIndexRef.current);
       return true;
     };
 
@@ -50,6 +54,22 @@ export default function PhotoGrid(props: PropsType) {
     return () => backHandler.remove();
   }, []);
 
+  const onViewableItemsChangedCallBack = useCallback(
+    ({
+      viewableItems,
+      changed,
+    }: {
+      viewableItems: ViewToken[];
+      changed: ViewToken[];
+    }) => {
+      if (viewableItems.length == 1) {
+        flatListCurrentIndexRef.current = viewableItems[0].index ?? 0;
+        console.log(flatListCurrentIndexRef.current);
+      }
+    },
+    [flatListCurrentIndexRef]
+  );
+
   return (
     <FlatList
       style={styles.flatListStyle}
@@ -57,6 +77,7 @@ export default function PhotoGrid(props: PropsType) {
       renderItem={renderItem}
       initialNumToRender={20}
       initialScrollIndex={props.startIndex}
+      onViewableItemsChanged={onViewableItemsChangedCallBack}
       viewabilityConfig={{
         itemVisiblePercentThreshold: 90,
       }}
@@ -69,7 +90,7 @@ export default function PhotoGrid(props: PropsType) {
       keyExtractor={(item, index) =>
         `Photo_${item.image.fileName}_index_${index}`
       }
-      onEndReachedThreshold={0.5}
+      onEndReachedThreshold={5}
       onEndReached={() => {
         console.log("PhotoSlider: onEndReached");
         props.onEndReached();
