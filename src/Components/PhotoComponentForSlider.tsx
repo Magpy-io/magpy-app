@@ -6,17 +6,16 @@ import {
 } from "react-native";
 
 import FastImage from "react-native-fast-image";
-import { useNavigation } from "@react-navigation/native";
 
 import { PhotoType } from "~/Helpers/types";
 
 type PropsType = {
   photo: PhotoType;
   onPress: () => void;
+  index: number;
 };
 
 export default function PhotoComponentForSlider(props: PropsType) {
-  const navigation = useNavigation();
   return (
     <TouchableWithoutFeedback
       onPress={() => {

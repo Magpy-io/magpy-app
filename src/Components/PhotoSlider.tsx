@@ -1,74 +1,62 @@
 import {
   StyleSheet,
   Text,
-  View,
   FlatList,
-  TouchableWithoutFeedback,
   Dimensions,
   BackHandler,
-  ViewToken,
 } from "react-native";
 
-import FastImage from "react-native-fast-image";
-import { Image } from "react-native-elements";
-import { Button, Overlay } from "react-native-elements";
-import { useNavigation } from "@react-navigation/native";
-import {
-  useEffect,
-  useState,
-  useRef,
-  useCallback,
-  MutableRefObject,
-} from "react";
-import { useFocusEffect } from "@react-navigation/native";
+import { useCallback, useEffect, useState } from "react";
 import { PhotoType } from "~/Helpers/types";
 import PhotoComponentForSlider from "./PhotoComponentForSlider";
 
-type PhotoGridProps = {
-  loadMore: (
-    count: number,
-    offset: number
-  ) => Promise<{
-    photos: PhotoType[];
-    nextOffset: number;
-    endReached: boolean;
-  }>;
+const ITEM_WIDTH = Dimensions.get("window").width;
+
+type PropsType = {
+  photos: PhotoType[];
+  onSwitchMode: (index: number) => void;
+  onEndReached: () => void;
+  startIndex: number;
   title?: string;
   onPhotoClicked?: (photo: PhotoType) => void;
 };
 
-const ItemsToLoadPerEndReached = 200;
-
-export default function PhotoGrid(props: PhotoGridProps) {
-  const [photos, setPhotos] = useState<PhotoType[]>([]);
-  const [nextOffset, setNextOffset] = useState(0);
-  const [isFetching, setIsFetching] = useState(false);
-
-  useEffect(() => {
-    if (photos.length == 0) {
-      setIsFetching(true);
-      props.loadMore(ItemsToLoadPerEndReached, 0).then((newPhotos) => {
-        setPhotos(newPhotos.photos);
-        setNextOffset(newPhotos.nextOffset);
-        setIsFetching(false);
-      });
-    }
-  }, []);
-
+export default function PhotoGrid(props: PropsType) {
+  console.log("PhotoSlider: Render");
   const PhotoPressed = props.onPhotoClicked ?? ((photo: PhotoType) => {});
 
-  console.log("Render PhotoSlider");
+  const renderItem = useCallback(
+    ({ item, index }: { item: PhotoType; index: number }) => (
+      <PhotoComponentForSlider
+        photo={item}
+        onPress={() => PhotoPressed(props.photos[index])}
+        index={index}
+      />
+    ),
+    [props.photos]
+  );
+
+  useEffect(() => {
+    const backAction = () => {
+      props.onSwitchMode(0);
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+
+    return () => backHandler.remove();
+  }, []);
 
   return (
     <FlatList
       style={styles.flatListStyle}
-      data={photos}
-      renderItem={({ item, index }) => (
-        <PhotoComponentForSlider
-          photo={item}
-          onPress={() => PhotoPressed(photos[index])}
-        />
-      )}
+      data={props.photos}
+      renderItem={renderItem}
+      initialNumToRender={20}
+      initialScrollIndex={props.startIndex}
       viewabilityConfig={{
         itemVisiblePercentThreshold: 90,
       }}
@@ -81,20 +69,16 @@ export default function PhotoGrid(props: PhotoGridProps) {
       keyExtractor={(item, index) =>
         `Photo_${item.image.fileName}_index_${index}`
       }
-      onEndReachedThreshold={20}
+      onEndReachedThreshold={0.5}
       onEndReached={() => {
-        if (!isFetching) {
-          setIsFetching(true);
-          props
-            .loadMore(ItemsToLoadPerEndReached, nextOffset)
-            .then((newPhotos) => {
-              console.log("photos" + photos.length);
-              setPhotos([...photos, ...newPhotos.photos]);
-              setNextOffset(newPhotos.nextOffset);
-              setIsFetching(false);
-            });
-        }
+        console.log("PhotoSlider: onEndReached");
+        props.onEndReached();
       }}
+      getItemLayout={(data, index) => ({
+        length: ITEM_WIDTH,
+        offset: ITEM_WIDTH * index,
+        index,
+      })}
       ListHeaderComponent={() =>
         props.title ? (
           <Text style={styles.titleStyle}>{props.title}</Text>

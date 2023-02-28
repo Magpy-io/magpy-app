@@ -29,7 +29,10 @@ const ITEMS_TO_LOAD_PER_END_REACHED = 200;
 export default function PhotoGallery(props: PropsType) {
   console.log("PhotoGallery: Render");
   const [photos, setPhotos] = useState<PhotoType[]>([]);
-  const [isPhotoSelected, setIsPhotoSelected] = useState(false);
+  const [switchingState, setSwitchingState] = useState({
+    isPhotoSelected: false,
+    startIndexWhenSwitching: 0,
+  });
   const nextOffset = useRef(0);
   const isFetching = useRef(false);
 
@@ -56,17 +59,29 @@ export default function PhotoGallery(props: PropsType) {
     }
   }, [isFetching, photos, nextOffset]);
 
-  useEffect(() => {
-    console.log("PhotoGallery: useEffect");
-    fetchMore();
-  }, []);
+  const onSwitchMode = (index: number) => {
+    setSwitchingState((s) => ({
+      isPhotoSelected: !s.isPhotoSelected,
+      startIndexWhenSwitching: index,
+    }));
+  };
 
   return (
     <View style={styles.viewStyle}>
-      {!isPhotoSelected ? (
-        <PhotoGrid photos={photos} onEndReached={fetchMore} />
+      {!switchingState.isPhotoSelected ? (
+        <PhotoGrid
+          photos={photos}
+          onEndReached={fetchMore}
+          onSwitchMode={onSwitchMode}
+          startIndex={switchingState.startIndexWhenSwitching}
+        />
       ) : (
-        <PhotoSlider loadMore={props.loadMore} />
+        <PhotoSlider
+          photos={photos}
+          onEndReached={fetchMore}
+          onSwitchMode={onSwitchMode}
+          startIndex={switchingState.startIndexWhenSwitching}
+        />
       )}
     </View>
   );
