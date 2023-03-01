@@ -22,7 +22,7 @@ const Navigation = () => {
         screenOptions={{
           headerShown: false,
         }}
-        initialRouteName="Local"
+        initialRouteName="Server"
       >
         <Drawer.Screen name="Local" component={PhotoGalleryLocalScreen} />
         <Drawer.Screen name="Server" component={PhotoGalleryServerScreen} />

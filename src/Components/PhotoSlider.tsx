@@ -17,6 +17,8 @@ type PropsType = {
   photos: PhotoType[];
   onSwitchMode: (index: number) => void;
   onEndReached: () => void;
+  onPostPhoto: (photo: PhotoType) => void;
+  RequestFullPhoto: (index: number) => void;
   startIndex: number;
   title?: string;
   onPhotoClicked?: (photo: PhotoType) => void;
@@ -24,6 +26,7 @@ type PropsType = {
 
 export default function PhotoGrid(props: PropsType) {
   console.log("PhotoSlider: Render");
+  console.log("PhotoSlider: Render props len " + String(props.photos.length));
 
   const flatListCurrentIndexRef = useRef(0);
 
@@ -34,6 +37,7 @@ export default function PhotoGrid(props: PropsType) {
       <PhotoComponentForSlider
         photo={item}
         onPress={() => PhotoPressed(props.photos[index])}
+        onLongPress={() => props.onPostPhoto(props.photos[index])}
         index={index}
       />
     ),
@@ -63,8 +67,11 @@ export default function PhotoGrid(props: PropsType) {
       changed: ViewToken[];
     }) => {
       if (viewableItems.length == 1) {
-        flatListCurrentIndexRef.current = viewableItems[0].index ?? 0;
-        console.log(flatListCurrentIndexRef.current);
+        const index = viewableItems[0].index ?? 0;
+        flatListCurrentIndexRef.current = index;
+        if (!props.photos[index].inDevice) {
+          props.RequestFullPhoto(index);
+        }
       }
     },
     [flatListCurrentIndexRef]
@@ -75,7 +82,7 @@ export default function PhotoGrid(props: PropsType) {
       style={styles.flatListStyle}
       data={props.photos}
       renderItem={renderItem}
-      initialNumToRender={20}
+      initialNumToRender={1}
       initialScrollIndex={props.startIndex}
       onViewableItemsChanged={onViewableItemsChangedCallBack}
       viewabilityConfig={{

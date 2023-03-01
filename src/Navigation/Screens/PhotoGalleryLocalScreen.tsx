@@ -1,16 +1,13 @@
 import React, { useState, useEffect, useCallback } from "react";
 import * as AndroidPermissions from "~/Helpers/GetPermissionsAndroid";
 import { PhotoIdentifier } from "@react-native-camera-roll/camera-roll";
-import RNFS from "react-native-fs";
 
 import { Text } from "react-native";
 import PhotoGallery from "~/Components/PhotoGallery";
 
 import GetPhotos from "~/Helpers/GetGalleryPhotos";
-import { postPhoto } from "~/Helpers/Queries";
 import { PhotoType } from "~/Helpers/types";
 import * as Queries from "~/Helpers/Queries";
-import PhotoComponentForSlider from "~/Components/PhotoComponentForSlider";
 
 type PhotoGalleryProps = {};
 
@@ -104,23 +101,6 @@ export default function PhotoGalleryLocalScreen(props: PhotoGalleryProps) {
       endReached: photosFromDevice.endReached,
     };
   }
-
-  function postPhotoMethod(photo: PhotoType) {
-    RNFS.readFile(photo.image.path, "base64")
-      .then((res: string) => {
-        postPhoto({
-          name: photo.image.fileName,
-          fileSize: photo.image.fileSize,
-          width: photo.image.width,
-          height: photo.image.height,
-          date: new Date(photo.created).toJSON(),
-          path: photo.image.path,
-          image64: res,
-        });
-      })
-      .catch((err: any) => console.log(err));
-  }
-
   console.log("Render PhotoGalleryLocalScreen");
 
   return hasPermissions ? (

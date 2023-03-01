@@ -9,6 +9,7 @@ type PropsType = {
   photos: PhotoType[];
   onEndReached: () => void;
   onSwitchMode: (index: number) => void;
+  onPostPhoto: (photo: PhotoType) => void;
   startIndex: number;
   title?: string;
   onPhotoClicked?: (index: number) => void;
@@ -28,6 +29,7 @@ export default function PhotoGrid(props: PropsType) {
       <PhotoComponentForGrid
         photo={item}
         onPress={() => PhotoPressed(index)}
+        onLongPress={() => props.onPostPhoto(props.photos[index])}
         index={index}
       />
     ),

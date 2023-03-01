@@ -6,7 +6,8 @@ import { PhotoType } from "~/Helpers/types";
 
 type PropsType = {
   photo: PhotoType;
-  onPress: () => void;
+  onPress: () => void | undefined;
+  onLongPress: () => void | undefined;
   index: number;
 };
 
@@ -15,6 +16,9 @@ export default function PhotoComponentForGrid(props: PropsType) {
     <TouchableWithoutFeedback
       onPress={() => {
         props?.onPress();
+      }}
+      onLongPress={() => {
+        props?.onLongPress();
       }}
     >
       <View style={styles.itemStyle}>

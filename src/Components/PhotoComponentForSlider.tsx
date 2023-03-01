@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import {
   StyleSheet,
   View,
@@ -11,26 +12,42 @@ import { PhotoType } from "~/Helpers/types";
 
 type PropsType = {
   photo: PhotoType;
-  onPress: () => void;
+  onPress: () => void | undefined;
+  onLongPress: () => void | undefined;
   index: number;
 };
 
 export default function PhotoComponentForSlider(props: PropsType) {
+  const chooseImageCallback = useCallback(() => {
+    console.log("choosing image");
+    if (props.photo.inDevice) {
+      return props.photo.image.path;
+    } else {
+      if (props.photo.image.image64Full) {
+        return props.photo.image.image64Full;
+      } else {
+        return props.photo.image.image64;
+      }
+    }
+  }, [props.photo]);
+
   return (
     <TouchableWithoutFeedback
       onPress={() => {
         props?.onPress();
       }}
+      onLongPress={() => {
+        props?.onLongPress();
+      }}
     >
       <View style={styles.itemStyle}>
         <FastImage
           source={{
-            uri: props.photo.inDevice
-              ? props.photo.image.path
-              : props.photo.image.image64,
+            uri: chooseImageCallback(),
           }}
           resizeMode={FastImage.resizeMode.contain}
           style={[styles.imageStyle]}
+          resizeMethod={"resize"}
         />
       </View>
     </TouchableWithoutFeedback>
