@@ -20,7 +20,6 @@ type PropsType = {
   onPostPhoto: (photo: PhotoType) => void;
   RequestFullPhoto: (index: number) => void;
   startIndex: number;
-  title?: string;
   onPhotoClicked?: (photo: PhotoType) => void;
 };
 
@@ -107,23 +106,10 @@ export default function PhotoGrid(props: PropsType) {
         offset: ITEM_WIDTH * index,
         index,
       })}
-      ListHeaderComponent={() =>
-        props.title ? (
-          <Text style={styles.titleStyle}>{props.title}</Text>
-        ) : null
-      }
     />
   );
 }
 
 const styles = StyleSheet.create({
-  titleStyle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    padding: 10,
-    textAlign: "center",
-    color: "grey",
-    paddingBottom: 15,
-  },
   flatListStyle: {},
 });

@@ -19,7 +19,6 @@ type PropsType = {
 
 export default function PhotoComponentForSlider(props: PropsType) {
   const chooseImageCallback = useCallback(() => {
-    console.log("choosing image");
     if (props.photo.inDevice) {
       return props.photo.image.path;
     } else {
