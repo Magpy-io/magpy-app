@@ -58,10 +58,12 @@ const styles = StyleSheet.create({
     padding: 1,
     justifyContent: "center",
     width: Dimensions.get("screen").width,
+    backgroundColor: "white",
   },
   imageStyle: {
     width: "100%",
     height: "100%",
     borderRadius: 0,
+    backgroundColor: "white",
   },
 });

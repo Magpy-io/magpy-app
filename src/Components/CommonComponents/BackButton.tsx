@@ -14,6 +14,7 @@ import colors from "~/colors";
 
 type BackButtonProps = {
   style?: any;
+  onPress?: () => void;
 };
 
 export default function BackButton(props: BackButtonProps) {
@@ -23,10 +24,14 @@ export default function BackButton(props: BackButtonProps) {
       <Icon
         name="arrow-back-ios"
         color={"black"}
-        size={22}
+        size={26}
         style={styles.backIconStyle}
         onPress={() => {
-          navigation.goBack();
+          if (props.onPress) {
+            props.onPress();
+          } else {
+            navigation.goBack();
+          }
         }}
         underlayColor={colors.underlayColor}
       />
@@ -35,13 +40,6 @@ export default function BackButton(props: BackButtonProps) {
 }
 
 const styles = StyleSheet.create({
-  backIconStyle: {
-    padding: 15,
-  },
-  backButtonStyle: {
-    margin: 10,
-    position: "absolute",
-    top: 0,
-    left: 0,
-  },
+  backIconStyle: {},
+  backButtonStyle: { padding: 5 },
 });

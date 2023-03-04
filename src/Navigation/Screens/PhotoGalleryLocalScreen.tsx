@@ -71,7 +71,7 @@ export default function PhotoGalleryLocalScreen(props: PhotoGalleryProps) {
       const photo = edge.node;
       const photoObject: PhotoType = {
         inDevice: true,
-        inServer: photosExistInServer[index].exists,
+        inServer: false,
         image: {
           fileSize: photo.image.fileSize ?? 0,
           fileName: photo.image.filename ?? "",

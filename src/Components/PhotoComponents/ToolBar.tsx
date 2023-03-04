@@ -1,19 +1,9 @@
 import React, { useState, useEffect } from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  FlatList,
-  TouchableHighlight,
-  TouchableWithoutFeedback,
-  SafeAreaView,
-  Image,
-} from "react-native";
+import { StyleSheet, Text, View, TouchableHighlight } from "react-native";
 
 import { Icon } from "@rneui/themed";
-import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import colors from "~/colors";
-import { Photo as PhotoType } from "~/Helpers/types";
+import { PhotoType } from "~/Helpers/types";
 import { postPhoto } from "~/Helpers/Queries";
 import RNFS from "react-native-fs";
 
@@ -24,6 +14,7 @@ const TOOL_COLOR = "black";
 
 type ToolBarProps = {
   photo: PhotoType;
+  style?: any;
 };
 
 function postPhotoMethod(photo: PhotoType) {
@@ -57,7 +48,7 @@ export default function ToolBar(props: ToolBarProps) {
   }
 
   return (
-    <View style={styles.toolBarView}>
+    <View style={[styles.toolBarView, props.style]}>
       <View style={styles.toolsView}>
         {inDevice ? (
           <ToolComponent
@@ -144,14 +135,10 @@ function ToolComponent(props: ToolComponentProps) {
 
 const styles = StyleSheet.create({
   toolBarView: {
-    position: "absolute",
-    bottom: 0,
     width: "100%",
-    paddingHorizontal: 0,
-    backgroundColor: "white",
+    backgroundColor: "transparent",
   },
   toolsView: {
-    backgroundColor: TOOLBAR_COLOR,
     flex: 1,
     flexDirection: "row",
   },

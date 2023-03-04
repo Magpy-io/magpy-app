@@ -5,11 +5,14 @@ import {
   Dimensions,
   BackHandler,
   ViewToken,
+  View,
 } from "react-native";
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { PhotoType } from "~/Helpers/types";
 import PhotoComponentForSlider from "./PhotoComponentForSlider";
+import StatusBarComponent from "./PhotoComponents/StatusBarComponent";
+import ToolBar from "./PhotoComponents/ToolBar";
 
 const ITEM_WIDTH = Dimensions.get("window").width;
 
@@ -25,9 +28,10 @@ type PropsType = {
 
 export default function PhotoGrid(props: PropsType) {
   console.log("PhotoSlider: Render");
-  console.log("PhotoSlider: Render props len " + String(props.photos.length));
 
-  const flatListCurrentIndexRef = useRef(0);
+  const [flatListCurrentIndex, setFlatListCurrentIndex] = useState(
+    props.startIndex
+  );
 
   const PhotoPressed = props.onPhotoClicked ?? ((photo: PhotoType) => {});
 
@@ -45,7 +49,7 @@ export default function PhotoGrid(props: PropsType) {
 
   useEffect(() => {
     const backAction = () => {
-      props.onSwitchMode(flatListCurrentIndexRef.current);
+      props.onSwitchMode(flatListCurrentIndex);
       return true;
     };
 
@@ -67,49 +71,72 @@ export default function PhotoGrid(props: PropsType) {
     }) => {
       if (viewableItems.length == 1) {
         const index = viewableItems[0].index ?? 0;
-        flatListCurrentIndexRef.current = index;
+        setFlatListCurrentIndex(index);
         if (!props.photos[index].inDevice) {
           props.RequestFullPhoto(index);
         }
       }
     },
-    [flatListCurrentIndexRef]
+    []
   );
 
   return (
-    <FlatList
-      style={styles.flatListStyle}
-      data={props.photos}
-      renderItem={renderItem}
-      initialNumToRender={1}
-      initialScrollIndex={props.startIndex}
-      onViewableItemsChanged={onViewableItemsChangedCallBack}
-      viewabilityConfig={{
-        itemVisiblePercentThreshold: 90,
-      }}
-      horizontal={true}
-      snapToAlignment="start"
-      disableIntervalMomentum={true}
-      decelerationRate={"normal"}
-      showsHorizontalScrollIndicator={false}
-      snapToInterval={Dimensions.get("screen").width}
-      keyExtractor={(item, index) =>
-        `Photo_${item.image.fileName}_index_${index}`
-      }
-      onEndReachedThreshold={5}
-      onEndReached={() => {
-        console.log("PhotoSlider: onEndReached");
-        props.onEndReached();
-      }}
-      getItemLayout={(data, index) => ({
-        length: ITEM_WIDTH,
-        offset: ITEM_WIDTH * index,
-        index,
-      })}
-    />
+    <>
+      <View style={styles.centeringViewStyle}>
+        <FlatList
+          style={styles.flatListStyle}
+          data={props.photos}
+          renderItem={renderItem}
+          initialNumToRender={1}
+          initialScrollIndex={props.startIndex}
+          onViewableItemsChanged={onViewableItemsChangedCallBack}
+          viewabilityConfig={{
+            itemVisiblePercentThreshold: 90,
+          }}
+          horizontal={true}
+          snapToAlignment="start"
+          disableIntervalMomentum={true}
+          decelerationRate={"normal"}
+          showsHorizontalScrollIndicator={false}
+          snapToInterval={Dimensions.get("screen").width}
+          keyExtractor={(item, index) =>
+            `Photo_${item.image.fileName}_index_${index}`
+          }
+          onEndReachedThreshold={5}
+          onEndReached={() => {
+            console.log("PhotoSlider: onEndReached");
+            props.onEndReached();
+          }}
+          getItemLayout={(data, index) => ({
+            length: ITEM_WIDTH,
+            offset: ITEM_WIDTH * index,
+            index,
+          })}
+        />
+      </View>
+      <StatusBarComponent
+        style={styles.statusBarStyle}
+        photo={props.photos[flatListCurrentIndex]}
+        onBackButton={() => props.onSwitchMode(flatListCurrentIndex)}
+      />
+      <ToolBar
+        style={styles.toolBarStyle}
+        photo={props.photos[props.startIndex]}
+      />
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  flatListStyle: {},
+  centeringViewStyle: {
+    backgroundColor: "white",
+    position: "absolute",
+    height: "100%",
+    width: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  flatListStyle: { backgroundColor: "white" },
+  statusBarStyle: { position: "absolute", top: 0 },
+  toolBarStyle: { position: "absolute", bottom: 0 },
 });
