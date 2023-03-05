@@ -89,7 +89,7 @@ function StatusComponent(props: StatusComponentProps) {
 
 const styles = StyleSheet.create({
   StatusBarStyle: {
-    padding: 10,
+    padding: 5,
     width: "100%",
     backgroundColor: "transparent",
     opacity: 0.6,

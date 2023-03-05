@@ -20,10 +20,14 @@ type PropsType = {
   photos: PhotoType[];
   onSwitchMode: (index: number) => void;
   onEndReached: () => void;
-  onPostPhoto: (photo: PhotoType) => void;
+  onPostPhoto: (index: number) => void;
   RequestFullPhoto: (index: number) => void;
   startIndex: number;
-  onPhotoClicked?: (photo: PhotoType) => void;
+  onPhotoClicked?: (index: number) => void;
+  onDeleteAddLocal?: (index: number) => void;
+  onDeleteAddServer?: (index: number) => void;
+  onShare?: (index: number) => void;
+  onDetails?: (index: number) => void;
 };
 
 export default function PhotoGrid(props: PropsType) {
@@ -33,14 +37,12 @@ export default function PhotoGrid(props: PropsType) {
     props.startIndex
   );
 
-  const PhotoPressed = props.onPhotoClicked ?? ((photo: PhotoType) => {});
-
   const renderItem = useCallback(
     ({ item, index }: { item: PhotoType; index: number }) => (
       <PhotoComponentForSlider
         photo={item}
-        onPress={() => PhotoPressed(props.photos[index])}
-        onLongPress={() => props.onPostPhoto(props.photos[index])}
+        onPress={() => props.onPhotoClicked?.(index)}
+        onLongPress={() => props.onPostPhoto(index)}
         index={index}
       />
     ),
@@ -121,7 +123,12 @@ export default function PhotoGrid(props: PropsType) {
       />
       <ToolBar
         style={styles.toolBarStyle}
-        photo={props.photos[props.startIndex]}
+        photos={props.photos}
+        index={flatListCurrentIndex}
+        onDeleteAddLocal={props.onDeleteAddLocal}
+        onDeleteAddServer={props.onDeleteAddServer}
+        onDetails={props.onDetails}
+        onShare={props.onShare}
       />
     </>
   );

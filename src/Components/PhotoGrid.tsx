@@ -9,9 +9,10 @@ type PropsType = {
   photos: PhotoType[];
   onEndReached: () => void;
   onSwitchMode: (index: number) => void;
-  onPostPhoto: (photo: PhotoType) => void;
+  onPostPhoto: (index: number) => void;
   startIndex: number;
   onPhotoClicked?: (index: number) => void;
+  onRefresh: () => void;
 };
 
 export default function PhotoGrid(props: PropsType) {
@@ -28,7 +29,7 @@ export default function PhotoGrid(props: PropsType) {
       <PhotoComponentForGrid
         photo={item}
         onPress={() => PhotoPressed(index)}
-        onLongPress={() => props.onPostPhoto(props.photos[index])}
+        onLongPress={() => props.onPostPhoto(index)}
         index={index}
       />
     ),
@@ -58,7 +59,7 @@ export default function PhotoGrid(props: PropsType) {
         console.log("PhotoGrid: onEndReached");
         props.onEndReached();
       }}
-      onRefresh={() => {}}
+      onRefresh={props.onRefresh}
       refreshing={false}
       numColumns={3}
       getItemLayout={(data, index) => ({

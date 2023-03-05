@@ -4,8 +4,6 @@ import { StyleSheet, Text, View, TouchableHighlight } from "react-native";
 import { Icon } from "@rneui/themed";
 import colors from "~/colors";
 import { PhotoType } from "~/Helpers/types";
-import { postPhoto } from "~/Helpers/Queries";
-import RNFS from "react-native-fs";
 
 const ICON_SIZE = 26;
 const TEXT_SIZE = 12;
@@ -13,39 +11,18 @@ const TOOLBAR_COLOR = "white";
 const TOOL_COLOR = "black";
 
 type ToolBarProps = {
-  photo: PhotoType;
+  photos: PhotoType[];
+  index: number;
   style?: any;
+  onDeleteAddLocal?: (index: number) => void;
+  onDeleteAddServer?: (index: number) => void;
+  onShare?: (index: number) => void;
+  onDetails?: (index: number) => void;
 };
 
-function postPhotoMethod(photo: PhotoType) {
-  RNFS.readFile(photo.image.path, "base64")
-    .then((res: string) => {
-      postPhoto({
-        name: photo.image.fileName,
-        fileSize: photo.image.fileSize,
-        width: photo.image.width,
-        height: photo.image.height,
-        date: new Date(photo.created).toJSON(),
-        path: photo.image.path,
-        image64: res,
-      });
-    })
-    .catch((err: any) => console.log(err));
-}
-
 export default function ToolBar(props: ToolBarProps) {
-  const inDevice = props?.photo?.inDevice;
-  const inServer = props?.photo?.inServer;
-
-  function deleteFromDevice(photo: PhotoType) {}
-
-  function deleteFromServer(photo: PhotoType) {}
-
-  function saveToDevice(photo: PhotoType) {}
-
-  function addToServer(photo: PhotoType) {
-    postPhotoMethod(photo);
-  }
+  const inDevice = props?.photos[props.index]?.inDevice;
+  const inServer = props?.photos[props.index]?.inServer;
 
   return (
     <View style={[styles.toolBarView, props.style]}>
@@ -54,30 +31,38 @@ export default function ToolBar(props: ToolBarProps) {
           <ToolComponent
             icon="mobile-off"
             text="Delete from device"
-            onPress={() => deleteFromDevice(props.photo)}
+            onPress={() => props.onDeleteAddLocal?.(props.index)}
           />
         ) : (
           <ToolComponent
             icon="system-update"
             text="Save to device"
-            onPress={() => saveToDevice(props.photo)}
+            onPress={() => props.onDeleteAddLocal?.(props.index)}
           />
         )}
         {inServer ? (
           <ToolComponent
             icon="delete"
             text="Delete from server"
-            onPress={() => deleteFromServer(props.photo)}
+            onPress={() => props.onDeleteAddServer?.(props.index)}
           />
         ) : (
           <ToolComponent
             icon="backup"
             text="Back up"
-            onPress={() => addToServer(props.photo)}
+            onPress={() => props.onDeleteAddServer?.(props.index)}
           />
         )}
-        <ToolComponent icon="share" text="Share" onPress={() => {}} />
-        <ToolComponent icon="info" text="Details" onPress={() => {}} />
+        <ToolComponent
+          icon="share"
+          text="Share"
+          onPress={() => props.onShare?.(props.index)}
+        />
+        <ToolComponent
+          icon="info"
+          text="Details"
+          onPress={() => props.onDetails?.(props.index)}
+        />
       </View>
     </View>
   );

@@ -1,16 +1,8 @@
-import React, { useState, useEffect } from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  FlatList,
-  TouchableWithoutFeedback,
-  SafeAreaView,
-  Image,
-} from "react-native";
+import { StyleSheet, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Icon } from "@rneui/themed";
 import colors from "~/colors";
+import { TouchableHighlight } from "react-native-gesture-handler";
 
 type BackButtonProps = {
   style?: any;
@@ -20,12 +12,9 @@ type BackButtonProps = {
 export default function BackButton(props: BackButtonProps) {
   const navigation = useNavigation();
   return (
-    <View style={[styles.backButtonStyle, props.style]}>
-      <Icon
-        name="arrow-back-ios"
-        color={"black"}
-        size={26}
-        style={styles.backIconStyle}
+    <View>
+      <TouchableHighlight
+        style={[styles.backButtonStyle, props.style]}
         onPress={() => {
           if (props.onPress) {
             props.onPress();
@@ -34,12 +23,19 @@ export default function BackButton(props: BackButtonProps) {
           }
         }}
         underlayColor={colors.underlayColor}
-      />
+      >
+        <Icon
+          name="arrow-back"
+          color={"black"}
+          size={26}
+          style={styles.backIconStyle}
+        />
+      </TouchableHighlight>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  backIconStyle: {},
   backButtonStyle: { padding: 5 },
+  backIconStyle: {},
 });

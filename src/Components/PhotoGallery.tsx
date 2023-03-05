@@ -1,4 +1,4 @@
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, Platform } from "react-native";
 
 import { useState, useRef, useCallback } from "react";
 import { PhotoType } from "~/Helpers/types";
@@ -7,21 +7,13 @@ import PhotoSlider from "~/Components/PhotoSlider";
 import { postPhoto, getPhotoById } from "~/Helpers/Queries";
 import RNFS from "react-native-fs";
 
-const postPhotoHelper = (photo: PhotoType) => {
-  RNFS.readFile(photo.image.path, "base64")
-    .then((res: string) => {
-      postPhoto({
-        name: photo.image.fileName,
-        fileSize: photo.image.fileSize,
-        width: photo.image.width,
-        height: photo.image.height,
-        date: new Date(photo.created).toJSON(),
-        path: photo.image.path,
-        image64: res,
-      });
-    })
-    .catch((err: any) => console.log(err));
-};
+function urlToFilePath(url: string) {
+  let filePath = url;
+  if (Platform.OS === "android" && url.startsWith("file:///")) {
+    filePath = url.replace("file://", "");
+  }
+  return decodeURI(filePath);
+}
 
 type PropsType = {
   loadMore: (
@@ -63,6 +55,46 @@ export default function PhotoGallery(props: PropsType) {
     [photos]
   );
 
+  const deletePhotoCallback = useCallback(
+    (index: number) => {
+      const photo = photos[index];
+      RNFS.unlink(urlToFilePath(photo.image.path))
+        .then((r) => {
+          const newPhotos = [...photos];
+          newPhotos[index].inDevice = false;
+          setPhotos(newPhotos);
+        })
+        .then(() => {})
+        .catch((err: any) => console.log(err));
+    },
+    [photos]
+  );
+
+  const postPhotoCallback = useCallback(
+    (index: number) => {
+      const photo = photos[index];
+      RNFS.readFile(photo.image.path, "base64")
+        .then((res: string) => {
+          return postPhoto({
+            name: photo.image.fileName,
+            fileSize: photo.image.fileSize,
+            width: photo.image.width,
+            height: photo.image.height,
+            date: new Date(photo.created).toJSON(),
+            path: photo.image.path,
+            image64: res,
+          });
+        })
+        .then((r) => {
+          const newPhotos = [...photos];
+          newPhotos[index].inServer = true;
+          setPhotos(newPhotos);
+        })
+        .catch((err: any) => console.log(err));
+    },
+    [photos]
+  );
+
   const fetchMoreCallback = useCallback(async () => {
     if (endReached.current) {
       console.log(`PhotoGallery: fetchMore : end reached.`);
@@ -80,8 +112,8 @@ export default function PhotoGallery(props: PropsType) {
       );
 
       nextOffset.current = newPhotos.nextOffset;
-      isFetching.current = false;
       endReached.current = newPhotos.endReached;
+      isFetching.current = false;
       setPhotos([...photos, ...newPhotos.photos]);
 
       console.log(
@@ -101,6 +133,27 @@ export default function PhotoGallery(props: PropsType) {
     }));
   };
 
+  const onRefresh = useCallback(async () => {
+    if (!isFetching.current) {
+      console.log(`PhotoGallery: onRefresh`);
+      isFetching.current = true;
+      const newPhotos = await props.loadMore(ITEMS_TO_LOAD_PER_END_REACHED, 0);
+
+      nextOffset.current = newPhotos.nextOffset;
+      endReached.current = newPhotos.endReached;
+      isFetching.current = false;
+      setPhotos(newPhotos.photos);
+
+      console.log(
+        `PhotoGallery: onRefresh: Fetch successful, fetched : ${newPhotos.photos.length}, nextOffset : ${nextOffset.current}`
+      );
+    } else {
+      console.log(
+        "PhotoGallery: onRefresh: A fetch is already in progress, exiting."
+      );
+    }
+  }, []);
+
   return (
     <View style={styles.viewStyle}>
       {!switchingState.isPhotoSelected ? (
@@ -108,7 +161,8 @@ export default function PhotoGallery(props: PropsType) {
           photos={photos}
           onEndReached={fetchMoreCallback}
           onSwitchMode={onSwitchMode}
-          onPostPhoto={postPhotoHelper}
+          onPostPhoto={postPhotoCallback}
+          onRefresh={onRefresh}
           startIndex={switchingState.startIndexWhenSwitching}
         />
       ) : (
@@ -116,9 +170,11 @@ export default function PhotoGallery(props: PropsType) {
           photos={photos}
           onEndReached={fetchMoreCallback}
           onSwitchMode={onSwitchMode}
-          onPostPhoto={postPhotoHelper}
+          onPostPhoto={postPhotoCallback}
           RequestFullPhoto={RequestFullPhotoCallback}
           startIndex={switchingState.startIndexWhenSwitching}
+          onDeleteAddServer={postPhotoCallback}
+          onDeleteAddLocal={deletePhotoCallback}
         />
       )}
     </View>
