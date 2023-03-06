@@ -4,7 +4,7 @@ import { useState, useRef, useCallback } from "react";
 import { PhotoType } from "~/Helpers/types";
 import PhotoGrid from "~/Components/PhotoGrid";
 import PhotoSlider from "~/Components/PhotoSlider";
-import { postPhoto, getPhotoById } from "~/Helpers/Queries";
+import { postPhoto, getPhotoById, removePhotoById } from "~/Helpers/Queries";
 import { RemovePhoto } from "~/Helpers/GetGalleryPhotos";
 import RNFS from "react-native-fs";
 
@@ -86,14 +86,43 @@ export default function PhotoGallery(props: PropsType) {
             image64: res,
           });
         })
-        .then((r) => {
+        .then((response: any) => {
+          const postedPhoto = response.data.photo;
           const newPhotos = [...photos];
           newPhotos[index].inServer = true;
+          newPhotos[index].id = postedPhoto.id;
+          newPhotos[index].syncDate = postedPhoto.syncDate;
           setPhotos(newPhotos);
         })
         .catch((err: any) => console.log(err));
     },
     [photos]
+  );
+
+  const removePhotoFromServerCallback = useCallback(
+    (index: number) => {
+      const photo = photos[index];
+      removePhotoById(photo.id)
+        .then(() => {
+          const newPhotos = [...photos];
+          newPhotos[index].inServer = false;
+          setPhotos(newPhotos);
+        })
+        .catch((err: any) => console.log(err));
+    },
+    [photos]
+  );
+
+  const deleteAddServerCallback = useCallback(
+    (index: number) => {
+      const photo = photos[index];
+      if (photo.inServer) {
+        removePhotoFromServerCallback(index);
+      } else {
+        postPhotoCallback(index);
+      }
+    },
+    [postPhotoCallback, removePhotoFromServerCallback, photos]
   );
 
   const fetchMoreCallback = useCallback(async () => {
@@ -174,7 +203,7 @@ export default function PhotoGallery(props: PropsType) {
           onPostPhoto={postPhotoCallback}
           RequestFullPhoto={RequestFullPhotoCallback}
           startIndex={switchingState.startIndexWhenSwitching}
-          onDeleteAddServer={postPhotoCallback}
+          onDeleteAddServer={deleteAddServerCallback}
           onDeleteAddLocal={deletePhotoCallback}
         />
       )}
