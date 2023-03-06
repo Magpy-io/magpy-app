@@ -5,6 +5,7 @@ import { PhotoType } from "~/Helpers/types";
 import PhotoGrid from "~/Components/PhotoGrid";
 import PhotoSlider from "~/Components/PhotoSlider";
 import { postPhoto, getPhotoById } from "~/Helpers/Queries";
+import { RemovePhoto } from "~/Helpers/GetGalleryPhotos";
 import RNFS from "react-native-fs";
 
 function urlToFilePath(url: string) {
@@ -58,8 +59,8 @@ export default function PhotoGallery(props: PropsType) {
   const deletePhotoCallback = useCallback(
     (index: number) => {
       const photo = photos[index];
-      RNFS.unlink(urlToFilePath(photo.image.path))
-        .then((r) => {
+      RemovePhoto(photo.image.path)
+        .then(() => {
           const newPhotos = [...photos];
           newPhotos[index].inDevice = false;
           setPhotos(newPhotos);

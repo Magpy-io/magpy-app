@@ -5,7 +5,7 @@ import { PhotoIdentifier } from "@react-native-camera-roll/camera-roll";
 import { Text } from "react-native";
 import PhotoGallery from "~/Components/PhotoGallery";
 
-import GetPhotos from "~/Helpers/GetGalleryPhotos";
+import { GetPhotos } from "~/Helpers/GetGalleryPhotos";
 import { PhotoType } from "~/Helpers/types";
 import * as Queries from "~/Helpers/Queries";
 
