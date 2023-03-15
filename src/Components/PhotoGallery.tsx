@@ -43,7 +43,10 @@ export default function PhotoGallery(props: PropsType) {
 
   const RequestFullPhotoCallback = useCallback(
     (index: number) => {
-      getPhotoById(photos[index].id)
+      if (photos[index].image.image64Full) {
+        return;
+      }
+      return getPhotoById(photos[index].id)
         .then((r) => {
           const newPhotos = [...photos];
           newPhotos[
@@ -59,13 +62,31 @@ export default function PhotoGallery(props: PropsType) {
   const deletePhotoCallback = useCallback(
     (index: number) => {
       const photo = photos[index];
-      RemovePhoto(photo.image.path)
+      if (photo.inServer) {
+        RequestFullPhotoCallback(index);
+      }
+
+      return RemovePhoto(photo.image.path)
         .then(() => {
-          const newPhotos = [...photos];
-          newPhotos[index].inDevice = false;
-          setPhotos(newPhotos);
+          if (photo.inServer) {
+            const newPhotos = [...photos];
+            newPhotos[index].inDevice = false;
+            setPhotos(newPhotos);
+          } else {
+            const newPhotos = [...photos];
+            newPhotos.splice(index, 1);
+            setPhotos(newPhotos);
+            setSwitchingState(
+              ({ isPhotoSelected, startIndexWhenSwitching }) => {
+                return {
+                  isPhotoSelected: isPhotoSelected,
+                  startIndexWhenSwitching:
+                    index < photos.length ? index : photos.length - 1,
+                };
+              }
+            );
+          }
         })
-        .then(() => {})
         .catch((err: any) => console.log(err));
     },
     [photos]
@@ -74,7 +95,7 @@ export default function PhotoGallery(props: PropsType) {
   const postPhotoCallback = useCallback(
     (index: number) => {
       const photo = photos[index];
-      RNFS.readFile(photo.image.path, "base64")
+      return RNFS.readFile(photo.image.path, "base64")
         .then((res: string) => {
           return postPhoto({
             name: photo.image.fileName,
@@ -87,12 +108,16 @@ export default function PhotoGallery(props: PropsType) {
           });
         })
         .then((response: any) => {
-          const postedPhoto = response.data.photo;
           const newPhotos = [...photos];
-          newPhotos[index].inServer = true;
-          newPhotos[index].id = postedPhoto.id;
-          newPhotos[index].syncDate = postedPhoto.syncDate;
+          newPhotos.splice(index, 1);
           setPhotos(newPhotos);
+          setSwitchingState(({ isPhotoSelected, startIndexWhenSwitching }) => {
+            return {
+              isPhotoSelected: isPhotoSelected,
+              startIndexWhenSwitching:
+                index < photos.length ? index : photos.length - 1,
+            };
+          });
         })
         .catch((err: any) => console.log(err));
     },
@@ -102,11 +127,18 @@ export default function PhotoGallery(props: PropsType) {
   const removePhotoFromServerCallback = useCallback(
     (index: number) => {
       const photo = photos[index];
-      removePhotoById(photo.id)
+      return removePhotoById(photo.id)
         .then(() => {
           const newPhotos = [...photos];
-          newPhotos[index].inServer = false;
+          newPhotos.splice(index, 1);
           setPhotos(newPhotos);
+          setSwitchingState(({ isPhotoSelected, startIndexWhenSwitching }) => {
+            return {
+              isPhotoSelected: isPhotoSelected,
+              startIndexWhenSwitching:
+                index < newPhotos.length ? index : newPhotos.length - 1,
+            };
+          });
         })
         .catch((err: any) => console.log(err));
     },
@@ -117,9 +149,9 @@ export default function PhotoGallery(props: PropsType) {
     (index: number) => {
       const photo = photos[index];
       if (photo.inServer) {
-        removePhotoFromServerCallback(index);
+        return removePhotoFromServerCallback(index);
       } else {
-        postPhotoCallback(index);
+        return postPhotoCallback(index);
       }
     },
     [postPhotoCallback, removePhotoFromServerCallback, photos]

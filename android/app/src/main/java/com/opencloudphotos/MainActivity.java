@@ -4,7 +4,16 @@ import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;
 import com.facebook.react.ReactRootView;
 
+import com.rtndeletemedia.DeleteMediaModule;
+import android.os.Bundle;
+
 public class MainActivity extends ReactActivity {
+
+  @Override
+  public void onCreate(Bundle savedInstanceState) {
+      super.onCreate(savedInstanceState);
+      DeleteMediaModule.init(this);
+  }
 
   /**
    * Returns the name of the main component registered from JavaScript. This is used to schedule

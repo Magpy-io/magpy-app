@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import { StyleSheet, View, TouchableWithoutFeedback } from "react-native";
 
 import FastImage from "react-native-fast-image";
@@ -12,6 +13,18 @@ type PropsType = {
 };
 
 export default function PhotoComponentForGrid(props: PropsType) {
+  const chooseImageCallback = useCallback(() => {
+    if (props.photo.inDevice) {
+      return props.photo.image.path;
+    } else {
+      if (props.photo.image.image64Full) {
+        return props.photo.image.image64Full;
+      } else {
+        return props.photo.image.image64;
+      }
+    }
+  }, [props.photo]);
+
   return (
     <TouchableWithoutFeedback
       onPress={() => {
@@ -23,11 +36,7 @@ export default function PhotoComponentForGrid(props: PropsType) {
     >
       <View style={styles.itemStyle}>
         <FastImage
-          source={{
-            uri: props.photo.inDevice
-              ? props.photo.image.path
-              : props.photo.image.image64,
-          }}
+          source={{ uri: chooseImageCallback() }}
           resizeMode={FastImage.resizeMode.cover}
           style={[styles.imageStyle]}
         />

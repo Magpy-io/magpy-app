@@ -37,9 +37,7 @@ export default function PhotoComponentForSlider(props: PropsType) {
     >
       <View style={styles.itemStyle}>
         <FastImage
-          source={{
-            uri: chooseImageCallback(),
-          }}
+          source={{ uri: chooseImageCallback() }}
           resizeMode={FastImage.resizeMode.contain}
           style={[styles.imageStyle]}
           resizeMethod={"resize"}

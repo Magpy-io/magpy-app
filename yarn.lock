@@ -5898,6 +5898,11 @@ react-native-codegen@^0.70.6:
     jscodeshift "^0.13.1"
     nullthrows "^1.1.1"
 
+react-native-delete-media@^1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/react-native-delete-media/-/react-native-delete-media-1.0.4.tgz#dcd3afc89ebda23a31e53fa9e325b65bac0f3d40"
+  integrity sha512-YV+7yJY08Py7TdShITnqYB5jX4TnzmR9JscTV++2yUYlrqs+voSDhc+ih/n99Ojv57BC8gWqFPaixlgBiueKVw==
+
 react-native-elements@^3.4.2:
   version "3.4.2"
   resolved "https://registry.yarnpkg.com/react-native-elements/-/react-native-elements-3.4.2.tgz#66602be9c5e0e0a2a831913adec80ff6518d1ee2"

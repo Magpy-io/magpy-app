@@ -32,6 +32,9 @@ type PropsType = {
 
 export default function PhotoGrid(props: PropsType) {
   console.log("PhotoSlider: Render");
+  console.log(props.photos.length);
+
+  const flatlistRef = useRef<FlatList>(null);
 
   const [flatListCurrentIndex, setFlatListCurrentIndex] = useState(
     props.startIndex
@@ -50,6 +53,22 @@ export default function PhotoGrid(props: PropsType) {
   );
 
   useEffect(() => {
+    if (props.photos.length == 0) {
+      return;
+    }
+
+    let indexToScroll = props.startIndex;
+    if (props.startIndex >= props.photos.length) {
+      indexToScroll = props.photos.length - 1;
+    }
+
+    flatlistRef.current?.scrollToIndex({
+      animated: false,
+      index: indexToScroll,
+    });
+  }, [props.photos.length, props.startIndex]);
+
+  useEffect(() => {
     const backAction = () => {
       props.onSwitchMode(flatListCurrentIndex);
       return true;
@@ -63,6 +82,15 @@ export default function PhotoGrid(props: PropsType) {
     return () => backHandler.remove();
   }, []);
 
+  useEffect(() => {
+    if (flatListCurrentIndex >= props.photos.length) {
+      setFlatListCurrentIndex(props.photos.length - 1);
+    }
+    if (!props.photos[flatListCurrentIndex].inDevice) {
+      props.RequestFullPhoto(flatListCurrentIndex);
+    }
+  }, [flatListCurrentIndex, props.photos]);
+
   const onViewableItemsChangedCallBack = useCallback(
     ({
       viewableItems,
@@ -74,9 +102,6 @@ export default function PhotoGrid(props: PropsType) {
       if (viewableItems.length == 1) {
         const index = viewableItems[0].index ?? 0;
         setFlatListCurrentIndex(index);
-        if (!props.photos[index].inDevice) {
-          props.RequestFullPhoto(index);
-        }
       }
     },
     []
@@ -87,10 +112,10 @@ export default function PhotoGrid(props: PropsType) {
       <View style={styles.centeringViewStyle}>
         <FlatList
           style={styles.flatListStyle}
+          ref={flatlistRef}
           data={props.photos}
           renderItem={renderItem}
           initialNumToRender={1}
-          initialScrollIndex={props.startIndex}
           onViewableItemsChanged={onViewableItemsChangedCallBack}
           viewabilityConfig={{
             itemVisiblePercentThreshold: 90,

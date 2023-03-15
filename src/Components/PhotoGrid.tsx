@@ -38,6 +38,22 @@ export default function PhotoGrid(props: PropsType) {
 
   useEffect(() => {
     if (props.photos.length == 0) {
+      return;
+    }
+
+    let indexToScroll = Math.floor(props.startIndex / 3);
+    if (props.startIndex >= props.photos.length) {
+      indexToScroll = Math.floor((props.photos.length - 1) / 3);
+    }
+
+    flatlistRef.current?.scrollToIndex({
+      animated: false,
+      index: indexToScroll,
+    });
+  }, [props.photos.length, props.startIndex]);
+
+  useEffect(() => {
+    if (props.photos.length == 0) {
       props.onEndReached();
     }
   }, [props.photos.length]);
@@ -50,7 +66,6 @@ export default function PhotoGrid(props: PropsType) {
       renderItem={renderItem}
       maxToRenderPerBatch={20}
       initialNumToRender={20}
-      initialScrollIndex={Math.floor(props.startIndex / 3)}
       keyExtractor={(item, index) =>
         `Photo_${item.image.fileName}_index_${index}`
       }
