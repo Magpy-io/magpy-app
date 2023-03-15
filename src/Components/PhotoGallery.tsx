@@ -5,7 +5,7 @@ import { PhotoType } from "~/Helpers/types";
 import PhotoGrid from "~/Components/PhotoGrid";
 import PhotoSlider from "~/Components/PhotoSlider";
 import { postPhoto, getPhotoById, removePhotoById } from "~/Helpers/Queries";
-import { RemovePhoto } from "~/Helpers/GetGalleryPhotos";
+import { addPhoto, RemovePhoto } from "~/Helpers/GetGalleryPhotos";
 import RNFS from "react-native-fs";
 
 function urlToFilePath(url: string) {
@@ -90,6 +90,38 @@ export default function PhotoGallery(props: PropsType) {
         .catch((err: any) => console.log(err));
     },
     [photos]
+  );
+
+  const addPhotoLocalCallback = useCallback(
+    (index: number) => {
+      const photo = photos[index];
+
+      return addPhoto(
+        photo.image.path,
+        photo.image.image64Full.split("data:image/jpeg;base64,")[1]
+      ).then(() => {
+        const newPhotos = [...photos];
+        newPhotos[index].inDevice = true;
+        setPhotos(newPhotos);
+      });
+    },
+    [photos]
+  );
+
+  const deleteAddLocalCallback = useCallback(
+    (index: number) => {
+      if (index >= photos.length) {
+        return;
+      }
+
+      const photo = photos[index];
+      if (photo.inDevice) {
+        return deletePhotoCallback(index);
+      } else {
+        return addPhotoLocalCallback(index);
+      }
+    },
+    [deletePhotoCallback, addPhotoLocalCallback, photos]
   );
 
   const postPhotoCallback = useCallback(
@@ -236,7 +268,7 @@ export default function PhotoGallery(props: PropsType) {
           RequestFullPhoto={RequestFullPhotoCallback}
           startIndex={switchingState.startIndexWhenSwitching}
           onDeleteAddServer={deleteAddServerCallback}
-          onDeleteAddLocal={deletePhotoCallback}
+          onDeleteAddLocal={deleteAddLocalCallback}
         />
       )}
     </View>

@@ -32,10 +32,9 @@ type PropsType = {
 
 export default function PhotoGrid(props: PropsType) {
   console.log("PhotoSlider: Render");
-  console.log(props.photos.length);
 
   const flatlistRef = useRef<FlatList>(null);
-
+  const flatListCurrentIndexRef = useRef<number>(props.startIndex);
   const [flatListCurrentIndex, setFlatListCurrentIndex] = useState(
     props.startIndex
   );
@@ -57,8 +56,8 @@ export default function PhotoGrid(props: PropsType) {
       return;
     }
 
-    let indexToScroll = props.startIndex;
-    if (props.startIndex >= props.photos.length) {
+    let indexToScroll = flatListCurrentIndex;
+    if (flatListCurrentIndex >= props.photos.length) {
       indexToScroll = props.photos.length - 1;
     }
 
@@ -66,11 +65,28 @@ export default function PhotoGrid(props: PropsType) {
       animated: false,
       index: indexToScroll,
     });
-  }, [props.photos.length, props.startIndex]);
+  }, [props.photos.length, flatListCurrentIndex]);
+
+  useEffect(() => {
+    if (props.photos.length == 0) {
+      props.onSwitchMode(0);
+      return;
+    }
+    if (flatListCurrentIndex >= props.photos.length) {
+      setFlatListCurrentIndex(props.photos.length - 1);
+      return;
+    }
+
+    console.log(flatListCurrentIndex);
+    console.log(props.photos.length);
+    if (!props.photos[flatListCurrentIndex].inDevice) {
+      props.RequestFullPhoto(flatListCurrentIndex);
+    }
+  }, [flatListCurrentIndex, props.photos, props.onSwitchMode]);
 
   useEffect(() => {
     const backAction = () => {
-      props.onSwitchMode(flatListCurrentIndex);
+      props.onSwitchMode(flatListCurrentIndexRef.current);
       return true;
     };
 
@@ -80,16 +96,7 @@ export default function PhotoGrid(props: PropsType) {
     );
 
     return () => backHandler.remove();
-  }, []);
-
-  useEffect(() => {
-    if (flatListCurrentIndex >= props.photos.length) {
-      setFlatListCurrentIndex(props.photos.length - 1);
-    }
-    if (!props.photos[flatListCurrentIndex].inDevice) {
-      props.RequestFullPhoto(flatListCurrentIndex);
-    }
-  }, [flatListCurrentIndex, props.photos]);
+  }, [props.onSwitchMode]);
 
   const onViewableItemsChangedCallBack = useCallback(
     ({
@@ -101,6 +108,8 @@ export default function PhotoGrid(props: PropsType) {
     }) => {
       if (viewableItems.length == 1) {
         const index = viewableItems[0].index ?? 0;
+        console.log(index);
+        flatListCurrentIndexRef.current = index;
         setFlatListCurrentIndex(index);
       }
     },
@@ -116,6 +125,7 @@ export default function PhotoGrid(props: PropsType) {
           data={props.photos}
           renderItem={renderItem}
           initialNumToRender={1}
+          initialScrollIndex={props.startIndex}
           onViewableItemsChanged={onViewableItemsChangedCallBack}
           viewabilityConfig={{
             itemVisiblePercentThreshold: 90,

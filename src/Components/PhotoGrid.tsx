@@ -19,6 +19,7 @@ export default function PhotoGrid(props: PropsType) {
   console.log("PhotoGrid: Render");
 
   const flatlistRef = useRef<FlatList>(null);
+  const photosLenRef = useRef<number>(props.photos.length);
 
   const PhotoPressed = (index: number) => {
     props.onSwitchMode(index);
@@ -37,25 +38,26 @@ export default function PhotoGrid(props: PropsType) {
   );
 
   useEffect(() => {
-    if (props.photos.length == 0) {
+    if (photosLenRef.current == 0) {
       return;
     }
 
     let indexToScroll = Math.floor(props.startIndex / 3);
-    if (props.startIndex >= props.photos.length) {
-      indexToScroll = Math.floor((props.photos.length - 1) / 3);
+    if (indexToScroll >= photosLenRef.current) {
+      indexToScroll = Math.floor((photosLenRef.current - 1) / 3);
     }
 
     flatlistRef.current?.scrollToIndex({
       animated: false,
       index: indexToScroll,
     });
-  }, [props.photos.length, props.startIndex]);
+  }, [props.startIndex]);
 
   useEffect(() => {
     if (props.photos.length == 0) {
       props.onEndReached();
     }
+    photosLenRef.current = props.photos.length;
   }, [props.photos.length]);
 
   return (

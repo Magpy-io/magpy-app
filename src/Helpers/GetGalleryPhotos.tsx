@@ -1,5 +1,6 @@
 import { CameraRoll } from "@react-native-camera-roll/camera-roll";
 import { DeleteMedia } from "react-native-delete-media";
+import RNFS from "react-native-fs";
 
 function GetPhotos(n: number, offset: number = 0) {
   return CameraRoll.getPhotos({
@@ -12,8 +13,14 @@ function GetPhotos(n: number, offset: number = 0) {
   });
 }
 
-async function RemovePhoto(uri: string) {
+function addPhoto(path: string, image: string) {
+  return RNFS.writeFile(path, image, "base64").catch((error) => {
+    alert(JSON.stringify(error));
+  });
+}
+
+function RemovePhoto(uri: string) {
   return DeleteMedia.deletePhotos([uri]);
 }
 
-export { GetPhotos, RemovePhoto };
+export { GetPhotos, RemovePhoto, addPhoto };
