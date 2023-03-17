@@ -3,13 +3,16 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { PhotoType } from "~/Helpers/types";
 import PhotoComponentForGrid from "./PhotoComponentForGrid";
 
-const ITEM_HEIGHT = Dimensions.get("window").width / 3;
+const ITEM_HEIGHT = Dimensions.get("screen").width / 3;
+
+const listEmptyComponent = () => {
+  return <Text style={styles.textOnEmpty}>No Data</Text>;
+};
 
 type PropsType = {
   photos: PhotoType[];
   onEndReached: () => void;
   onSwitchMode: (index: number) => void;
-  onPostPhoto: (index: number) => void;
   startIndex: number;
   onPhotoClicked?: (index: number) => void;
   onRefresh: () => void;
@@ -19,6 +22,7 @@ export default function PhotoGrid(props: PropsType) {
   console.log("PhotoGrid: Render");
 
   const flatlistRef = useRef<FlatList>(null);
+  const photosLenRef = useRef<number>(props.photos.length);
 
   const PhotoPressed = (index: number) => {
     props.onSwitchMode(index);
@@ -29,17 +33,33 @@ export default function PhotoGrid(props: PropsType) {
       <PhotoComponentForGrid
         photo={item}
         onPress={() => PhotoPressed(index)}
-        onLongPress={() => props.onPostPhoto(index)}
-        index={index}
+        //onLongPress={() => props.onPostPhoto(index)}
       />
     ),
     [props.photos]
   );
 
   useEffect(() => {
+    if (photosLenRef.current == 0) {
+      return;
+    }
+
+    let indexToScroll = Math.floor(props.startIndex / 3);
+    if (indexToScroll >= photosLenRef.current) {
+      indexToScroll = Math.floor((photosLenRef.current - 1) / 3);
+    }
+
+    flatlistRef.current?.scrollToIndex({
+      animated: false,
+      index: indexToScroll,
+    });
+  }, [props.startIndex]);
+
+  useEffect(() => {
     if (props.photos.length == 0) {
       props.onEndReached();
     }
+    photosLenRef.current = props.photos.length;
   }, [props.photos.length]);
 
   return (
@@ -67,10 +87,12 @@ export default function PhotoGrid(props: PropsType) {
         offset: ITEM_HEIGHT * index,
         index,
       })}
+      ListEmptyComponent={listEmptyComponent}
     />
   );
 }
 
 const styles = StyleSheet.create({
   flatListStyle: {},
+  textOnEmpty: { fontSize: 15 },
 });

@@ -2,7 +2,7 @@ import { PermissionsAndroid, Permission, Platform } from "react-native";
 
 async function hasAndroidPermissionWriteExternalStorage() {
   return await hasAndroidAnyPermission(
-    PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE
+    PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
   );
 }
 

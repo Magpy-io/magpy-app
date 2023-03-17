@@ -9,6 +9,7 @@ const routes = {
   getPhotosExist: path + "photosExist/",
   getPhotosDataN: path + "photosDataGetNb/",
   getPhotosByIds: path + "photosGetId/",
+  deletePhotoId: path + "photoDelete",
 };
 
 function getPhotoById(id: string) {
@@ -61,6 +62,16 @@ function getPhotosByIds(ids: Array<string>) {
   }).then((r) => r.json());
 }
 
+function removePhotoById(id: string) {
+  return fetch(routes.deletePhotoId, {
+    method: "Delete",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ id: id }),
+  }).then((r) => r.json());
+}
+
 type PostPhotoFormat = {
   name: string;
   fileSize: number;
@@ -72,7 +83,7 @@ type PostPhotoFormat = {
 };
 
 function postPhoto(photo: PostPhotoFormat) {
-  fetch(routes.postPhoto, {
+  return fetch(routes.postPhoto, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -88,4 +99,5 @@ export {
   getPhotosExist,
   getPhotosDataN,
   getPhotosByIds,
+  removePhotoById,
 };

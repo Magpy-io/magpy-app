@@ -4,9 +4,10 @@ import { useState, useRef, useCallback } from "react";
 import { PhotoType } from "~/Helpers/types";
 import PhotoGrid from "~/Components/PhotoGrid";
 import PhotoSlider from "~/Components/PhotoSlider";
-import { postPhoto, getPhotoById } from "~/Helpers/Queries";
-import { RemovePhoto } from "~/Helpers/GetGalleryPhotos";
+import { postPhoto, getPhotoById, removePhotoById } from "~/Helpers/Queries";
+import { addPhoto, RemovePhoto } from "~/Helpers/GetGalleryPhotos";
 import RNFS from "react-native-fs";
+import { ReloadInstructions } from "react-native/Libraries/NewAppScreen";
 
 function urlToFilePath(url: string) {
   let filePath = url;
@@ -43,7 +44,10 @@ export default function PhotoGallery(props: PropsType) {
 
   const RequestFullPhotoCallback = useCallback(
     (index: number) => {
-      getPhotoById(photos[index].id)
+      if (photos[index].image.image64Full) {
+        return;
+      }
+      return getPhotoById(photos[index].id)
         .then((r) => {
           const newPhotos = [...photos];
           newPhotos[
@@ -59,22 +63,72 @@ export default function PhotoGallery(props: PropsType) {
   const deletePhotoCallback = useCallback(
     (index: number) => {
       const photo = photos[index];
-      RemovePhoto(photo.image.path)
+      if (photo.inServer) {
+        RequestFullPhotoCallback(index);
+      }
+
+      return RemovePhoto(photo.image.path)
         .then(() => {
-          const newPhotos = [...photos];
-          newPhotos[index].inDevice = false;
-          setPhotos(newPhotos);
+          if (photo.inServer) {
+            const newPhotos = [...photos];
+            newPhotos[index].inDevice = false;
+            setPhotos(newPhotos);
+          } else {
+            const newPhotos = [...photos];
+            newPhotos.splice(index, 1);
+            setPhotos(newPhotos);
+            setSwitchingState(
+              ({ isPhotoSelected, startIndexWhenSwitching }) => {
+                return {
+                  isPhotoSelected: isPhotoSelected,
+                  startIndexWhenSwitching:
+                    index < photos.length ? index : photos.length - 1,
+                };
+              }
+            );
+          }
         })
-        .then(() => {})
         .catch((err: any) => console.log(err));
     },
     [photos]
   );
 
+  const addPhotoLocalCallback = useCallback(
+    (index: number) => {
+      const photo = photos[index];
+
+      return addPhoto(
+        photo.image.path,
+        photo.image.image64Full.split("data:image/jpeg;base64,")[1]
+      ).then(() => {
+        const newPhotos = [...photos];
+        newPhotos[index].inDevice = true;
+        setPhotos(newPhotos);
+      });
+    },
+    [photos]
+  );
+
+  const deleteAddLocalCallback = useCallback(
+    (index: number) => {
+      if (index >= photos.length) {
+        return;
+      }
+
+      const photo = photos[index];
+      if (photo.inDevice) {
+        return deletePhotoCallback(index);
+      } else {
+        return addPhotoLocalCallback(index);
+      }
+    },
+    [deletePhotoCallback, addPhotoLocalCallback, photos]
+  );
+
   const postPhotoCallback = useCallback(
     (index: number) => {
       const photo = photos[index];
-      RNFS.readFile(photo.image.path, "base64")
+      return RNFS.readFile(photo.image.path, "base64")
         .then((res: string) => {
           return postPhoto({
             name: photo.image.fileName,
@@ -86,14 +140,54 @@ export default function PhotoGallery(props: PropsType) {
             image64: res,
           });
         })
-        .then((r) => {
+        .then((response: any) => {
           const newPhotos = [...photos];
-          newPhotos[index].inServer = true;
+          newPhotos.splice(index, 1);
           setPhotos(newPhotos);
+          setSwitchingState(({ isPhotoSelected, startIndexWhenSwitching }) => {
+            return {
+              isPhotoSelected: isPhotoSelected,
+              startIndexWhenSwitching:
+                index < photos.length ? index : photos.length - 1,
+            };
+          });
         })
         .catch((err: any) => console.log(err));
     },
     [photos]
+  );
+
+  const removePhotoFromServerCallback = useCallback(
+    (index: number) => {
+      const photo = photos[index];
+      return removePhotoById(photo.id)
+        .then(() => {
+          const newPhotos = [...photos];
+          newPhotos.splice(index, 1);
+          setPhotos(newPhotos);
+          setSwitchingState(({ isPhotoSelected, startIndexWhenSwitching }) => {
+            return {
+              isPhotoSelected: isPhotoSelected,
+              startIndexWhenSwitching:
+                index < newPhotos.length ? index : newPhotos.length - 1,
+            };
+          });
+        })
+        .catch((err: any) => console.log(err));
+    },
+    [photos]
+  );
+
+  const deleteAddServerCallback = useCallback(
+    (index: number) => {
+      const photo = photos[index];
+      if (photo.inServer) {
+        return removePhotoFromServerCallback(index);
+      } else {
+        return postPhotoCallback(index);
+      }
+    },
+    [postPhotoCallback, removePhotoFromServerCallback, photos]
   );
 
   const fetchMoreCallback = useCallback(async () => {
@@ -160,22 +254,20 @@ export default function PhotoGallery(props: PropsType) {
       {!switchingState.isPhotoSelected ? (
         <PhotoGrid
           photos={photos}
+          startIndex={switchingState.startIndexWhenSwitching}
           onEndReached={fetchMoreCallback}
           onSwitchMode={onSwitchMode}
-          onPostPhoto={postPhotoCallback}
           onRefresh={onRefresh}
-          startIndex={switchingState.startIndexWhenSwitching}
         />
       ) : (
         <PhotoSlider
           photos={photos}
+          startIndex={switchingState.startIndexWhenSwitching}
           onEndReached={fetchMoreCallback}
           onSwitchMode={onSwitchMode}
-          onPostPhoto={postPhotoCallback}
           RequestFullPhoto={RequestFullPhotoCallback}
-          startIndex={switchingState.startIndexWhenSwitching}
-          onDeleteAddServer={postPhotoCallback}
-          onDeleteAddLocal={deletePhotoCallback}
+          onDeleteAddServer={deleteAddServerCallback}
+          onDeleteAddLocal={deleteAddLocalCallback}
         />
       )}
     </View>

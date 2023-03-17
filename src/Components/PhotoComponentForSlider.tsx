@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import React, { useCallback } from "react";
 import {
   StyleSheet,
   View,
@@ -14,10 +14,9 @@ type PropsType = {
   photo: PhotoType;
   onPress?: () => void;
   onLongPress?: () => void;
-  index: number;
 };
 
-export default function PhotoComponentForSlider(props: PropsType) {
+function PhotoComponentForSlider(props: PropsType) {
   const chooseImageCallback = useCallback(() => {
     if (props.photo.inDevice) {
       return props.photo.image.path;
@@ -37,12 +36,9 @@ export default function PhotoComponentForSlider(props: PropsType) {
     >
       <View style={styles.itemStyle}>
         <FastImage
-          source={{
-            uri: chooseImageCallback(),
-          }}
+          source={{ uri: chooseImageCallback() }}
           resizeMode={FastImage.resizeMode.contain}
-          style={[styles.imageStyle]}
-          resizeMethod={"resize"}
+          style={styles.imageStyle}
         />
       </View>
     </TouchableWithoutFeedback>
@@ -63,3 +59,5 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
 });
+
+export default React.memo(PhotoComponentForSlider);
