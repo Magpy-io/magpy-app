@@ -3,13 +3,16 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { PhotoType } from "~/Helpers/types";
 import PhotoComponentForGrid from "./PhotoComponentForGrid";
 
-const ITEM_HEIGHT = Dimensions.get("window").width / 3;
+const ITEM_HEIGHT = Dimensions.get("screen").width / 3;
+
+const listEmptyComponent = () => {
+  return <Text style={styles.textOnEmpty}>No Data</Text>;
+};
 
 type PropsType = {
   photos: PhotoType[];
   onEndReached: () => void;
   onSwitchMode: (index: number) => void;
-  onPostPhoto: (index: number) => void;
   startIndex: number;
   onPhotoClicked?: (index: number) => void;
   onRefresh: () => void;
@@ -30,8 +33,7 @@ export default function PhotoGrid(props: PropsType) {
       <PhotoComponentForGrid
         photo={item}
         onPress={() => PhotoPressed(index)}
-        onLongPress={() => props.onPostPhoto(index)}
-        index={index}
+        //onLongPress={() => props.onPostPhoto(index)}
       />
     ),
     [props.photos]
@@ -68,6 +70,7 @@ export default function PhotoGrid(props: PropsType) {
       renderItem={renderItem}
       maxToRenderPerBatch={20}
       initialNumToRender={20}
+      initialScrollIndex={Math.floor(props.startIndex / 3)}
       keyExtractor={(item, index) =>
         `Photo_${item.image.fileName}_index_${index}`
       }
@@ -84,10 +87,12 @@ export default function PhotoGrid(props: PropsType) {
         offset: ITEM_HEIGHT * index,
         index,
       })}
+      ListEmptyComponent={listEmptyComponent}
     />
   );
 }
 
 const styles = StyleSheet.create({
   flatListStyle: {},
+  textOnEmpty: { fontSize: 15 },
 });

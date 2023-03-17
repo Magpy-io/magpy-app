@@ -7,6 +7,7 @@ import PhotoSlider from "~/Components/PhotoSlider";
 import { postPhoto, getPhotoById, removePhotoById } from "~/Helpers/Queries";
 import { addPhoto, RemovePhoto } from "~/Helpers/GetGalleryPhotos";
 import RNFS from "react-native-fs";
+import { ReloadInstructions } from "react-native/Libraries/NewAppScreen";
 
 function urlToFilePath(url: string) {
   let filePath = url;
@@ -253,20 +254,18 @@ export default function PhotoGallery(props: PropsType) {
       {!switchingState.isPhotoSelected ? (
         <PhotoGrid
           photos={photos}
+          startIndex={switchingState.startIndexWhenSwitching}
           onEndReached={fetchMoreCallback}
           onSwitchMode={onSwitchMode}
-          onPostPhoto={postPhotoCallback}
           onRefresh={onRefresh}
-          startIndex={switchingState.startIndexWhenSwitching}
         />
       ) : (
         <PhotoSlider
           photos={photos}
+          startIndex={switchingState.startIndexWhenSwitching}
           onEndReached={fetchMoreCallback}
           onSwitchMode={onSwitchMode}
-          onPostPhoto={postPhotoCallback}
           RequestFullPhoto={RequestFullPhotoCallback}
-          startIndex={switchingState.startIndexWhenSwitching}
           onDeleteAddServer={deleteAddServerCallback}
           onDeleteAddLocal={deleteAddLocalCallback}
         />

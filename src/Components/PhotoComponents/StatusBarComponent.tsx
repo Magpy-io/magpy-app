@@ -1,26 +1,25 @@
-import React, { useState, useEffect } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 import { Icon } from "@rneui/themed";
 import colors from "~/colors";
-import { PhotoType } from "~/Helpers/types";
 import BackButton from "../CommonComponents/BackButton";
+import React from "react";
 
 type StatusBarComponentProps = {
-  photo: PhotoType;
+  inDevice: boolean;
+  inServer: boolean;
   style?: any;
   onBackButton?: () => void;
 };
 
-export default function StatusBarComponent(props: StatusBarComponentProps) {
-  const inDevice = props.photo?.inDevice;
-  const inServer = props.photo?.inServer;
+function StatusBarComponent(props: StatusBarComponentProps) {
+  const deviceStatusText = props.inDevice ? "On device" : "Not on device";
+  const serverStatusText = props.inServer ? "Backed up" : "Not backed up";
 
-  const deviceStatusText = inDevice ? "On device" : "Not on device";
-  const serverStatusText = inServer ? "Backed up" : "Not backed up";
-
-  const deviceStatusIcon = inDevice ? "mobile-friendly" : "phonelink-erase";
-  const serverStatusIcon = inServer ? "cloud-done" : "cloud-off";
+  const deviceStatusIcon = props.inDevice
+    ? "mobile-friendly"
+    : "phonelink-erase";
+  const serverStatusIcon = props.inServer ? "cloud-done" : "cloud-off";
 
   return (
     <View style={[styles.StatusBarStyle, props.style]}>
@@ -31,12 +30,12 @@ export default function StatusBarComponent(props: StatusBarComponentProps) {
         <StatusComponent
           icon={deviceStatusIcon}
           text={deviceStatusText}
-          valid={inDevice}
+          valid={props.inDevice}
         />
         <StatusComponent
           icon={serverStatusIcon}
           text={serverStatusText}
-          valid={inServer}
+          valid={props.inServer}
         />
       </View>
     </View>
@@ -46,7 +45,7 @@ export default function StatusBarComponent(props: StatusBarComponentProps) {
 type StatusComponentProps = {
   icon: string;
   text: string;
-  valid?: boolean | null;
+  valid: boolean;
 };
 
 const VALID_COLOR = colors.success;
@@ -54,7 +53,7 @@ const VALID_BACKGROUND_COLOR = colors.lightSuccess;
 const INVALID_COLOR = "black";
 const INVALID_BACKGROUND_COLOR = colors.greyBackgroundColor;
 
-function StatusComponent(props: StatusComponentProps) {
+const StatusComponent = React.memo((props: StatusComponentProps) => {
   return (
     <View
       style={[
@@ -85,7 +84,7 @@ function StatusComponent(props: StatusComponentProps) {
       </Text>
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   StatusBarStyle: {
@@ -108,3 +107,5 @@ const styles = StyleSheet.create({
     marginHorizontal: 3,
   },
 });
+
+export default React.memo(StatusBarComponent);

@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
 import { StyleSheet, Text, View, TouchableHighlight } from "react-native";
 
 import { Icon } from "@rneui/themed";
 import colors from "~/colors";
 import { PhotoType } from "~/Helpers/types";
+import React from "react";
 
 const ICON_SIZE = 26;
 const TEXT_SIZE = 12;
@@ -11,57 +11,54 @@ const TOOLBAR_COLOR = "white";
 const TOOL_COLOR = "black";
 
 type ToolBarProps = {
-  photos: PhotoType[];
-  index: number;
+  inDevice: boolean;
+  inServer: boolean;
   style?: any;
-  onDeleteAddLocal?: (index: number) => void;
-  onDeleteAddServer?: (index: number) => void;
-  onShare?: (index: number) => void;
-  onDetails?: (index: number) => void;
+  onDeleteAddLocal?: () => void;
+  onDeleteAddServer?: () => void;
+  onShare?: () => void;
+  onDetails?: () => void;
 };
 
-export default function ToolBar(props: ToolBarProps) {
-  const inDevice = props?.photos[props.index]?.inDevice;
-  const inServer = props?.photos[props.index]?.inServer;
-
+function ToolBar(props: ToolBarProps) {
   return (
     <View style={[styles.toolBarView, props.style]}>
       <View style={styles.toolsView}>
-        {inDevice ? (
+        {props.inDevice ? (
           <ToolComponent
             icon="mobile-off"
             text="Delete from device"
-            onPress={() => props.onDeleteAddLocal?.(props.index)}
+            onPress={() => props.onDeleteAddLocal?.()}
           />
         ) : (
           <ToolComponent
             icon="system-update"
             text="Save to device"
-            onPress={() => props.onDeleteAddLocal?.(props.index)}
+            onPress={() => props.onDeleteAddLocal?.()}
           />
         )}
-        {inServer ? (
+        {props.inServer ? (
           <ToolComponent
             icon="delete"
             text="Delete from server"
-            onPress={() => props.onDeleteAddServer?.(props.index)}
+            onPress={() => props.onDeleteAddServer?.()}
           />
         ) : (
           <ToolComponent
             icon="backup"
             text="Back up"
-            onPress={() => props.onDeleteAddServer?.(props.index)}
+            onPress={() => props.onDeleteAddServer?.()}
           />
         )}
         <ToolComponent
           icon="share"
           text="Share"
-          onPress={() => props.onShare?.(props.index)}
+          onPress={() => props.onShare?.()}
         />
         <ToolComponent
           icon="info"
           text="Details"
-          onPress={() => props.onDetails?.(props.index)}
+          onPress={() => props.onDetails?.()}
         />
       </View>
     </View>
@@ -75,7 +72,7 @@ type ToolComponentProps = {
   onPress: () => void;
 };
 
-function ToolComponent(props: ToolComponentProps) {
+const ToolComponent = React.memo((props: ToolComponentProps) => {
   return (
     <TouchableHighlight
       onPress={props.onPress}
@@ -116,7 +113,7 @@ function ToolComponent(props: ToolComponentProps) {
       </View>
     </TouchableHighlight>
   );
-}
+});
 
 const styles = StyleSheet.create({
   toolBarView: {
@@ -129,3 +126,5 @@ const styles = StyleSheet.create({
   },
   iconContainerStyle: {},
 });
+
+export default React.memo(ToolBar);

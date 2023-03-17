@@ -1,6 +1,6 @@
 type PhotoType = {
-  inDevice: boolean | null;
-  inServer: boolean | null;
+  inDevice: boolean;
+  inServer: boolean;
   image: {
     fileSize: number;
     fileName: string;
