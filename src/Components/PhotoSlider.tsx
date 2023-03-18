@@ -1,10 +1,11 @@
-import { StyleSheet, BackHandler } from "react-native";
+import { StyleSheet, BackHandler, StatusBar } from "react-native";
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { PhotoType } from "~/Helpers/types";
 import StatusBarComponent from "./PhotoComponents/StatusBarComponent";
 import ToolBar from "./PhotoComponents/ToolBar";
 import PhotoSliderCore from "./PhotoSliderCore";
+import FullScreen from "react-native-full-screen";
 
 import {
   ContextSourceTypes,
@@ -25,6 +26,7 @@ export default function PhotoSlider(props: PropsType) {
   const [flatListCurrentIndex, setFlatListCurrentIndex] = useState(
     props.startIndex
   );
+  const [isFullScreen, setIsFullScreen] = useState(false);
 
   const validFlatListCurrentIndex =
     context.photos.length != 0 && flatListCurrentIndex < context.photos.length;
@@ -59,14 +61,23 @@ export default function PhotoSlider(props: PropsType) {
 
   return (
     <>
+      <StatusBar hidden={isFullScreen} />
       <PhotoSliderCore
         photos={context.photos}
         startIndex={props.startIndex}
         onSwitchMode={props.onSwitchMode}
         onIndexChanged={onCurrentIndexChanged}
         onEndReached={context.fetchMore}
+        onPhotoClick={() => {
+          if (isFullScreen) {
+            FullScreen.offFullScreen();
+          } else {
+            FullScreen.onFullScreen();
+          }
+          setIsFullScreen((f) => !f);
+        }}
       />
-      {validFlatListCurrentIndex ? (
+      {validFlatListCurrentIndex && !isFullScreen ? (
         <StatusBarComponent
           style={styles.statusBarStyle}
           inDevice={context.photos[flatListCurrentIndex].inDevice}
@@ -77,7 +88,7 @@ export default function PhotoSlider(props: PropsType) {
         <></>
       )}
 
-      {validFlatListCurrentIndex ? (
+      {validFlatListCurrentIndex && !isFullScreen ? (
         <ToolBar
           style={styles.toolBarStyle}
           inDevice={context.photos[flatListCurrentIndex].inDevice}
