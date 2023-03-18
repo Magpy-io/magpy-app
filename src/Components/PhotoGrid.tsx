@@ -1,92 +1,84 @@
-import { StyleSheet, Text, FlatList, Dimensions } from "react-native";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { StyleSheet, Text, FlatList, Dimensions, View } from "react-native";
+import { useCallback, useContext, useEffect, useRef } from "react";
 import { PhotoType } from "~/Helpers/types";
 import PhotoComponentForGrid from "./PhotoComponentForGrid";
 
+import {
+  ContextSourceTypes,
+  useSelectedContext,
+} from "~/Components/ContextProvider";
+
 const ITEM_HEIGHT = Dimensions.get("screen").width / 3;
 
+function keyExtractor(item: PhotoType, index: number) {
+  return `Photo_${item.image.fileName}_index_${index}`;
+}
+
+function getItemLayout(data: any, index: number) {
+  return {
+    length: ITEM_HEIGHT,
+    offset: ITEM_HEIGHT * index,
+    index,
+  };
+}
+
 const listEmptyComponent = () => {
-  return <Text style={styles.textOnEmpty}>No Data</Text>;
+  return (
+    <View style={styles.viewOnEmpty}>
+      <Text style={styles.textOnEmpty}>No Data</Text>
+    </View>
+  );
 };
 
 type PropsType = {
-  photos: PhotoType[];
-  onEndReached: () => void;
-  onSwitchMode: (index: number) => void;
+  contextSource: ContextSourceTypes;
   startIndex: number;
-  onPhotoClicked?: (index: number) => void;
-  onRefresh: () => void;
+  onSwitchMode: (index: number) => void;
 };
 
 export default function PhotoGrid(props: PropsType) {
-  console.log("PhotoGrid: Render");
+  const context = useSelectedContext(props.contextSource);
 
   const flatlistRef = useRef<FlatList>(null);
-  const photosLenRef = useRef<number>(props.photos.length);
-
-  const PhotoPressed = (index: number) => {
-    props.onSwitchMode(index);
-  };
 
   const renderItem = useCallback(
     ({ item, index }: { item: PhotoType; index: number }) => (
       <PhotoComponentForGrid
         photo={item}
-        onPress={() => PhotoPressed(index)}
-        //onLongPress={() => props.onPostPhoto(index)}
+        onPress={() => props.onSwitchMode(index)}
       />
     ),
-    [props.photos]
+    [props.onSwitchMode]
   );
 
-  useEffect(() => {
-    if (photosLenRef.current == 0) {
-      return;
-    }
+  let correctStartIndex = Math.floor(props.startIndex / 3);
 
-    let indexToScroll = Math.floor(props.startIndex / 3);
-    if (indexToScroll >= photosLenRef.current) {
-      indexToScroll = Math.floor((photosLenRef.current - 1) / 3);
-    }
-
-    flatlistRef.current?.scrollToIndex({
-      animated: false,
-      index: indexToScroll,
-    });
-  }, [props.startIndex]);
+  if (props.startIndex >= context.photos.length) {
+    correctStartIndex = Math.floor((context.photos.length - 1) / 3);
+  }
 
   useEffect(() => {
-    if (props.photos.length == 0) {
-      props.onEndReached();
+    if (context.photos.length == 0) {
+      context.onRefresh();
     }
-    photosLenRef.current = props.photos.length;
-  }, [props.photos.length]);
+  }, [context.photos.length]);
 
   return (
     <FlatList
       ref={flatlistRef}
       style={styles.flatListStyle}
-      data={props.photos}
+      data={context.photos}
       renderItem={renderItem}
       maxToRenderPerBatch={20}
       initialNumToRender={20}
-      initialScrollIndex={Math.floor(props.startIndex / 3)}
-      keyExtractor={(item, index) =>
-        `Photo_${item.image.fileName}_index_${index}`
-      }
+      initialScrollIndex={correctStartIndex}
+      keyExtractor={keyExtractor}
       onEndReachedThreshold={1}
-      onEndReached={() => {
-        console.log("PhotoGrid: onEndReached");
-        props.onEndReached();
-      }}
-      onRefresh={props.onRefresh}
+      onEndReached={context.fetchMore}
+      onRefresh={context.onRefresh}
       refreshing={false}
       numColumns={3}
-      getItemLayout={(data, index) => ({
-        length: ITEM_HEIGHT,
-        offset: ITEM_HEIGHT * index,
-        index,
-      })}
+      getItemLayout={getItemLayout}
       ListEmptyComponent={listEmptyComponent}
     />
   );
@@ -94,5 +86,9 @@ export default function PhotoGrid(props: PropsType) {
 
 const styles = StyleSheet.create({
   flatListStyle: {},
-  textOnEmpty: { fontSize: 15 },
+  textOnEmpty: {
+    fontSize: 15,
+    textAlign: "center",
+  },
+  viewOnEmpty: {},
 });

@@ -1,11 +1,4 @@
-import {
-  StyleSheet,
-  Text,
-  FlatList,
-  Dimensions,
-  BackHandler,
-  ViewToken,
-} from "react-native";
+import { StyleSheet, FlatList, Dimensions, ViewToken } from "react-native";
 
 import React, { useCallback, useEffect, useRef } from "react";
 import { PhotoType } from "~/Helpers/types";
@@ -47,11 +40,8 @@ function PhotoSliderCore(props: PropsType) {
         onLongPress={() => props.onPhotoLongClick?.(index)}
       />
     ),
-    [props.photos, props.onPhotoClick, props.onPhotoLongClick]
+    [props.onPhotoClick, props.onPhotoLongClick]
   );
-
-  const indexOutOfRange =
-    props.startIndex >= props.photos.length || props.startIndex < 0;
 
   let correctStartIndex = props.startIndex;
 
@@ -89,17 +79,35 @@ function PhotoSliderCore(props: PropsType) {
 
   useEffect(() => {
     if (props.photos.length == 0) {
-      props.onSwitchMode(0);
       return;
+    }
+    const indexOutOfRange =
+      flatListCurrentIndexRef.current >= props.photos.length ||
+      props.startIndex < 0;
+
+    let indexToScroll = flatListCurrentIndexRef.current;
+
+    if (flatListCurrentIndexRef.current < 0) {
+      indexToScroll = 0;
+    }
+
+    if (flatListCurrentIndexRef.current >= props.photos.length) {
+      indexToScroll = props.photos.length - 1;
     }
 
     if (indexOutOfRange) {
       flatlistRef.current?.scrollToIndex({
         animated: false,
-        index: props.photos.length - 1,
+        index: indexToScroll,
       });
     }
-  }, [props.photos.length, props.startIndex, props.onSwitchMode]);
+  }, [props.photos.length]);
+
+  useEffect(() => {
+    if (props.photos.length == 0) {
+      props.onSwitchMode(0);
+    }
+  }, [props.photos.length, props.onSwitchMode]);
 
   return (
     <FlatList
@@ -118,7 +126,7 @@ function PhotoSliderCore(props: PropsType) {
       disableIntervalMomentum={true}
       decelerationRate={"normal"}
       showsHorizontalScrollIndicator={false}
-      snapToInterval={Dimensions.get("screen").width}
+      snapToInterval={ITEM_WIDTH}
       keyExtractor={keyExtractor}
       onEndReachedThreshold={5}
       onEndReached={props.onEndReached}
