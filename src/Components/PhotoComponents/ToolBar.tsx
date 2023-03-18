@@ -5,10 +5,10 @@ import colors from "~/colors";
 import { PhotoType } from "~/Helpers/types";
 import React from "react";
 
-const ICON_SIZE = 26;
-const TEXT_SIZE = 12;
-const TOOLBAR_COLOR = "white";
-const TOOL_COLOR = "black";
+const ICON_SIZE = 20;
+const TEXT_SIZE = 10;
+const TOOLBAR_COLOR = "#ffffffd0";
+const TOOL_COLOR = "#4d4d4d";
 
 type ToolBarProps = {
   inDevice: boolean;
@@ -81,7 +81,7 @@ const ToolComponent = React.memo((props: ToolComponentProps) => {
       style={{
         flex: 1,
         padding: 5,
-        paddingVertical: 20,
+        paddingVertical: 8,
       }}
       underlayColor={colors.underlayColor}
     >
@@ -125,6 +125,7 @@ const styles = StyleSheet.create({
   toolsView: {
     flex: 1,
     flexDirection: "row",
+    backgroundColor: TOOLBAR_COLOR,
   },
   iconContainerStyle: {},
 });
