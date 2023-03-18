@@ -1,11 +1,4 @@
-import {
-  StyleSheet,
-  Text,
-  FlatList,
-  Dimensions,
-  BackHandler,
-  ViewToken,
-} from "react-native";
+import { StyleSheet, FlatList, Dimensions, ViewToken } from "react-native";
 
 import React, { useCallback, useEffect, useRef } from "react";
 import { PhotoType } from "~/Helpers/types";
@@ -99,7 +92,7 @@ function PhotoSliderCore(props: PropsType) {
         index: props.photos.length - 1,
       });
     }
-  }, [props.photos.length, props.startIndex, props.onSwitchMode]);
+  }, [props.photos.length, props.onSwitchMode]);
 
   return (
     <FlatList
@@ -118,7 +111,7 @@ function PhotoSliderCore(props: PropsType) {
       disableIntervalMomentum={true}
       decelerationRate={"normal"}
       showsHorizontalScrollIndicator={false}
-      snapToInterval={Dimensions.get("screen").width}
+      snapToInterval={ITEM_WIDTH}
       keyExtractor={keyExtractor}
       onEndReachedThreshold={5}
       onEndReached={props.onEndReached}

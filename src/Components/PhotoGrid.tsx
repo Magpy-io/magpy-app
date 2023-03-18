@@ -1,26 +1,31 @@
-import { StyleSheet, Text, FlatList, Dimensions } from "react-native";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { StyleSheet, Text, FlatList, Dimensions, View } from "react-native";
+import { useCallback, useContext, useEffect, useRef } from "react";
 import { PhotoType } from "~/Helpers/types";
 import PhotoComponentForGrid from "./PhotoComponentForGrid";
+
+import {
+  ContextSourceTypes,
+  useSelectedContext,
+} from "~/Components/ContextProvider";
 
 const ITEM_HEIGHT = Dimensions.get("screen").width / 3;
 
 const listEmptyComponent = () => {
-  return <Text style={styles.textOnEmpty}>No Data</Text>;
+  return (
+    <View style={styles.viewOnEmpty}>
+      <Text style={styles.textOnEmpty}>No Data</Text>
+    </View>
+  );
 };
 
 type PropsType = {
+  contextSource: ContextSourceTypes;
   photos: PhotoType[];
-  onEndReached: () => void;
-  onSwitchMode: (index: number) => void;
   startIndex: number;
-  onPhotoClicked?: (index: number) => void;
-  onRefresh: () => void;
+  onSwitchMode: (index: number) => void;
 };
 
 export default function PhotoGrid(props: PropsType) {
-  console.log("PhotoGrid: Render");
-
   const flatlistRef = useRef<FlatList>(null);
   const photosLenRef = useRef<number>(props.photos.length);
 
@@ -94,5 +99,9 @@ export default function PhotoGrid(props: PropsType) {
 
 const styles = StyleSheet.create({
   flatListStyle: {},
-  textOnEmpty: { fontSize: 15 },
+  textOnEmpty: {
+    fontSize: 15,
+    textAlign: "center",
+  },
+  viewOnEmpty: {},
 });

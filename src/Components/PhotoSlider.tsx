@@ -1,12 +1,4 @@
-import {
-  StyleSheet,
-  Text,
-  FlatList,
-  Dimensions,
-  BackHandler,
-  ViewToken,
-  View,
-} from "react-native";
+import { StyleSheet, BackHandler } from "react-native";
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { PhotoType } from "~/Helpers/types";
@@ -14,17 +6,16 @@ import StatusBarComponent from "./PhotoComponents/StatusBarComponent";
 import ToolBar from "./PhotoComponents/ToolBar";
 import PhotoSliderCore from "./PhotoSliderCore";
 
+import {
+  ContextSourceTypes,
+  useSelectedContext,
+} from "~/Components/ContextProvider";
+
 type PropsType = {
+  contextSource: ContextSourceTypes;
   photos: PhotoType[];
   startIndex: number;
   onSwitchMode: (index: number) => void;
-  onEndReached: () => void;
-  RequestFullPhoto: (index: number) => void;
-  onPhotoClicked?: (index: number) => void;
-  onDeleteAddLocal?: (index: number) => void;
-  onDeleteAddServer?: (index: number) => void;
-  onShare?: (index: number) => void;
-  onDetails?: (index: number) => void;
 };
 
 export default function PhotoSlider(props: PropsType) {
