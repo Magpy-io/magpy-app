@@ -22,7 +22,7 @@ export default function PhotoGalleryLocalScreen(props: PropsType) {
   }, []);
 
   return hasPermissions ? (
-    <PhotoGallery contextSource={"server"} />
+    <PhotoGallery contextSource={"local"} />
   ) : (
     <Text>Permissions needed</Text>
   );

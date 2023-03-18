@@ -6,12 +6,18 @@ import React, {
   useCallback,
   useContext,
 } from "react";
+
+import RNFS from "react-native-fs";
+
 import { PhotoType } from "~/Helpers/types";
 
 import {
   GetMorePhotosLocal,
   GetMorePhotosServer,
 } from "~/Helpers/GetMorePhotos";
+
+import { postPhoto, getPhotoById, removePhotoById } from "~/Helpers/Queries";
+import { addPhoto, RemovePhoto } from "~/Helpers/GetGalleryPhotos";
 
 type ContextSourceTypes = "local" | "server";
 
@@ -24,11 +30,16 @@ type stateType = {
   onRefreshServer: () => Promise<void>;
   fetchMoreLocal: () => Promise<void>;
   fetchMoreServer: () => Promise<void>;
-  setPhotosLocal: (photos: Array<PhotoType>) => void;
+  RequestFullPhotoServer: (index: number) => Promise<void>;
+  addPhotoLocal: (index: number) => Promise<void>;
+  addPhotoServer: (index: number) => Promise<void>;
+  deletePhotoLocalFromLocal: (index: number) => Promise<void>;
+  deletePhotoLocalFromServer: (index: number) => Promise<void>;
+  deletePhotoServer: (index: number) => Promise<void>;
 };
 const AppContext = createContext<stateType>(undefined);
 
-const ITEMS_TO_LOAD_PER_END_REACHED_LOCAL = 100;
+const ITEMS_TO_LOAD_PER_END_REACHED_LOCAL = 30;
 
 const ITEMS_TO_LOAD_PER_END_REACHED_SERVER = 100;
 
@@ -115,6 +126,112 @@ const ContextProvider = (props: PropsType) => {
     }
   }, [photosServer]);
 
+  const RequestFullPhotoServer = useCallback(
+    (index: number) => {
+      const photo = photosServer[index];
+      if (photo.image.image64Full) {
+        return Promise.resolve();
+      }
+      return getPhotoById(photo.id)
+        .then((r) => {
+          const newPhotos = [...photosServer];
+          newPhotos[
+            index
+          ].image.image64Full = `data:image/jpeg;base64,${r.data.photo.image64}`;
+          setPhotosServer(newPhotos);
+        })
+        .catch((err: any) => console.log(err));
+    },
+    [photosServer]
+  );
+
+  const addPhotoLocal = useCallback(
+    (index: number) => {
+      const photo = photosServer[index];
+
+      return addPhoto(
+        photo.image.path,
+        photo.image.image64Full.split("data:image/jpeg;base64,")[1]
+      ).then(() => {
+        const newPhotos = [...photosServer];
+        newPhotos[index].inDevice = true;
+        setPhotosServer(newPhotos);
+      });
+    },
+    [photosServer]
+  );
+
+  const addPhotoServer = useCallback(
+    (index: number) => {
+      const photo = photosLocal[index];
+      return RNFS.readFile(photo.image.path, "base64")
+        .then((res: string) => {
+          return postPhoto({
+            name: photo.image.fileName,
+            fileSize: photo.image.fileSize,
+            width: photo.image.width,
+            height: photo.image.height,
+            date: new Date(photo.created).toJSON(),
+            path: photo.image.path,
+            image64: res,
+          });
+        })
+        .then((response: any) => {
+          const newPhotos = [...photosLocal];
+          newPhotos.splice(index, 1);
+          setPhotosLocal(newPhotos);
+        })
+        .catch((err: any) => console.log(err));
+    },
+    [photosLocal]
+  );
+
+  const deletePhotoLocalFromLocal = useCallback(
+    (index: number) => {
+      const photo = photosLocal[index];
+
+      return RemovePhoto(photo.image.path)
+        .then(() => {
+          const newPhotos = [...photosLocal];
+          newPhotos.splice(index, 1);
+          setPhotosLocal(newPhotos);
+        })
+        .catch((err: any) => console.log(err));
+    },
+    [photosLocal]
+  );
+
+  const deletePhotoLocalFromServer = useCallback(
+    (index: number) => {
+      const photo = photosServer[index];
+
+      RequestFullPhotoServer(index);
+
+      return RemovePhoto(photo.image.path)
+        .then(() => {
+          const newPhotos = [...photosServer];
+          newPhotos[index].inDevice = false;
+          setPhotosServer(newPhotos);
+        })
+        .catch((err: any) => console.log(err));
+    },
+    [photosServer]
+  );
+
+  const deletePhotoServer = useCallback(
+    (index: number) => {
+      const photo = photosServer[index];
+      return removePhotoById(photo.id)
+        .then(() => {
+          const newPhotos = [...photosServer];
+          newPhotos.splice(index, 1);
+          setPhotosServer(newPhotos);
+        })
+        .catch((err: any) => console.log(err));
+    },
+    [photosServer]
+  );
+
   const value = {
     photosLocal: photosLocal,
     photosServer: photosServer,
@@ -124,7 +241,12 @@ const ContextProvider = (props: PropsType) => {
     onRefreshServer: onRefreshServer,
     fetchMoreLocal: fetchMoreLocal,
     fetchMoreServer: fetchMoreServer,
-    setPhotosLocal: setPhotosLocal,
+    RequestFullPhotoServer: RequestFullPhotoServer,
+    addPhotoLocal: addPhotoLocal,
+    addPhotoServer: addPhotoServer,
+    deletePhotoLocalFromLocal: deletePhotoLocalFromLocal,
+    deletePhotoLocalFromServer: deletePhotoLocalFromServer,
+    deletePhotoServer: deletePhotoServer,
   };
 
   return (
@@ -141,6 +263,11 @@ function useSelectedContext(type: ContextSourceTypes) {
       endReachedRef: contextGlobal.endReachedLocalRef,
       onRefresh: contextGlobal.onRefreshLocal,
       fetchMore: contextGlobal.fetchMoreLocal,
+      RequestFullPhoto: contextGlobal.RequestFullPhotoServer,
+      addPhotoLocal: contextGlobal.addPhotoLocal,
+      addPhotoServer: contextGlobal.addPhotoServer,
+      deletePhotoLocal: contextGlobal.deletePhotoLocalFromLocal,
+      deletePhotoServer: contextGlobal.deletePhotoServer,
     };
   } else {
     //"server"
@@ -149,6 +276,11 @@ function useSelectedContext(type: ContextSourceTypes) {
       endReachedRef: contextGlobal.endReachedServerRef,
       onRefresh: contextGlobal.onRefreshServer,
       fetchMore: contextGlobal.fetchMoreServer,
+      RequestFullPhoto: contextGlobal.RequestFullPhotoServer,
+      addPhotoLocal: contextGlobal.addPhotoLocal,
+      addPhotoServer: contextGlobal.addPhotoServer,
+      deletePhotoLocal: contextGlobal.deletePhotoLocalFromServer,
+      deletePhotoServer: contextGlobal.deletePhotoServer,
     };
   }
 }

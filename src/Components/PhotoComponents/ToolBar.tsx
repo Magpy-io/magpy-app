@@ -14,8 +14,10 @@ type ToolBarProps = {
   inDevice: boolean;
   inServer: boolean;
   style?: any;
-  onDeleteAddLocal?: () => void;
-  onDeleteAddServer?: () => void;
+  onDeleteLocal?: () => void;
+  onAddLocal?: () => void;
+  onDeleteServer?: () => void;
+  onAddServer?: () => void;
   onShare?: () => void;
   onDetails?: () => void;
 };
@@ -28,26 +30,26 @@ function ToolBar(props: ToolBarProps) {
           <ToolComponent
             icon="mobile-off"
             text="Delete from device"
-            onPress={() => props.onDeleteAddLocal?.()}
+            onPress={() => props.onDeleteLocal?.()}
           />
         ) : (
           <ToolComponent
             icon="system-update"
             text="Save to device"
-            onPress={() => props.onDeleteAddLocal?.()}
+            onPress={() => props.onAddLocal?.()}
           />
         )}
         {props.inServer ? (
           <ToolComponent
             icon="delete"
             text="Delete from server"
-            onPress={() => props.onDeleteAddServer?.()}
+            onPress={() => props.onDeleteServer?.()}
           />
         ) : (
           <ToolComponent
             icon="backup"
             text="Back up"
-            onPress={() => props.onDeleteAddServer?.()}
+            onPress={() => props.onAddServer?.()}
           />
         )}
         <ToolComponent
