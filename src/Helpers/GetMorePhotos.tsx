@@ -94,7 +94,7 @@ async function GetMorePhotosServer(n: number, offset: number) {
   const images64Res = await Queries.getPhotosByIds(ids);
 
   const images64 = images64Res.data.photos;
-  const images64Formated: string[] = [];
+  const images64Formated: Array<string> = [];
   let j = 0;
   for (let i = 0; i < filesExist.length; i++) {
     if (filesExist[i]) {
