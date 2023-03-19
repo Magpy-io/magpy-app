@@ -37,7 +37,7 @@ const AppContext = createContext<stateType>(undefined);
 
 const ITEMS_TO_LOAD_PER_END_REACHED_LOCAL = 3000;
 
-const ITEMS_TO_LOAD_PER_END_REACHED_SERVER = 100;
+const ITEMS_TO_LOAD_PER_END_REACHED_SERVER = 3000;
 
 type PropsType = {
   children: any;

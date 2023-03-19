@@ -11,7 +11,6 @@ export default function PhotoGalleryScreen(props: PropsType) {
       photos={context.photosServer}
       onRefresh={context.onRefreshServer}
       RequestFullPhoto={context.RequestFullPhotoServer}
-      fetchMore={context.fetchMoreServer}
       addPhotoLocal={context.addPhotoLocal}
       addPhotoServer={context.addPhotoServer}
       deletePhotoLocal={context.deletePhotoLocalFromServer}
