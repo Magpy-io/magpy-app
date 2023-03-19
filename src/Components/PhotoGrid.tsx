@@ -3,11 +3,6 @@ import { useCallback, useContext, useEffect, useRef } from "react";
 import { PhotoType } from "~/Helpers/types";
 import PhotoComponentForGrid from "./PhotoComponentForGrid";
 
-import {
-  ContextSourceTypes,
-  useSelectedContext,
-} from "~/Components/ContextProvider";
-
 const ITEM_HEIGHT = Dimensions.get("screen").width / 3;
 
 function keyExtractor(item: PhotoType, index: number) {
@@ -31,14 +26,14 @@ const listEmptyComponent = () => {
 };
 
 type PropsType = {
-  contextSource: ContextSourceTypes;
+  photos: Array<PhotoType>;
   startIndex: number;
   onSwitchMode: (index: number) => void;
+  onRefresh: () => void;
+  fetchMore?: () => void;
 };
 
 export default function PhotoGrid(props: PropsType) {
-  const context = useSelectedContext(props.contextSource);
-
   const flatlistRef = useRef<FlatList>(null);
 
   const renderItem = useCallback(
@@ -53,29 +48,29 @@ export default function PhotoGrid(props: PropsType) {
 
   let correctStartIndex = Math.floor(props.startIndex / 3);
 
-  if (props.startIndex >= context.photos.length) {
-    correctStartIndex = Math.floor((context.photos.length - 1) / 3);
+  if (props.startIndex >= props.photos.length) {
+    correctStartIndex = Math.floor((props.photos.length - 1) / 3);
   }
 
   useEffect(() => {
-    if (context.photos.length == 0) {
-      context.onRefresh();
+    if (props.photos.length == 0) {
+      props.onRefresh();
     }
-  }, [context.photos.length]);
+  }, [props.photos.length]);
 
   return (
     <FlatList
       ref={flatlistRef}
       style={styles.flatListStyle}
-      data={context.photos}
+      data={props.photos}
       renderItem={renderItem}
       maxToRenderPerBatch={20}
       initialNumToRender={20}
       initialScrollIndex={correctStartIndex}
       keyExtractor={keyExtractor}
       onEndReachedThreshold={1}
-      onEndReached={context.fetchMore}
-      onRefresh={context.onRefresh}
+      onEndReached={props.fetchMore}
+      onRefresh={props.onRefresh}
       refreshing={false}
       numColumns={3}
       getItemLayout={getItemLayout}

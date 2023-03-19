@@ -6,37 +6,35 @@ import StatusBarComponent from "./PhotoComponents/StatusBarComponent";
 import ToolBar from "./PhotoComponents/ToolBar";
 import PhotoSliderCore from "./PhotoSliderCore";
 
-import {
-  ContextSourceTypes,
-  useSelectedContext,
-} from "~/Components/ContextProvider";
-
 type PropsType = {
-  contextSource: ContextSourceTypes;
+  photos: Array<PhotoType>;
   startIndex: number;
   onSwitchMode: (index: number) => void;
-  onPhotoClick?: (index: number) => void;
-  onPhotoLongClick?: (index: number) => void;
+  RequestFullPhoto: (index: number) => void;
+  fetchMore?: () => void;
+  addPhotoLocal?: (index: number) => void;
+  addPhotoServer?: (index: number) => void;
+  deletePhotoLocal?: (index: number) => void;
+  deletePhotoServer?: (index: number) => void;
 };
 
 export default function PhotoSlider(props: PropsType) {
-  const context = useSelectedContext(props.contextSource);
   const flatListCurrentIndexRef = useRef<number>(props.startIndex);
   const [flatListCurrentIndex, setFlatListCurrentIndex] = useState(
     props.startIndex
   );
 
   const validFlatListCurrentIndex =
-    context.photos.length != 0 && flatListCurrentIndex < context.photos.length;
+    props.photos.length != 0 && flatListCurrentIndex < props.photos.length;
 
   useEffect(() => {
     if (
       validFlatListCurrentIndex &&
-      !context.photos[flatListCurrentIndex].inDevice
+      !props.photos[flatListCurrentIndex].inDevice
     ) {
-      context.RequestFullPhoto(flatListCurrentIndex);
+      props.RequestFullPhoto(flatListCurrentIndex);
     }
-  }, [context.photos, flatListCurrentIndex, validFlatListCurrentIndex]);
+  }, [props.photos, flatListCurrentIndex, validFlatListCurrentIndex]);
 
   const onCurrentIndexChanged = useCallback((index: number) => {
     flatListCurrentIndexRef.current = index;
@@ -57,20 +55,25 @@ export default function PhotoSlider(props: PropsType) {
     return () => backHandler.remove();
   }, [props.onSwitchMode]);
 
+  useEffect(() => {
+    if (props.photos.length == 0) {
+      props.onSwitchMode(0);
+    }
+  }, [props.photos.length, props.onSwitchMode]);
+
   return (
     <>
       <PhotoSliderCore
-        photos={context.photos}
+        photos={props.photos}
         startIndex={props.startIndex}
-        onSwitchMode={props.onSwitchMode}
         onIndexChanged={onCurrentIndexChanged}
-        onEndReached={context.fetchMore}
+        onEndReached={props.fetchMore}
       />
       {validFlatListCurrentIndex ? (
         <StatusBarComponent
           style={styles.statusBarStyle}
-          inDevice={context.photos[flatListCurrentIndex].inDevice}
-          inServer={context.photos[flatListCurrentIndex].inServer}
+          inDevice={props.photos[flatListCurrentIndex].inDevice}
+          inServer={props.photos[flatListCurrentIndex].inServer}
           onBackButton={() => props.onSwitchMode(flatListCurrentIndex)}
         />
       ) : (
@@ -80,12 +83,12 @@ export default function PhotoSlider(props: PropsType) {
       {validFlatListCurrentIndex ? (
         <ToolBar
           style={styles.toolBarStyle}
-          inDevice={context.photos[flatListCurrentIndex].inDevice}
-          inServer={context.photos[flatListCurrentIndex].inServer}
-          onAddLocal={() => context.addPhotoLocal(flatListCurrentIndex)}
-          onAddServer={() => context.addPhotoServer(flatListCurrentIndex)}
-          onDeleteLocal={() => context.deletePhotoLocal(flatListCurrentIndex)}
-          onDeleteServer={() => context.deletePhotoServer(flatListCurrentIndex)}
+          inDevice={props.photos[flatListCurrentIndex].inDevice}
+          inServer={props.photos[flatListCurrentIndex].inServer}
+          onAddLocal={() => props.addPhotoLocal?.(flatListCurrentIndex)}
+          onAddServer={() => props.addPhotoServer?.(flatListCurrentIndex)}
+          onDeleteLocal={() => props.deletePhotoLocal?.(flatListCurrentIndex)}
+          onDeleteServer={() => props.deletePhotoServer?.(flatListCurrentIndex)}
         />
       ) : (
         <></>

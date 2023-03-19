@@ -21,7 +21,6 @@ function getItemLayout(data: any, index: number) {
 type PropsType = {
   photos: PhotoType[];
   startIndex: number;
-  onSwitchMode: (index: number) => void;
   onIndexChanged?: (index: number) => void;
   onEndReached?: () => void;
   onPhotoClick?: (index: number) => void;
@@ -102,12 +101,6 @@ function PhotoSliderCore(props: PropsType) {
       });
     }
   }, [props.photos.length]);
-
-  useEffect(() => {
-    if (props.photos.length == 0) {
-      props.onSwitchMode(0);
-    }
-  }, [props.photos.length, props.onSwitchMode]);
 
   return (
     <FlatList

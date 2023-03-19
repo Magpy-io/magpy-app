@@ -3,19 +3,20 @@ import { StyleSheet, View } from "react-native";
 import { useState } from "react";
 import PhotoGrid from "~/Components/PhotoGrid";
 import PhotoSlider from "~/Components/PhotoSlider";
-
-import {
-  ContextSourceTypes,
-  useSelectedContext,
-} from "~/Components/ContextProvider";
+import { PhotoType } from "~/Helpers/types";
 
 type PropsType = {
-  contextSource: ContextSourceTypes;
+  photos: Array<PhotoType>;
+  onRefresh: () => void;
+  RequestFullPhoto: (index: number) => void;
+  fetchMore?: () => void;
+  addPhotoLocal?: (index: number) => void;
+  addPhotoServer?: (index: number) => void;
+  deletePhotoLocal?: (index: number) => void;
+  deletePhotoServer?: (index: number) => void;
 };
 
 export default function PhotoGallery(props: PropsType) {
-  const context = useSelectedContext(props.contextSource);
-
   const [switchingState, setSwitchingState] = useState({
     isPhotoSelected: false,
     startIndexWhenSwitching: 0,
@@ -32,15 +33,23 @@ export default function PhotoGallery(props: PropsType) {
     <View style={styles.viewStyle}>
       {!switchingState.isPhotoSelected ? (
         <PhotoGrid
-          contextSource={props.contextSource}
+          photos={props.photos}
           startIndex={switchingState.startIndexWhenSwitching}
           onSwitchMode={onSwitchMode}
+          fetchMore={props.fetchMore}
+          onRefresh={props.onRefresh}
         />
       ) : (
         <PhotoSlider
-          contextSource={props.contextSource}
+          photos={props.photos}
           startIndex={switchingState.startIndexWhenSwitching}
           onSwitchMode={onSwitchMode}
+          RequestFullPhoto={props.RequestFullPhoto}
+          fetchMore={props.fetchMore}
+          addPhotoLocal={props.addPhotoLocal}
+          addPhotoServer={props.addPhotoServer}
+          deletePhotoLocal={props.deletePhotoLocal}
+          deletePhotoServer={props.deletePhotoServer}
         />
       )}
     </View>

@@ -2,7 +2,6 @@ import React, {
   createContext,
   useState,
   useRef,
-  MutableRefObject,
   useCallback,
   useContext,
 } from "react";
@@ -19,13 +18,9 @@ import {
 import { postPhoto, getPhotoById, removePhotoById } from "~/Helpers/Queries";
 import { addPhoto, RemovePhoto } from "~/Helpers/GetGalleryPhotos";
 
-type ContextSourceTypes = "local" | "server";
-
 type stateType = {
   photosLocal: Array<PhotoType>;
   photosServer: Array<PhotoType>;
-  endReachedLocalRef: MutableRefObject<boolean>;
-  endReachedServerRef: MutableRefObject<boolean>;
   onRefreshLocal: () => Promise<void>;
   onRefreshServer: () => Promise<void>;
   fetchMoreLocal: () => Promise<void>;
@@ -37,9 +32,10 @@ type stateType = {
   deletePhotoLocalFromServer: (index: number) => Promise<void>;
   deletePhotoServer: (index: number) => Promise<void>;
 };
+
 const AppContext = createContext<stateType>(undefined);
 
-const ITEMS_TO_LOAD_PER_END_REACHED_LOCAL = 30;
+const ITEMS_TO_LOAD_PER_END_REACHED_LOCAL = 3000;
 
 const ITEMS_TO_LOAD_PER_END_REACHED_SERVER = 100;
 
@@ -235,8 +231,6 @@ const ContextProvider = (props: PropsType) => {
   const value = {
     photosLocal: photosLocal,
     photosServer: photosServer,
-    endReachedLocalRef: endReachedLocal,
-    endReachedServerRef: endReachedServer,
     onRefreshLocal: onRefreshLocal,
     onRefreshServer: onRefreshServer,
     fetchMoreLocal: fetchMoreLocal,
@@ -254,36 +248,8 @@ const ContextProvider = (props: PropsType) => {
   );
 };
 
-function useSelectedContext(type: ContextSourceTypes) {
-  const contextGlobal = useContext(AppContext);
-
-  if (type == "local") {
-    return {
-      photos: contextGlobal.photosLocal,
-      endReachedRef: contextGlobal.endReachedLocalRef,
-      onRefresh: contextGlobal.onRefreshLocal,
-      fetchMore: contextGlobal.fetchMoreLocal,
-      RequestFullPhoto: contextGlobal.RequestFullPhotoServer,
-      addPhotoLocal: contextGlobal.addPhotoLocal,
-      addPhotoServer: contextGlobal.addPhotoServer,
-      deletePhotoLocal: contextGlobal.deletePhotoLocalFromLocal,
-      deletePhotoServer: contextGlobal.deletePhotoServer,
-    };
-  } else {
-    //"server"
-    return {
-      photos: contextGlobal.photosServer,
-      endReachedRef: contextGlobal.endReachedServerRef,
-      onRefresh: contextGlobal.onRefreshServer,
-      fetchMore: contextGlobal.fetchMoreServer,
-      RequestFullPhoto: contextGlobal.RequestFullPhotoServer,
-      addPhotoLocal: contextGlobal.addPhotoLocal,
-      addPhotoServer: contextGlobal.addPhotoServer,
-      deletePhotoLocal: contextGlobal.deletePhotoLocalFromServer,
-      deletePhotoServer: contextGlobal.deletePhotoServer,
-    };
-  }
+function useMainContext() {
+  return useContext(AppContext);
 }
 
-export { ContextProvider, useSelectedContext };
-export type { ContextSourceTypes };
+export { ContextProvider, useMainContext };

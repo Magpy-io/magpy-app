@@ -21,11 +21,11 @@ async function GetMorePhotosLocal(n: number, offset: number) {
   while (!foundAnyPhotoNotInServer && !photosFromDevice.endReached) {
     photosFromDevice = await GetPhotos(n, totalOffset);
 
-    photosExistInServer = (
-      await Queries.getPhotosExist(
-        photosFromDevice.edges.map((edge) => edge.node.image.uri)
-      )
-    ).data.photosExist;
+    const queryReturn = await Queries.getPhotosExist(
+      photosFromDevice.edges.map((edge) => edge.node.image.uri)
+    );
+
+    photosExistInServer = queryReturn.data.photosExist;
 
     if (
       photosExistInServer.length != 0 &&
@@ -38,7 +38,7 @@ async function GetMorePhotosLocal(n: number, offset: number) {
   }
 
   if (!foundAnyPhotoNotInServer) {
-    return { photos: [], nextOffset: n + totalOffset, endReached: true };
+    return { photos: [], nextOffset: totalOffset, endReached: true };
   }
 
   const photosNotInServer = photosFromDevice.edges.filter((edge, index) => {
@@ -59,15 +59,11 @@ async function GetMorePhotosLocal(n: number, offset: number) {
         image64: "",
         image64Full: "",
       },
-      id: photosExistInServer[index].exists
-        ? photosExistInServer[index].photo.id
-        : "",
+      id: `local_${photo.image.uri}`,
       album: photo.group_name,
       created: new Date(photo.timestamp).toJSON(),
       modified: (photo as any).modified,
-      syncDate: photosExistInServer[index].exists
-        ? photosExistInServer[index].photo.syncDate
-        : "",
+      syncDate: "",
       type: photo.type,
     };
     return photoObject;
