@@ -16,6 +16,8 @@ type PhotoType = {
   modified: string;
   syncDate: string;
   type: string; //JPEG PNG
+  isLoading: boolean;
+  loadingPercentage: number;
 };
 
 export type { PhotoType };

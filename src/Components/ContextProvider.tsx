@@ -14,7 +14,12 @@ import {
   GetMorePhotosServer,
 } from "~/Helpers/GetMorePhotos";
 
-import { postPhoto, getPhotoById, removePhotoById } from "~/Helpers/Queries";
+import {
+  postPhoto,
+  postPhotoWithProgress,
+  getPhotoById,
+  removePhotoById,
+} from "~/Helpers/Queries";
 import { addPhoto, RemovePhoto } from "~/Helpers/GetGalleryPhotos";
 
 import {
@@ -140,18 +145,29 @@ const ContextProvider = (props: PropsType) => {
     async (index: number) => {
       const photo = state.photosLocal[index];
 
+      if (photo.isLoading) {
+        return;
+      }
+
       const res = await RNFS.readFile(photo.image.path, "base64");
 
-      const response = await postPhoto({
-        name: photo.image.fileName,
-        fileSize: photo.image.fileSize,
-        width: photo.image.width,
-        height: photo.image.height,
-        date: new Date(photo.created).toJSON(),
-        path: photo.image.path,
-        image64: res,
-      });
-
+      const response = await postPhotoWithProgress(
+        {
+          name: photo.image.fileName,
+          fileSize: photo.image.fileSize,
+          width: photo.image.width,
+          height: photo.image.height,
+          date: new Date(photo.created).toJSON(),
+          path: photo.image.path,
+          image64: res,
+        },
+        (p: number, t: number) => {
+          dispatch({
+            type: Actions.updatePhotoProgress,
+            payload: { photo: photo, p: (p + 1) / t },
+          });
+        }
+      );
       dispatch({ type: Actions.addPhotoServer, payload: { photo: photo } });
     },
     [state]

@@ -7,7 +7,7 @@ import React from "react";
 
 const ICON_SIZE = 20;
 const TEXT_SIZE = 10;
-const TOOLBAR_COLOR = "#ffffffd0";
+const TOOLBAR_COLOR = "#ffffff";
 const TOOL_COLOR = "#4d4d4d";
 
 type ToolBarProps = {

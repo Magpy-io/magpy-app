@@ -74,6 +74,10 @@ export default function PhotoSlider(props: PropsType) {
           style={styles.statusBarStyle}
           inDevice={props.photos[flatListCurrentIndex].inDevice}
           inServer={props.photos[flatListCurrentIndex].inServer}
+          isLoading={props.photos[flatListCurrentIndex].isLoading}
+          loadingPercentage={
+            props.photos[flatListCurrentIndex].loadingPercentage
+          }
           onBackButton={() => props.onSwitchMode(flatListCurrentIndex)}
         />
       ) : (

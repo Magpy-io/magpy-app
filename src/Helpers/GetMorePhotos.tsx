@@ -65,6 +65,8 @@ async function GetMorePhotosLocal(n: number, offset: number) {
       modified: (photo as any).modified,
       syncDate: "",
       type: photo.type,
+      isLoading: false,
+      loadingPercentage: 0,
     };
     return photoObject;
   });
@@ -125,6 +127,8 @@ async function GetMorePhotosServer(n: number, offset: number) {
       modified: "",
       syncDate: photo.syncDate,
       type: "",
+      isLoading: false,
+      loadingPercentage: 0,
     };
     return photoObject;
   });

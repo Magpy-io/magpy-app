@@ -29,6 +29,7 @@ enum Actions {
   deletePhotoLocalFromLocal = "DELETE_PHOTO_LOCAL_FROM_LOCAL",
   deletePhotoLocalFromServer = "DELETE_PHOTO_LOCAL_FROM_SERVER",
   deletePhotoServer = "DELETE_PHOTO_SERVER",
+  updatePhotoProgress = "UPDATE_PHOTO_PROGRESS",
 }
 
 type Action = {
@@ -151,6 +152,19 @@ function GlobalReducer(prevState: stateType, action: Action) {
         newPhotosServer.splice(findCorrespondingPhotoIndex, 1);
       }
       newState.photosServer = newPhotosServer;
+      return newState;
+    }
+    case Actions.updatePhotoProgress: {
+      const newState = { ...prevState };
+      const newPhotosLocal = [...newState.photosLocal];
+      const findCorrespondingPhoto = newPhotosLocal.find(
+        (photo) => photo.id == action.payload.photo.id
+      );
+      if (findCorrespondingPhoto) {
+        findCorrespondingPhoto.isLoading = true;
+        findCorrespondingPhoto.loadingPercentage = action.payload.p;
+      }
+      newState.photosServer = newPhotosLocal;
       return newState;
     }
   }

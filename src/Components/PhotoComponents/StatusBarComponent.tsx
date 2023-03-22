@@ -4,10 +4,13 @@ import { Icon } from "@rneui/themed";
 import colors from "~/colors";
 import BackButton from "../CommonComponents/BackButton";
 import React from "react";
+import * as Progress from "react-native-progress";
 
 type StatusBarComponentProps = {
   inDevice: boolean;
   inServer: boolean;
+  isLoading: boolean;
+  loadingPercentage: number;
   style?: any;
   onBackButton?: () => void;
 };
@@ -27,6 +30,17 @@ function StatusBarComponent(props: StatusBarComponentProps) {
         <BackButton onPress={props.onBackButton} />
       </View>
       <View style={styles.statusBarComponentStyle}>
+        {props.isLoading ? (
+          <Progress.Pie
+            style={styles.pieStyle}
+            progress={props.loadingPercentage}
+            size={30}
+            borderColor={"#d6d6d6"}
+            color={"#d6d6d6"}
+          />
+        ) : (
+          <></>
+        )}
         <StatusComponent
           icon={deviceStatusIcon}
           text={deviceStatusText}
@@ -90,8 +104,8 @@ const styles = StyleSheet.create({
   StatusBarStyle: {
     padding: 5,
     width: "100%",
-    backgroundColor: "transparent",
-    opacity: 0.6,
+    backgroundColor: "white",
+    //    opacity: 0.6,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -106,6 +120,7 @@ const styles = StyleSheet.create({
     borderRadius: 3,
     marginHorizontal: 3,
   },
+  pieStyle: { marginRight: 10 },
 });
 
 export default React.memo(StatusBarComponent);
