@@ -63,8 +63,8 @@ function PhotoComponentForGrid(props: PropsType) {
               style={styles.pieStyle}
               progress={props.photo.loadingPercentage}
               size={60}
-              borderColor={"#00000010"}
-              color={"#00000010"}
+              borderColor={"#000000a0"}
+              color={"#000000a0"}
               thickness={8}
               indeterminate={props.photo.loadingPercentage == 0}
             />
@@ -112,8 +112,7 @@ const styles = StyleSheet.create({
     height: "100%",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "white",
-    opacity: 0.4,
+    backgroundColor: "#ffffff50",
   },
   pieStyle: {},
   iconViewStyle: {
