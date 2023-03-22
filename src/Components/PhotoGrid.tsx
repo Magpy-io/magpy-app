@@ -1,5 +1,5 @@
 import { StyleSheet, Text, FlatList, Dimensions, View } from "react-native";
-import { useCallback, useContext, useEffect, useRef } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { PhotoType } from "~/Helpers/types";
 import PhotoComponentForGrid from "./PhotoComponentForGrid";
 
@@ -35,15 +35,54 @@ type PropsType = {
 
 export default function PhotoGrid(props: PropsType) {
   const flatlistRef = useRef<FlatList>(null);
+  const [isSelecting, setIsSelecting] = useState(false);
+  const [seletedIds, setSelectedIds] = useState(new Map());
+
+  const onRenderItemPress = useCallback(
+    (item: PhotoType, index: number) => {
+      if (isSelecting) {
+        setSelectedIds((sIds) => {
+          if (sIds.has(item.id)) {
+            const newMap = new Map(sIds);
+            newMap.delete(item.id);
+            return newMap;
+          } else {
+            const newMap = new Map(sIds);
+            newMap.set(item.id, true);
+            return newMap;
+          }
+        });
+      } else {
+        props.onSwitchMode(index);
+      }
+    },
+    [props.onSwitchMode, isSelecting]
+  );
+
+  const onRenderItemLongPress = useCallback(
+    (item: PhotoType, index: number) => {
+      if (!isSelecting) {
+        setIsSelecting(true);
+        const map = new Map();
+        map.set(item.id, true);
+        setSelectedIds(map);
+      }
+    },
+    [isSelecting]
+  );
 
   const renderItem = useCallback(
     ({ item, index }: { item: PhotoType; index: number }) => (
       <PhotoComponentForGrid
         photo={item}
-        onPress={() => props.onSwitchMode(index)}
+        index={index}
+        isSelecting={isSelecting}
+        isSelected={seletedIds.has(item.id)}
+        onPress={onRenderItemPress}
+        onLongPress={onRenderItemLongPress}
       />
     ),
-    [props.onSwitchMode]
+    [onRenderItemPress, onRenderItemLongPress, isSelecting, seletedIds]
   );
 
   let correctStartIndex = Math.floor(props.startIndex / 3);
@@ -51,6 +90,13 @@ export default function PhotoGrid(props: PropsType) {
   if (props.startIndex >= props.photos.length) {
     correctStartIndex = Math.floor((props.photos.length - 1) / 3);
   }
+
+  useEffect(() => {
+    const noItemsSelected = seletedIds.size == 0;
+    if (noItemsSelected) {
+      setIsSelecting(() => false);
+    }
+  }, [seletedIds]);
 
   useEffect(() => {
     if (props.photos.length == 0) {

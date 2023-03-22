@@ -1,5 +1,6 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import { StyleSheet, View, TouchableWithoutFeedback } from "react-native";
+import { Icon } from "@rneui/themed";
 
 import FastImage from "react-native-fast-image";
 
@@ -9,8 +10,11 @@ import * as Progress from "react-native-progress";
 
 type PropsType = {
   photo: PhotoType;
-  onPress?: () => void;
-  onLongPress?: () => void;
+  index: number;
+  isSelecting: boolean;
+  isSelected: boolean;
+  onPress?: (item: PhotoType, index: number) => void;
+  onLongPress?: (item: PhotoType, index: number) => void;
 };
 
 function PhotoComponentForGrid(props: PropsType) {
@@ -26,10 +30,26 @@ function PhotoComponentForGrid(props: PropsType) {
     }
   }, [props.photo]);
 
+  const onPress = useMemo(() => {
+    if (props.onPress) {
+      return props.onPress;
+    } else {
+      return (item: PhotoType, index: number) => {};
+    }
+  }, [props.onPress]);
+
+  const onLongPress = useMemo(() => {
+    if (props.onLongPress) {
+      return props.onLongPress;
+    } else {
+      return (item: PhotoType, index: number) => {};
+    }
+  }, [props.onLongPress]);
+
   return (
     <TouchableWithoutFeedback
-      onPress={props.onPress}
-      onLongPress={props.onLongPress}
+      onPress={() => onPress(props.photo, props.index)}
+      onLongPress={() => onLongPress(props.photo, props.index)}
     >
       <View style={styles.itemStyle}>
         <FastImage
@@ -37,19 +57,37 @@ function PhotoComponentForGrid(props: PropsType) {
           resizeMode={FastImage.resizeMode.cover}
           style={styles.imageStyle}
         />
-        {props.photo.isLoading ? (
+        {props.photo.isLoading && (
           <View style={styles.pieViewStyle}>
             <Progress.Circle
               style={styles.pieStyle}
               progress={props.photo.loadingPercentage}
               size={60}
-              borderColor={"#00000080"}
-              color={"#00000080"}
+              borderColor={"#00000010"}
+              color={"#00000010"}
               thickness={8}
+              indeterminate={props.photo.loadingPercentage == 0}
             />
           </View>
-        ) : (
-          <></>
+        )}
+        {props.isSelecting && (
+          <View style={styles.iconViewStyle}>
+            {props.isSelected ? (
+              <Icon
+                style={styles.iconStyle}
+                name="check-circle"
+                size={35}
+                color="#39a5f7"
+              />
+            ) : (
+              <Icon
+                style={styles.iconStyle}
+                name="radio-button-unchecked"
+                size={35}
+                color="white"
+              />
+            )}
+          </View>
         )}
       </View>
     </TouchableWithoutFeedback>
@@ -72,11 +110,19 @@ const styles = StyleSheet.create({
   pieViewStyle: {
     width: "100%",
     height: "100%",
-    position: "absolute",
     alignItems: "center",
     justifyContent: "center",
+    backgroundColor: "white",
+    opacity: 0.4,
   },
   pieStyle: {},
+  iconViewStyle: {
+    width: "100%",
+    height: "100%",
+    alignItems: "flex-end",
+    justifyContent: "flex-end",
+  },
+  iconStyle: { margin: 5 },
 });
 
 export default React.memo(PhotoComponentForGrid);
