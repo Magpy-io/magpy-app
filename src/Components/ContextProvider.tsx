@@ -19,8 +19,13 @@ import {
   postPhotoWithProgress,
   getPhotoById,
   removePhotoById,
+  updatePhotoPath,
 } from "~/Helpers/Queries";
-import { addPhoto, RemovePhoto } from "~/Helpers/GetGalleryPhotos";
+import {
+  addPhoto,
+  RemovePhoto,
+  getFirstPossibleFileName,
+} from "~/Helpers/GetGalleryPhotos";
 
 import {
   GlobalReducer,
@@ -130,13 +135,40 @@ const ContextProvider = (props: PropsType) => {
   const addPhotoLocal = useCallback(
     async (index: number) => {
       const photo = state.photosServer[index];
+      const image64 = photo.image.image64Full.substring(
+        "data:image/jpeg;base64,".length
+      );
+      const dirPath = "/storage/emulated/0/DCIM/Restored/";
+      let photoCreated = false;
 
-      await addPhoto(
-        photo.image.path,
-        photo.image.image64Full.split("data:image/jpeg;base64,")[1]
+      try {
+        await RNFS.mkdir(dirPath);
+      } catch (err) {
+        console.log(err);
+      }
+
+      const dirExists = await RNFS.exists(dirPath);
+
+      const filePath = await getFirstPossibleFileName(
+        "file://" + dirPath + photo.image.fileName
       );
 
-      dispatch({ type: Actions.addPhotoLocal, payload: { photo: photo } });
+      try {
+        if (dirExists) {
+          await addPhoto(filePath, image64);
+          photoCreated = true;
+        }
+      } catch (err) {
+        console.log(err);
+      }
+
+      if (photoCreated) {
+        photo.image.path = filePath;
+        dispatch({ type: Actions.addPhotoLocal, payload: { photo: photo } });
+        await updatePhotoPath(photo.id, filePath);
+      } else {
+        console.log("Photo not created.");
+      }
     },
     [state]
   );
