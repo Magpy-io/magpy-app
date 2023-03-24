@@ -62,59 +62,74 @@ const ContextProvider = (props: PropsType) => {
   const [state, dispatch] = useReducer(GlobalReducer, initialState);
 
   const onRefreshLocal = useCallback(async () => {
-    const newPhotos = await GetMorePhotosLocal(
-      ITEMS_TO_LOAD_PER_END_REACHED_LOCAL,
-      0
-    );
-
-    dispatch({
-      type: Actions.setNewPhotosLocal,
-      payload: { newPhotos: newPhotos },
-    });
-  }, [state]);
+    try {
+      const newPhotos = await GetMorePhotosLocal(
+        ITEMS_TO_LOAD_PER_END_REACHED_LOCAL,
+        0
+      );
+      dispatch({
+        type: Actions.setNewPhotosLocal,
+        payload: { newPhotos: newPhotos },
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  }, []);
 
   const onRefreshServer = useCallback(async () => {
-    const newPhotos = await GetMorePhotosServer(
-      ITEMS_TO_LOAD_PER_END_REACHED_SERVER,
-      0
-    );
+    try {
+      const newPhotos = await GetMorePhotosServer(
+        ITEMS_TO_LOAD_PER_END_REACHED_SERVER,
+        0
+      );
 
-    dispatch({
-      type: Actions.setNewPhotosServer,
-      payload: { newPhotos: newPhotos },
-    });
-  }, [state]);
+      dispatch({
+        type: Actions.setNewPhotosServer,
+        payload: { newPhotos: newPhotos },
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  }, []);
 
   const fetchMoreLocal = useCallback(async () => {
-    if (state.endReachedLocal) {
-      return;
+    try {
+      if (state.endReachedLocal) {
+        return;
+      }
+
+      const newPhotos = await GetMorePhotosLocal(
+        ITEMS_TO_LOAD_PER_END_REACHED_LOCAL,
+        state.nextOffsetLocal
+      );
+
+      dispatch({
+        type: Actions.addToPhotosLocal,
+        payload: { newPhotos: newPhotos },
+      });
+    } catch (err) {
+      console.log(err);
     }
-
-    const newPhotos = await GetMorePhotosLocal(
-      ITEMS_TO_LOAD_PER_END_REACHED_LOCAL,
-      state.nextOffsetLocal
-    );
-
-    dispatch({
-      type: Actions.addToPhotosLocal,
-      payload: { newPhotos: newPhotos },
-    });
   }, [state]);
 
   const fetchMoreServer = useCallback(async () => {
-    if (state.endReachedServer) {
-      return;
+    try {
+      if (state.endReachedServer) {
+        return;
+      }
+
+      const newPhotos = await GetMorePhotosServer(
+        ITEMS_TO_LOAD_PER_END_REACHED_SERVER,
+        state.nextOffsetServer
+      );
+
+      dispatch({
+        type: Actions.addToPhotosServer,
+        payload: { newPhotos: newPhotos },
+      });
+    } catch (err) {
+      console.log(err);
     }
-
-    const newPhotos = await GetMorePhotosServer(
-      ITEMS_TO_LOAD_PER_END_REACHED_SERVER,
-      state.nextOffsetServer
-    );
-
-    dispatch({
-      type: Actions.addToPhotosServer,
-      payload: { newPhotos: newPhotos },
-    });
   }, [state]);
 
   const RequestFullPhotoServer = useCallback(
@@ -122,52 +137,51 @@ const ContextProvider = (props: PropsType) => {
       const photo = state.photosServer[index];
 
       if (photo.image.image64Full) {
-        return Promise.resolve();
+        return;
       }
+      try {
+        const result = await getPhotoById(photo.id);
 
-      const result = await getPhotoById(photo.id);
-
-      dispatch({ type: Actions.addFullPhotoById, payload: { result: result } });
+        dispatch({
+          type: Actions.addFullPhotoById,
+          payload: { result: result },
+        });
+      } catch (err) {
+        console.log(err);
+      }
     },
     [state]
   );
 
   const addPhotoLocal = useCallback(
     async (index: number) => {
-      const photo = state.photosServer[index];
-      const image64 = photo.image.image64Full.substring(
-        "data:image/jpeg;base64,".length
-      );
-      const dirPath = "/storage/emulated/0/DCIM/Restored/";
-      let photoCreated = false;
-
       try {
+        const photo = state.photosServer[index];
+        const image64 = photo.image.image64Full.substring(
+          "data:image/jpeg;base64,".length
+        );
+        const dirPath = "/storage/emulated/0/DCIM/Restored/";
+
         await RNFS.mkdir(dirPath);
-      } catch (err) {
-        console.log(err);
-      }
 
-      const dirExists = await RNFS.exists(dirPath);
+        const dirExists = await RNFS.exists(dirPath);
 
-      const filePath = await getFirstPossibleFileName(
-        "file://" + dirPath + photo.image.fileName
-      );
-
-      try {
-        if (dirExists) {
-          await addPhoto(filePath, image64);
-          photoCreated = true;
+        if (!dirExists) {
+          console.log("directory not created to write image.");
+          return;
         }
-      } catch (err) {
-        console.log(err);
-      }
 
-      if (photoCreated) {
+        const filePath = await getFirstPossibleFileName(
+          "file://" + dirPath + photo.image.fileName
+        );
+
+        await addPhoto(filePath, image64);
+
         photo.image.path = filePath;
         dispatch({ type: Actions.addPhotoLocal, payload: { photo: photo } });
         await updatePhotoPath(photo.id, filePath);
-      } else {
-        console.log("Photo not created.");
+      } catch (err) {
+        console.log(err);
       }
     },
     [state]

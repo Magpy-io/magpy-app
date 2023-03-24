@@ -85,9 +85,11 @@ function GlobalReducer(prevState: stateType, action: Action) {
       );
       if (findCorrespondingPhoto) {
         findCorrespondingPhoto.image.image64Full = `data:image/jpeg;base64,${action.payload.result.data.photo.image64}`;
+        newState.photosServer = newPhotosServer;
+        return newState;
+      } else {
+        return prevState;
       }
-      newState.photosServer = newPhotosServer;
-      return newState;
     }
 
     case Actions.addPhotoLocal: {
@@ -98,9 +100,11 @@ function GlobalReducer(prevState: stateType, action: Action) {
       );
       if (findCorrespondingPhoto) {
         findCorrespondingPhoto.inDevice = true;
+        newState.photosServer = newPhotosServer;
+        return newState;
+      } else {
+        return prevState;
       }
-      newState.photosServer = newPhotosServer;
-      return newState;
     }
 
     case Actions.addPhotoServer: {
@@ -111,9 +115,11 @@ function GlobalReducer(prevState: stateType, action: Action) {
       );
       if (findCorrespondingPhotoIndex >= 0) {
         newPhotosLocal.splice(findCorrespondingPhotoIndex, 1);
+        newState.photosLocal = newPhotosLocal;
+        return newState;
+      } else {
+        return prevState;
       }
-      newState.photosLocal = newPhotosLocal;
-      return newState;
     }
 
     case Actions.deletePhotoLocalFromLocal: {
@@ -124,9 +130,11 @@ function GlobalReducer(prevState: stateType, action: Action) {
       );
       if (findCorrespondingPhotoIndex >= 0) {
         newPhotosLocal.splice(findCorrespondingPhotoIndex, 1);
+        newState.photosLocal = newPhotosLocal;
+        return newState;
+      } else {
+        return prevState;
       }
-      newState.photosLocal = newPhotosLocal;
-      return newState;
     }
 
     case Actions.deletePhotoLocalFromServer: {
@@ -137,9 +145,11 @@ function GlobalReducer(prevState: stateType, action: Action) {
       );
       if (findCorrespondingPhoto) {
         findCorrespondingPhoto.inDevice = false;
+        newState.photosServer = newPhotosServer;
+        return newState;
+      } else {
+        return prevState;
       }
-      newState.photosServer = newPhotosServer;
-      return newState;
     }
 
     case Actions.deletePhotoServer: {
@@ -150,10 +160,13 @@ function GlobalReducer(prevState: stateType, action: Action) {
       );
       if (findCorrespondingPhotoIndex >= 0) {
         newPhotosServer.splice(findCorrespondingPhotoIndex, 1);
+        newState.photosServer = newPhotosServer;
+        return newState;
+      } else {
+        return prevState;
       }
-      newState.photosServer = newPhotosServer;
-      return newState;
     }
+
     case Actions.updatePhotoProgress: {
       const newState = { ...prevState };
       const newPhotosLocal = [...newState.photosLocal];
@@ -163,12 +176,15 @@ function GlobalReducer(prevState: stateType, action: Action) {
       if (findCorrespondingPhoto) {
         findCorrespondingPhoto.isLoading = true;
         findCorrespondingPhoto.loadingPercentage = action.payload.p;
+        newState.photosLocal = newPhotosLocal;
+        return newState;
+      } else {
+        return prevState;
       }
-      newState.photosLocal = newPhotosLocal;
-      return newState;
     }
   }
   return prevState;
 }
 
 export { GlobalReducer, initialState, Actions };
+export type { Action };
