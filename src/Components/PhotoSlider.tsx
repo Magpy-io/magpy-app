@@ -69,9 +69,8 @@ export default function PhotoSlider(props: PropsType) {
         onIndexChanged={onCurrentIndexChanged}
         onEndReached={props.fetchMore}
       />
-      {validFlatListCurrentIndex ? (
+      {validFlatListCurrentIndex && (
         <StatusBarComponent
-          style={styles.statusBarStyle}
           inDevice={props.photos[flatListCurrentIndex].inDevice}
           inServer={props.photos[flatListCurrentIndex].inServer}
           isLoading={props.photos[flatListCurrentIndex].isLoading}
@@ -80,13 +79,10 @@ export default function PhotoSlider(props: PropsType) {
           }
           onBackButton={() => props.onSwitchMode(flatListCurrentIndex)}
         />
-      ) : (
-        <></>
       )}
 
-      {validFlatListCurrentIndex ? (
+      {validFlatListCurrentIndex && (
         <ToolBar
-          style={styles.toolBarStyle}
           inDevice={props.photos[flatListCurrentIndex].inDevice}
           inServer={props.photos[flatListCurrentIndex].inServer}
           onAddLocal={() => props.addPhotoLocal?.(flatListCurrentIndex)}
@@ -94,8 +90,6 @@ export default function PhotoSlider(props: PropsType) {
           onDeleteLocal={() => props.deletePhotoLocal?.(flatListCurrentIndex)}
           onDeleteServer={() => props.deletePhotoServer?.(flatListCurrentIndex)}
         />
-      ) : (
-        <></>
       )}
     </>
   );
@@ -111,6 +105,4 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   flatListStyle: { backgroundColor: "white" },
-  statusBarStyle: { position: "absolute", top: 0 },
-  toolBarStyle: { position: "absolute", bottom: 0 },
 });

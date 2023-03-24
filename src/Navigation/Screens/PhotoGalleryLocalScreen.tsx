@@ -1,10 +1,20 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { StyleSheet, Text } from "react-native";
+
 import * as AndroidPermissions from "~/Helpers/GetPermissionsAndroid";
 
-import { Text } from "react-native";
 import PhotoGallery from "~/Components/PhotoGallery";
-
 import { useMainContext } from "~/Components/ContextProvider";
+
+function photosNbToString(n: number) {
+  if (!n) {
+    return "All media is backed up.";
+  }
+  if (n == 1) {
+    return "1 Photo ready for backup.";
+  }
+  return `${n} Photos ready for backup.`;
+}
 
 type PropsType = {};
 
@@ -33,8 +43,14 @@ export default function PhotoGalleryLocalScreen(props: PropsType) {
       addPhotoServer={context.addPhotoServer}
       deletePhotoLocal={context.deletePhotoLocalFromLocal}
       deletePhotoServer={context.deletePhotoServer}
+      gridHeaderTextFunction={photosNbToString}
     />
   ) : (
     <Text>Permissions needed</Text>
   );
 }
+
+const styles = StyleSheet.create({
+  viewHeader: { paddingVertical: 30 },
+  textHeader: { fontSize: 17, textAlign: "center" },
+});

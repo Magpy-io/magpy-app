@@ -2,7 +2,7 @@ import { StyleSheet, Text, View } from "react-native";
 
 import { Icon } from "@rneui/themed";
 import colors from "~/colors";
-import BackButton from "../CommonComponents/BackButton";
+import BackButton from "~/Components/CommonComponents/BackButton";
 import React from "react";
 import * as Progress from "react-native-progress";
 
@@ -105,10 +105,11 @@ const styles = StyleSheet.create({
     padding: 5,
     width: "100%",
     backgroundColor: "white",
-    //    opacity: 0.6,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    position: "absolute",
+    top: 0,
   },
   statusBarBackButtonStyle: {},
   statusBarComponentStyle: {

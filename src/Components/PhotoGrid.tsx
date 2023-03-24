@@ -1,7 +1,16 @@
 import { StyleSheet, Text, FlatList, Dimensions, View } from "react-native";
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { PhotoType } from "~/Helpers/types";
 import PhotoComponentForGrid from "./PhotoComponentForGrid";
+import StatusBarGridComponent from "./PhotoComponents/StatusBarGridComponent";
+import { JSXElement } from "@babel/types";
 
 const ITEM_HEIGHT = Dimensions.get("screen").width / 3;
 
@@ -17,10 +26,10 @@ function getItemLayout(data: any, index: number) {
   };
 }
 
-const listEmptyComponent = () => {
+const listHeaderComponent = (props: { displayText: string }) => {
   return (
-    <View style={styles.viewOnEmpty}>
-      <Text style={styles.textOnEmpty}>No Data</Text>
+    <View style={styles.viewHeader}>
+      <Text style={styles.textHeader}>{props.displayText}</Text>
     </View>
   );
 };
@@ -31,12 +40,25 @@ type PropsType = {
   onSwitchMode: (index: number) => void;
   onRefresh: () => void;
   fetchMore?: () => void;
+  headerDisplayTextFunction?: (photosNb: number) => string;
 };
 
 export default function PhotoGrid(props: PropsType) {
   const flatlistRef = useRef<FlatList>(null);
   const [isSelecting, setIsSelecting] = useState(false);
   const [seletedIds, setSelectedIds] = useState(new Map());
+
+  const headerText = props.headerDisplayTextFunction
+    ? props.headerDisplayTextFunction(props.photos.length)
+    : `${props.photos.length} photos`;
+
+  const HeaderListComponent = useMemo(
+    () =>
+      listHeaderComponent({
+        displayText: headerText,
+      }),
+    [headerText]
+  );
 
   const onRenderItemPress = useCallback(
     (item: PhotoType, index: number) => {
@@ -105,23 +127,31 @@ export default function PhotoGrid(props: PropsType) {
   }, [props.photos.length]);
 
   return (
-    <FlatList
-      ref={flatlistRef}
-      style={styles.flatListStyle}
-      data={props.photos}
-      renderItem={renderItem}
-      maxToRenderPerBatch={20}
-      initialNumToRender={20}
-      initialScrollIndex={correctStartIndex}
-      keyExtractor={keyExtractor}
-      onEndReachedThreshold={1}
-      onEndReached={props.fetchMore}
-      onRefresh={props.onRefresh}
-      refreshing={false}
-      numColumns={3}
-      getItemLayout={getItemLayout}
-      ListEmptyComponent={listEmptyComponent}
-    />
+    <View>
+      <FlatList
+        ref={flatlistRef}
+        style={styles.flatListStyle}
+        data={props.photos}
+        renderItem={renderItem}
+        maxToRenderPerBatch={20}
+        initialNumToRender={20}
+        initialScrollIndex={correctStartIndex}
+        keyExtractor={keyExtractor}
+        onEndReachedThreshold={1}
+        onEndReached={props.fetchMore}
+        onRefresh={props.onRefresh}
+        refreshing={false}
+        numColumns={3}
+        getItemLayout={getItemLayout}
+        ListHeaderComponent={HeaderListComponent}
+      />
+      {isSelecting && (
+        <StatusBarGridComponent
+          selectedNb={seletedIds.size}
+          onCancelButton={() => setIsSelecting(false)}
+        />
+      )}
+    </View>
   );
 }
 
@@ -132,4 +162,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   viewOnEmpty: {},
+  viewHeader: { paddingVertical: 30 },
+  textHeader: { fontSize: 17, textAlign: "center" },
 });

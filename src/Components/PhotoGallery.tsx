@@ -14,6 +14,7 @@ type PropsType = {
   addPhotoServer?: (index: number) => void;
   deletePhotoLocal?: (index: number) => void;
   deletePhotoServer?: (index: number) => void;
+  gridHeaderTextFunction?: (photosNb: number) => string;
 };
 
 export default function PhotoGallery(props: PropsType) {
@@ -38,6 +39,7 @@ export default function PhotoGallery(props: PropsType) {
           onSwitchMode={onSwitchMode}
           fetchMore={props.fetchMore}
           onRefresh={props.onRefresh}
+          headerDisplayTextFunction={props.gridHeaderTextFunction}
         />
       ) : (
         <PhotoSlider

@@ -121,6 +121,8 @@ const styles = StyleSheet.create({
   toolBarView: {
     width: "100%",
     backgroundColor: "transparent",
+    position: "absolute",
+    bottom: 0,
   },
   toolsView: {
     flex: 1,

@@ -164,7 +164,7 @@ function GlobalReducer(prevState: stateType, action: Action) {
         findCorrespondingPhoto.isLoading = true;
         findCorrespondingPhoto.loadingPercentage = action.payload.p;
       }
-      newState.photosServer = newPhotosLocal;
+      newState.photosLocal = newPhotosLocal;
       return newState;
     }
   }
