@@ -35,8 +35,19 @@ function addPhoto(path: string, image: string) {
   return RNFS.writeFile(path, image, "base64");
 }
 
-function RemovePhoto(uri: string) {
-  return DeleteMedia.deletePhotos([uri]);
+async function RemovePhotos(uris: string[]) {
+  const urisThatExist = [];
+  for (let i = 0; i < uris.length; i++) {
+    if (await RNFS.exists(uris[i])) {
+      urisThatExist.push(uris[i]);
+    }
+  }
+
+  if (urisThatExist.length == 0) {
+    return;
+  }
+
+  return DeleteMedia.deletePhotos(urisThatExist);
 }
 
-export { GetPhotos, RemovePhoto, addPhoto, getFirstPossibleFileName };
+export { GetPhotos, RemovePhotos, addPhoto, getFirstPossibleFileName };

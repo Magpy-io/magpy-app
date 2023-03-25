@@ -10,6 +10,7 @@ import React, {
 import { PhotoType } from "~/Helpers/types";
 import PhotoComponentForGrid from "./PhotoComponentForGrid";
 import StatusBarGridComponent from "./PhotoComponents/StatusBarGridComponent";
+import ToolBarGrid from "./PhotoComponents/ToolBarGrid";
 import { JSXElement } from "@babel/types";
 
 const ITEM_HEIGHT = Dimensions.get("screen").width / 3;
@@ -41,6 +42,8 @@ type PropsType = {
   onRefresh: () => void;
   fetchMore?: () => void;
   headerDisplayTextFunction?: (photosNb: number) => string;
+  addPhotoServer?: (photos: PhotoType[]) => void;
+  deletePhotoLocal?: (photos: PhotoType[]) => void;
 };
 
 export default function PhotoGrid(props: PropsType) {
@@ -70,7 +73,7 @@ export default function PhotoGrid(props: PropsType) {
             return newMap;
           } else {
             const newMap = new Map(sIds);
-            newMap.set(item.id, true);
+            newMap.set(item.id, item);
             return newMap;
           }
         });
@@ -86,7 +89,7 @@ export default function PhotoGrid(props: PropsType) {
       if (!isSelecting) {
         setIsSelecting(true);
         const map = new Map();
-        map.set(item.id, true);
+        map.set(item.id, item);
         setSelectedIds(map);
       }
     },
@@ -149,6 +152,18 @@ export default function PhotoGrid(props: PropsType) {
         <StatusBarGridComponent
           selectedNb={seletedIds.size}
           onCancelButton={() => setIsSelecting(false)}
+        />
+      )}
+      {isSelecting && (
+        <ToolBarGrid
+          onAddServer={() => {
+            setIsSelecting(false);
+            return props.addPhotoServer?.(Array.from(seletedIds.values()));
+          }}
+          onDeleteLocal={() => {
+            setIsSelecting(false);
+            return props.deletePhotoLocal?.(Array.from(seletedIds.values()));
+          }}
         />
       )}
     </View>

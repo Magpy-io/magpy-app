@@ -3,6 +3,7 @@ import React, {
   useCallback,
   useContext,
   useReducer,
+  useRef,
 } from "react";
 
 import RNFS from "react-native-fs";
@@ -23,7 +24,7 @@ import {
 } from "~/Helpers/Queries";
 import {
   addPhoto,
-  RemovePhoto,
+  RemovePhotos,
   getFirstPossibleFileName,
 } from "~/Helpers/GetGalleryPhotos";
 
@@ -31,7 +32,9 @@ import {
   GlobalReducer,
   initialState,
   Actions,
+  Action,
 } from "~/Components/ContextReducer";
+import { returnStatement } from "@babel/types";
 
 type contextType = {
   photosLocal: Array<PhotoType>;
@@ -42,8 +45,8 @@ type contextType = {
   fetchMoreServer: () => Promise<void>;
   RequestFullPhotoServer: (index: number) => Promise<void>;
   addPhotoLocal: (index: number) => Promise<void>;
-  addPhotoServer: (index: number) => Promise<void>;
-  deletePhotoLocalFromLocal: (index: number) => Promise<void>;
+  addPhotoServer: (photos: PhotoType[]) => Promise<void>;
+  deletePhotoLocalFromLocal: (photos: PhotoType[]) => Promise<void>;
   deletePhotoLocalFromServer: (index: number) => Promise<void>;
   deletePhotoServer: (index: number) => Promise<void>;
 };
@@ -60,6 +63,9 @@ type PropsType = {
 
 const ContextProvider = (props: PropsType) => {
   const [state, dispatch] = useReducer(GlobalReducer, initialState);
+
+  const photosUploading = useRef([] as PhotoType[]);
+  const isPhotosUploading = useRef(false);
 
   const onRefreshLocal = useCallback(async () => {
     try {
@@ -187,40 +193,68 @@ const ContextProvider = (props: PropsType) => {
     [state]
   );
 
-  const addPhotoServer = useCallback(
-    async (index: number) => {
-      try {
-        const photo = state.photosLocal[index];
+  const addSinglePhotoServer = async (
+    photo: PhotoType,
+    dispatch: React.Dispatch<Action>
+  ) => {
+    const res = await RNFS.readFile(photo.image.path, "base64");
 
-        if (photo.isLoading) {
+    const response = await postPhotoWithProgress(
+      {
+        name: photo.image.fileName,
+        fileSize: photo.image.fileSize,
+        width: photo.image.width,
+        height: photo.image.height,
+        date: new Date(photo.created).toJSON(),
+        path: photo.image.path,
+        image64: res,
+      },
+      (p: number, t: number) => {
+        dispatch({
+          type: Actions.updatePhotoProgress,
+          payload: { photo: photo, p: (p + 1) / t },
+        });
+      }
+    );
+
+    if (!response.ok) {
+      console.log(response);
+    }
+
+    dispatch({
+      type: Actions.addPhotoServer,
+      payload: { photo: photo },
+    });
+  };
+
+  const addPhotoServer = useCallback(
+    async (photos: PhotoType[]) => {
+      try {
+        for (let i = 0; i < photos.length; i++) {
+          if (!photos[i].isLoading) {
+            dispatch({
+              type: Actions.updatePhotoProgress,
+              payload: { photo: photos[i], p: 0 },
+            });
+            photosUploading.current.push(photos[i]);
+          }
+        }
+
+        if (isPhotosUploading.current) {
           return;
         }
 
-        const res = await RNFS.readFile(photo.image.path, "base64");
-
-        const response = await postPhotoWithProgress(
-          {
-            name: photo.image.fileName,
-            fileSize: photo.image.fileSize,
-            width: photo.image.width,
-            height: photo.image.height,
-            date: new Date(photo.created).toJSON(),
-            path: photo.image.path,
-            image64: res,
-          },
-          (p: number, t: number) => {
-            dispatch({
-              type: Actions.updatePhotoProgress,
-              payload: { photo: photo, p: (p + 1) / t },
-            });
+        while (photosUploading.current.length != 0) {
+          isPhotosUploading.current = true;
+          const photo = photosUploading.current.shift() as PhotoType;
+          try {
+            await addSinglePhotoServer(photo, dispatch);
+          } catch (err) {
+            console.log(`error while posting photo with id ${photo.id}`);
+            console.log(err);
           }
-        );
-
-        if (!response.ok) {
-          console.log(response);
         }
-
-        dispatch({ type: Actions.addPhotoServer, payload: { photo: photo } });
+        isPhotosUploading.current = false;
       } catch (err) {
         console.log(err);
       }
@@ -229,15 +263,15 @@ const ContextProvider = (props: PropsType) => {
   );
 
   const deletePhotoLocalFromLocal = useCallback(
-    async (index: number) => {
+    async (photos: PhotoType[]) => {
       try {
-        const photo = state.photosLocal[index];
+        const uris = photos.map((photo) => photo.image.path);
 
-        await RemovePhoto(photo.image.path);
+        await RemovePhotos(uris);
 
         dispatch({
-          type: Actions.deletePhotoLocalFromLocal,
-          payload: { photo: photo },
+          type: Actions.deletePhotosLocalFromLocal,
+          payload: { photos: photos },
         });
       } catch (err) {
         console.log(err);

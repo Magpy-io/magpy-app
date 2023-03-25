@@ -13,8 +13,8 @@ type PropsType = {
   RequestFullPhoto: (index: number) => void;
   fetchMore?: () => void;
   addPhotoLocal?: (index: number) => void;
-  addPhotoServer?: (index: number) => void;
-  deletePhotoLocal?: (index: number) => void;
+  addPhotoServer?: (photos: PhotoType[]) => void;
+  deletePhotoLocal?: (photos: PhotoType[]) => void;
   deletePhotoServer?: (index: number) => void;
 };
 
@@ -86,8 +86,12 @@ export default function PhotoSlider(props: PropsType) {
           inDevice={props.photos[flatListCurrentIndex].inDevice}
           inServer={props.photos[flatListCurrentIndex].inServer}
           onAddLocal={() => props.addPhotoLocal?.(flatListCurrentIndex)}
-          onAddServer={() => props.addPhotoServer?.(flatListCurrentIndex)}
-          onDeleteLocal={() => props.deletePhotoLocal?.(flatListCurrentIndex)}
+          onAddServer={() =>
+            props.addPhotoServer?.([props.photos[flatListCurrentIndex]])
+          }
+          onDeleteLocal={() =>
+            props.deletePhotoLocal?.([props.photos[flatListCurrentIndex]])
+          }
           onDeleteServer={() => props.deletePhotoServer?.(flatListCurrentIndex)}
         />
       )}

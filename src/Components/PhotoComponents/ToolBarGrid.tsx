@@ -10,8 +10,6 @@ const TOOLBAR_COLOR = "#ffffff";
 const TOOL_COLOR = "#4d4d4d";
 
 type ToolBarProps = {
-  inDevice: boolean;
-  inServer: boolean;
   style?: any;
   onDeleteLocal?: () => void;
   onAddLocal?: () => void;
@@ -21,45 +19,24 @@ type ToolBarProps = {
   onDetails?: () => void;
 };
 
-function ToolBar(props: ToolBarProps) {
+function ToolBarGrid(props: ToolBarProps) {
   return (
     <View style={[styles.toolBarView, props.style]}>
       <View style={styles.toolsView}>
-        {props.inDevice ? (
-          <ToolComponent
-            icon="mobile-off"
-            text="Delete from device"
-            onPress={() => props.onDeleteLocal?.()}
-          />
-        ) : (
-          <ToolComponent
-            icon="system-update"
-            text="Save to device"
-            onPress={() => props.onAddLocal?.()}
-          />
-        )}
-        {props.inServer ? (
-          <ToolComponent
-            icon="delete"
-            text="Delete from server"
-            onPress={() => props.onDeleteServer?.()}
-          />
-        ) : (
-          <ToolComponent
-            icon="backup"
-            text="Back up"
-            onPress={() => props.onAddServer?.()}
-          />
-        )}
+        <ToolComponent
+          icon="backup"
+          text="Back up"
+          onPress={() => props.onAddServer?.()}
+        />
+        <ToolComponent
+          icon="mobile-off"
+          text="Delete from device"
+          onPress={() => props.onDeleteLocal?.()}
+        />
         <ToolComponent
           icon="share"
           text="Share"
           onPress={() => props.onShare?.()}
-        />
-        <ToolComponent
-          icon="info"
-          text="Details"
-          onPress={() => props.onDetails?.()}
         />
       </View>
     </View>
@@ -131,4 +108,4 @@ const styles = StyleSheet.create({
   iconContainerStyle: {},
 });
 
-export default React.memo(ToolBar);
+export default React.memo(ToolBarGrid);

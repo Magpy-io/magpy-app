@@ -26,7 +26,7 @@ enum Actions {
   addFullPhotoById = "ADD_FULL_PHOTO_BY_ID",
   addPhotoLocal = "ADD_PHOTO_LOCAL",
   addPhotoServer = "ADD_PHOTO_SERVER",
-  deletePhotoLocalFromLocal = "DELETE_PHOTO_LOCAL_FROM_LOCAL",
+  deletePhotosLocalFromLocal = "DELETE_PHOTOS_LOCAL_FROM_LOCAL",
   deletePhotoLocalFromServer = "DELETE_PHOTO_LOCAL_FROM_SERVER",
   deletePhotoServer = "DELETE_PHOTO_SERVER",
   updatePhotoProgress = "UPDATE_PHOTO_PROGRESS",
@@ -122,19 +122,18 @@ function GlobalReducer(prevState: stateType, action: Action) {
       }
     }
 
-    case Actions.deletePhotoLocalFromLocal: {
+    case Actions.deletePhotosLocalFromLocal: {
       const newState = { ...prevState };
-      const newPhotosLocal = [...newState.photosLocal];
-      const findCorrespondingPhotoIndex = newPhotosLocal.findIndex(
-        (photo) => photo.id == action.payload.photo.id
+
+      const ids: string[] = action.payload.photos.map(
+        (photo: PhotoType) => photo.id
       );
-      if (findCorrespondingPhotoIndex >= 0) {
-        newPhotosLocal.splice(findCorrespondingPhotoIndex, 1);
-        newState.photosLocal = newPhotosLocal;
-        return newState;
-      } else {
-        return prevState;
-      }
+
+      newState.photosLocal = newState.photosLocal.filter(
+        (photo) => !ids.includes(photo.id)
+      );
+
+      return newState;
     }
 
     case Actions.deletePhotoLocalFromServer: {

@@ -11,8 +11,8 @@ type PropsType = {
   RequestFullPhoto: (index: number) => void;
   fetchMore?: () => void;
   addPhotoLocal?: (index: number) => void;
-  addPhotoServer?: (index: number) => void;
-  deletePhotoLocal?: (index: number) => void;
+  addPhotoServer?: (photos: PhotoType[]) => void;
+  deletePhotoLocal?: (photos: PhotoType[]) => void;
   deletePhotoServer?: (index: number) => void;
   gridHeaderTextFunction?: (photosNb: number) => string;
 };
@@ -39,6 +39,8 @@ export default function PhotoGallery(props: PropsType) {
           onSwitchMode={onSwitchMode}
           fetchMore={props.fetchMore}
           onRefresh={props.onRefresh}
+          addPhotoServer={props.addPhotoServer}
+          deletePhotoLocal={props.deletePhotoLocal}
           headerDisplayTextFunction={props.gridHeaderTextFunction}
         />
       ) : (
