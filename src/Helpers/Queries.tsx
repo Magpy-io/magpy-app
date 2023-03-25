@@ -104,7 +104,7 @@ async function postPhotoWithProgress(
 
   const base64ImageSplit = splitString(base64Image);
 
-  const r = await fetch(routes.postPhotoInit, {
+  const response = await fetch(routes.postPhotoInit, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -118,14 +118,17 @@ async function postPhotoWithProgress(
       path: photo.path,
       image64Len: base64Image.length,
     }),
-  });
+  }).then((r) => r.json());
 
-  const rJson = await r.json();
+  if (!response.ok) {
+    return response;
+  }
 
-  const id = rJson.data.photo.id;
+  const id = response.data.photo.id;
 
+  let responseI;
   for (let i = 0; i < base64ImageSplit.length; i++) {
-    await fetch(routes.postPhotoPart, {
+    responseI = await fetch(routes.postPhotoPart, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -136,9 +139,15 @@ async function postPhotoWithProgress(
         partSize: base64ImageSplit[i].length,
         photoPart: base64ImageSplit[i],
       }),
-    });
+    }).then((r) => r.json());
+
+    if (!responseI.ok) {
+      return responseI;
+    }
+
     f(i, base64ImageSplit.length);
   }
+  return responseI;
 }
 
 function splitString(str: string) {

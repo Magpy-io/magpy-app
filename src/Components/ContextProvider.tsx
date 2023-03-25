@@ -189,76 +189,101 @@ const ContextProvider = (props: PropsType) => {
 
   const addPhotoServer = useCallback(
     async (index: number) => {
-      const photo = state.photosLocal[index];
+      try {
+        const photo = state.photosLocal[index];
 
-      if (photo.isLoading) {
-        return;
-      }
-
-      const res = await RNFS.readFile(photo.image.path, "base64");
-
-      const response = await postPhotoWithProgress(
-        {
-          name: photo.image.fileName,
-          fileSize: photo.image.fileSize,
-          width: photo.image.width,
-          height: photo.image.height,
-          date: new Date(photo.created).toJSON(),
-          path: photo.image.path,
-          image64: res,
-        },
-        (p: number, t: number) => {
-          dispatch({
-            type: Actions.updatePhotoProgress,
-            payload: { photo: photo, p: (p + 1) / t },
-          });
+        if (photo.isLoading) {
+          return;
         }
-      );
-      dispatch({ type: Actions.addPhotoServer, payload: { photo: photo } });
+
+        const res = await RNFS.readFile(photo.image.path, "base64");
+
+        const response = await postPhotoWithProgress(
+          {
+            name: photo.image.fileName,
+            fileSize: photo.image.fileSize,
+            width: photo.image.width,
+            height: photo.image.height,
+            date: new Date(photo.created).toJSON(),
+            path: photo.image.path,
+            image64: res,
+          },
+          (p: number, t: number) => {
+            dispatch({
+              type: Actions.updatePhotoProgress,
+              payload: { photo: photo, p: (p + 1) / t },
+            });
+          }
+        );
+
+        if (!response.ok) {
+          console.log(response);
+        }
+
+        dispatch({ type: Actions.addPhotoServer, payload: { photo: photo } });
+      } catch (err) {
+        console.log(err);
+      }
     },
     [state]
   );
 
   const deletePhotoLocalFromLocal = useCallback(
     async (index: number) => {
-      const photo = state.photosLocal[index];
+      try {
+        const photo = state.photosLocal[index];
 
-      await RemovePhoto(photo.image.path);
+        await RemovePhoto(photo.image.path);
 
-      dispatch({
-        type: Actions.deletePhotoLocalFromLocal,
-        payload: { photo: photo },
-      });
+        dispatch({
+          type: Actions.deletePhotoLocalFromLocal,
+          payload: { photo: photo },
+        });
+      } catch (err) {
+        console.log(err);
+      }
     },
     [state]
   );
 
   const deletePhotoLocalFromServer = useCallback(
     async (index: number) => {
-      const photo = state.photosServer[index];
+      try {
+        const photo = state.photosServer[index];
 
-      RequestFullPhotoServer(index);
+        RequestFullPhotoServer(index);
 
-      await RemovePhoto(photo.image.path);
+        await RemovePhoto(photo.image.path);
 
-      dispatch({
-        type: Actions.deletePhotoLocalFromServer,
-        payload: { photo: photo },
-      });
+        dispatch({
+          type: Actions.deletePhotoLocalFromServer,
+          payload: { photo: photo },
+        });
+      } catch (err) {
+        console.log(err);
+      }
     },
     [state]
   );
 
   const deletePhotoServer = useCallback(
     async (index: number) => {
-      const photo = state.photosServer[index];
+      try {
+        const photo = state.photosServer[index];
 
-      await removePhotoById(photo.id);
+        const response = await removePhotoById(photo.id);
 
-      dispatch({
-        type: Actions.deletePhotoServer,
-        payload: { photo: photo },
-      });
+        if (!response.ok) {
+          console.log(response);
+        }
+
+        dispatch({
+          type: Actions.deletePhotoServer,
+          payload: { photo: photo },
+        });
+      } catch (err) {
+        console.log(err);
+      }
     },
     [state]
   );
