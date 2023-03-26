@@ -35,6 +35,10 @@ const listHeaderComponent = (props: { displayText: string }) => {
   );
 };
 
+const listFooterComponent = () => {
+  return <View style={styles.viewFooter}></View>;
+};
+
 type PropsType = {
   photos: Array<PhotoType>;
   startIndex: number;
@@ -42,8 +46,8 @@ type PropsType = {
   onRefresh: () => void;
   fetchMore?: () => void;
   headerDisplayTextFunction?: (photosNb: number) => string;
-  addPhotoServer?: (photos: PhotoType[]) => void;
-  deletePhotoLocal?: (photos: PhotoType[]) => void;
+  addPhotosServer?: (photos: PhotoType[]) => void;
+  deletePhotosLocal?: (photos: PhotoType[]) => void;
 };
 
 export default function PhotoGrid(props: PropsType) {
@@ -147,6 +151,7 @@ export default function PhotoGrid(props: PropsType) {
         numColumns={3}
         getItemLayout={getItemLayout}
         ListHeaderComponent={HeaderListComponent}
+        ListFooterComponent={listFooterComponent}
       />
       {isSelecting && (
         <StatusBarGridComponent
@@ -158,11 +163,11 @@ export default function PhotoGrid(props: PropsType) {
         <ToolBarGrid
           onAddServer={() => {
             setIsSelecting(false);
-            return props.addPhotoServer?.(Array.from(seletedIds.values()));
+            return props.addPhotosServer?.(Array.from(seletedIds.values()));
           }}
           onDeleteLocal={() => {
             setIsSelecting(false);
-            return props.deletePhotoLocal?.(Array.from(seletedIds.values()));
+            return props.deletePhotosLocal?.(Array.from(seletedIds.values()));
           }}
         />
       )}
@@ -179,4 +184,5 @@ const styles = StyleSheet.create({
   viewOnEmpty: {},
   viewHeader: { paddingVertical: 30 },
   textHeader: { fontSize: 17, textAlign: "center" },
+  viewFooter: { marginVertical: 35 },
 });

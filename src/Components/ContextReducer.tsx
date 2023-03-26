@@ -28,8 +28,10 @@ enum Actions {
   addPhotoServer = "ADD_PHOTO_SERVER",
   deletePhotosLocalFromLocal = "DELETE_PHOTOS_LOCAL_FROM_LOCAL",
   deletePhotoLocalFromServer = "DELETE_PHOTO_LOCAL_FROM_SERVER",
+  deletePhotosLocalFromServer = "DELETE_PHOTOS_LOCAL_FROM_SERVER",
   deletePhotoServer = "DELETE_PHOTO_SERVER",
   updatePhotoProgress = "UPDATE_PHOTO_PROGRESS",
+  addCroppedPhotos = "ADD_CROPPED_PHOTOS",
 }
 
 type Action = {
@@ -151,6 +153,26 @@ function GlobalReducer(prevState: stateType, action: Action) {
       }
     }
 
+    case Actions.deletePhotosLocalFromServer: {
+      const newState = { ...prevState };
+
+      const newPhotosServer = [...newState.photosServer];
+
+      const ids: string[] = action.payload.photos.map(
+        (photo: PhotoType) => photo.id
+      );
+
+      ids.forEach((id) => {
+        const photo = newPhotosServer.find((v) => v.id == id);
+        if (photo) {
+          photo.inDevice = false;
+        }
+      });
+
+      newState.photosServer = newPhotosServer;
+      return newState;
+    }
+
     case Actions.deletePhotoServer: {
       const newState = { ...prevState };
       const newPhotosServer = [...newState.photosServer];
@@ -180,6 +202,25 @@ function GlobalReducer(prevState: stateType, action: Action) {
       } else {
         return prevState;
       }
+    }
+
+    case Actions.addCroppedPhotos: {
+      const newState = { ...prevState };
+
+      const newPhotosServer = [...newState.photosServer];
+      action.payload.images64.forEach((element: any) => {
+        const requestPhoto = element.photo;
+        const index = newPhotosServer.findIndex((v) => v.id == requestPhoto.id);
+
+        if (index >= 0) {
+          const newPhoto = { ...newPhotosServer[index] };
+          newPhoto.image.image64 = `data:image/jpeg;base64,${requestPhoto.image64}`;
+          newPhotosServer[index] = newPhoto;
+        }
+      });
+
+      newState.photosServer = newPhotosServer;
+      return newState;
     }
   }
   return prevState;

@@ -5,6 +5,7 @@ import * as AndroidPermissions from "~/Helpers/GetPermissionsAndroid";
 
 import PhotoGallery from "~/Components/PhotoGallery";
 import { useMainContext } from "~/Components/ContextProvider";
+import { PhotoType } from "~/Helpers/types";
 
 function photosNbToString(n: number) {
   if (!n) {
@@ -39,10 +40,13 @@ export default function PhotoGalleryLocalScreen(props: PropsType) {
       photos={context.photosLocal}
       onRefresh={context.onRefreshLocal}
       RequestFullPhoto={context.RequestFullPhotoServer}
-      addPhotoLocal={context.addPhotoLocal}
-      addPhotoServer={context.addPhotoServer}
-      deletePhotoLocal={context.deletePhotoLocalFromLocal}
-      deletePhotoServer={context.deletePhotoServer}
+      addPhotosLocal={context.addPhotosLocal}
+      addPhotosServer={context.addPhotosServer}
+      deletePhotosLocal={context.deletePhotosLocalFromLocal}
+      deletePhotoLocal={(photo: PhotoType) =>
+        context.deletePhotosLocalFromLocal([photo])
+      }
+      deletePhotosServer={context.deletePhotosServer}
       gridHeaderTextFunction={photosNbToString}
     />
   ) : (

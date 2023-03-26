@@ -7,6 +7,7 @@ import React, {
 } from "react";
 
 import RNFS from "react-native-fs";
+import { ErrorCodes } from "react-native-delete-media";
 
 import { PhotoType } from "~/Helpers/types";
 
@@ -21,6 +22,7 @@ import {
   getPhotoById,
   removePhotoById,
   updatePhotoPath,
+  getPhotosByIds,
 } from "~/Helpers/Queries";
 import {
   addPhoto,
@@ -34,7 +36,6 @@ import {
   Actions,
   Action,
 } from "~/Components/ContextReducer";
-import { returnStatement } from "@babel/types";
 
 type contextType = {
   photosLocal: Array<PhotoType>;
@@ -43,17 +44,52 @@ type contextType = {
   onRefreshServer: () => Promise<void>;
   fetchMoreLocal: () => Promise<void>;
   fetchMoreServer: () => Promise<void>;
-  RequestFullPhotoServer: (index: number) => Promise<void>;
-  addPhotoLocal: (index: number) => Promise<void>;
-  addPhotoServer: (photos: PhotoType[]) => Promise<void>;
-  deletePhotoLocalFromLocal: (photos: PhotoType[]) => Promise<void>;
-  deletePhotoLocalFromServer: (index: number) => Promise<void>;
-  deletePhotoServer: (index: number) => Promise<void>;
+  RequestFullPhotoServer: (photo: PhotoType) => Promise<void>;
+  addPhotosLocal: (photos: PhotoType[]) => Promise<void>;
+  addPhotosServer: (photos: PhotoType[]) => Promise<void>;
+  deletePhotosLocalFromLocal: (photos: PhotoType[]) => Promise<void>;
+  deletePhotoLocalFromServer: (photo: PhotoType) => Promise<void>;
+  deletePhotosLocalFromServer: (photos: PhotoType[]) => Promise<void>;
+  deletePhotosServer: (photos: PhotoType[]) => Promise<void>;
 };
 
 const ITEMS_TO_LOAD_PER_END_REACHED_LOCAL = 3000;
 
 const ITEMS_TO_LOAD_PER_END_REACHED_SERVER = 3000;
+
+const addSinglePhotoServer = async (
+  photo: PhotoType,
+  dispatch: React.Dispatch<Action>
+) => {
+  const res = await RNFS.readFile(photo.image.path, "base64");
+
+  const response = await postPhotoWithProgress(
+    {
+      name: photo.image.fileName,
+      fileSize: photo.image.fileSize,
+      width: photo.image.width,
+      height: photo.image.height,
+      date: new Date(photo.created).toJSON(),
+      path: photo.image.path,
+      image64: res,
+    },
+    (p: number, t: number) => {
+      dispatch({
+        type: Actions.updatePhotoProgress,
+        payload: { photo: photo, p: (p + 1) / t },
+      });
+    }
+  );
+
+  if (!response.ok) {
+    console.log(response);
+  }
+
+  dispatch({
+    type: Actions.addPhotoServer,
+    payload: { photo: photo },
+  });
+};
 
 const AppContext = createContext<contextType | undefined>(undefined);
 
@@ -138,189 +174,212 @@ const ContextProvider = (props: PropsType) => {
     }
   }, [state]);
 
-  const RequestFullPhotoServer = useCallback(
-    async (index: number) => {
-      const photo = state.photosServer[index];
-
-      if (photo.image.image64Full) {
-        return;
-      }
-      try {
-        const result = await getPhotoById(photo.id);
-
-        dispatch({
-          type: Actions.addFullPhotoById,
-          payload: { result: result },
-        });
-      } catch (err) {
-        console.log(err);
-      }
-    },
-    [state]
-  );
-
-  const addPhotoLocal = useCallback(
-    async (index: number) => {
-      try {
-        const photo = state.photosServer[index];
-        const image64 = photo.image.image64Full.substring(
-          "data:image/jpeg;base64,".length
-        );
-        const dirPath = "/storage/emulated/0/DCIM/Restored/";
-
-        await RNFS.mkdir(dirPath);
-
-        const dirExists = await RNFS.exists(dirPath);
-
-        if (!dirExists) {
-          console.log("directory not created to write image.");
-          return;
-        }
-
-        const filePath = await getFirstPossibleFileName(
-          "file://" + dirPath + photo.image.fileName
-        );
-
-        await addPhoto(filePath, image64);
-
-        photo.image.path = filePath;
-        dispatch({ type: Actions.addPhotoLocal, payload: { photo: photo } });
-        await updatePhotoPath(photo.id, filePath);
-      } catch (err) {
-        console.log(err);
-      }
-    },
-    [state]
-  );
-
-  const addSinglePhotoServer = async (
-    photo: PhotoType,
-    dispatch: React.Dispatch<Action>
-  ) => {
-    const res = await RNFS.readFile(photo.image.path, "base64");
-
-    const response = await postPhotoWithProgress(
-      {
-        name: photo.image.fileName,
-        fileSize: photo.image.fileSize,
-        width: photo.image.width,
-        height: photo.image.height,
-        date: new Date(photo.created).toJSON(),
-        path: photo.image.path,
-        image64: res,
-      },
-      (p: number, t: number) => {
-        dispatch({
-          type: Actions.updatePhotoProgress,
-          payload: { photo: photo, p: (p + 1) / t },
-        });
-      }
-    );
-
-    if (!response.ok) {
-      console.log(response);
+  const RequestFullPhotoServer = useCallback(async (photo: PhotoType) => {
+    if (photo.image.image64Full) {
+      return;
     }
+    try {
+      const result = await getPhotoById(photo.id);
 
-    dispatch({
-      type: Actions.addPhotoServer,
-      payload: { photo: photo },
-    });
-  };
+      dispatch({
+        type: Actions.addFullPhotoById,
+        payload: { result: result },
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  }, []);
 
-  const addPhotoServer = useCallback(
+  const RequestCroppedPhotosServer = useCallback(
     async (photos: PhotoType[]) => {
       try {
-        for (let i = 0; i < photos.length; i++) {
-          if (!photos[i].isLoading) {
-            dispatch({
-              type: Actions.updatePhotoProgress,
-              payload: { photo: photos[i], p: 0 },
-            });
-            photosUploading.current.push(photos[i]);
-          }
-        }
-
-        if (isPhotosUploading.current) {
-          return;
-        }
-
-        while (photosUploading.current.length != 0) {
-          isPhotosUploading.current = true;
-          const photo = photosUploading.current.shift() as PhotoType;
-          try {
-            await addSinglePhotoServer(photo, dispatch);
-          } catch (err) {
-            console.log(`error while posting photo with id ${photo.id}`);
-            console.log(err);
-          }
-        }
-        isPhotosUploading.current = false;
+        const ids = photos.map((photo) => photo.id);
+        const images64 = (await getPhotosByIds(ids)).data.photos;
+        const images64Filtered = images64.filter(
+          (image64: any) => image64.exists
+        );
+        dispatch({
+          type: Actions.addCroppedPhotos,
+          payload: { images64: images64Filtered },
+        });
       } catch (err) {
         console.log(err);
       }
     },
-    [state]
+    []
   );
 
-  const deletePhotoLocalFromLocal = useCallback(
+  const addPhotosLocal = useCallback(async (photos: PhotoType[]) => {
+    try {
+      const photo = state.photosServer[index];
+      const image64 = photo.image.image64Full.substring(
+        "data:image/jpeg;base64,".length
+      );
+      const dirPath = "/storage/emulated/0/DCIM/Restored/";
+
+      await RNFS.mkdir(dirPath);
+
+      const dirExists = await RNFS.exists(dirPath);
+
+      if (!dirExists) {
+        console.log("directory not created to write image.");
+        return;
+      }
+
+      const filePath = await getFirstPossibleFileName(
+        "file://" + dirPath + photo.image.fileName
+      );
+
+      await addPhoto(filePath, image64);
+
+      photo.image.path = filePath;
+      dispatch({ type: Actions.addPhotoLocal, payload: { photo: photo } });
+      await updatePhotoPath(photo.id, filePath);
+    } catch (err) {
+      console.log(err);
+    }
+  }, []);
+
+  const addPhotosServer = useCallback(async (photos: PhotoType[]) => {
+    try {
+      for (let i = 0; i < photos.length; i++) {
+        if (!photos[i].isLoading) {
+          dispatch({
+            type: Actions.updatePhotoProgress,
+            payload: { photo: photos[i], p: 0 },
+          });
+          photosUploading.current.push(photos[i]);
+        }
+      }
+
+      if (isPhotosUploading.current) {
+        return;
+      }
+
+      while (photosUploading.current.length != 0) {
+        isPhotosUploading.current = true;
+        const photo = photosUploading.current.shift() as PhotoType;
+        try {
+          await addSinglePhotoServer(photo, dispatch);
+        } catch (err) {
+          console.log(`error while posting photo with id ${photo.id}`);
+          console.log(err);
+        }
+      }
+      isPhotosUploading.current = false;
+    } catch (err) {
+      console.log(err);
+    }
+  }, []);
+
+  const deletePhotosLocalFromLocal = useCallback(
     async (photos: PhotoType[]) => {
       try {
         const uris = photos.map((photo) => photo.image.path);
+        let photosRemoved = true;
 
-        await RemovePhotos(uris);
+        try {
+          await RemovePhotos(uris);
+        } catch (err: any) {
+          photosRemoved = false;
+          const code: ErrorCodes = err.code;
 
-        dispatch({
-          type: Actions.deletePhotosLocalFromLocal,
-          payload: { photos: photos },
-        });
+          if (code != "ERROR_USER_REJECTED") {
+            throw err;
+          }
+        }
+
+        if (photosRemoved) {
+          dispatch({
+            type: Actions.deletePhotosLocalFromLocal,
+            payload: { photos: photos },
+          });
+        }
       } catch (err) {
         console.log(err);
       }
     },
-    [state]
+    []
   );
 
-  const deletePhotoLocalFromServer = useCallback(
-    async (index: number) => {
+  const deletePhotoLocalFromServer = useCallback(async (photo: PhotoType) => {
+    try {
+      RequestFullPhotoServer(photo);
+
+      let photoRemoved = true;
+
       try {
-        const photo = state.photosServer[index];
+        await RemovePhotos([photo.image.path]);
+      } catch (err: any) {
+        photoRemoved = false;
+        const code: ErrorCodes = err.code;
 
-        RequestFullPhotoServer(index);
-
-        await RemovePhoto(photo.image.path);
-
+        if (code != "ERROR_USER_REJECTED") {
+          throw err;
+        }
+      }
+      if (photoRemoved) {
         dispatch({
           type: Actions.deletePhotoLocalFromServer,
           payload: { photo: photo },
         });
-      } catch (err) {
-        console.log(err);
       }
-    },
-    [state]
-  );
+    } catch (err) {
+      console.log(err);
+    }
+  }, []);
 
-  const deletePhotoServer = useCallback(
-    async (index: number) => {
+  const deletePhotosLocalFromServer = useCallback(
+    async (photos: PhotoType[]) => {
       try {
-        const photo = state.photosServer[index];
+        RequestCroppedPhotosServer(photos);
 
-        const response = await removePhotoById(photo.id);
+        const uris = photos.map((photo) => photo.image.path);
 
-        if (!response.ok) {
-          console.log(response);
+        let photosRemoved = true;
+
+        try {
+          await RemovePhotos(uris);
+        } catch (err: any) {
+          photosRemoved = false;
+          const code: ErrorCodes = err.code;
+
+          if (code != "ERROR_USER_REJECTED") {
+            throw err;
+          }
         }
 
-        dispatch({
-          type: Actions.deletePhotoServer,
-          payload: { photo: photo },
-        });
+        if (photosRemoved) {
+          dispatch({
+            type: Actions.deletePhotosLocalFromServer,
+            payload: { photos: photos },
+          });
+        }
       } catch (err) {
         console.log(err);
       }
     },
-    [state]
+    []
   );
+
+  const deletePhotosServer = useCallback(async (photos: PhotoType[]) => {
+    try {
+      const photo = state.photosServer[index];
+
+      const response = await removePhotoById(photo.id);
+
+      if (!response.ok) {
+        console.log(response);
+      }
+
+      dispatch({
+        type: Actions.deletePhotoServer,
+        payload: { photo: photo },
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  }, []);
 
   const value = {
     photosLocal: state.photosLocal,
@@ -330,11 +389,12 @@ const ContextProvider = (props: PropsType) => {
     fetchMoreLocal: fetchMoreLocal,
     fetchMoreServer: fetchMoreServer,
     RequestFullPhotoServer: RequestFullPhotoServer,
-    addPhotoLocal: addPhotoLocal,
-    addPhotoServer: addPhotoServer,
-    deletePhotoLocalFromLocal: deletePhotoLocalFromLocal,
+    addPhotosLocal: addPhotosLocal,
+    addPhotosServer: addPhotosServer,
+    deletePhotosLocalFromLocal: deletePhotosLocalFromLocal,
     deletePhotoLocalFromServer: deletePhotoLocalFromServer,
-    deletePhotoServer: deletePhotoServer,
+    deletePhotosLocalFromServer: deletePhotosLocalFromServer,
+    deletePhotosServer: deletePhotosServer,
   };
 
   return (

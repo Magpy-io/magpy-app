@@ -129,7 +129,6 @@ async function postPhotoWithProgress(
 
   let responseI;
   for (let i = 0; i < base64ImageSplit.length; i++) {
-    console.log(i);
     responseI = await fetch(routes.postPhotoPart, {
       method: "POST",
       headers: {

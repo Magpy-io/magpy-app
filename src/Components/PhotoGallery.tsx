@@ -8,12 +8,13 @@ import { PhotoType } from "~/Helpers/types";
 type PropsType = {
   photos: Array<PhotoType>;
   onRefresh: () => void;
-  RequestFullPhoto: (index: number) => void;
+  RequestFullPhoto: (photo: PhotoType) => void;
   fetchMore?: () => void;
-  addPhotoLocal?: (index: number) => void;
-  addPhotoServer?: (photos: PhotoType[]) => void;
-  deletePhotoLocal?: (photos: PhotoType[]) => void;
-  deletePhotoServer?: (index: number) => void;
+  addPhotosLocal?: (photos: PhotoType[]) => void;
+  addPhotosServer?: (photos: PhotoType[]) => void;
+  deletePhotosLocal?: (photos: PhotoType[]) => void;
+  deletePhotoLocal?: (photo: PhotoType) => void;
+  deletePhotosServer?: (photos: PhotoType[]) => void;
   gridHeaderTextFunction?: (photosNb: number) => string;
 };
 
@@ -39,8 +40,8 @@ export default function PhotoGallery(props: PropsType) {
           onSwitchMode={onSwitchMode}
           fetchMore={props.fetchMore}
           onRefresh={props.onRefresh}
-          addPhotoServer={props.addPhotoServer}
-          deletePhotoLocal={props.deletePhotoLocal}
+          addPhotosServer={props.addPhotosServer}
+          deletePhotosLocal={props.deletePhotosLocal}
           headerDisplayTextFunction={props.gridHeaderTextFunction}
         />
       ) : (
@@ -50,10 +51,14 @@ export default function PhotoGallery(props: PropsType) {
           onSwitchMode={onSwitchMode}
           RequestFullPhoto={props.RequestFullPhoto}
           fetchMore={props.fetchMore}
-          addPhotoLocal={props.addPhotoLocal}
-          addPhotoServer={props.addPhotoServer}
+          addPhotoLocal={(photo: PhotoType) => props.addPhotosLocal?.([photo])}
+          addPhotoServer={(photo: PhotoType) =>
+            props.addPhotosServer?.([photo])
+          }
           deletePhotoLocal={props.deletePhotoLocal}
-          deletePhotoServer={props.deletePhotoServer}
+          deletePhotoServer={(photo: PhotoType) =>
+            props.deletePhotosServer?.([photo])
+          }
         />
       )}
     </View>

@@ -21,10 +21,11 @@ export default function PhotoGalleryScreen(props: PropsType) {
       photos={context.photosServer}
       onRefresh={context.onRefreshServer}
       RequestFullPhoto={context.RequestFullPhotoServer}
-      addPhotoLocal={context.addPhotoLocal}
-      addPhotoServer={context.addPhotoServer}
+      addPhotosLocal={context.addPhotosLocal}
+      addPhotosServer={context.addPhotosServer}
+      deletePhotosLocal={context.deletePhotosLocalFromServer}
       deletePhotoLocal={context.deletePhotoLocalFromServer}
-      deletePhotoServer={context.deletePhotoServer}
+      deletePhotosServer={context.deletePhotosServer}
       gridHeaderTextFunction={photosNbToString}
     />
   );

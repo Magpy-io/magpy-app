@@ -10,12 +10,12 @@ type PropsType = {
   photos: Array<PhotoType>;
   startIndex: number;
   onSwitchMode: (index: number) => void;
-  RequestFullPhoto: (index: number) => void;
+  RequestFullPhoto: (photo: PhotoType) => void;
   fetchMore?: () => void;
-  addPhotoLocal?: (index: number) => void;
-  addPhotoServer?: (photos: PhotoType[]) => void;
-  deletePhotoLocal?: (photos: PhotoType[]) => void;
-  deletePhotoServer?: (index: number) => void;
+  addPhotoLocal?: (photo: PhotoType) => void;
+  addPhotoServer?: (photo: PhotoType) => void;
+  deletePhotoLocal?: (photo: PhotoType) => void;
+  deletePhotoServer?: (photo: PhotoType) => void;
 };
 
 export default function PhotoSlider(props: PropsType) {
@@ -32,7 +32,7 @@ export default function PhotoSlider(props: PropsType) {
       validFlatListCurrentIndex &&
       !props.photos[flatListCurrentIndex].inDevice
     ) {
-      props.RequestFullPhoto(flatListCurrentIndex);
+      props.RequestFullPhoto(props.photos[flatListCurrentIndex]);
     }
   }, [props.photos, flatListCurrentIndex, validFlatListCurrentIndex]);
 
@@ -85,14 +85,18 @@ export default function PhotoSlider(props: PropsType) {
         <ToolBar
           inDevice={props.photos[flatListCurrentIndex].inDevice}
           inServer={props.photos[flatListCurrentIndex].inServer}
-          onAddLocal={() => props.addPhotoLocal?.(flatListCurrentIndex)}
+          onAddLocal={() =>
+            props.addPhotoLocal?.(props.photos[flatListCurrentIndex])
+          }
           onAddServer={() =>
-            props.addPhotoServer?.([props.photos[flatListCurrentIndex]])
+            props.addPhotoServer?.(props.photos[flatListCurrentIndex])
           }
           onDeleteLocal={() =>
-            props.deletePhotoLocal?.([props.photos[flatListCurrentIndex]])
+            props.deletePhotoLocal?.(props.photos[flatListCurrentIndex])
           }
-          onDeleteServer={() => props.deletePhotoServer?.(flatListCurrentIndex)}
+          onDeleteServer={() =>
+            props.deletePhotoServer?.(props.photos[flatListCurrentIndex])
+          }
         />
       )}
     </>
