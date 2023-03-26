@@ -14,6 +14,7 @@ const routes = {
   getPhotosByIds: path + "photosGetId/",
   deletePhotoId: path + "photoDelete/",
   updatePhotoPath: path + "photoUpdatePath/",
+  getPhotoByParts: path + "photoPartGetId/",
 };
 
 function getPhotoById(id: string) {
@@ -124,10 +125,11 @@ async function postPhotoWithProgress(
     return response;
   }
 
-  const id = response.data.photo.id;
+  const id = response.data.id;
 
   let responseI;
   for (let i = 0; i < base64ImageSplit.length; i++) {
+    console.log(i);
     responseI = await fetch(routes.postPhotoPart, {
       method: "POST",
       headers: {
@@ -146,6 +148,50 @@ async function postPhotoWithProgress(
     }
 
     f(i, base64ImageSplit.length);
+  }
+  return responseI;
+}
+
+async function getPhotoWithProgress(
+  id: string,
+  f: (progess: number, total: number) => void
+) {
+  const response = await fetch(routes.getPhotoByParts, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ id: id }),
+  }).then((r) => r.json());
+
+  if (!response.ok) {
+    return response;
+  }
+
+  const totalNbParts = response.data.totalNbOfParts;
+
+  const image64Parts = [response.data.photo.image64];
+
+  let responseI;
+  for (let i = 1; i < totalNbParts; i++) {
+    responseI = await fetch(routes.getPhotoByParts, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: id,
+        part: i,
+      }),
+    }).then((r) => r.json());
+
+    if (!responseI.ok) {
+      return responseI;
+    }
+
+    image64Parts.push(responseI.data.photo.image64);
+
+    f(i, totalNbParts);
   }
   return responseI;
 }
@@ -186,4 +232,5 @@ export {
   removePhotoById,
   postPhotoWithProgress,
   updatePhotoPath,
+  getPhotoWithProgress,
 };
