@@ -4,12 +4,12 @@ import { Icon } from "@rneui/themed";
 import colors from "~/colors";
 import { TouchableHighlight } from "react-native-gesture-handler";
 
-type BackButtonProps = {
+type PropsType = {
   style?: any;
   onPress?: () => void;
 };
 
-export default function BackButton(props: BackButtonProps) {
+export default function BackButton(props: PropsType) {
   const navigation = useNavigation();
   return (
     <View>

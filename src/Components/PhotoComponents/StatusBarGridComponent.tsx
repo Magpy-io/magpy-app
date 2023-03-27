@@ -1,15 +1,14 @@
 import { StyleSheet, Text, View } from "react-native";
 
-import { Icon } from "@rneui/themed";
-import colors from "~/colors";
 import CancelButton from "~/Components/CommonComponents/CancelButton";
+import SelectAllButton from "~/Components/CommonComponents/SelectAllButton";
 import React from "react";
-import * as Progress from "react-native-progress";
 
 type StatusBarComponentProps = {
   selectedNb: number;
   style?: any;
   onCancelButton?: () => void;
+  onSelectAllButton?: () => void;
 };
 
 function selectedElementsToString(n: number) {
@@ -31,10 +30,12 @@ function StatusBarGridComponent(props: StatusBarComponentProps) {
         <CancelButton onPress={props.onCancelButton} />
       </View>
 
-      <View style={styles.elementsSelectedViewStyle}>
-        <Text style={styles.textElementsSelectedStyle}>
-          {selectedElementsToString(props.selectedNb)}
-        </Text>
+      <Text style={styles.textElementsSelectedStyle}>
+        {selectedElementsToString(props.selectedNb)}
+      </Text>
+
+      <View style={styles.statusBarSelectAllButtonStyle}>
+        <SelectAllButton onPress={props.onSelectAllButton} />
       </View>
     </View>
   );
@@ -52,10 +53,7 @@ const styles = StyleSheet.create({
     top: 0,
   },
   statusBarCancelButtonStyle: {},
-  elementsSelectedViewStyle: {
-    flex: 1,
-    alignItems: "center",
-  },
+  statusBarSelectAllButtonStyle: {},
   textElementsSelectedStyle: {
     fontSize: 20,
     fontWeight: "bold",

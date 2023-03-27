@@ -45,6 +45,7 @@ export default function PhotoGallery(props: PropsType) {
           addPhotosServer={props.addPhotosServer}
           addPhotosLocal={props.addPhotosLocal}
           deletePhotosLocal={props.deletePhotosLocal}
+          deletePhotosServer={props.deletePhotosServer}
           headerDisplayTextFunction={props.gridHeaderTextFunction}
         />
       ) : (

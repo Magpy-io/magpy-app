@@ -49,6 +49,7 @@ type PropsType = {
   addPhotosServer?: (photos: PhotoType[]) => void;
   addPhotosLocal?: (photos: PhotoType[]) => void;
   deletePhotosLocal?: (photos: PhotoType[]) => void;
+  deletePhotosServer?: (photos: PhotoType[]) => void;
 };
 
 export default function PhotoGrid(props: PropsType) {
@@ -115,6 +116,18 @@ export default function PhotoGrid(props: PropsType) {
     [onRenderItemPress, onRenderItemLongPress, isSelecting, seletedIds]
   );
 
+  const onSelectAll = useCallback(() => {
+    setSelectedIds((ids) => {
+      const newMap = new Map();
+
+      props.photos.forEach((photo) => {
+        newMap.set(photo.id, photo);
+      });
+
+      return newMap;
+    });
+  }, [props.photos]);
+
   let correctStartIndex = Math.floor(props.startIndex / 3);
 
   if (props.startIndex >= props.photos.length) {
@@ -135,7 +148,7 @@ export default function PhotoGrid(props: PropsType) {
   }, [props.photos.length]);
 
   return (
-    <View>
+    <View style={styles.mainViewStyle}>
       <FlatList
         ref={flatlistRef}
         style={styles.flatListStyle}
@@ -158,6 +171,7 @@ export default function PhotoGrid(props: PropsType) {
         <StatusBarGridComponent
           selectedNb={seletedIds.size}
           onCancelButton={() => setIsSelecting(false)}
+          onSelectAllButton={onSelectAll}
         />
       )}
       {isSelecting && (
@@ -175,6 +189,10 @@ export default function PhotoGrid(props: PropsType) {
             setIsSelecting(false);
             return props.deletePhotosLocal?.(Array.from(seletedIds.values()));
           }}
+          onDeleteServer={() => {
+            setIsSelecting(false);
+            return props.deletePhotosServer?.(Array.from(seletedIds.values()));
+          }}
         />
       )}
     </View>
@@ -182,6 +200,7 @@ export default function PhotoGrid(props: PropsType) {
 }
 
 const styles = StyleSheet.create({
+  mainViewStyle: { height: "100%", width: "100%" },
   flatListStyle: {},
   textOnEmpty: {
     fontSize: 15,

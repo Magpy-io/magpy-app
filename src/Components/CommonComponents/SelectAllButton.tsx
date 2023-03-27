@@ -8,7 +8,7 @@ type PropsType = {
   onPress?: () => void;
 };
 
-export default function BackButton(props: PropsType) {
+export default function SelectAllButton(props: PropsType) {
   return (
     <View>
       <TouchableHighlight
@@ -17,7 +17,7 @@ export default function BackButton(props: PropsType) {
         underlayColor={colors.underlayColor}
       >
         <Icon
-          name="close"
+          name="select-all"
           color={"black"}
           size={26}
           style={styles.backIconStyle}

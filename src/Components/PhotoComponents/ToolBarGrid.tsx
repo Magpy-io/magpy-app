@@ -42,6 +42,13 @@ function ToolBarGrid(props: ToolBarProps) {
           text="Delete from device"
           onPress={() => props.onDeleteLocal?.()}
         />
+        {props.contextLocation == "server" && (
+          <ToolComponent
+            icon="delete"
+            text="Delete from server"
+            onPress={() => props.onDeleteServer?.()}
+          />
+        )}
         <ToolComponent
           icon="share"
           text="Share"

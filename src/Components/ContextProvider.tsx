@@ -20,7 +20,7 @@ import {
   postPhoto,
   postPhotoWithProgress,
   getPhotoById,
-  removePhotoById,
+  removePhotosById,
   updatePhotoPath,
   getPhotosByIds,
   getPhotoWithProgress,
@@ -395,8 +395,8 @@ const ContextProvider = (props: PropsType) => {
       }
       if (photoRemoved) {
         dispatch({
-          type: Actions.deletePhotoLocalFromServer,
-          payload: { photo: photo },
+          type: Actions.deletePhotosLocalFromServer,
+          payload: { photos: [photo] },
         });
       }
     } catch (err) {
@@ -439,17 +439,17 @@ const ContextProvider = (props: PropsType) => {
 
   const deletePhotosServer = useCallback(async (photos: PhotoType[]) => {
     try {
-      const photo = state.photosServer[index];
+      const ids = photos.map((photo) => photo.id);
 
-      const response = await removePhotoById(photo.id);
+      const response = await removePhotosById(ids);
 
       if (!response.ok) {
         console.log(response);
       }
 
       dispatch({
-        type: Actions.deletePhotoServer,
-        payload: { photo: photo },
+        type: Actions.deletePhotosServer,
+        payload: { ids: ids },
       });
     } catch (err) {
       console.log(err);

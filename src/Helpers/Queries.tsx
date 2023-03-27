@@ -12,7 +12,7 @@ const routes = {
   getPhotosExist: path + "photosExist/",
   getPhotosDataN: path + "photosDataGetNb/",
   getPhotosByIds: path + "photosGetId/",
-  deletePhotoId: path + "photoDelete/",
+  deletePhotoId: path + "photosDelete/",
   updatePhotoPath: path + "photoUpdatePath/",
   getPhotoByParts: path + "photoPartGetId/",
 };
@@ -67,13 +67,13 @@ function getPhotosByIds(ids: Array<string>) {
   }).then((r) => r.json());
 }
 
-function removePhotoById(id: string) {
+function removePhotosById(ids: string[]) {
   return fetch(routes.deletePhotoId, {
-    method: "Delete",
+    method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ id: id }),
+    body: JSON.stringify({ ids: ids }),
   }).then((r) => r.json());
 }
 
@@ -229,7 +229,7 @@ export {
   getPhotosExist,
   getPhotosDataN,
   getPhotosByIds,
-  removePhotoById,
+  removePhotosById,
   postPhotoWithProgress,
   updatePhotoPath,
   getPhotoWithProgress,

@@ -27,9 +27,8 @@ enum Actions {
   addPhotoLocal = "ADD_PHOTO_LOCAL",
   addPhotoServer = "ADD_PHOTO_SERVER",
   deletePhotosLocalFromLocal = "DELETE_PHOTOS_LOCAL_FROM_LOCAL",
-  deletePhotoLocalFromServer = "DELETE_PHOTO_LOCAL_FROM_SERVER",
   deletePhotosLocalFromServer = "DELETE_PHOTOS_LOCAL_FROM_SERVER",
-  deletePhotoServer = "DELETE_PHOTO_SERVER",
+  deletePhotosServer = "DELETE_PHOTOS_SERVER",
   updatePhotoProgress = "UPDATE_PHOTO_PROGRESS",
   updatePhotoProgressServer = "UPDATE_PHOTO_PROGRESS_SERVER",
   addCroppedPhotos = "ADD_CROPPED_PHOTOS",
@@ -139,21 +138,6 @@ function GlobalReducer(prevState: stateType, action: Action) {
       return newState;
     }
 
-    case Actions.deletePhotoLocalFromServer: {
-      const newState = { ...prevState };
-      const newPhotosServer = [...newState.photosServer];
-      const findCorrespondingPhoto = newPhotosServer.find(
-        (photo) => photo.id == action.payload.photo.id
-      );
-      if (findCorrespondingPhoto) {
-        findCorrespondingPhoto.inDevice = false;
-        newState.photosServer = newPhotosServer;
-        return newState;
-      } else {
-        return prevState;
-      }
-    }
-
     case Actions.deletePhotosLocalFromServer: {
       const newState = { ...prevState };
 
@@ -174,19 +158,14 @@ function GlobalReducer(prevState: stateType, action: Action) {
       return newState;
     }
 
-    case Actions.deletePhotoServer: {
+    case Actions.deletePhotosServer: {
       const newState = { ...prevState };
-      const newPhotosServer = [...newState.photosServer];
-      const findCorrespondingPhotoIndex = newPhotosServer.findIndex(
-        (photo) => photo.id == action.payload.photo.id
+
+      newState.photosServer = newState.photosServer.filter(
+        (photo) => !action.payload.ids.includes(photo.id)
       );
-      if (findCorrespondingPhotoIndex >= 0) {
-        newPhotosServer.splice(findCorrespondingPhotoIndex, 1);
-        newState.photosServer = newPhotosServer;
-        return newState;
-      } else {
-        return prevState;
-      }
+
+      return newState;
     }
 
     case Actions.updatePhotoProgress: {
