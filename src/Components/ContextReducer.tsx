@@ -31,6 +31,7 @@ enum Actions {
   deletePhotosLocalFromServer = "DELETE_PHOTOS_LOCAL_FROM_SERVER",
   deletePhotoServer = "DELETE_PHOTO_SERVER",
   updatePhotoProgress = "UPDATE_PHOTO_PROGRESS",
+  updatePhotoProgressServer = "UPDATE_PHOTO_PROGRESS_SERVER",
   addCroppedPhotos = "ADD_CROPPED_PHOTOS",
 }
 
@@ -191,12 +192,14 @@ function GlobalReducer(prevState: stateType, action: Action) {
     case Actions.updatePhotoProgress: {
       const newState = { ...prevState };
       const newPhotosLocal = [...newState.photosLocal];
-      const findCorrespondingPhoto = newPhotosLocal.find(
+      const findCorrespondingPhotoIndex = newPhotosLocal.findIndex(
         (photo) => photo.id == action.payload.photo.id
       );
-      if (findCorrespondingPhoto) {
-        findCorrespondingPhoto.isLoading = true;
-        findCorrespondingPhoto.loadingPercentage = action.payload.p;
+      if (findCorrespondingPhotoIndex >= 0) {
+        const newPhoto = { ...newPhotosLocal[findCorrespondingPhotoIndex] };
+        newPhoto.isLoading = action.payload.isLoading;
+        newPhoto.loadingPercentage = action.payload.p;
+        newPhotosLocal[findCorrespondingPhotoIndex] = newPhoto;
         newState.photosLocal = newPhotosLocal;
         return newState;
       } else {
@@ -221,6 +224,24 @@ function GlobalReducer(prevState: stateType, action: Action) {
 
       newState.photosServer = newPhotosServer;
       return newState;
+    }
+
+    case Actions.updatePhotoProgressServer: {
+      const newState = { ...prevState };
+      const newPhotosServer = [...newState.photosServer];
+      const findCorrespondingPhotoIndex = newPhotosServer.findIndex(
+        (photo) => photo.id == action.payload.photo.id
+      );
+      if (findCorrespondingPhotoIndex >= 0) {
+        const newPhoto = { ...newPhotosServer[findCorrespondingPhotoIndex] };
+        newPhoto.isLoading = action.payload.isLoading;
+        newPhoto.loadingPercentage = action.payload.p;
+        newPhotosServer[findCorrespondingPhotoIndex] = newPhoto;
+        newState.photosServer = newPhotosServer;
+        return newState;
+      } else {
+        return prevState;
+      }
     }
   }
   return prevState;

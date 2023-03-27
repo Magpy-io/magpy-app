@@ -11,6 +11,7 @@ const TOOL_COLOR = "#4d4d4d";
 
 type ToolBarProps = {
   style?: any;
+  contextLocation: string;
   onDeleteLocal?: () => void;
   onAddLocal?: () => void;
   onDeleteServer?: () => void;
@@ -23,11 +24,19 @@ function ToolBarGrid(props: ToolBarProps) {
   return (
     <View style={[styles.toolBarView, props.style]}>
       <View style={styles.toolsView}>
-        <ToolComponent
-          icon="backup"
-          text="Back up"
-          onPress={() => props.onAddServer?.()}
-        />
+        {props.contextLocation == "local" ? (
+          <ToolComponent
+            icon="backup"
+            text="Back up"
+            onPress={() => props.onAddServer?.()}
+          />
+        ) : (
+          <ToolComponent
+            icon="system-update"
+            text="Save to device"
+            onPress={() => props.onAddLocal?.()}
+          />
+        )}
         <ToolComponent
           icon="mobile-off"
           text="Delete from device"

@@ -11,7 +11,6 @@ import { PhotoType } from "~/Helpers/types";
 import PhotoComponentForGrid from "./PhotoComponentForGrid";
 import StatusBarGridComponent from "./PhotoComponents/StatusBarGridComponent";
 import ToolBarGrid from "./PhotoComponents/ToolBarGrid";
-import { JSXElement } from "@babel/types";
 
 const ITEM_HEIGHT = Dimensions.get("screen").width / 3;
 
@@ -42,11 +41,13 @@ const listFooterComponent = () => {
 type PropsType = {
   photos: Array<PhotoType>;
   startIndex: number;
+  contextLocation: string;
   onSwitchMode: (index: number) => void;
   onRefresh: () => void;
   fetchMore?: () => void;
   headerDisplayTextFunction?: (photosNb: number) => string;
   addPhotosServer?: (photos: PhotoType[]) => void;
+  addPhotosLocal?: (photos: PhotoType[]) => void;
   deletePhotosLocal?: (photos: PhotoType[]) => void;
 };
 
@@ -161,6 +162,11 @@ export default function PhotoGrid(props: PropsType) {
       )}
       {isSelecting && (
         <ToolBarGrid
+          contextLocation={props.contextLocation}
+          onAddLocal={() => {
+            setIsSelecting(false);
+            return props.addPhotosLocal?.(Array.from(seletedIds.values()));
+          }}
           onAddServer={() => {
             setIsSelecting(false);
             return props.addPhotosServer?.(Array.from(seletedIds.values()));

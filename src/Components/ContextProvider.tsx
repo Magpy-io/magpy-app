@@ -23,6 +23,7 @@ import {
   removePhotoById,
   updatePhotoPath,
   getPhotosByIds,
+  getPhotoWithProgress,
 } from "~/Helpers/Queries";
 import {
   addPhoto,
@@ -76,19 +77,77 @@ const addSinglePhotoServer = async (
     (p: number, t: number) => {
       dispatch({
         type: Actions.updatePhotoProgress,
-        payload: { photo: photo, p: (p + 1) / t },
+        payload: { photo: photo, isLoading: true, p: (p + 1) / t },
       });
     }
   );
 
   if (!response.ok) {
     console.log(response);
+    return;
   }
 
   dispatch({
     type: Actions.addPhotoServer,
     payload: { photo: photo },
   });
+};
+
+const addSinglePhotoLocal = async (
+  photo: PhotoType,
+  dispatch: React.Dispatch<Action>
+) => {
+  let image64;
+
+  if (photo.image.image64Full) {
+    image64 = photo.image.image64Full.substring(
+      "data:image/jpeg;base64,".length
+    );
+  } else {
+    const result = await getPhotoWithProgress(
+      photo.id,
+      (p: number, t: number) => {
+        dispatch({
+          type: Actions.updatePhotoProgressServer,
+          payload: { photo: photo, isLoading: true, p: (p + 1) / t },
+        });
+      }
+    );
+    if (!result.ok) {
+      console.log(result);
+      return;
+    }
+    image64 = result.data.photo.image64;
+  }
+
+  const dirPath = "/storage/emulated/0/DCIM/Restored/";
+
+  await RNFS.mkdir(dirPath);
+
+  const dirExists = await RNFS.exists(dirPath);
+
+  if (!dirExists) {
+    console.log("directory not created to write image.");
+    return;
+  }
+
+  const filePath = await getFirstPossibleFileName(
+    "file://" + dirPath + photo.image.fileName
+  );
+
+  await addPhoto(filePath, image64);
+
+  photo.image.path = filePath;
+  dispatch({ type: Actions.addPhotoLocal, payload: { photo: photo } });
+  dispatch({
+    type: Actions.updatePhotoProgressServer,
+    payload: { photo: photo, isLoading: false, p: 0 },
+  });
+  const result = await updatePhotoPath(photo.id, filePath);
+
+  if (!result.ok) {
+    console.log(result);
+  }
 };
 
 const AppContext = createContext<contextType | undefined>(undefined);
@@ -102,6 +161,9 @@ const ContextProvider = (props: PropsType) => {
 
   const photosUploading = useRef([] as PhotoType[]);
   const isPhotosUploading = useRef(false);
+
+  const photosDownloading = useRef([] as PhotoType[]);
+  const isPhotosDownloading = useRef(false);
 
   const onRefreshLocal = useCallback(async () => {
     try {
@@ -181,6 +243,11 @@ const ContextProvider = (props: PropsType) => {
     try {
       const result = await getPhotoById(photo.id);
 
+      if (!result.ok) {
+        console.log(result);
+        return;
+      }
+
       dispatch({
         type: Actions.addFullPhotoById,
         payload: { result: result },
@@ -194,7 +261,14 @@ const ContextProvider = (props: PropsType) => {
     async (photos: PhotoType[]) => {
       try {
         const ids = photos.map((photo) => photo.id);
-        const images64 = (await getPhotosByIds(ids)).data.photos;
+        const result = await getPhotosByIds(ids);
+
+        if (!result.ok) {
+          console.log(result);
+          return;
+        }
+
+        const images64 = result.data.photos;
         const images64Filtered = images64.filter(
           (image64: any) => image64.exists
         );
@@ -211,30 +285,31 @@ const ContextProvider = (props: PropsType) => {
 
   const addPhotosLocal = useCallback(async (photos: PhotoType[]) => {
     try {
-      const photo = state.photosServer[index];
-      const image64 = photo.image.image64Full.substring(
-        "data:image/jpeg;base64,".length
-      );
-      const dirPath = "/storage/emulated/0/DCIM/Restored/";
+      for (let i = 0; i < photos.length; i++) {
+        if (!photos[i].isLoading && !photos[i].inDevice) {
+          dispatch({
+            type: Actions.updatePhotoProgressServer,
+            payload: { photo: photos[i], isLoading: true, p: 0 },
+          });
+          photosDownloading.current.push(photos[i]);
+        }
+      }
 
-      await RNFS.mkdir(dirPath);
-
-      const dirExists = await RNFS.exists(dirPath);
-
-      if (!dirExists) {
-        console.log("directory not created to write image.");
+      if (isPhotosDownloading.current) {
         return;
       }
 
-      const filePath = await getFirstPossibleFileName(
-        "file://" + dirPath + photo.image.fileName
-      );
-
-      await addPhoto(filePath, image64);
-
-      photo.image.path = filePath;
-      dispatch({ type: Actions.addPhotoLocal, payload: { photo: photo } });
-      await updatePhotoPath(photo.id, filePath);
+      while (photosDownloading.current.length != 0) {
+        isPhotosDownloading.current = true;
+        const photo = photosDownloading.current.shift() as PhotoType;
+        try {
+          await addSinglePhotoLocal(photo, dispatch);
+        } catch (err) {
+          console.log(`error while downloading photo with id ${photo.id}`);
+          console.log(err);
+        }
+      }
+      isPhotosDownloading.current = false;
     } catch (err) {
       console.log(err);
     }
@@ -246,7 +321,7 @@ const ContextProvider = (props: PropsType) => {
         if (!photos[i].isLoading) {
           dispatch({
             type: Actions.updatePhotoProgress,
-            payload: { photo: photos[i], p: 0 },
+            payload: { photo: photos[i], isLoading: true, p: 0 },
           });
           photosUploading.current.push(photos[i]);
         }

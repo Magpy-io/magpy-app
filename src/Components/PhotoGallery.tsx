@@ -1,6 +1,6 @@
 import { StyleSheet, View } from "react-native";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import PhotoGrid from "~/Components/PhotoGrid";
 import PhotoSlider from "~/Components/PhotoSlider";
 import { PhotoType } from "~/Helpers/types";
@@ -8,6 +8,7 @@ import { PhotoType } from "~/Helpers/types";
 type PropsType = {
   photos: Array<PhotoType>;
   onRefresh: () => void;
+  contextLocation: string;
   RequestFullPhoto: (photo: PhotoType) => void;
   fetchMore?: () => void;
   addPhotosLocal?: (photos: PhotoType[]) => void;
@@ -24,12 +25,12 @@ export default function PhotoGallery(props: PropsType) {
     startIndexWhenSwitching: 0,
   });
 
-  const onSwitchMode = (index: number) => {
+  const onSwitchMode = useCallback((index: number) => {
     setSwitchingState((s) => ({
       isPhotoSelected: !s.isPhotoSelected,
       startIndexWhenSwitching: index,
     }));
-  };
+  }, []);
 
   return (
     <View style={styles.viewStyle}>
@@ -37,10 +38,12 @@ export default function PhotoGallery(props: PropsType) {
         <PhotoGrid
           photos={props.photos}
           startIndex={switchingState.startIndexWhenSwitching}
+          contextLocation={props.contextLocation}
           onSwitchMode={onSwitchMode}
           fetchMore={props.fetchMore}
           onRefresh={props.onRefresh}
           addPhotosServer={props.addPhotosServer}
+          addPhotosLocal={props.addPhotosLocal}
           deletePhotosLocal={props.deletePhotosLocal}
           headerDisplayTextFunction={props.gridHeaderTextFunction}
         />

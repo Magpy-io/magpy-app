@@ -192,6 +192,7 @@ async function getPhotoWithProgress(
 
     f(i, totalNbParts);
   }
+  responseI.data.photo.image64 = image64Parts.join("");
   return responseI;
 }
 

@@ -20,6 +20,7 @@ export default function PhotoGalleryScreen(props: PropsType) {
     <PhotoGallery
       photos={context.photosServer}
       onRefresh={context.onRefreshServer}
+      contextLocation={"server"}
       RequestFullPhoto={context.RequestFullPhotoServer}
       addPhotosLocal={context.addPhotosLocal}
       addPhotosServer={context.addPhotosServer}
