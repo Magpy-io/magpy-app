@@ -1,4 +1,12 @@
-import { StyleSheet, Text, FlatList, Dimensions, View } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  FlatList,
+  Dimensions,
+  View,
+  StyleProp,
+  ViewStyle,
+} from "react-native";
 import React, {
   useCallback,
   useContext,
@@ -40,6 +48,7 @@ const listFooterComponent = () => {
 
 type PropsType = {
   photos: Array<PhotoType>;
+  style?: StyleProp<ViewStyle>;
   startIndex: number;
   contextLocation: string;
   onSwitchMode: (index: number) => void;
@@ -103,16 +112,19 @@ export default function PhotoGrid(props: PropsType) {
   );
 
   const renderItem = useCallback(
-    ({ item, index }: { item: PhotoType; index: number }) => (
-      <PhotoComponentForGrid
-        photo={item}
-        index={index}
-        isSelecting={isSelecting}
-        isSelected={seletedIds.has(item.id)}
-        onPress={onRenderItemPress}
-        onLongPress={onRenderItemLongPress}
-      />
-    ),
+    ({ item, index }: { item: PhotoType; index: number }) => {
+      return (
+        <PhotoComponentForGrid
+          key={item.id}
+          photo={item}
+          index={index}
+          isSelecting={isSelecting}
+          isSelected={seletedIds.has(item.id)}
+          onPress={onRenderItemPress}
+          onLongPress={onRenderItemLongPress}
+        />
+      );
+    },
     [onRenderItemPress, onRenderItemLongPress, isSelecting, seletedIds]
   );
 
@@ -147,8 +159,12 @@ export default function PhotoGrid(props: PropsType) {
     }
   }, [props.photos.length]);
 
+  useEffect(() => {
+    console.log("grid render");
+  }, [props.photos]);
+
   return (
-    <View style={styles.mainViewStyle}>
+    <View style={[styles.mainViewStyle, props.style]}>
       <FlatList
         ref={flatlistRef}
         style={styles.flatListStyle}

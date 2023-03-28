@@ -129,15 +129,7 @@ function PhotoSliderCore(props: PropsType) {
 }
 
 const styles = StyleSheet.create({
-  centeringViewStyle: {
-    backgroundColor: "white",
-    position: "absolute",
-    height: "100%",
-    width: "100%",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  flatListStyle: { backgroundColor: "white" },
+  flatListStyle: { backgroundColor: "red" },
   statusBarStyle: { position: "absolute", top: 0 },
   toolBarStyle: { position: "absolute", bottom: 0 },
 });

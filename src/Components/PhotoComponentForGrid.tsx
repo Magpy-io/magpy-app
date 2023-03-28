@@ -18,11 +18,13 @@ type PropsType = {
 };
 
 function PhotoComponentForGrid(props: PropsType) {
+  console.log("hi");
+
   const chooseImageCallback = useCallback(() => {
     if (props.photo.inDevice) {
       return props.photo.image.path;
     } else {
-      if (props.photo.image.image64Full) {
+      if (false && props.photo.image.image64Full) {
         return props.photo.image.image64Full;
       } else {
         return props.photo.image.image64;
@@ -124,4 +126,17 @@ const styles = StyleSheet.create({
   iconStyle: { margin: 5 },
 });
 
-export default React.memo(PhotoComponentForGrid);
+export default React.memo(
+  PhotoComponentForGrid,
+  (prevProps: PropsType, nextProps: PropsType) => {
+    const e =
+      prevProps.photo == nextProps.photo &&
+      prevProps.isSelected == nextProps.isSelected &&
+      prevProps.isSelecting == nextProps.isSelecting &&
+      prevProps.onPress == nextProps.onPress &&
+      prevProps.onLongPress == nextProps.onLongPress &&
+      prevProps.index == nextProps.index;
+    console.log(e);
+    return e;
+  }
+);

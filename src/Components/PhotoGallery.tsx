@@ -1,12 +1,12 @@
 import { StyleSheet, View } from "react-native";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import PhotoGrid from "~/Components/PhotoGrid";
 import PhotoSlider from "~/Components/PhotoSlider";
 import { PhotoType } from "~/Helpers/types";
 
 type PropsType = {
-  photos: Array<PhotoType>;
+  photos: PhotoType[];
   onRefresh: () => void;
   contextLocation: string;
   RequestFullPhoto: (photo: PhotoType) => void;
@@ -21,7 +21,7 @@ type PropsType = {
 
 export default function PhotoGallery(props: PropsType) {
   const [switchingState, setSwitchingState] = useState({
-    isPhotoSelected: false,
+    isPhotoSelected: true,
     startIndexWhenSwitching: 0,
   });
 
@@ -32,24 +32,16 @@ export default function PhotoGallery(props: PropsType) {
     }));
   }, []);
 
+  useEffect(() => {
+    console.log("gallery render");
+  }, [props.photos]);
+
   return (
     <View style={styles.viewStyle}>
-      {!switchingState.isPhotoSelected ? (
-        <PhotoGrid
-          photos={props.photos}
-          startIndex={switchingState.startIndexWhenSwitching}
-          contextLocation={props.contextLocation}
-          onSwitchMode={onSwitchMode}
-          fetchMore={props.fetchMore}
-          onRefresh={props.onRefresh}
-          addPhotosServer={props.addPhotosServer}
-          addPhotosLocal={props.addPhotosLocal}
-          deletePhotosLocal={props.deletePhotosLocal}
-          deletePhotosServer={props.deletePhotosServer}
-          headerDisplayTextFunction={props.gridHeaderTextFunction}
-        />
-      ) : (
+      <View style={{ backgroundColor: "red" }}>
         <PhotoSlider
+          key={"photo_slider_" + props.contextLocation}
+          style={{ top: 0 }}
           photos={props.photos}
           startIndex={switchingState.startIndexWhenSwitching}
           onSwitchMode={onSwitchMode}
@@ -64,14 +56,29 @@ export default function PhotoGallery(props: PropsType) {
             props.deletePhotosServer?.([photo])
           }
         />
-      )}
+        <PhotoGrid
+          key={"photo_grid_" + props.contextLocation}
+          style={{ top: 0 }}
+          photos={props.photos}
+          startIndex={switchingState.startIndexWhenSwitching}
+          contextLocation={props.contextLocation}
+          onSwitchMode={onSwitchMode}
+          fetchMore={props.fetchMore}
+          onRefresh={props.onRefresh}
+          addPhotosServer={props.addPhotosServer}
+          addPhotosLocal={props.addPhotosLocal}
+          deletePhotosLocal={props.deletePhotosLocal}
+          deletePhotosServer={props.deletePhotosServer}
+          headerDisplayTextFunction={props.gridHeaderTextFunction}
+        />
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   viewStyle: {
-    flex: 1,
-    margin: 1,
+    top: 0,
+    backgroundColor: "red",
   },
 });

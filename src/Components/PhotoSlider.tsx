@@ -1,4 +1,10 @@
-import { StyleSheet, BackHandler } from "react-native";
+import {
+  StyleSheet,
+  BackHandler,
+  View,
+  StyleProp,
+  ViewStyle,
+} from "react-native";
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { PhotoType } from "~/Helpers/types";
@@ -8,6 +14,7 @@ import PhotoSliderCore from "./PhotoSliderCore";
 
 type PropsType = {
   photos: Array<PhotoType>;
+  style?: StyleProp<ViewStyle>;
   startIndex: number;
   onSwitchMode: (index: number) => void;
   RequestFullPhoto: (photo: PhotoType) => void;
@@ -62,7 +69,7 @@ export default function PhotoSlider(props: PropsType) {
   }, [props.photos.length, props.onSwitchMode]);
 
   return (
-    <>
+    <View style={[styles.mainViewStyle, props.style]}>
       <PhotoSliderCore
         photos={props.photos}
         startIndex={props.startIndex}
@@ -99,18 +106,15 @@ export default function PhotoSlider(props: PropsType) {
           }
         />
       )}
-    </>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  centeringViewStyle: {
-    backgroundColor: "white",
-    position: "absolute",
+  mainViewStyle: {
     height: "100%",
     width: "100%",
-    justifyContent: "center",
-    alignItems: "center",
+    top: 0,
+    backgroundColor: "red",
   },
-  flatListStyle: { backgroundColor: "white" },
 });
