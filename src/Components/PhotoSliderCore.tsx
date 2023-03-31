@@ -23,8 +23,8 @@ type PropsType = {
   startIndex: number;
   onIndexChanged?: (index: number) => void;
   onEndReached?: () => void;
-  onPhotoClick?: (index: number) => void;
-  onPhotoLongClick?: (index: number) => void;
+  onPhotoClick?: (item: PhotoType, index: number) => void;
+  onPhotoLongClick?: (item: PhotoType, index: number) => void;
 };
 
 function PhotoSliderCore(props: PropsType) {
@@ -35,8 +35,9 @@ function PhotoSliderCore(props: PropsType) {
     ({ item, index }: { item: PhotoType; index: number }) => (
       <PhotoComponentForSlider
         photo={item}
-        onPress={() => props.onPhotoClick?.(index)}
-        onLongPress={() => props.onPhotoLongClick?.(index)}
+        index={index}
+        onPress={props.onPhotoClick}
+        onLongPress={props.onPhotoLongClick}
       />
     ),
     [props.onPhotoClick, props.onPhotoLongClick]
@@ -100,7 +101,19 @@ function PhotoSliderCore(props: PropsType) {
         index: indexToScroll,
       });
     }
-  }, [props.photos.length]);
+  }, [props.photos.length, props.startIndex]);
+
+  const startIndexOutOfRange = props.startIndex >= props.photos.length;
+
+  useEffect(() => {
+    if (startIndexOutOfRange) {
+      return;
+    }
+    flatlistRef.current?.scrollToIndex({
+      animated: false,
+      index: props.startIndex,
+    });
+  }, [startIndexOutOfRange, props.startIndex]);
 
   return (
     <FlatList
@@ -129,17 +142,7 @@ function PhotoSliderCore(props: PropsType) {
 }
 
 const styles = StyleSheet.create({
-  centeringViewStyle: {
-    backgroundColor: "white",
-    position: "absolute",
-    height: "100%",
-    width: "100%",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  flatListStyle: { backgroundColor: "white" },
-  statusBarStyle: { position: "absolute", top: 0 },
-  toolBarStyle: { position: "absolute", bottom: 0 },
+  flatListStyle: {},
 });
 
-export default React.memo(PhotoSliderCore);
+export default PhotoSliderCore;

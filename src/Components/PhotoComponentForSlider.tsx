@@ -12,8 +12,9 @@ import { PhotoType } from "~/Helpers/types";
 
 type PropsType = {
   photo: PhotoType;
-  onPress?: () => void;
-  onLongPress?: () => void;
+  index: number;
+  onPress?: (item: PhotoType, index: number) => void;
+  onLongPress?: (item: PhotoType, index: number) => void;
 };
 
 function PhotoComponentForSlider(props: PropsType) {
@@ -31,8 +32,8 @@ function PhotoComponentForSlider(props: PropsType) {
 
   return (
     <TouchableWithoutFeedback
-      onPress={props.onPress}
-      onLongPress={props.onLongPress}
+      onPress={() => props.onPress?.(props.photo, props.index)}
+      onLongPress={() => props.onLongPress?.(props.photo, props.index)}
     >
       <View style={styles.itemStyle}>
         <FastImage

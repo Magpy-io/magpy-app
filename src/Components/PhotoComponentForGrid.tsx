@@ -22,7 +22,7 @@ function PhotoComponentForGrid(props: PropsType) {
     if (props.photo.inDevice) {
       return props.photo.image.path;
     } else {
-      if (props.photo.image.image64Full) {
+      if (false && props.photo.image.image64Full) {
         return props.photo.image.image64Full;
       } else {
         return props.photo.image.image64;

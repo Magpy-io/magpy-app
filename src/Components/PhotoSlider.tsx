@@ -1,6 +1,12 @@
-import { StyleSheet, BackHandler } from "react-native";
+import {
+  StyleSheet,
+  BackHandler,
+  View,
+  StyleProp,
+  ViewStyle,
+} from "react-native";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { PhotoType } from "~/Helpers/types";
 import StatusBarComponent from "./PhotoComponents/StatusBarComponent";
 import ToolBar from "./PhotoComponents/ToolBar";
@@ -8,8 +14,9 @@ import PhotoSliderCore from "./PhotoSliderCore";
 
 type PropsType = {
   photos: Array<PhotoType>;
+  style?: StyleProp<ViewStyle>;
   startIndex: number;
-  onSwitchMode: (index: number) => void;
+  onSwitchMode: (isPhotoSelected: boolean, index: number) => void;
   RequestFullPhoto: (photo: PhotoType) => void;
   fetchMore?: () => void;
   addPhotoLocal?: (photo: PhotoType) => void;
@@ -18,7 +25,7 @@ type PropsType = {
   deletePhotoServer?: (photo: PhotoType) => void;
 };
 
-export default function PhotoSlider(props: PropsType) {
+function PhotoSlider(props: PropsType) {
   const flatListCurrentIndexRef = useRef<number>(props.startIndex);
   const [flatListCurrentIndex, setFlatListCurrentIndex] = useState(
     props.startIndex
@@ -43,7 +50,7 @@ export default function PhotoSlider(props: PropsType) {
 
   useEffect(() => {
     const backAction = () => {
-      props.onSwitchMode(flatListCurrentIndexRef.current);
+      props.onSwitchMode(false, flatListCurrentIndexRef.current);
       return true;
     };
 
@@ -57,12 +64,12 @@ export default function PhotoSlider(props: PropsType) {
 
   useEffect(() => {
     if (props.photos.length == 0) {
-      props.onSwitchMode(0);
+      props.onSwitchMode(false, 0);
     }
   }, [props.photos.length, props.onSwitchMode]);
 
   return (
-    <>
+    <View style={[styles.mainViewStyle, props.style]}>
       <PhotoSliderCore
         photos={props.photos}
         startIndex={props.startIndex}
@@ -77,7 +84,7 @@ export default function PhotoSlider(props: PropsType) {
           loadingPercentage={
             props.photos[flatListCurrentIndex].loadingPercentage
           }
-          onBackButton={() => props.onSwitchMode(flatListCurrentIndex)}
+          onBackButton={() => props.onSwitchMode(false, flatListCurrentIndex)}
         />
       )}
 
@@ -99,18 +106,15 @@ export default function PhotoSlider(props: PropsType) {
           }
         />
       )}
-    </>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  centeringViewStyle: {
-    backgroundColor: "white",
-    position: "absolute",
+  mainViewStyle: {
     height: "100%",
     width: "100%",
-    justifyContent: "center",
-    alignItems: "center",
   },
-  flatListStyle: { backgroundColor: "white" },
 });
+
+export default PhotoSlider;

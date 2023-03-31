@@ -82,11 +82,13 @@ function GlobalReducer(prevState: stateType, action: Action) {
     case Actions.addFullPhotoById: {
       const newState = { ...prevState };
       const newPhotosServer = [...newState.photosServer];
-      const findCorrespondingPhoto = newPhotosServer.find(
+      const findCorrespondingPhotoIndex = newPhotosServer.findIndex(
         (photo) => photo.id == action.payload.result.data.photo.id
       );
-      if (findCorrespondingPhoto) {
-        findCorrespondingPhoto.image.image64Full = `data:image/jpeg;base64,${action.payload.result.data.photo.image64}`;
+      if (findCorrespondingPhotoIndex >= 0) {
+        const newPhoto = { ...newPhotosServer[findCorrespondingPhotoIndex] };
+        newPhoto.image.image64Full = `data:image/jpeg;base64,${action.payload.result.data.photo.image64}`;
+        newPhotosServer[findCorrespondingPhotoIndex] = newPhoto;
         newState.photosServer = newPhotosServer;
         return newState;
       } else {

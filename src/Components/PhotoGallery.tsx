@@ -1,12 +1,12 @@
 import { StyleSheet, View } from "react-native";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import PhotoGrid from "~/Components/PhotoGrid";
 import PhotoSlider from "~/Components/PhotoSlider";
 import { PhotoType } from "~/Helpers/types";
 
 type PropsType = {
-  photos: Array<PhotoType>;
+  photos: PhotoType[];
   onRefresh: () => void;
   contextLocation: string;
   RequestFullPhoto: (photo: PhotoType) => void;
@@ -21,49 +21,96 @@ type PropsType = {
 
 export default function PhotoGallery(props: PropsType) {
   const [switchingState, setSwitchingState] = useState({
-    isPhotoSelected: false,
+    isPhotoSelected: true,
     startIndexWhenSwitching: 0,
   });
 
-  const onSwitchMode = useCallback((index: number) => {
-    setSwitchingState((s) => ({
-      isPhotoSelected: !s.isPhotoSelected,
-      startIndexWhenSwitching: index,
-    }));
-  }, []);
+  const onSwitchMode = useCallback(
+    (isPhotoSelected: boolean, index: number) => {
+      setSwitchingState((s) => ({
+        isPhotoSelected: isPhotoSelected,
+        startIndexWhenSwitching: index,
+      }));
+    },
+    []
+  );
 
   return (
     <View style={styles.viewStyle}>
-      {!switchingState.isPhotoSelected ? (
-        <PhotoGrid
-          photos={props.photos}
-          startIndex={switchingState.startIndexWhenSwitching}
-          contextLocation={props.contextLocation}
-          onSwitchMode={onSwitchMode}
-          fetchMore={props.fetchMore}
-          onRefresh={props.onRefresh}
-          addPhotosServer={props.addPhotosServer}
-          addPhotosLocal={props.addPhotosLocal}
-          deletePhotosLocal={props.deletePhotosLocal}
-          deletePhotosServer={props.deletePhotosServer}
-          headerDisplayTextFunction={props.gridHeaderTextFunction}
-        />
+      {switchingState.isPhotoSelected ? (
+        <View style={styles.viewStyle}>
+          <PhotoSlider
+            key={"photo_slider_" + props.contextLocation}
+            style={{}}
+            photos={props.photos}
+            startIndex={switchingState.startIndexWhenSwitching}
+            onSwitchMode={onSwitchMode}
+            RequestFullPhoto={props.RequestFullPhoto}
+            fetchMore={props.fetchMore}
+            addPhotoLocal={(photo: PhotoType) =>
+              props.addPhotosLocal?.([photo])
+            }
+            addPhotoServer={(photo: PhotoType) =>
+              props.addPhotosServer?.([photo])
+            }
+            deletePhotoLocal={props.deletePhotoLocal}
+            deletePhotoServer={(photo: PhotoType) =>
+              props.deletePhotosServer?.([photo])
+            }
+          />
+          <PhotoGrid
+            key={"photo_grid_" + props.contextLocation}
+            style={{}}
+            photos={props.photos}
+            startIndex={switchingState.startIndexWhenSwitching}
+            contextLocation={props.contextLocation}
+            onSwitchMode={onSwitchMode}
+            fetchMore={props.fetchMore}
+            onRefresh={props.onRefresh}
+            addPhotosServer={props.addPhotosServer}
+            addPhotosLocal={props.addPhotosLocal}
+            deletePhotosLocal={props.deletePhotosLocal}
+            deletePhotosServer={props.deletePhotosServer}
+            headerDisplayTextFunction={props.gridHeaderTextFunction}
+          />
+        </View>
       ) : (
-        <PhotoSlider
-          photos={props.photos}
-          startIndex={switchingState.startIndexWhenSwitching}
-          onSwitchMode={onSwitchMode}
-          RequestFullPhoto={props.RequestFullPhoto}
-          fetchMore={props.fetchMore}
-          addPhotoLocal={(photo: PhotoType) => props.addPhotosLocal?.([photo])}
-          addPhotoServer={(photo: PhotoType) =>
-            props.addPhotosServer?.([photo])
-          }
-          deletePhotoLocal={props.deletePhotoLocal}
-          deletePhotoServer={(photo: PhotoType) =>
-            props.deletePhotosServer?.([photo])
-          }
-        />
+        <View style={styles.viewStyle}>
+          <PhotoGrid
+            key={"photo_grid_" + props.contextLocation}
+            style={{}}
+            photos={props.photos}
+            startIndex={switchingState.startIndexWhenSwitching}
+            contextLocation={props.contextLocation}
+            onSwitchMode={onSwitchMode}
+            fetchMore={props.fetchMore}
+            onRefresh={props.onRefresh}
+            addPhotosServer={props.addPhotosServer}
+            addPhotosLocal={props.addPhotosLocal}
+            deletePhotosLocal={props.deletePhotosLocal}
+            deletePhotosServer={props.deletePhotosServer}
+            headerDisplayTextFunction={props.gridHeaderTextFunction}
+          />
+          <PhotoSlider
+            key={"photo_slider_" + props.contextLocation}
+            style={{}}
+            photos={props.photos}
+            startIndex={switchingState.startIndexWhenSwitching}
+            onSwitchMode={onSwitchMode}
+            RequestFullPhoto={props.RequestFullPhoto}
+            fetchMore={props.fetchMore}
+            addPhotoLocal={(photo: PhotoType) =>
+              props.addPhotosLocal?.([photo])
+            }
+            addPhotoServer={(photo: PhotoType) =>
+              props.addPhotosServer?.([photo])
+            }
+            deletePhotoLocal={props.deletePhotoLocal}
+            deletePhotoServer={(photo: PhotoType) =>
+              props.deletePhotosServer?.([photo])
+            }
+          />
+        </View>
       )}
     </View>
   );
@@ -71,7 +118,9 @@ export default function PhotoGallery(props: PropsType) {
 
 const styles = StyleSheet.create({
   viewStyle: {
-    flex: 1,
-    margin: 1,
+    position: "absolute",
+    top: 0,
+    height: "100%",
+    width: "100%",
   },
 });
