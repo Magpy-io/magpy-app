@@ -18,10 +18,6 @@ type PropsType = {};
 export default function PhotoGalleryScreen(props: PropsType) {
   const context = useMainContext();
 
-  useEffect(() => {
-    console.log("screen render");
-  }, [context.photosServer]);
-
   return (
     <PhotoGallery
       photos={context.photosServer}

@@ -51,7 +51,7 @@ type PropsType = {
   style?: StyleProp<ViewStyle>;
   startIndex: number;
   contextLocation: string;
-  onSwitchMode: (index: number) => void;
+  onSwitchMode: (isPhotoSelected: boolean, index: number) => void;
   onRefresh: () => void;
   fetchMore?: () => void;
   headerDisplayTextFunction?: (photosNb: number) => string;
@@ -61,7 +61,7 @@ type PropsType = {
   deletePhotosServer?: (photos: PhotoType[]) => void;
 };
 
-export default function PhotoGrid(props: PropsType) {
+function PhotoGrid(props: PropsType) {
   const flatlistRef = useRef<FlatList>(null);
   const [isSelecting, setIsSelecting] = useState(false);
   const [seletedIds, setSelectedIds] = useState(new Map());
@@ -70,13 +70,11 @@ export default function PhotoGrid(props: PropsType) {
     ? props.headerDisplayTextFunction(props.photos.length)
     : `${props.photos.length} photos`;
 
-  const HeaderListComponent = useMemo(
-    () =>
-      listHeaderComponent({
-        displayText: headerText,
-      }),
-    [headerText]
-  );
+  const HeaderListComponent = useMemo(() => {
+    return listHeaderComponent({
+      displayText: headerText,
+    });
+  }, [headerText]);
 
   const onRenderItemPress = useCallback(
     (item: PhotoType, index: number) => {
@@ -93,7 +91,7 @@ export default function PhotoGrid(props: PropsType) {
           }
         });
       } else {
-        props.onSwitchMode(index);
+        props.onSwitchMode(true, index);
       }
     },
     [props.onSwitchMode, isSelecting]
@@ -153,16 +151,6 @@ export default function PhotoGrid(props: PropsType) {
     }
   }, [seletedIds]);
 
-  useEffect(() => {
-    if (props.photos.length == 0) {
-      props.onRefresh();
-    }
-  }, [props.photos.length]);
-
-  useEffect(() => {
-    console.log("grid render");
-  }, [props.photos]);
-
   return (
     <View style={[styles.mainViewStyle, props.style]}>
       <FlatList
@@ -183,6 +171,7 @@ export default function PhotoGrid(props: PropsType) {
         ListHeaderComponent={HeaderListComponent}
         ListFooterComponent={listFooterComponent}
       />
+
       {isSelecting && (
         <StatusBarGridComponent
           selectedNb={seletedIds.size}
@@ -227,3 +216,5 @@ const styles = StyleSheet.create({
   textHeader: { fontSize: 17, textAlign: "center" },
   viewFooter: { marginVertical: 35 },
 });
+
+export default PhotoGrid;

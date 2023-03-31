@@ -441,16 +441,16 @@ const ContextProvider = (props: PropsType) => {
     try {
       const ids = photos.map((photo) => photo.id);
 
+      dispatch({
+        type: Actions.deletePhotosServer,
+        payload: { ids: ids },
+      });
+
       const response = await removePhotosById(ids);
 
       if (!response.ok) {
         console.log(response);
       }
-
-      dispatch({
-        type: Actions.deletePhotosServer,
-        payload: { ids: ids },
-      });
     } catch (err) {
       console.log(err);
     }
