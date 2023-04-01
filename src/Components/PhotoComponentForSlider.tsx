@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useMemo } from "react";
 import {
   StyleSheet,
   View,
@@ -18,12 +18,14 @@ type PropsType = {
 };
 
 function PhotoComponentForSlider(props: PropsType) {
-  const chooseImageCallback = useCallback(() => {
+  console.log("render photo for slider", props.photo.id);
+
+  const uriSource = useMemo(() => {
     if (props.photo.inDevice) {
       return props.photo.image.path;
     } else {
-      if (props.photo.image.image64Full) {
-        return props.photo.image.image64Full;
+      if (props.photo.image.pathCache) {
+        return props.photo.image.pathCache;
       } else {
         return props.photo.image.image64;
       }
@@ -37,7 +39,7 @@ function PhotoComponentForSlider(props: PropsType) {
     >
       <View style={styles.itemStyle}>
         <FastImage
-          source={{ uri: chooseImageCallback() }}
+          source={{ uri: uriSource }}
           resizeMode={FastImage.resizeMode.contain}
           style={styles.imageStyle}
         />

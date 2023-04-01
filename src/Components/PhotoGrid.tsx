@@ -62,6 +62,7 @@ type PropsType = {
 };
 
 function PhotoGrid(props: PropsType) {
+  console.log("render grid");
   const flatlistRef = useRef<FlatList>(null);
   const [isSelecting, setIsSelecting] = useState(false);
   const [seletedIds, setSelectedIds] = useState(new Map());

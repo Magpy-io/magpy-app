@@ -56,8 +56,8 @@ async function GetMorePhotosLocal(n: number, offset: number) {
         height: photo.image.height,
         width: photo.image.width,
         path: photo.image.uri,
+        pathCache: "",
         image64: "",
-        image64Full: "",
       },
       id: `local_${photo.image.uri}`,
       album: photo.group_name,
@@ -116,10 +116,10 @@ async function GetMorePhotosServer(n: number, offset: number) {
         height: photo.height,
         width: photo.width,
         path: photo.clientPath,
+        pathCache: "",
         image64: filesExist[index]
           ? ""
           : `data:image/jpeg;base64,${images64Formated[index]}`,
-        image64Full: "",
       },
       id: photo.id,
       album: "",

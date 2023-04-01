@@ -20,6 +20,7 @@ function photosNbToString(n: number) {
 type PropsType = {};
 
 export default function PhotoGalleryLocalScreen(props: PropsType) {
+  console.log("render screen local");
   const [hasPermissions, setHasPermissions] = useState<boolean>(true);
   const context = useMainContext();
 

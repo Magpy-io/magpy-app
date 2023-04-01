@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from "react";
+import React, { useMemo } from "react";
 import { StyleSheet, View, TouchableWithoutFeedback } from "react-native";
 import { Icon } from "@rneui/themed";
 
@@ -18,12 +18,13 @@ type PropsType = {
 };
 
 function PhotoComponentForGrid(props: PropsType) {
-  const chooseImageCallback = useCallback(() => {
+  console.log("render photo for grid", props.photo.id);
+  const uriSource = useMemo(() => {
     if (props.photo.inDevice) {
       return props.photo.image.path;
     } else {
-      if (false && props.photo.image.image64Full) {
-        return props.photo.image.image64Full;
+      if (props.photo.image.pathCache) {
+        return props.photo.image.pathCache;
       } else {
         return props.photo.image.image64;
       }
@@ -53,7 +54,7 @@ function PhotoComponentForGrid(props: PropsType) {
     >
       <View style={styles.itemStyle}>
         <FastImage
-          source={{ uri: chooseImageCallback() }}
+          source={{ uri: uriSource }}
           resizeMode={FastImage.resizeMode.cover}
           style={styles.imageStyle}
         />

@@ -29,6 +29,8 @@ import {
   addPhoto,
   RemovePhotos,
   getFirstPossibleFileName,
+  clearCache,
+  addPhotoToCache,
 } from "~/Helpers/GetGalleryPhotos";
 
 import {
@@ -97,12 +99,11 @@ const addSinglePhotoLocal = async (
   photo: PhotoType,
   dispatch: React.Dispatch<Action>
 ) => {
-  let image64;
-
-  if (photo.image.image64Full) {
-    image64 = photo.image.image64Full.substring(
-      "data:image/jpeg;base64,".length
-    );
+  let newUri = "";
+  if (photo.image.pathCache) {
+    newUri = await addPhoto(photo.image.fileName, {
+      pathCache: photo.image.pathCache,
+    });
   } else {
     const result = await getPhotoWithProgress(
       photo.id,
@@ -117,33 +118,17 @@ const addSinglePhotoLocal = async (
       console.log(result);
       return;
     }
-    image64 = result.data.photo.image64;
+    const image64 = result.data.photo.image64;
+    newUri = await addPhoto(photo.image.fileName, { image64: image64 });
   }
 
-  const dirPath = "/storage/emulated/0/DCIM/Restored/";
-
-  await RNFS.mkdir(dirPath);
-
-  const dirExists = await RNFS.exists(dirPath);
-
-  if (!dirExists) {
-    console.log("directory not created to write image.");
-    return;
-  }
-
-  const filePath = await getFirstPossibleFileName(
-    "file://" + dirPath + photo.image.fileName
-  );
-
-  await addPhoto(filePath, image64);
-
-  photo.image.path = filePath;
+  photo.image.path = newUri;
   dispatch({ type: Actions.addPhotoLocal, payload: { photo: photo } });
   dispatch({
     type: Actions.updatePhotoProgressServer,
     payload: { photo: photo, isLoading: false, p: 0 },
   });
-  const result = await updatePhotoPath(photo.id, filePath);
+  const result = await updatePhotoPath(photo.id, newUri);
 
   if (!result.ok) {
     console.log(result);
@@ -182,6 +167,7 @@ const ContextProvider = (props: PropsType) => {
 
   const onRefreshServer = useCallback(async () => {
     try {
+      await clearCache();
       const newPhotos = await GetMorePhotosServer(
         ITEMS_TO_LOAD_PER_END_REACHED_SERVER,
         0
@@ -237,7 +223,7 @@ const ContextProvider = (props: PropsType) => {
   }, [state]);
 
   const RequestFullPhotoServer = useCallback(async (photo: PhotoType) => {
-    if (photo.image.image64Full) {
+    if (photo.image.pathCache) {
       return;
     }
     try {
@@ -248,9 +234,14 @@ const ContextProvider = (props: PropsType) => {
         return;
       }
 
+      const pathCache = await addPhotoToCache(
+        photo.image.fileName,
+        result.data.photo.image64
+      );
+      photo.image.pathCache = pathCache;
       dispatch({
         type: Actions.addFullPhotoById,
-        payload: { result: result },
+        payload: { photo: photo },
       });
     } catch (err) {
       console.log(err);

@@ -26,6 +26,7 @@ type PropsType = {
 };
 
 function PhotoSlider(props: PropsType) {
+  console.log("render slider");
   const flatListCurrentIndexRef = useRef<number>(props.startIndex);
   const [flatListCurrentIndex, setFlatListCurrentIndex] = useState(
     props.startIndex

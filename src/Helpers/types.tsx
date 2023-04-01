@@ -7,8 +7,8 @@ type PhotoType = {
     height: number;
     width: number;
     path: string;
+    pathCache: string;
     image64: string;
-    image64Full: string;
   };
   id: string;
   album: string;

@@ -1,6 +1,6 @@
 import { StyleSheet, View } from "react-native";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import PhotoGrid from "~/Components/PhotoGrid";
 import PhotoSlider from "~/Components/PhotoSlider";
 import { PhotoType } from "~/Helpers/types";
@@ -20,6 +20,7 @@ type PropsType = {
 };
 
 export default function PhotoGallery(props: PropsType) {
+  console.log("render gallery");
   const [switchingState, setSwitchingState] = useState({
     isPhotoSelected: true,
     startIndexWhenSwitching: 0,

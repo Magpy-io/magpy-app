@@ -31,8 +31,23 @@ async function getFirstPossibleFileName(path: string) {
   return currentPath;
 }
 
-function addPhoto(path: string, image: string) {
-  return RNFS.writeFile(path, image, "base64");
+async function addPhoto(
+  imageName: string,
+  source: { image64?: string; pathCache?: string }
+) {
+  if (source.image64) {
+    const cachePhotoPath = RNFS.ExternalCachesDirectoryPath + `/${imageName}`;
+    await RNFS.writeFile(cachePhotoPath, source.image64, "base64");
+    await CameraRoll.save(cachePhotoPath, { album: "Restored" });
+    await RNFS.unlink(cachePhotoPath);
+  } else if (source.pathCache) {
+    await CameraRoll.save(source.pathCache, { album: "Restored" });
+    await RNFS.unlink(source.pathCache);
+  } else {
+    throw "addPhoto no image provided";
+  }
+  const dirPath = "/storage/emulated/0/DCIM/Restored/";
+  return "file://" + dirPath + imageName;
 }
 
 async function RemovePhotos(uris: string[]) {
@@ -50,4 +65,25 @@ async function RemovePhotos(uris: string[]) {
   return DeleteMedia.deletePhotos(urisThatExist);
 }
 
-export { GetPhotos, RemovePhotos, addPhoto, getFirstPossibleFileName };
+async function addPhotoToCache(imageName: string, image: string) {
+  const cachePhotoPath = RNFS.ExternalCachesDirectoryPath + `/${imageName}`;
+  await RNFS.writeFile(cachePhotoPath, image, "base64");
+  return "file://" + cachePhotoPath;
+}
+
+async function clearCache() {
+  const results = await RNFS.readDir(RNFS.ExternalCachesDirectoryPath);
+
+  for (let i = 0; i < results.length; i++) {
+    await RNFS.unlink(results[i].path);
+  }
+}
+
+export {
+  GetPhotos,
+  RemovePhotos,
+  addPhoto,
+  getFirstPossibleFileName,
+  clearCache,
+  addPhotoToCache,
+};

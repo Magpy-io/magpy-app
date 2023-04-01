@@ -16,6 +16,7 @@ function photosNbToString(n: number) {
 type PropsType = {};
 
 export default function PhotoGalleryScreen(props: PropsType) {
+  console.log("render screen server");
   const context = useMainContext();
 
   return (

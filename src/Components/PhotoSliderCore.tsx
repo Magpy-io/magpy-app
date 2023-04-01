@@ -121,7 +121,7 @@ function PhotoSliderCore(props: PropsType) {
       ref={flatlistRef}
       data={props.photos}
       renderItem={renderItem}
-      initialNumToRender={1}
+      initialNumToRender={10}
       initialScrollIndex={correctStartIndex}
       onViewableItemsChanged={onViewableItemsChangedCallBack}
       viewabilityConfig={{
