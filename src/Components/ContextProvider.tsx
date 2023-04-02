@@ -28,7 +28,6 @@ import {
 import {
   addPhoto,
   RemovePhotos,
-  getFirstPossibleFileName,
   clearCache,
   addPhotoToCache,
 } from "~/Helpers/GetGalleryPhotos";
@@ -99,28 +98,21 @@ const addSinglePhotoLocal = async (
   photo: PhotoType,
   dispatch: React.Dispatch<Action>
 ) => {
-  let newUri = "";
-  if (photo.image.pathCache) {
-    newUri = await addPhoto(photo.image.fileName, {
-      pathCache: photo.image.pathCache,
-    });
-  } else {
-    const result = await getPhotoWithProgress(
-      photo.id,
-      (p: number, t: number) => {
-        dispatch({
-          type: Actions.updatePhotoProgressServer,
-          payload: { photo: photo, isLoading: true, p: (p + 1) / t },
-        });
-      }
-    );
-    if (!result.ok) {
-      console.log(result);
-      return;
+  const result = await getPhotoWithProgress(
+    photo.id,
+    (p: number, t: number) => {
+      dispatch({
+        type: Actions.updatePhotoProgressServer,
+        payload: { photo: photo, isLoading: true, p: (p + 1) / t },
+      });
     }
-    const image64 = result.data.photo.image64;
-    newUri = await addPhoto(photo.image.fileName, { image64: image64 });
+  );
+  if (!result.ok) {
+    console.log(result);
+    return;
   }
+  const image64 = result.data.photo.image64;
+  const newUri = await addPhoto(photo, image64);
 
   photo.image.path = newUri;
   dispatch({ type: Actions.addPhotoLocal, payload: { photo: photo } });
@@ -128,10 +120,11 @@ const addSinglePhotoLocal = async (
     type: Actions.updatePhotoProgressServer,
     payload: { photo: photo, isLoading: false, p: 0 },
   });
-  const result = await updatePhotoPath(photo.id, newUri);
 
-  if (!result.ok) {
-    console.log(result);
+  const result1 = await updatePhotoPath(photo.id, newUri);
+
+  if (!result1.ok) {
+    console.log(result1);
   }
 };
 

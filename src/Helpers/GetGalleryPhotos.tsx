@@ -1,6 +1,10 @@
 import { CameraRoll } from "@react-native-camera-roll/camera-roll";
 import { DeleteMedia } from "react-native-delete-media";
 import RNFS from "react-native-fs";
+import { NativeModules } from "react-native";
+import { PhotoType } from "./types";
+
+const { MainModule } = NativeModules;
 
 function GetPhotos(n: number, offset: number = 0) {
   return CameraRoll.getPhotos({
@@ -13,9 +17,12 @@ function GetPhotos(n: number, offset: number = 0) {
   });
 }
 
-async function getFirstPossibleFileName(path: string) {
+async function getFirstPossibleFileName(imageName: string) {
+  const path =
+    (await MainModule.getRestoredMediaAbsolutePath()) + "/" + imageName;
+
   if (!(await RNFS.exists(path))) {
-    return path;
+    return path.split("/").pop();
   }
   const pathSplitted = path.split(".");
   const extension = pathSplitted.pop();
@@ -28,26 +35,20 @@ async function getFirstPossibleFileName(path: string) {
     currentPath = pathWithoutExtension + ` (${i++}).` + extension;
     exists = await RNFS.exists(currentPath);
   }
-  return currentPath;
+  return currentPath.split("/").pop();
 }
 
-async function addPhoto(
-  imageName: string,
-  source: { image64?: string; pathCache?: string }
-) {
-  if (source.image64) {
-    const cachePhotoPath = RNFS.ExternalCachesDirectoryPath + `/${imageName}`;
-    await RNFS.writeFile(cachePhotoPath, source.image64, "base64");
-    await CameraRoll.save(cachePhotoPath, { album: "Restored" });
-    await RNFS.unlink(cachePhotoPath);
-  } else if (source.pathCache) {
-    await CameraRoll.save(source.pathCache, { album: "Restored" });
-    await RNFS.unlink(source.pathCache);
-  } else {
-    throw "addPhoto no image provided";
-  }
-  const dirPath = "/storage/emulated/0/DCIM/Restored/";
-  return "file://" + dirPath + imageName;
+async function addPhoto(photo: PhotoType, image64: string) {
+  const extention = photo.image.fileName.split(".").pop();
+  const cachePhotoPath =
+    RNFS.ExternalCachesDirectoryPath + `/${photo.id}.${extention}`;
+  await RNFS.writeFile(cachePhotoPath, image64, "base64");
+  const imageName = await getFirstPossibleFileName(photo.image.fileName);
+  const path = await MainModule.saveToRestored(cachePhotoPath, {
+    name: imageName,
+  });
+  await RNFS.unlink(cachePhotoPath);
+  return "file://" + path;
 }
 
 async function RemovePhotos(uris: string[]) {
@@ -79,11 +80,4 @@ async function clearCache() {
   }
 }
 
-export {
-  GetPhotos,
-  RemovePhotos,
-  addPhoto,
-  getFirstPossibleFileName,
-  clearCache,
-  addPhotoToCache,
-};
+export { GetPhotos, RemovePhotos, addPhoto, clearCache, addPhotoToCache };
