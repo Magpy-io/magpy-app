@@ -41,7 +41,8 @@ async function getFirstPossibleFileName(imageName: string) {
 async function addPhoto(photo: PhotoType, image64: string) {
   const extention = photo.image.fileName.split(".").pop();
   const cachePhotoPath =
-    RNFS.ExternalCachesDirectoryPath + `/${photo.id}.${extention}`;
+    RNFS.ExternalCachesDirectoryPath +
+    `/temp_full_image_${photo.id}.${extention}`;
   await RNFS.writeFile(cachePhotoPath, image64, "base64");
   const imageName = await getFirstPossibleFileName(photo.image.fileName);
   const path = await MainModule.saveToRestored(cachePhotoPath, {
