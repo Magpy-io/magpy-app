@@ -1,11 +1,7 @@
 import React from "react";
-import { Dimensions } from "react-native";
 
 import { NavigationContainer } from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 
-import TopTabBar from "~/Navigation/TopTabBar";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 //Screens
 import PhotoGalleryServerScreen from "~/Navigation/Screens/PhotoGalleryServerScreen";
@@ -24,8 +20,8 @@ const Navigation = () => {
         }}
         initialRouteName="Server"
       >
-        <Drawer.Screen name="Local" component={PhotoGalleryLocalScreen} />
         <Drawer.Screen name="Server" component={PhotoGalleryServerScreen} />
+        <Drawer.Screen name="Local" component={PhotoGalleryLocalScreen} />
         <Drawer.Screen name="Test" component={TestScreen} />
       </Drawer.Navigator>
     </NavigationContainer>

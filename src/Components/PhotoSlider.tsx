@@ -16,6 +16,9 @@ type PropsType = {
   photos: Array<PhotoType>;
   style?: StyleProp<ViewStyle>;
   startIndex: number;
+  contextLocation: string;
+  id: string;
+  isSliding: boolean;
   onSwitchMode: (isPhotoSelected: boolean, index: number) => void;
   RequestFullPhoto: (photo: PhotoType) => void;
   fetchMore?: () => void;
@@ -26,7 +29,7 @@ type PropsType = {
 };
 
 function PhotoSlider(props: PropsType) {
-  console.log("render slider");
+  console.log("render slider", props.contextLocation);
   const flatListCurrentIndexRef = useRef<number>(props.startIndex);
   const [flatListCurrentIndex, setFlatListCurrentIndex] = useState(
     props.startIndex
@@ -51,17 +54,23 @@ function PhotoSlider(props: PropsType) {
 
   useEffect(() => {
     const backAction = () => {
-      props.onSwitchMode(false, flatListCurrentIndexRef.current);
-      return true;
+      if (props.isSliding) {
+        props.onSwitchMode(false, flatListCurrentIndexRef.current);
+        backHandler.remove();
+        return true;
+      } else {
+        return false;
+      }
     };
-
     const backHandler = BackHandler.addEventListener(
       "hardwareBackPress",
       backAction
     );
 
-    return () => backHandler.remove();
-  }, [props.onSwitchMode]);
+    return () => {
+      return backHandler.remove();
+    };
+  }, [props.onSwitchMode, props.isSliding]);
 
   useEffect(() => {
     if (props.photos.length == 0) {

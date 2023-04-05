@@ -51,6 +51,7 @@ type PropsType = {
   style?: StyleProp<ViewStyle>;
   startIndex: number;
   contextLocation: string;
+  id: string;
   onSwitchMode: (isPhotoSelected: boolean, index: number) => void;
   onRefresh: () => void;
   fetchMore?: () => void;
@@ -62,7 +63,7 @@ type PropsType = {
 };
 
 function PhotoGrid(props: PropsType) {
-  console.log("render grid");
+  console.log("render grid", props.contextLocation);
   const flatlistRef = useRef<FlatList>(null);
   const [isSelecting, setIsSelecting] = useState(false);
   const [seletedIds, setSelectedIds] = useState(new Map());
@@ -127,6 +128,11 @@ function PhotoGrid(props: PropsType) {
     [onRenderItemPress, onRenderItemLongPress, isSelecting, seletedIds]
   );
 
+  const onBackButton = useCallback(
+    () => setIsSelecting(false),
+    [setIsSelecting]
+  );
+
   const onSelectAll = useCallback(() => {
     setSelectedIds((ids) => {
       const newMap = new Map();
@@ -174,7 +180,7 @@ function PhotoGrid(props: PropsType) {
       {isSelecting && (
         <StatusBarGridComponent
           selectedNb={seletedIds.size}
-          onCancelButton={() => setIsSelecting(false)}
+          onCancelButton={onBackButton}
           onSelectAllButton={onSelectAll}
         />
       )}

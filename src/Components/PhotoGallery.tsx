@@ -20,18 +20,27 @@ type PropsType = {
 };
 
 export default function PhotoGallery(props: PropsType) {
-  console.log("render gallery");
+  console.log("render gallery", props.contextLocation);
   const [switchingState, setSwitchingState] = useState({
-    isPhotoSelected: true,
+    isPhotoSelected: false,
     startIndexWhenSwitching: 0,
   });
 
   const onSwitchMode = useCallback(
     (isPhotoSelected: boolean, index: number) => {
-      setSwitchingState((s) => ({
-        isPhotoSelected: isPhotoSelected,
-        startIndexWhenSwitching: index,
-      }));
+      setSwitchingState((s) => {
+        if (
+          s.isPhotoSelected != isPhotoSelected ||
+          s.startIndexWhenSwitching != index
+        ) {
+          return {
+            isPhotoSelected: isPhotoSelected,
+            startIndexWhenSwitching: index,
+          };
+        } else {
+          return s;
+        }
+      });
     },
     []
   );
@@ -42,6 +51,9 @@ export default function PhotoGallery(props: PropsType) {
         <View style={styles.viewStyle}>
           <PhotoSlider
             key={"photo_slider_" + props.contextLocation}
+            id={"photo_slider_" + props.contextLocation}
+            contextLocation={props.contextLocation}
+            isSliding={switchingState.isPhotoSelected}
             style={{}}
             photos={props.photos}
             startIndex={switchingState.startIndexWhenSwitching}
@@ -61,10 +73,11 @@ export default function PhotoGallery(props: PropsType) {
           />
           <PhotoGrid
             key={"photo_grid_" + props.contextLocation}
+            id={"photo_grid_" + props.contextLocation}
+            contextLocation={props.contextLocation}
             style={{}}
             photos={props.photos}
             startIndex={switchingState.startIndexWhenSwitching}
-            contextLocation={props.contextLocation}
             onSwitchMode={onSwitchMode}
             fetchMore={props.fetchMore}
             onRefresh={props.onRefresh}
@@ -79,10 +92,11 @@ export default function PhotoGallery(props: PropsType) {
         <View style={styles.viewStyle}>
           <PhotoGrid
             key={"photo_grid_" + props.contextLocation}
+            id={"photo_grid_" + props.contextLocation}
+            contextLocation={props.contextLocation}
             style={{}}
             photos={props.photos}
             startIndex={switchingState.startIndexWhenSwitching}
-            contextLocation={props.contextLocation}
             onSwitchMode={onSwitchMode}
             fetchMore={props.fetchMore}
             onRefresh={props.onRefresh}
@@ -94,6 +108,9 @@ export default function PhotoGallery(props: PropsType) {
           />
           <PhotoSlider
             key={"photo_slider_" + props.contextLocation}
+            id={"photo_slider_" + props.contextLocation}
+            contextLocation={props.contextLocation}
+            isSliding={switchingState.isPhotoSelected}
             style={{}}
             photos={props.photos}
             startIndex={switchingState.startIndexWhenSwitching}
