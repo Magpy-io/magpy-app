@@ -131,6 +131,10 @@ function PhotoGrid(props: PropsType) {
     setSelectedIds((ids) => {
       const newMap = new Map();
 
+      if (ids.size == props.photos.length) {
+        return newMap;
+      }
+
       props.photos.forEach((photo) => {
         newMap.set(photo.id, photo);
       });
@@ -145,13 +149,6 @@ function PhotoGrid(props: PropsType) {
     correctStartIndex = Math.floor((props.photos.length - 1) / 3);
   }
 
-  useEffect(() => {
-    const noItemsSelected = seletedIds.size == 0;
-    if (noItemsSelected) {
-      setIsSelecting(() => false);
-    }
-  }, [seletedIds]);
-
   return (
     <View style={[styles.mainViewStyle, props.style]}>
       <FlatList
@@ -159,8 +156,9 @@ function PhotoGrid(props: PropsType) {
         style={styles.flatListStyle}
         data={props.photos}
         renderItem={renderItem}
-        maxToRenderPerBatch={20}
-        initialNumToRender={20}
+        windowSize={1}
+        maxToRenderPerBatch={1}
+        initialNumToRender={1}
         initialScrollIndex={correctStartIndex}
         keyExtractor={keyExtractor}
         onEndReachedThreshold={1}
