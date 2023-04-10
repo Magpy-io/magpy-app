@@ -4,32 +4,45 @@ import { PhotoType } from "~/Helpers/types";
 import * as Queries from "~/Helpers/Queries";
 import RNFS from "react-native-fs";
 
-async function GetMorePhotosLocal(n: number, offset: number) {
+type GetMorePhotosReturnType = {
+  photos: PhotoType[];
+  nextOffset: number;
+  endReached: boolean;
+};
+
+async function GetMorePhotosLocal(
+  n: number,
+  offset: number
+): Promise<GetMorePhotosReturnType> {
   let foundAnyPhotoNotInServer = false;
   let photosFromDevice = {
     edges: new Array<PhotoIdentifier>(),
     endReached: false,
   };
-  let photosExistInServer: Array<{
-    exists: boolean;
-    path: string;
-    photo: any;
-  }>;
+  let photosExistInServer: Queries.GetPhotosByPathReturnType;
 
   let totalOffset = offset;
 
   while (!foundAnyPhotoNotInServer && !photosFromDevice.endReached) {
     photosFromDevice = await GetPhotos(n, totalOffset);
 
-    const queryReturn = await Queries.getPhotosExist(
-      photosFromDevice.edges.map((edge) => edge.node.image.uri)
+    photosExistInServer = await Queries.getPhotosByPath(
+      photosFromDevice.edges.map((edge) => edge.node.image.uri),
+      "data"
     );
 
-    photosExistInServer = queryReturn.data.photosExist;
+    if (photosExistInServer.error) {
+      console.log(photosExistInServer.error);
+      return {
+        photos: [],
+        nextOffset: offset,
+        endReached: false,
+      };
+    }
 
     if (
-      photosExistInServer.length != 0 &&
-      photosExistInServer.every((v) => v.exists)
+      photosExistInServer.photos.length != 0 &&
+      photosExistInServer.photos.every((v) => v.exists)
     ) {
       totalOffset += n;
     } else {
@@ -42,7 +55,7 @@ async function GetMorePhotosLocal(n: number, offset: number) {
   }
 
   const photosNotInServer = photosFromDevice.edges.filter((edge, index) => {
-    return !photosExistInServer[index].exists;
+    return !photosExistInServer.photos[index].exists;
   });
 
   const photos = photosNotInServer.map((edge, index) => {
@@ -78,44 +91,81 @@ async function GetMorePhotosLocal(n: number, offset: number) {
   };
 }
 
-async function GetMorePhotosServer(n: number, offset: number) {
-  const photosData = await Queries.getPhotosDataN(n, offset);
+async function GetMorePhotosServer(
+  n: number,
+  offset: number
+): Promise<GetMorePhotosReturnType> {
+  const photosData = await Queries.getPhotos(n, offset, "data");
+
+  if (photosData.error) {
+    console.log(photosData.error);
+    return {
+      photos: [],
+      nextOffset: offset,
+      endReached: false,
+    };
+  }
+
+  if (photosData.photos.length == 0) {
+    return {
+      photos: [],
+      nextOffset: n + offset,
+      endReached: photosData.endReached,
+    };
+  }
 
   const filesExist = await Promise.all(
-    photosData.data.photos.map((photo: any) => {
-      return RNFS.exists(photo.clientPath);
+    photosData.photos.map((photo) => {
+      return RNFS.exists(photo.meta.clientPath);
     })
   );
 
   const ids = [];
   for (let i = 0; i < filesExist.length; i++) {
     if (!filesExist[i]) {
-      ids.push(photosData.data.photos[i].id);
+      ids.push(photosData.photos[i].id);
     }
   }
-  const images64Res = await Queries.getPhotosByIds(ids);
 
-  const images64 = images64Res.data.photos;
   const images64Formated: Array<string> = [];
-  let j = 0;
-  for (let i = 0; i < filesExist.length; i++) {
-    if (filesExist[i]) {
-      images64Formated.push("");
-    } else {
-      images64Formated.push(images64[j++].photo.image64);
+
+  if (ids.length == 0) {
+    images64Formated.length = photosData.photos.length;
+    images64Formated.fill("");
+  } else {
+    const images64Res = await Queries.getPhotosById(ids, "thumbnail");
+
+    if (images64Res.error) {
+      console.log(images64Res.error);
+      return {
+        photos: [],
+        nextOffset: offset,
+        endReached: false,
+      };
+    }
+
+    const images64 = images64Res.photos;
+
+    let j = 0;
+    for (let i = 0; i < filesExist.length; i++) {
+      if (filesExist[i]) {
+        images64Formated.push("");
+      } else {
+        images64Formated.push(images64[j++].photo?.image64 as string);
+      }
     }
   }
 
-  const photos = photosData.data.photos.map((photo: any, index: number) => {
+  const photos = photosData.photos.map((photo, index: number) => {
     const photoObject: PhotoType = {
       inDevice: filesExist[index],
       inServer: true,
       image: {
-        fileSize: photo.fileSize,
-        fileName: photo.name,
-        height: photo.height,
-        width: photo.width,
-        path: photo.clientPath,
+        fileSize: photo.meta.fileSize,
+        fileName: photo.meta.name,
+        height: photo.meta.height,
+        width: photo.meta.width,
+        path: photo.meta.clientPath,
         pathCache: "",
         image64: filesExist[index]
           ? ""
@@ -123,19 +173,20 @@ async function GetMorePhotosServer(n: number, offset: number) {
       },
       id: photo.id,
       album: "",
-      created: photo.date,
+      created: photo.meta.date,
       modified: "",
-      syncDate: photo.syncDate,
+      syncDate: photo.meta.syncDate,
       type: "",
       isLoading: false,
       loadingPercentage: 0,
     };
     return photoObject;
   });
+
   return {
     photos: photos,
     nextOffset: n + offset,
-    endReached: photosData.data.endReached,
+    endReached: photosData.endReached,
   };
 }
 

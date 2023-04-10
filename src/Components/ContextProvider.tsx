@@ -16,15 +16,7 @@ import {
   GetMorePhotosServer,
 } from "~/Helpers/GetMorePhotos";
 
-import {
-  postPhoto,
-  postPhotoWithProgress,
-  getPhotoById,
-  removePhotosById,
-  updatePhotoPath,
-  getPhotosByIds,
-  getPhotoWithProgress,
-} from "~/Helpers/Queries";
+import * as Queries from "~/Helpers/Queries";
 import {
   addPhoto,
   RemovePhotos,
@@ -65,7 +57,7 @@ const addSinglePhotoServer = async (
 ) => {
   const res = await RNFS.readFile(photo.image.path, "base64");
 
-  const response = await postPhotoWithProgress(
+  const result = await Queries.addPhotoWithProgress(
     {
       name: photo.image.fileName,
       fileSize: photo.image.fileSize,
@@ -83,8 +75,8 @@ const addSinglePhotoServer = async (
     }
   );
 
-  if (!response.ok) {
-    console.log(response);
+  if (result.error) {
+    console.log(result.error);
     return;
   }
 
@@ -98,7 +90,7 @@ const addSinglePhotoLocal = async (
   photo: PhotoType,
   dispatch: React.Dispatch<Action>
 ) => {
-  const result = await getPhotoWithProgress(
+  const result = await Queries.getPhotoWithProgress(
     photo.id,
     (p: number, t: number) => {
       dispatch({
@@ -107,11 +99,13 @@ const addSinglePhotoLocal = async (
       });
     }
   );
-  if (!result.ok) {
-    console.log(result);
+
+  if (result.error) {
+    console.log(result.error);
     return;
   }
-  const image64 = result.data.photo.image64;
+
+  const image64 = result.photo.image64;
   const newUri = await addPhoto(photo, image64);
 
   photo.image.path = newUri;
@@ -121,10 +115,11 @@ const addSinglePhotoLocal = async (
     payload: { photo: photo, isLoading: false, p: 0 },
   });
 
-  const result1 = await updatePhotoPath(photo.id, newUri);
+  const result1 = await Queries.updatePhotoPath(photo.id, newUri);
 
-  if (!result1.ok) {
-    console.log(result1);
+  if (result1.error) {
+    console.log(result1.error);
+    return;
   }
 };
 
@@ -220,16 +215,22 @@ const ContextProvider = (props: PropsType) => {
       return;
     }
     try {
-      const result = await getPhotoById(photo.id);
+      const result = await Queries.getPhotosById([photo.id], "compressed");
 
-      if (!result.ok) {
+      if (result.error) {
+        console.log(result.error);
+        return;
+      }
+
+      if (!result.photos[0].exists) {
+        console.log(`Photo with id ${photo.id} not found`);
         console.log(result);
         return;
       }
 
       const pathCache = await addPhotoToCache(
         photo.image.fileName,
-        result.data.photo.image64
+        result.photos[0].photo?.image64 as string
       );
       photo.image.pathCache = pathCache;
       dispatch({
@@ -245,20 +246,25 @@ const ContextProvider = (props: PropsType) => {
     async (photos: PhotoType[]) => {
       try {
         const ids = photos.map((photo) => photo.id);
-        const result = await getPhotosByIds(ids);
+        const result = await Queries.getPhotosById(ids, "thumbnail");
 
-        if (!result.ok) {
-          console.log(result);
+        if (result.error) {
+          console.log(result.error);
           return;
         }
 
-        const images64 = result.data.photos;
-        const images64Filtered = images64.filter(
-          (image64: any) => image64.exists
+        const photosWithImage64 = result.photos;
+        const photosWithImage64Filtered = photosWithImage64.filter(
+          (image64) => image64.exists
         );
+
+        const images64 = photosWithImage64Filtered.map((v) => {
+          return { id: v.photo?.id, image64: v.photo?.image64 };
+        });
+
         dispatch({
           type: Actions.addCroppedPhotos,
-          payload: { images64: images64Filtered },
+          payload: { images64: images64 },
         });
       } catch (err) {
         console.log(err);
@@ -430,10 +436,10 @@ const ContextProvider = (props: PropsType) => {
         payload: { ids: ids },
       });
 
-      const response = await removePhotosById(ids);
+      const result = await Queries.deletePhotosById(ids);
 
-      if (!response.ok) {
-        console.log(response);
+      if (result.error) {
+        console.log(result.error);
       }
     } catch (err) {
       console.log(err);

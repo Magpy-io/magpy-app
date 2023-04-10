@@ -192,8 +192,7 @@ function GlobalReducer(prevState: stateType, action: Action) {
       const newState = { ...prevState };
 
       const newPhotosServer = [...newState.photosServer];
-      action.payload.images64.forEach((element: any) => {
-        const requestPhoto = element.photo;
+      action.payload.images64.forEach((requestPhoto: any) => {
         const index = newPhotosServer.findIndex((v) => v.id == requestPhoto.id);
 
         if (index >= 0) {
