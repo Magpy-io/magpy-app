@@ -114,6 +114,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#ffffff50",
+    position: "absolute",
   },
   pieStyle: {},
   iconViewStyle: {
@@ -121,6 +122,7 @@ const styles = StyleSheet.create({
     height: "100%",
     alignItems: "flex-end",
     justifyContent: "flex-end",
+    position: "absolute",
   },
   iconStyle: { margin: 5 },
 });
