@@ -11,6 +11,7 @@ import { PhotoType } from "~/Helpers/types";
 import StatusBarComponent from "./PhotoComponents/StatusBarComponent";
 import ToolBar from "./PhotoComponents/ToolBar";
 import PhotoSliderCore from "./PhotoSliderCore";
+import { Text } from "react-native-elements";
 
 type PropsType = {
   photos: Array<PhotoType>;
@@ -34,6 +35,7 @@ function PhotoSlider(props: PropsType) {
   const [flatListCurrentIndex, setFlatListCurrentIndex] = useState(
     props.startIndex
   );
+  const [viewDetails, setViewDetails] = useState(false);
 
   const validFlatListCurrentIndex =
     props.photos.length != 0 && flatListCurrentIndex < props.photos.length;
@@ -86,6 +88,20 @@ function PhotoSlider(props: PropsType) {
         onIndexChanged={onCurrentIndexChanged}
         onEndReached={props.fetchMore}
       />
+
+      {validFlatListCurrentIndex && viewDetails && (
+        <View
+          style={{
+            backgroundColor: "white",
+            position: "absolute",
+            top: "50%",
+            padding: 10,
+          }}
+        >
+          <Text>{`Name: ${props.photos[flatListCurrentIndex].image.fileName}\nPath: ${props.photos[flatListCurrentIndex].image.path}\nTaken: ${props.photos[flatListCurrentIndex].created}\nModified: ${props.photos[flatListCurrentIndex].modified}`}</Text>
+        </View>
+      )}
+
       {validFlatListCurrentIndex && (
         <StatusBarComponent
           inDevice={props.photos[flatListCurrentIndex].inDevice}
@@ -114,6 +130,7 @@ function PhotoSlider(props: PropsType) {
           onDeleteServer={() =>
             props.deletePhotoServer?.(props.photos[flatListCurrentIndex])
           }
+          onDetails={() => setViewDetails((v) => !v)}
         />
       )}
     </View>

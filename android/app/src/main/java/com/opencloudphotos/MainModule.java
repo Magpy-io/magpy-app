@@ -12,6 +12,7 @@ import com.facebook.react.common.ReactConstants;
 import com.reactnativecommunity.cameraroll.Utils;
 
 import android.content.ContentResolver;
+import android.media.ExifInterface;
 import android.os.Build;
 import android.os.FileUtils;
 import android.provider.MediaStore.Images;
@@ -22,7 +23,15 @@ import android.net.Uri;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.security.Timestamp;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.Locale;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -87,12 +96,36 @@ public class MainModule extends ReactContextBaseJavaModule{
             ContentResolver resolver = mContext.getContentResolver();
             Uri mediaContentUri = isVideo
                     ? resolver.insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, mediaDetails)
-                    : resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, mediaDetails);
+                    : resolver.insert(Images.Media.EXTERNAL_CONTENT_URI, mediaDetails);
             output = resolver.openOutputStream(mediaContentUri);
             input = new FileInputStream(source);
             FileUtils.copy(input, output);
+
+            long datetime_original = 0L;
+            try {
+                ExifInterface exifInterface = new ExifInterface(source.getPath());
+
+                String date_time = exifInterface.getAttribute(
+                        ExifInterface.TAG_DATETIME_ORIGINAL);
+
+                DateFormat df = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss");
+                Date date = df.parse(date_time);
+
+                if(date == null){
+                    Log.e("Tag", "Could not parse date from exif data");
+                }else{
+                    datetime_original = date.getTime();
+                }
+
+            } catch (IOException | ParseException e) {
+                Log.e("Tag", e.getMessage());
+            }
+
             mediaDetails.clear();
-            mediaDetails.put(MediaStore.Images.Media.IS_PENDING, 0);
+            mediaDetails.put(Images.Media.IS_PENDING, 0);
+            if(datetime_original != 0){
+                mediaDetails.put(MediaStore.MediaColumns.DATE_ADDED, datetime_original/1000);
+            }
             resolver.update(mediaContentUri, mediaDetails, null, null);
             mPromise.resolve(getRestoredMediaAbsolutePathPrivate() + File.separator + name);
         } catch (IOException e) {
