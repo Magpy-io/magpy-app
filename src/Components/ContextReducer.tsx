@@ -7,6 +7,7 @@ type stateType = {
   photosServer: Array<PhotoType>;
   nextOffsetServer: number;
   endReachedServer: boolean;
+  isServiceAddingServerPhotos: boolean;
 };
 
 const initialState = {
@@ -16,6 +17,7 @@ const initialState = {
   photosServer: new Array<PhotoType>(),
   nextOffsetServer: 0,
   endReachedServer: false,
+  isServiceAddingServerPhotos: false,
 };
 
 enum Actions {
@@ -32,6 +34,7 @@ enum Actions {
   updatePhotoProgress = "UPDATE_PHOTO_PROGRESS",
   updatePhotoProgressServer = "UPDATE_PHOTO_PROGRESS_SERVER",
   addCroppedPhotos = "ADD_CROPPED_PHOTOS",
+  setServiceAddingServerPhotos = "SET_SERVICE_ADDING_SERVER_PHOTOS",
 }
 
 type Action = {
@@ -222,6 +225,12 @@ function GlobalReducer(prevState: stateType, action: Action) {
       } else {
         return prevState;
       }
+    }
+
+    case Actions.setServiceAddingServerPhotos: {
+      const newState = { ...prevState };
+      newState.isServiceAddingServerPhotos = action.payload.isServiceOn;
+      return newState;
     }
   }
   return prevState;

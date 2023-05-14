@@ -1,6 +1,6 @@
 package com.opencloudphotos;
 import com.facebook.common.logging.FLog;
-import com.facebook.react.bridge.NativeModule;
+import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
@@ -8,12 +8,17 @@ import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.common.ReactConstants;
 import com.reactnativecommunity.cameraroll.Utils;
 
+import android.app.ActivityManager;
 import android.content.ContentResolver;
+import android.content.Context;
+import android.content.Intent;
 import android.media.ExifInterface;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.FileUtils;
 import android.provider.MediaStore.Images;
 
@@ -23,17 +28,11 @@ import android.net.Uri;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.security.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.Locale;
-import java.util.Map;
-import java.util.HashMap;
 
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -146,5 +145,114 @@ public class MainModule extends ReactContextBaseJavaModule{
                 }
             }
         }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.Q)
+    public boolean isServiceRunningInner(){
+        ReactContext context = getReactApplicationContext();
+        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        for(ActivityManager.RunningServiceInfo service: activityManager.getRunningServices(Integer.MAX_VALUE)) {
+            if(SendingMediaForegroundService.class.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.Q)
+    @ReactMethod
+    public void isServiceRunning(Promise promise){
+        Boolean b = isServiceRunningInner();
+        promise.resolve(b);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.Q)
+    @ReactMethod
+    public void getIds(Promise promise){
+        if(!isServiceRunningInner()){
+            promise.reject("SERVICE_NOT_RUNNING", "Service not running");
+            return;
+        }
+        String[] ids = SendingMediaForegroundService.getInstance().getIds();
+
+        WritableArray retArray = Arguments.createArray();
+
+        for (String id : ids) {
+            retArray.pushString(id);
+        }
+        promise.resolve((retArray));
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.Q)
+    @ReactMethod
+    public void getCurrentIndex(Promise promise){
+        if(!isServiceRunningInner()){
+            promise.reject("SERVICE_NOT_RUNNING", "Service not running");
+            return;
+        }
+
+        double index = (double)SendingMediaForegroundService.getInstance().getCurrentIndex();
+        promise.resolve(index);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    @ReactMethod
+    public void startSendingMediaService(ReadableArray photos, Promise promise){
+        ReactContext context = getReactApplicationContext();
+        Intent serviceIntent = new Intent(context,
+                SendingMediaForegroundService.class);
+
+        context.startForegroundService(serviceIntent);
+
+        String[] ids = new String[photos.size()];
+        String[] names = new String[photos.size()];
+        String[] dates = new String[photos.size()];
+        String[] paths = new String[photos.size()];
+        int[] widths = new int[photos.size()];
+        int[] heights = new int[photos.size()];
+        int[] sizes = new int[photos.size()];
+
+        for(int i=0; i<photos.size(); i++){
+            ids[i] = photos.getMap(i).getString("id");
+            names[i] = photos.getMap(i).getString("name");
+            dates[i] = photos.getMap(i).getString("date");
+            paths[i] = photos.getMap(i).getString("path");
+            widths[i] = photos.getMap(i).getInt("width");
+            heights[i] = photos.getMap(i).getInt("height");
+            sizes[i] = photos.getMap(i).getInt("size");
+        }
+
+        Bundle b = new Bundle();
+        b.putStringArray("ids", ids);
+        b.putStringArray("names", names);
+        b.putStringArray("dates", dates);
+        b.putStringArray("paths", paths);
+        b.putIntArray("widths", widths);
+        b.putIntArray("heights", heights);
+        b.putIntArray("sizes", sizes);
+
+        Log.d("Service", "Waiting for instance creation");
+        int waitCounter = 0;
+        while(SendingMediaForegroundService.getInstance() == null && waitCounter < 10){
+            waitCounter++;
+            Log.d("Service", Integer.toString(waitCounter));
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if(waitCounter >= 10){
+            promise.reject("ERROR_INIT_SERVICE_IN_TIME","Exception in startSendingMediaService. SendingMediaForegroundService not initialized before trying to send data to thread (sendDataToThread)");
+            Log.e("Service", "Exception in startSendingMediaService. SendingMediaForegroundService not initialized before trying to send data to thread (sendDataToThread)");
+            context.stopService(serviceIntent);
+            return;
+        }else{
+            Log.d("Service", "service instance created");
+        }
+
+        SendingMediaForegroundService.getInstance().sendDataToThread(b);
+
     }
 }

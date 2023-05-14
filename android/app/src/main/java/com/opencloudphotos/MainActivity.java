@@ -5,10 +5,16 @@ import com.facebook.react.ReactActivityDelegate;
 import com.facebook.react.ReactRootView;
 
 import com.rtndeletemedia.DeleteMediaModule;
+
+import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+
+import androidx.annotation.RequiresApi;
 
 public class MainActivity extends ReactActivity {
 
+  @RequiresApi(api = Build.VERSION_CODES.O)
   @Override
   public void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);

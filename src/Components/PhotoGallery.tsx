@@ -17,6 +17,7 @@ type PropsType = {
   deletePhotoLocal?: (photo: PhotoType) => void;
   deletePhotosServer?: (photos: PhotoType[]) => void;
   gridHeaderTextFunction?: (photosNb: number) => string;
+  refreshPhotosAddingServer?: () => Promise<void>;
 };
 
 export default function PhotoGallery(props: PropsType) {
@@ -86,6 +87,7 @@ export default function PhotoGallery(props: PropsType) {
             deletePhotosLocal={props.deletePhotosLocal}
             deletePhotosServer={props.deletePhotosServer}
             headerDisplayTextFunction={props.gridHeaderTextFunction}
+            refreshPhotosAddingServer={props.refreshPhotosAddingServer}
           />
         </View>
       ) : (
@@ -105,6 +107,7 @@ export default function PhotoGallery(props: PropsType) {
             deletePhotosLocal={props.deletePhotosLocal}
             deletePhotosServer={props.deletePhotosServer}
             headerDisplayTextFunction={props.gridHeaderTextFunction}
+            refreshPhotosAddingServer={props.refreshPhotosAddingServer}
           />
           <PhotoSlider
             key={"photo_slider_" + props.contextLocation}

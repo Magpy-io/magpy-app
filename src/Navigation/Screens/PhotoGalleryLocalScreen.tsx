@@ -51,6 +51,7 @@ export default function PhotoGalleryLocalScreen(props: PropsType) {
       }
       deletePhotosServer={context.deletePhotosServer}
       gridHeaderTextFunction={photosNbToString}
+      refreshPhotosAddingServer={context.refreshPhotosAddingServer}
     />
   ) : (
     <Text>Permissions needed</Text>

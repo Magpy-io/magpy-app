@@ -18,7 +18,7 @@ type PropsType = {
 };
 
 function PhotoComponentForGrid(props: PropsType) {
-  console.log("render photo for grid", props.index, props.photo.id);
+  //console.log("render photo for grid", props.index, props.photo.id);
   const uriSource = useMemo(() => {
     if (props.photo.inDevice) {
       return props.photo.image.path;

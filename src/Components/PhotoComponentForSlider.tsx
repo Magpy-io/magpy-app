@@ -18,7 +18,7 @@ type PropsType = {
 };
 
 function PhotoComponentForSlider(props: PropsType) {
-  console.log("render photo for slider", props.index, props.photo.id);
+  //console.log("render photo for slider", props.index, props.photo.id);
 
   const uriSource = useMemo(() => {
     if (props.photo.inDevice) {

@@ -6,6 +6,9 @@ import React, {
   useRef,
 } from "react";
 
+import { NativeModules } from "react-native";
+const { MainModule } = NativeModules;
+
 import RNFS from "react-native-fs";
 import { ErrorCodes } from "react-native-delete-media";
 
@@ -45,6 +48,7 @@ type contextType = {
   deletePhotoLocalFromServer: (photo: PhotoType) => Promise<void>;
   deletePhotosLocalFromServer: (photos: PhotoType[]) => Promise<void>;
   deletePhotosServer: (photos: PhotoType[]) => Promise<void>;
+  refreshPhotosAddingServer: () => Promise<void>;
 };
 
 const ITEMS_TO_LOAD_PER_END_REACHED_LOCAL = 3000;
@@ -307,6 +311,40 @@ const ContextProvider = (props: PropsType) => {
 
   const addPhotosServer = useCallback(async (photos: PhotoType[]) => {
     try {
+      MainModule.startSendingMediaService(
+        photos.map((p) => {
+          return {
+            id: p.id,
+            name: p.image.fileName,
+            date: new Date(p.created).toJSON(),
+            path: p.image.path,
+            width: p.image.width,
+            height: p.image.height,
+            size: p.image.fileSize,
+          };
+        })
+      );
+
+      dispatch({
+        type: Actions.setServiceAddingServerPhotos,
+        payload: { isServiceOn: true },
+      });
+
+      for (let i = 0; i < photos.length; i++) {
+        if (!photos[i].isLoading) {
+          dispatch({
+            type: Actions.updatePhotoProgress,
+            payload: { photo: photos[i], isLoading: true, p: 0 },
+          });
+          photosUploading.current.push(photos[i]);
+        }
+      }
+    } catch (err) {
+      console.log(err);
+    }
+
+    return;
+    try {
       for (let i = 0; i < photos.length; i++) {
         if (!photos[i].isLoading) {
           dispatch({
@@ -446,6 +484,47 @@ const ContextProvider = (props: PropsType) => {
     }
   }, []);
 
+  const refreshPhotosAddingServer = useCallback(async () => {
+    try {
+      if (!state.isServiceAddingServerPhotos) {
+        return;
+      }
+
+      if (!(await MainModule.isServiceRunning())) {
+        dispatch({
+          type: Actions.setServiceAddingServerPhotos,
+          payload: { isServiceOn: false },
+        });
+        return;
+      }
+
+      const ids = await MainModule.getIds();
+      const currentIndex = await MainModule.getCurrentIndex();
+
+      for (let i = 0; i < ids.length; i++) {
+        const photo = state.photosLocal.find((v) => v.id == ids[i]);
+
+        if (!photo) {
+          continue;
+        }
+
+        if (i < currentIndex) {
+          dispatch({
+            type: Actions.addPhotoServer,
+            payload: { photo: photo },
+          });
+        } else {
+          dispatch({
+            type: Actions.updatePhotoProgress,
+            payload: { photo: photo, isLoading: true, p: 0 },
+          });
+        }
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }, [state]);
+
   const value = {
     photosLocal: state.photosLocal,
     photosServer: state.photosServer,
@@ -460,6 +539,7 @@ const ContextProvider = (props: PropsType) => {
     deletePhotoLocalFromServer: deletePhotoLocalFromServer,
     deletePhotosLocalFromServer: deletePhotosLocalFromServer,
     deletePhotosServer: deletePhotosServer,
+    refreshPhotosAddingServer: refreshPhotosAddingServer,
   };
 
   return (
