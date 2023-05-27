@@ -142,6 +142,8 @@ const ContextProvider = (props: PropsType) => {
   const photosDownloading = useRef([] as PhotoType[]);
   const isPhotosDownloading = useRef(false);
 
+  const isrefreshPhotosAddingServerRunning = useRef(false);
+
   const onRefreshLocal = useCallback(async () => {
     try {
       const newPhotos = await GetMorePhotosLocal(
@@ -486,44 +488,40 @@ const ContextProvider = (props: PropsType) => {
 
   const refreshPhotosAddingServer = useCallback(async () => {
     try {
-      if (!state.isServiceAddingServerPhotos) {
+      if (isrefreshPhotosAddingServerRunning.current) {
         return;
       }
 
-      if (!(await MainModule.isServiceRunning())) {
-        dispatch({
-          type: Actions.setServiceAddingServerPhotos,
-          payload: { isServiceOn: false },
-        });
+      isrefreshPhotosAddingServerRunning.current = true;
+
+      const serviceRunning = await MainModule.isServiceRunning();
+
+      dispatch({
+        type: Actions.setServiceAddingServerPhotos,
+        payload: { isServiceOn: serviceRunning },
+      });
+
+      if (!serviceRunning) {
         return;
       }
 
       const ids = await MainModule.getIds();
       const currentIndex = await MainModule.getCurrentIndex();
 
-      for (let i = 0; i < ids.length; i++) {
-        const photo = state.photosLocal.find((v) => v.id == ids[i]);
+      dispatch({
+        type: Actions.updatePhotosFromService,
+        payload: { ids: ids }, //, added: i < currentIndex },
+      });
 
-        if (!photo) {
-          continue;
-        }
+      // for (let i = 0; i < ids.length; i++) {
 
-        if (i < currentIndex) {
-          dispatch({
-            type: Actions.addPhotoServer,
-            payload: { photo: photo },
-          });
-        } else {
-          dispatch({
-            type: Actions.updatePhotoProgress,
-            payload: { photo: photo, isLoading: true, p: 0 },
-          });
-        }
-      }
+      // }
     } catch (err) {
       console.log(err);
+    } finally {
+      isrefreshPhotosAddingServerRunning.current = false;
     }
-  }, [state]);
+  }, []);
 
   const value = {
     photosLocal: state.photosLocal,

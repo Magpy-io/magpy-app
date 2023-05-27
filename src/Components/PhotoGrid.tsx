@@ -160,13 +160,13 @@ function PhotoGrid(props: PropsType) {
     console.log("useEffect");
     const intervalId = setInterval(() => {
       props.refreshPhotosAddingServer?.();
-    }, 1000);
+    }, 3000);
 
     return () => {
       console.log("clearing ", intervalId);
       clearInterval(intervalId);
     };
-  }, [props.refreshPhotosAddingServer]);
+  }, []);
 
   return (
     <View style={[styles.mainViewStyle, props.style]}>
