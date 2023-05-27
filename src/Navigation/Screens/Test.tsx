@@ -40,7 +40,7 @@ export default function TestScreen() {
   return (
     <View>
       <View style={{ width: 150, marginTop: 200 }}>
-        <Button onPress={f} title="test button" />
+        <Button onPress={onDisplayNotification} title="test button" />
       </View>
     </View>
   );
