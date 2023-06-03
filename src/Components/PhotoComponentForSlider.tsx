@@ -12,13 +12,12 @@ import { PhotoType } from "~/Helpers/types";
 
 type PropsType = {
   photo: PhotoType;
-  index: number;
-  onPress?: (item: PhotoType, index: number) => void;
-  onLongPress?: (item: PhotoType, index: number) => void;
+  onPress?: (item: PhotoType) => void;
+  onLongPress?: (item: PhotoType) => void;
 };
 
 function PhotoComponentForSlider(props: PropsType) {
-  console.log("render photo for slider", props.index, props.photo.id);
+  console.log("render photo for slider", props.photo.id);
 
   const uriSource = useMemo(() => {
     if (props.photo.inDevice) {
@@ -34,8 +33,8 @@ function PhotoComponentForSlider(props: PropsType) {
 
   return (
     <TouchableWithoutFeedback
-      onPress={() => props.onPress?.(props.photo, props.index)}
-      onLongPress={() => props.onLongPress?.(props.photo, props.index)}
+      onPress={() => props.onPress?.(props.photo)}
+      onLongPress={() => props.onLongPress?.(props.photo)}
     >
       <View style={styles.itemStyle}>
         <FastImage

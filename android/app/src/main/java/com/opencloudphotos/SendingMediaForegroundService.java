@@ -144,7 +144,7 @@ public class SendingMediaForegroundService extends Service {
             for (int i=0; i<nbPhotos; i++) {
                 Log.d("Service", names[i]);
                 try {
-                    Thread.sleep(2000);
+                    Thread.sleep(3000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

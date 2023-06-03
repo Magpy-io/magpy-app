@@ -1,6 +1,6 @@
 import { StyleSheet, View } from "react-native";
 
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 import PhotoGrid from "~/Components/PhotoGrid";
 import PhotoSlider from "~/Components/PhotoSlider";
 import { PhotoType } from "~/Helpers/types";
@@ -46,6 +46,18 @@ export default function PhotoGallery(props: PropsType) {
     []
   );
 
+  useEffect(() => {
+    console.log("useEffect");
+    const intervalId = setInterval(() => {
+      props.refreshPhotosAddingServer?.();
+    }, 3000);
+
+    return () => {
+      console.log("clearing ", intervalId);
+      clearInterval(intervalId);
+    };
+  }, []);
+
   return (
     <View style={styles.viewStyle}>
       {switchingState.isPhotoSelected ? (
@@ -87,7 +99,6 @@ export default function PhotoGallery(props: PropsType) {
             deletePhotosLocal={props.deletePhotosLocal}
             deletePhotosServer={props.deletePhotosServer}
             headerDisplayTextFunction={props.gridHeaderTextFunction}
-            refreshPhotosAddingServer={props.refreshPhotosAddingServer}
           />
         </View>
       ) : (
@@ -107,7 +118,6 @@ export default function PhotoGallery(props: PropsType) {
             deletePhotosLocal={props.deletePhotosLocal}
             deletePhotosServer={props.deletePhotosServer}
             headerDisplayTextFunction={props.gridHeaderTextFunction}
-            refreshPhotosAddingServer={props.refreshPhotosAddingServer}
           />
           <PhotoSlider
             key={"photo_slider_" + props.contextLocation}

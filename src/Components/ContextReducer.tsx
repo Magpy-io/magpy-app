@@ -2,11 +2,9 @@ import { PhotoType } from "~/Helpers/types";
 
 type stateType = {
   photosLocal: Array<PhotoType>;
-  photosLocalIdMap: Map<string, number>;
   nextOffsetLocal: number;
   endReachedLocal: boolean;
   photosServer: Array<PhotoType>;
-  photosServerIdMap: Map<string, number>;
   nextOffsetServer: number;
   endReachedServer: boolean;
   isServiceAddingServerPhotos: boolean;
@@ -14,11 +12,9 @@ type stateType = {
 
 const initialState = {
   photosLocal: new Array<PhotoType>(),
-  photosLocalIdMap: new Map(),
   nextOffsetLocal: 0,
   endReachedLocal: false,
   photosServer: new Array<PhotoType>(),
-  photosServerIdMap: new Map(),
   nextOffsetServer: 0,
   endReachedServer: false,
   isServiceAddingServerPhotos: false,
@@ -54,14 +50,6 @@ function GlobalReducer(prevState: stateType, action: Action) {
       newState.nextOffsetLocal = action.payload.newPhotos.nextOffset;
       newState.endReachedLocal = action.payload.newPhotos.endReached;
       newState.photosLocal = action.payload.newPhotos.photos;
-      newState.photosLocalIdMap = new Map();
-
-      newState.photosLocal.forEach((photo, index) => {
-        if (index == 0) {
-          console.log(photo.id);
-        }
-        newState.photosLocalIdMap.set(photo.id, index);
-      });
 
       return newState;
     }
@@ -253,27 +241,30 @@ function GlobalReducer(prevState: stateType, action: Action) {
     case Actions.updatePhotosFromService: {
       const newState = { ...prevState };
       const newPhotosLocal = [...newState.photosLocal];
+      const ids = action.payload.ids;
+      const currentIndex = action.payload.currentIndex;
+      const idsSliced = ids.slice(0, currentIndex);
 
-      action.payload.ids.forEach((id: string, i: number) => {
-        const index = newState.photosLocalIdMap.get(id);
-
-        if (index === undefined) {
-          return;
-        }
-
-        if (false && i < action.payload.current) {
-          newPhotosLocal.splice(index, 1);
-        } else {
-          if (!newPhotosLocal[index].isLoading) {
-            const newPhoto = { ...newPhotosLocal[index] };
-            newPhoto.isLoading = true;
-            newPhoto.loadingPercentage = 0;
-            newPhotosLocal[index] = newPhoto;
-          }
-        }
+      const newPhotosLocalFiltered = newPhotosLocal.filter((photo) => {
+        return !idsSliced.includes(photo.id);
       });
 
-      newState.photosLocal = newPhotosLocal;
+      for (let i = currentIndex; i < ids.length; i++) {
+        const index = newPhotosLocalFiltered.findIndex(
+          (photo) => photo.id == ids[i]
+        );
+
+        if (index >= 0) {
+          if (!newPhotosLocalFiltered[index].isLoading) {
+            const newPhoto = { ...newPhotosLocalFiltered[index] };
+            newPhoto.isLoading = true;
+            newPhoto.loadingPercentage = 0;
+            newPhotosLocalFiltered[index] = newPhoto;
+          }
+        }
+      }
+
+      newState.photosLocal = newPhotosLocalFiltered;
       return newState;
     }
   }

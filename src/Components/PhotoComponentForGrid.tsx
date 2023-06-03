@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { StyleSheet, View, TouchableWithoutFeedback } from "react-native";
 import { Icon } from "@rneui/themed";
 
@@ -10,15 +10,14 @@ import * as Progress from "react-native-progress";
 
 type PropsType = {
   photo: PhotoType;
-  index: number;
   isSelecting: boolean;
   isSelected: boolean;
-  onPress?: (item: PhotoType, index: number) => void;
-  onLongPress?: (item: PhotoType, index: number) => void;
+  onPress?: (item: PhotoType) => void;
+  onLongPress?: (item: PhotoType) => void;
 };
 
 function PhotoComponentForGrid(props: PropsType) {
-  console.log("render photo for grid", props.index, props.photo.id);
+  console.log("render photo for grid", props.photo.id);
   const uriSource = useMemo(() => {
     if (props.photo.inDevice) {
       return props.photo.image.path;
@@ -35,7 +34,7 @@ function PhotoComponentForGrid(props: PropsType) {
     if (props.onPress) {
       return props.onPress;
     } else {
-      return (item: PhotoType, index: number) => {};
+      return (item: PhotoType) => {};
     }
   }, [props.onPress]);
 
@@ -43,14 +42,18 @@ function PhotoComponentForGrid(props: PropsType) {
     if (props.onLongPress) {
       return props.onLongPress;
     } else {
-      return (item: PhotoType, index: number) => {};
+      return (item: PhotoType) => {};
     }
   }, [props.onLongPress]);
 
+  useEffect(() => {
+    console.log("hi");
+  }, []);
+
   return (
     <TouchableWithoutFeedback
-      onPress={() => onPress(props.photo, props.index)}
-      onLongPress={() => onLongPress(props.photo, props.index)}
+      onPress={() => onPress(props.photo)}
+      onLongPress={() => onLongPress(props.photo)}
     >
       <View style={styles.itemStyle}>
         <FastImage

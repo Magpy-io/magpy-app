@@ -312,7 +312,7 @@ const ContextProvider = (props: PropsType) => {
   }, []);
 
   const addPhotosServer = useCallback(async (photos: PhotoType[]) => {
-    try {
+    /*   try {
       MainModule.startSendingMediaService(
         photos.map((p) => {
           return {
@@ -338,14 +338,13 @@ const ContextProvider = (props: PropsType) => {
             type: Actions.updatePhotoProgress,
             payload: { photo: photos[i], isLoading: true, p: 0 },
           });
-          photosUploading.current.push(photos[i]);
         }
       }
     } catch (err) {
       console.log(err);
     }
 
-    return;
+    return;*/
     try {
       for (let i = 0; i < photos.length; i++) {
         if (!photos[i].isLoading) {
@@ -510,12 +509,8 @@ const ContextProvider = (props: PropsType) => {
 
       dispatch({
         type: Actions.updatePhotosFromService,
-        payload: { ids: ids }, //, added: i < currentIndex },
+        payload: { ids, currentIndex },
       });
-
-      // for (let i = 0; i < ids.length; i++) {
-
-      // }
     } catch (err) {
       console.log(err);
     } finally {
