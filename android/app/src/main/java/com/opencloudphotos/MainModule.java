@@ -175,6 +175,10 @@ public class MainModule extends ReactContextBaseJavaModule{
         }
         String[] ids = SendingMediaForegroundService.getInstance().getIds();
 
+        if(ids == null){
+            ids = new String[0];
+        }
+
         WritableArray retArray = Arguments.createArray();
 
         for (String id : ids) {

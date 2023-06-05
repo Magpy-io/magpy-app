@@ -3,7 +3,6 @@ package com.opencloudphotos;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
@@ -14,15 +13,27 @@ import android.util.Log;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
-public class SendingMediaForegroundService extends Service {
+import com.facebook.react.HeadlessJsTaskService;
+import com.facebook.react.jstasks.HeadlessJsTaskConfig;
+import com.facebook.react.bridge.Arguments;
+
+public class SendingMediaForegroundService extends HeadlessJsTaskService {
 
     private static SendingMediaForegroundService instance;
-    private Intent callIntent;
+
     public Bundle bundle;
+    public String[] ids;
+    public String[] names;
+    public String[] dates;
+    public String[] paths ;
+    public int[] widths;
+    public int[] heights;
+    public int[] sizes;
     private Thread mainThread;
     private MyRunnable runnable;
     public Notification notification;
     public NotificationCompat.Builder notificationBuilder;
+    public int index;
 
     @Override
     public void onCreate() {
@@ -49,18 +60,16 @@ public class SendingMediaForegroundService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        callIntent = intent;
-
-        final String CHANNELID = "Foreground Service ID";
+        final String CHANNEL_ID = "Foreground Service ID";
         NotificationChannel channel = new NotificationChannel(
-                CHANNELID,
-                CHANNELID,
+                CHANNEL_ID,
+                CHANNEL_ID,
                 NotificationManager.IMPORTANCE_HIGH
         );
 
         getSystemService(NotificationManager.class).createNotificationChannel(channel);
 
-        notificationBuilder = new NotificationCompat.Builder(this, CHANNELID)
+        notificationBuilder = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle("OpenCloudPhotos")
                 .setContentText("Uploading photos")
                 .setSmallIcon(R.mipmap.ic_launcher)
@@ -79,21 +88,43 @@ public class SendingMediaForegroundService extends Service {
         return super.onStartCommand(intent, flags, startId);
     }
 
+    public void startNextTask(){
+        Bundle b = new Bundle();
+        b.putString("index", Integer.toString(index));
+        startTask(new HeadlessJsTaskConfig("MyTask", Arguments.fromBundle(b), 50000, true));
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    @Override
+    public void onHeadlessJsTaskFinish(int taskId) {
+        index++;
+
+        notificationBuilder.setProgress(ids.length, index, false);
+        this.getSystemService(NotificationManager.class).notify(1001, notificationBuilder.build());
+
+        if(index < ids.length){
+            startNextTask();
+        }else{
+            // Stop the foreground service and remove its notification
+            stopForeground(true);
+            // Stop the service
+            stopSelf();
+        }
+    }
+
     public void sendDataToThread(Bundle b){
         bundle = b;
     }
 
     public String[] getIds(){
-        return  bundle.getStringArray("ids");
+        return ids;
     }
 
     public int getCurrentIndex(){
-        return runnable.index;
+        return index;
     }
 
     private class MyRunnable implements Runnable {
-
-        public int index = 0;
 
         @RequiresApi(api = Build.VERSION_CODES.M)
         @Override
@@ -130,14 +161,17 @@ public class SendingMediaForegroundService extends Service {
                 return;
             }
 
-            String[] ids = service.bundle.getStringArray("ids");
-            String[] names = service.bundle.getStringArray("names");
-            String[] dates = service.bundle.getStringArray("dates");
-            String[] paths = service.bundle.getStringArray("paths");
-            int[] widths = service.bundle.getIntArray("widths");
-            int[] heights = service.bundle.getIntArray("heights");
-            int[] sizes = service.bundle.getIntArray("sizes");
+            service.ids = service.bundle.getStringArray("ids");
+            service.names = service.bundle.getStringArray("names");
+            service.dates = service.bundle.getStringArray("dates");
+            service.paths = service.bundle.getStringArray("paths");
+            service.widths = service.bundle.getIntArray("widths");
+            service.heights = service.bundle.getIntArray("heights");
+            service.sizes = service.bundle.getIntArray("sizes");
 
+            startNextTask();
+            return;
+            /*
             int nbPhotos = names.length;
             int lastProgress = 0;
             int newProgress = 0;
@@ -176,7 +210,7 @@ public class SendingMediaForegroundService extends Service {
             // Stop the foreground service and remove its notification
             stopForeground(true);
             // Stop the service
-            stopSelf();
+            stopSelf();*/
         }
     }
 }

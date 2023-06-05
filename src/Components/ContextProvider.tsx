@@ -148,7 +148,7 @@ const ContextProvider = (props: PropsType) => {
     console.log("useEffect");
     const intervalId = setInterval(() => {
       refreshPhotosAddingServer?.();
-    }, 3000);
+    }, 5000);
 
     return () => {
       console.log("clearing ", intervalId);

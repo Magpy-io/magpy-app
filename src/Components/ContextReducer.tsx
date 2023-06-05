@@ -234,6 +234,20 @@ function GlobalReducer(prevState: stateType, action: Action) {
         return prevState;
       }
       const newState = { ...prevState };
+
+      if (newState.isServiceAddingServerPhotos && !action.payload.isServiceOn) {
+        const newPhotosLocal = [...newState.photosLocal];
+        for (let i = 0; i < newPhotosLocal.length; i++) {
+          if (newPhotosLocal[i].isLoading) {
+            const newPhoto = { ...newPhotosLocal[i] };
+            newPhoto.isLoading = false;
+            newPhoto.loadingPercentage = 0;
+            newPhotosLocal[i] = newPhoto;
+          }
+        }
+        newState.photosLocal = newPhotosLocal;
+      }
+
       newState.isServiceAddingServerPhotos = action.payload.isServiceOn;
       return newState;
     }
