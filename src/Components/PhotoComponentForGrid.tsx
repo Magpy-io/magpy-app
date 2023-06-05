@@ -46,10 +46,6 @@ function PhotoComponentForGrid(props: PropsType) {
     }
   }, [props.onLongPress]);
 
-  useEffect(() => {
-    console.log("hi");
-  }, []);
-
   return (
     <TouchableWithoutFeedback
       onPress={() => onPress(props.photo)}

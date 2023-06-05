@@ -4,6 +4,7 @@ import React, {
   useContext,
   useReducer,
   useRef,
+  useEffect,
 } from "react";
 
 import { NativeModules } from "react-native";
@@ -48,7 +49,6 @@ type contextType = {
   deletePhotoLocalFromServer: (photo: PhotoType) => Promise<void>;
   deletePhotosLocalFromServer: (photos: PhotoType[]) => Promise<void>;
   deletePhotosServer: (photos: PhotoType[]) => Promise<void>;
-  refreshPhotosAddingServer: () => Promise<void>;
 };
 
 const ITEMS_TO_LOAD_PER_END_REACHED_LOCAL = 3000;
@@ -143,6 +143,18 @@ const ContextProvider = (props: PropsType) => {
   const isPhotosDownloading = useRef(false);
 
   const isrefreshPhotosAddingServerRunning = useRef(false);
+
+  useEffect(() => {
+    console.log("useEffect");
+    const intervalId = setInterval(() => {
+      refreshPhotosAddingServer?.();
+    }, 3000);
+
+    return () => {
+      console.log("clearing ", intervalId);
+      clearInterval(intervalId);
+    };
+  }, []);
 
   const onRefreshLocal = useCallback(async () => {
     try {
@@ -312,7 +324,7 @@ const ContextProvider = (props: PropsType) => {
   }, []);
 
   const addPhotosServer = useCallback(async (photos: PhotoType[]) => {
-    /*   try {
+    try {
       MainModule.startSendingMediaService(
         photos.map((p) => {
           return {
@@ -344,7 +356,7 @@ const ContextProvider = (props: PropsType) => {
       console.log(err);
     }
 
-    return;*/
+    return;
     try {
       for (let i = 0; i < photos.length; i++) {
         if (!photos[i].isLoading) {
@@ -532,7 +544,6 @@ const ContextProvider = (props: PropsType) => {
     deletePhotoLocalFromServer: deletePhotoLocalFromServer,
     deletePhotosLocalFromServer: deletePhotosLocalFromServer,
     deletePhotosServer: deletePhotosServer,
-    refreshPhotosAddingServer: refreshPhotosAddingServer,
   };
 
   return (

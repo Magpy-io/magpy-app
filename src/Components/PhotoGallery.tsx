@@ -17,7 +17,6 @@ type PropsType = {
   deletePhotoLocal?: (photo: PhotoType) => void;
   deletePhotosServer?: (photos: PhotoType[]) => void;
   gridHeaderTextFunction?: (photosNb: number) => string;
-  refreshPhotosAddingServer?: () => Promise<void>;
 };
 
 export default function PhotoGallery(props: PropsType) {
@@ -45,18 +44,6 @@ export default function PhotoGallery(props: PropsType) {
     },
     []
   );
-
-  useEffect(() => {
-    console.log("useEffect");
-    const intervalId = setInterval(() => {
-      props.refreshPhotosAddingServer?.();
-    }, 3000);
-
-    return () => {
-      console.log("clearing ", intervalId);
-      clearInterval(intervalId);
-    };
-  }, []);
 
   return (
     <View style={styles.viewStyle}>
