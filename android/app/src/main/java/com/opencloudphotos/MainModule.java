@@ -8,6 +8,7 @@ import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.ReadableType;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.common.ReactConstants;
 import com.reactnativecommunity.cameraroll.Utils;
@@ -149,6 +150,7 @@ public class MainModule extends ReactContextBaseJavaModule{
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
     public boolean isServiceRunningInner(){
+        //TODO change how to check for service running (maybe using broadcast receivers), getRunningServices is deprecated
         ReactContext context = getReactApplicationContext();
         ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         for(ActivityManager.RunningServiceInfo service: activityManager.getRunningServices(Integer.MAX_VALUE)) {
@@ -161,9 +163,17 @@ public class MainModule extends ReactContextBaseJavaModule{
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
     @ReactMethod
-    public void isServiceRunning(Promise promise){
-        Boolean b = isServiceRunningInner();
-        promise.resolve(b);
+    public void getServiceState(Promise promise){
+        if(!isServiceRunningInner()){
+            promise.resolve("DESTROYED");
+        }else{
+            if(SendingMediaForegroundService.getInstance() != null){
+                promise.resolve(SendingMediaForegroundService.getInstance().state);
+            }else{
+                promise.resolve("DESTROYED");
+                Log.e("Service", "getServiceState: Service not Destroyed but instance is null");
+            }
+        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
@@ -199,9 +209,15 @@ public class MainModule extends ReactContextBaseJavaModule{
         promise.resolve(index);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+    @RequiresApi(api = Build.VERSION_CODES.Q)
     @ReactMethod
     public void startSendingMediaService(ReadableArray photos, Promise promise){
+
+        if(isServiceRunningInner()){
+            promise.reject("SERVICE_RUNNING", "Service running");
+            return;
+        }
+
         ReactContext context = getReactApplicationContext();
         Intent serviceIntent = new Intent(context,
                 SendingMediaForegroundService.class);
@@ -237,7 +253,7 @@ public class MainModule extends ReactContextBaseJavaModule{
 
         Log.d("Service", "Waiting for instance creation");
         int waitCounter = 0;
-        while(SendingMediaForegroundService.getInstance() == null && waitCounter < 10){
+        while(SendingMediaForegroundService.getInstance() == null && waitCounter < 15){
             waitCounter++;
             Log.d("Service", Integer.toString(waitCounter));
             try {
@@ -247,7 +263,7 @@ public class MainModule extends ReactContextBaseJavaModule{
             }
         }
 
-        if(waitCounter >= 10){
+        if(waitCounter >= 15){
             promise.reject("ERROR_INIT_SERVICE_IN_TIME","Exception in startSendingMediaService. SendingMediaForegroundService not initialized before trying to send data to thread (sendDataToThread)");
             Log.e("Service", "Exception in startSendingMediaService. SendingMediaForegroundService not initialized before trying to send data to thread (sendDataToThread)");
             context.stopService(serviceIntent);
@@ -256,7 +272,33 @@ public class MainModule extends ReactContextBaseJavaModule{
             Log.d("Service", "service instance created");
         }
 
-        SendingMediaForegroundService.getInstance().sendDataToThread(b);
+        SendingMediaForegroundService.getInstance().sendPhotos(b);
+        promise.resolve(null);
+    }
 
+    @RequiresApi(api = Build.VERSION_CODES.Q)
+    @ReactMethod
+    public void onJsTaskFinished(ReadableMap data){
+        String returnCode = data.getString("code");
+        if(isServiceRunningInner()){
+            if(SendingMediaForegroundService.getInstance() != null){
+                if(SendingMediaForegroundService.getInstance().state.equals("ACTIVE")){
+                    SendingMediaForegroundService.getInstance().onTaskFinished(returnCode);
+                }
+            }else{
+                Log.e("Service", "onJsTaskFinished: Service not Destroyed but instance is null");
+            }
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.Q)
+    @ReactMethod
+    public void stopSendingMediaService(Promise promise){
+        if(!isServiceRunningInner()){
+            promise.reject("SERVICE_NOT_RUNNING", "Service not running");
+            return;
+        }
+        SendingMediaForegroundService.getInstance().stopService();
+        promise.resolve(null);
     }
 }

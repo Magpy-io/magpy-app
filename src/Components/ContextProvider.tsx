@@ -148,7 +148,7 @@ const ContextProvider = (props: PropsType) => {
     console.log("useEffect");
     const intervalId = setInterval(() => {
       refreshPhotosAddingServer?.();
-    }, 5000);
+    }, 2000);
 
     return () => {
       console.log("clearing ", intervalId);
@@ -325,7 +325,7 @@ const ContextProvider = (props: PropsType) => {
 
   const addPhotosServer = useCallback(async (photos: PhotoType[]) => {
     try {
-      MainModule.startSendingMediaService(
+      await MainModule.startSendingMediaService(
         photos.map((p) => {
           return {
             id: p.id,
@@ -338,11 +338,6 @@ const ContextProvider = (props: PropsType) => {
           };
         })
       );
-
-      dispatch({
-        type: Actions.setServiceAddingServerPhotos,
-        payload: { isServiceOn: true },
-      });
 
       for (let i = 0; i < photos.length; i++) {
         if (!photos[i].isLoading) {
@@ -505,14 +500,11 @@ const ContextProvider = (props: PropsType) => {
 
       isrefreshPhotosAddingServerRunning.current = true;
 
-      const serviceRunning = await MainModule.isServiceRunning();
+      const serviceState = await MainModule.getServiceState();
 
-      dispatch({
-        type: Actions.setServiceAddingServerPhotos,
-        payload: { isServiceOn: serviceRunning },
-      });
+      console.log("service is", serviceState);
 
-      if (!serviceRunning) {
+      if (serviceState == "DESTROYED") {
         return;
       }
 
@@ -523,6 +515,18 @@ const ContextProvider = (props: PropsType) => {
         type: Actions.updatePhotosFromService,
         payload: { ids, currentIndex },
       });
+
+      if (serviceState == "INACTIVE" || serviceState == "FAILED") {
+        await MainModule.stopSendingMediaService();
+        dispatch({
+          type: Actions.clearAllLoadingLocal,
+          payload: {},
+        });
+
+        if (serviceState == "FAILED") {
+          //TODO display toast message
+        }
+      }
     } catch (err) {
       console.log(err);
     } finally {

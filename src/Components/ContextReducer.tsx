@@ -7,7 +7,6 @@ type stateType = {
   photosServer: Array<PhotoType>;
   nextOffsetServer: number;
   endReachedServer: boolean;
-  isServiceAddingServerPhotos: boolean;
 };
 
 const initialState = {
@@ -17,7 +16,6 @@ const initialState = {
   photosServer: new Array<PhotoType>(),
   nextOffsetServer: 0,
   endReachedServer: false,
-  isServiceAddingServerPhotos: false,
 };
 
 enum Actions {
@@ -34,8 +32,8 @@ enum Actions {
   updatePhotoProgress = "UPDATE_PHOTO_PROGRESS",
   updatePhotoProgressServer = "UPDATE_PHOTO_PROGRESS_SERVER",
   addCroppedPhotos = "ADD_CROPPED_PHOTOS",
-  setServiceAddingServerPhotos = "SET_SERVICE_ADDING_SERVER_PHOTOS",
   updatePhotosFromService = "UPDATE_PHOTOS_FROM_SERVICE",
+  clearAllLoadingLocal = "CLEAR_ALL_LOADING_LOCAL",
 }
 
 type Action = {
@@ -229,29 +227,6 @@ function GlobalReducer(prevState: stateType, action: Action) {
       }
     }
 
-    case Actions.setServiceAddingServerPhotos: {
-      if (prevState.isServiceAddingServerPhotos == action.payload.isServiceOn) {
-        return prevState;
-      }
-      const newState = { ...prevState };
-
-      if (newState.isServiceAddingServerPhotos && !action.payload.isServiceOn) {
-        const newPhotosLocal = [...newState.photosLocal];
-        for (let i = 0; i < newPhotosLocal.length; i++) {
-          if (newPhotosLocal[i].isLoading) {
-            const newPhoto = { ...newPhotosLocal[i] };
-            newPhoto.isLoading = false;
-            newPhoto.loadingPercentage = 0;
-            newPhotosLocal[i] = newPhoto;
-          }
-        }
-        newState.photosLocal = newPhotosLocal;
-      }
-
-      newState.isServiceAddingServerPhotos = action.payload.isServiceOn;
-      return newState;
-    }
-
     case Actions.updatePhotosFromService: {
       const newState = { ...prevState };
       const newPhotosLocal = [...newState.photosLocal];
@@ -280,6 +255,28 @@ function GlobalReducer(prevState: stateType, action: Action) {
 
       newState.photosLocal = newPhotosLocalFiltered;
       return newState;
+    }
+
+    case Actions.clearAllLoadingLocal: {
+      const newState = { ...prevState };
+
+      let anyPhotoLoading = false;
+      const newPhotosLocal = [...newState.photosLocal];
+      for (let i = 0; i < newPhotosLocal.length; i++) {
+        if (newPhotosLocal[i].isLoading) {
+          anyPhotoLoading = true;
+          const newPhoto = { ...newPhotosLocal[i] };
+          newPhoto.isLoading = false;
+          newPhoto.loadingPercentage = 0;
+          newPhotosLocal[i] = newPhoto;
+        }
+      }
+      if (anyPhotoLoading) {
+        newState.photosLocal = newPhotosLocal;
+        return newState;
+      }
+
+      return prevState;
     }
   }
   return prevState;
