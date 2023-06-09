@@ -128,7 +128,10 @@ public class SendingMediaForegroundService extends HeadlessJsTaskService {
 
         startNextTask();
 
-        notificationBuilder.setProgress(ids.length, 0, false);
+        notificationBuilder
+                .setProgress(ids.length, 0, false)
+                .setContentText("Uploading photos ( " + Integer.toString(0) + " out of " + Integer.toString(ids.length) + " )");
+
         getSystemService(NotificationManager.class).notify(1001, notificationBuilder.build());
     }
 
@@ -138,7 +141,14 @@ public class SendingMediaForegroundService extends HeadlessJsTaskService {
         handler.postDelayed(timeoutRunnable, 10000);
 
         Bundle b = new Bundle();
-        b.putString("index", Integer.toString(index));
+
+        b.putString("path", paths[index]);
+        b.putString("name", names[index]);
+        b.putString("date", dates[index]);
+        b.putInt("height", heights[index]);
+        b.putInt("width", widths[index]);
+        b.putInt("size", sizes[index]);
+
         try{
             startTask(new HeadlessJsTaskConfig("MyTask", Arguments.fromBundle(b), 9000, true));
         }catch (Exception e){
@@ -167,7 +177,10 @@ public class SendingMediaForegroundService extends HeadlessJsTaskService {
         }
         index++;
 
-        notificationBuilder.setProgress(ids.length, index, false);
+        notificationBuilder
+                .setProgress(ids.length, index, false)
+                .setContentText("Uploading photos ( " + Integer.toString(index) + " out of " + Integer.toString(ids.length) + " )");
+
         getSystemService(NotificationManager.class).notify(1001, notificationBuilder.build());
 
         if(index < ids.length){

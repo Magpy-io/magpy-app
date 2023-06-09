@@ -163,6 +163,11 @@ function PhotoGrid(props: PropsType) {
     correctStartIndex = Math.floor((props.photos.length - 1) / 3);
   }
 
+  // TODO change the numColumns to 1 and create a renderItem containing 3 photos
+  // This will fix a bug in flatlist which makes it recreate all items each time one is added or removed from the top (indexes change for the rest)
+  // with numColumns set to 1, this problem is fixed and the items are able to rerender as needed
+  // This will also fix that when less than 3 photos are in a row, the 2 or 1 photo will stretch to fill all horizontal space.
+
   return (
     <View style={[styles.mainViewStyle, props.style]}>
       <FlatList

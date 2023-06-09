@@ -339,14 +339,14 @@ const ContextProvider = (props: PropsType) => {
         })
       );
 
-      for (let i = 0; i < photos.length; i++) {
-        if (!photos[i].isLoading) {
-          dispatch({
-            type: Actions.updatePhotoProgress,
-            payload: { photo: photos[i], isLoading: true, p: 0 },
-          });
-        }
-      }
+      // for (let i = 0; i < photos.length; i++) {
+      //   if (!photos[i].isLoading) {
+      //     dispatch({
+      //       type: Actions.updatePhotoProgress,
+      //       payload: { photo: photos[i], isLoading: true, p: 0 },
+      //     });
+      //   }
+      // }
     } catch (err) {
       console.log(err);
     }
@@ -504,7 +504,7 @@ const ContextProvider = (props: PropsType) => {
 
       console.log("service is", serviceState);
 
-      if (serviceState == "DESTROYED") {
+      if (serviceState == "DESTROYED" || serviceState == "STARTUP") {
         return;
       }
 

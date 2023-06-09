@@ -234,7 +234,7 @@ type AddPhotoWithProgressReturnType = {
 
 async function addPhotoWithProgress(
   photo: PostPhotoFormat,
-  f: (progess: number, total: number) => void
+  f?: (progess: number, total: number) => void
 ): Promise<AddPhotoWithProgressReturnType> {
   const base64Image = photo.image64;
 
@@ -281,7 +281,7 @@ async function addPhotoWithProgress(
       return formatError(responseI) as AddPhotoWithProgressReturnType;
     }
 
-    f(i, base64ImageSplit.length);
+    f?.(i, base64ImageSplit.length);
   }
   return { photo: responseI.data.photo } as AddPhotoWithProgressReturnType;
 }
