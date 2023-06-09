@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -20,6 +21,25 @@ import com.facebook.react.bridge.Arguments;
 import java.util.Objects;
 
 public class SendingMediaForegroundService extends HeadlessJsTaskService {
+
+    private class MyRunnable implements Runnable {
+
+        SendingMediaForegroundService service;
+
+        public MyRunnable(SendingMediaForegroundService p_service){
+            service = p_service;
+        }
+
+        @Override
+        public void run() {
+            // Stop the foreground service and remove its notification
+            service.stopForeground(true);
+
+            // TODO Send event
+
+            service.state = "FAILED";
+        }
+    }
 
     private static SendingMediaForegroundService instance;
 
@@ -37,28 +57,28 @@ public class SendingMediaForegroundService extends HeadlessJsTaskService {
     public Notification notification;
     public NotificationCompat.Builder notificationBuilder;
 
+    private Handler handler;
+    private MyRunnable timeoutRunnable;
+
     @Override
     public void onCreate() {
         instance = this;
+        handler = new Handler();
+        timeoutRunnable = new MyRunnable(this);
         super.onCreate();
     }
 
     @Override
     public void onDestroy() {
         instance = null;
+        if(handler != null && timeoutRunnable != null){
+            handler.removeCallbacks(timeoutRunnable);
+        }
         super.onDestroy();
     }
 
     public static SendingMediaForegroundService getInstance(){
         return  instance;
-    }
-
-    public static boolean isServiceActive(){
-        if(instance == null){
-            return false;
-        }
-
-        return Objects.equals(instance.state, "ACTIVE");
     }
 
     @Override
@@ -115,10 +135,12 @@ public class SendingMediaForegroundService extends HeadlessJsTaskService {
     public void startNextTask(){
         //TODO add timer
 
+        handler.postDelayed(timeoutRunnable, 10000);
+
         Bundle b = new Bundle();
         b.putString("index", Integer.toString(index));
         try{
-            startTask(new HeadlessJsTaskConfig("MyTask", Arguments.fromBundle(b), 10000, true));
+            startTask(new HeadlessJsTaskConfig("MyTask", Arguments.fromBundle(b), 9000, true));
         }catch (Exception e){
             Log.e("Service", e.getMessage());
         }
@@ -127,6 +149,8 @@ public class SendingMediaForegroundService extends HeadlessJsTaskService {
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     public void onTaskFinished(String code){
+
+        handler.removeCallbacks(timeoutRunnable);
 
         if(!Objects.equals(state, "ACTIVE")){
             return;
