@@ -502,7 +502,7 @@ const ContextProvider = (props: PropsType) => {
 
       const serviceState = await MainModule.getServiceState();
 
-      console.log("service is", serviceState);
+      //console.log("service is", serviceState);
 
       if (serviceState == "DESTROYED" || serviceState == "STARTUP") {
         return;
