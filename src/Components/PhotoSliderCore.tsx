@@ -23,8 +23,8 @@ type PropsType = {
   startIndex: number;
   onIndexChanged?: (index: number) => void;
   onEndReached?: () => void;
-  onPhotoClick?: (item: PhotoType, index: number) => void;
-  onPhotoLongClick?: (item: PhotoType, index: number) => void;
+  onPhotoClick?: (item: PhotoType) => void;
+  onPhotoLongClick?: (item: PhotoType) => void;
 };
 
 function PhotoSliderCore(props: PropsType) {
@@ -35,7 +35,6 @@ function PhotoSliderCore(props: PropsType) {
     ({ item, index }: { item: PhotoType; index: number }) => (
       <PhotoComponentForSlider
         photo={item}
-        index={index}
         onPress={props.onPhotoClick}
         onLongPress={props.onPhotoLongClick}
       />

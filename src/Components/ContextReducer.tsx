@@ -32,6 +32,8 @@ enum Actions {
   updatePhotoProgress = "UPDATE_PHOTO_PROGRESS",
   updatePhotoProgressServer = "UPDATE_PHOTO_PROGRESS_SERVER",
   addCroppedPhotos = "ADD_CROPPED_PHOTOS",
+  updatePhotosFromService = "UPDATE_PHOTOS_FROM_SERVICE",
+  clearAllLoadingLocal = "CLEAR_ALL_LOADING_LOCAL",
 }
 
 type Action = {
@@ -46,6 +48,7 @@ function GlobalReducer(prevState: stateType, action: Action) {
       newState.nextOffsetLocal = action.payload.newPhotos.nextOffset;
       newState.endReachedLocal = action.payload.newPhotos.endReached;
       newState.photosLocal = action.payload.newPhotos.photos;
+
       return newState;
     }
 
@@ -222,6 +225,58 @@ function GlobalReducer(prevState: stateType, action: Action) {
       } else {
         return prevState;
       }
+    }
+
+    case Actions.updatePhotosFromService: {
+      const newState = { ...prevState };
+      const newPhotosLocal = [...newState.photosLocal];
+      const ids = action.payload.ids;
+      const currentIndex = action.payload.currentIndex;
+      const idsSliced = ids.slice(0, currentIndex);
+
+      const newPhotosLocalFiltered = newPhotosLocal.filter((photo) => {
+        return !idsSliced.includes(photo.id);
+      });
+
+      for (let i = currentIndex; i < ids.length; i++) {
+        const index = newPhotosLocalFiltered.findIndex(
+          (photo) => photo.id == ids[i]
+        );
+
+        if (index >= 0) {
+          if (!newPhotosLocalFiltered[index].isLoading) {
+            const newPhoto = { ...newPhotosLocalFiltered[index] };
+            newPhoto.isLoading = true;
+            newPhoto.loadingPercentage = 0;
+            newPhotosLocalFiltered[index] = newPhoto;
+          }
+        }
+      }
+
+      newState.photosLocal = newPhotosLocalFiltered;
+      return newState;
+    }
+
+    case Actions.clearAllLoadingLocal: {
+      const newState = { ...prevState };
+
+      let anyPhotoLoading = false;
+      const newPhotosLocal = [...newState.photosLocal];
+      for (let i = 0; i < newPhotosLocal.length; i++) {
+        if (newPhotosLocal[i].isLoading) {
+          anyPhotoLoading = true;
+          const newPhoto = { ...newPhotosLocal[i] };
+          newPhoto.isLoading = false;
+          newPhoto.loadingPercentage = 0;
+          newPhotosLocal[i] = newPhoto;
+        }
+      }
+      if (anyPhotoLoading) {
+        newState.photosLocal = newPhotosLocal;
+        return newState;
+      }
+
+      return prevState;
     }
   }
   return prevState;

@@ -1,6 +1,6 @@
 import { StyleSheet, View } from "react-native";
 
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 import PhotoGrid from "~/Components/PhotoGrid";
 import PhotoSlider from "~/Components/PhotoSlider";
 import { PhotoType } from "~/Helpers/types";

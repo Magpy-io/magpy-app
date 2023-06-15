@@ -279,6 +279,8 @@ dependencies {
     }
     implementation project(':react-native-delete-media')
 
+    implementation "androidx.core:core:1.6.0"
+
 }
 
 if (isNewArchitectureEnabled()) {

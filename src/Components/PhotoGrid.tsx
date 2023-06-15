@@ -22,8 +22,8 @@ import ToolBarGrid from "./PhotoComponents/ToolBarGrid";
 
 const ITEM_HEIGHT = Dimensions.get("screen").width / 3;
 
-function keyExtractor(item: PhotoType, index: number) {
-  return `Photo_${item.image.fileName}_index_${index}`;
+function keyExtractor(item: PhotoType) {
+  return `grid_${item.id}`;
 }
 
 function getItemLayout(data: any, index: number) {
@@ -65,8 +65,17 @@ type PropsType = {
 function PhotoGrid(props: PropsType) {
   console.log("render grid", props.contextLocation);
   const flatlistRef = useRef<FlatList>(null);
+  const getPhotoIndexRef = useRef<(photo: PhotoType) => number>();
   const [isSelecting, setIsSelecting] = useState(false);
   const [seletedIds, setSelectedIds] = useState(new Map());
+
+  getPhotoIndexRef.current = (item: PhotoType) => {
+    let index = props.photos.findIndex((photo) => photo.id == item.id);
+    if (index < 0) {
+      index = 0;
+    }
+    return index;
+  };
 
   const headerText = props.headerDisplayTextFunction
     ? props.headerDisplayTextFunction(props.photos.length)
@@ -79,7 +88,7 @@ function PhotoGrid(props: PropsType) {
   }, [headerText]);
 
   const onRenderItemPress = useCallback(
-    (item: PhotoType, index: number) => {
+    (item: PhotoType) => {
       if (isSelecting) {
         setSelectedIds((sIds) => {
           if (sIds.has(item.id)) {
@@ -93,14 +102,14 @@ function PhotoGrid(props: PropsType) {
           }
         });
       } else {
-        props.onSwitchMode(true, index);
+        props.onSwitchMode(true, getPhotoIndexRef.current?.(item) || 0);
       }
     },
     [props.onSwitchMode, isSelecting]
   );
 
   const onRenderItemLongPress = useCallback(
-    (item: PhotoType, index: number) => {
+    (item: PhotoType) => {
       if (!isSelecting) {
         setIsSelecting(true);
         const map = new Map();
@@ -112,12 +121,11 @@ function PhotoGrid(props: PropsType) {
   );
 
   const renderItem = useCallback(
-    ({ item, index }: { item: PhotoType; index: number }) => {
+    ({ item }: { item: PhotoType }) => {
       return (
         <PhotoComponentForGrid
-          key={item.id}
+          key={`grid_${item.id}`}
           photo={item}
-          index={index}
           isSelecting={isSelecting}
           isSelected={seletedIds.has(item.id)}
           onPress={onRenderItemPress}
@@ -154,6 +162,11 @@ function PhotoGrid(props: PropsType) {
   if (props.startIndex >= props.photos.length) {
     correctStartIndex = Math.floor((props.photos.length - 1) / 3);
   }
+
+  // TODO change the numColumns to 1 and create a renderItem containing 3 photos
+  // This will fix a bug in flatlist which makes it recreate all items each time one is added or removed from the top (indexes change for the rest)
+  // with numColumns set to 1, this problem is fixed and the items are able to rerender as needed
+  // This will also fix that when less than 3 photos are in a row, the 2 or 1 photo will stretch to fill all horizontal space.
 
   return (
     <View style={[styles.mainViewStyle, props.style]}>

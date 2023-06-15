@@ -25,7 +25,6 @@ async function GetMorePhotosLocal(
 
   while (!foundAnyPhotoNotInServer && !photosFromDevice.endReached) {
     photosFromDevice = await GetPhotos(n, totalOffset);
-
     photosExistInServer = await Queries.getPhotosByPath(
       photosFromDevice.edges.map((edge) => edge.node.image.uri),
       "data"
