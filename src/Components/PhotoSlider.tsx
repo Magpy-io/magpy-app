@@ -13,6 +13,8 @@ import ToolBar from "./PhotoComponents/ToolBar";
 import PhotoSliderCore from "./PhotoSliderCore";
 import { Text } from "react-native-elements";
 
+import FullScreen from "react-native-full-screen";
+
 type PropsType = {
   photos: Array<PhotoType>;
   style?: StyleProp<ViewStyle>;
@@ -36,6 +38,8 @@ function PhotoSlider(props: PropsType) {
     props.startIndex
   );
   const [viewDetails, setViewDetails] = useState(false);
+
+  const [isFullScreen, setIsFullScreen] = useState(false);
 
   const validFlatListCurrentIndex =
     props.photos.length != 0 && flatListCurrentIndex < props.photos.length;
@@ -87,6 +91,14 @@ function PhotoSlider(props: PropsType) {
         startIndex={props.startIndex}
         onIndexChanged={onCurrentIndexChanged}
         onEndReached={props.fetchMore}
+        onPhotoClick={() => {
+          if (isFullScreen) {
+            FullScreen.offFullScreen();
+          } else {
+            FullScreen.onFullScreen();
+          }
+          setIsFullScreen((f) => !f);
+        }}
       />
 
       {validFlatListCurrentIndex && viewDetails && (
@@ -102,7 +114,7 @@ function PhotoSlider(props: PropsType) {
         </View>
       )}
 
-      {validFlatListCurrentIndex && (
+      {validFlatListCurrentIndex && !isFullScreen && (
         <StatusBarComponent
           inDevice={props.photos[flatListCurrentIndex].inDevice}
           inServer={props.photos[flatListCurrentIndex].inServer}
@@ -114,7 +126,7 @@ function PhotoSlider(props: PropsType) {
         />
       )}
 
-      {validFlatListCurrentIndex && (
+      {validFlatListCurrentIndex && !isFullScreen && (
         <ToolBar
           inDevice={props.photos[flatListCurrentIndex].inDevice}
           inServer={props.photos[flatListCurrentIndex].inServer}

@@ -10,6 +10,8 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 
+import androidx.core.view.WindowCompat;
+
 import androidx.annotation.RequiresApi;
 
 public class MainActivity extends ReactActivity {
@@ -19,6 +21,8 @@ public class MainActivity extends ReactActivity {
   public void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
       DeleteMediaModule.init(this);
+
+      WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
   }
 
   /**
