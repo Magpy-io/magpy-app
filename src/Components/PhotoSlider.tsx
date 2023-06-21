@@ -29,6 +29,7 @@ type PropsType = {
   addPhotoServer?: (photo: PhotoType) => void;
   deletePhotoLocal?: (photo: PhotoType) => void;
   deletePhotoServer?: (photo: PhotoType) => void;
+  onFullScreenChanged?: (fs: boolean) => void;
 };
 
 function PhotoSlider(props: PropsType) {
@@ -97,6 +98,7 @@ function PhotoSlider(props: PropsType) {
           } else {
             FullScreen.onFullScreen();
           }
+          props?.onFullScreenChanged?.(!isFullScreen);
           setIsFullScreen((f) => !f);
         }}
       />

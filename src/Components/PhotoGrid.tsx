@@ -6,6 +6,7 @@ import {
   View,
   StyleProp,
   ViewStyle,
+  PixelRatio,
 } from "react-native";
 import React, {
   useCallback,
@@ -175,7 +176,7 @@ function PhotoGrid(props: PropsType) {
         style={styles.flatListStyle}
         data={props.photos}
         renderItem={renderItem}
-        windowSize={1}
+        windowSize={3}
         maxToRenderPerBatch={1}
         initialNumToRender={1}
         initialScrollIndex={correctStartIndex}
@@ -223,8 +224,13 @@ function PhotoGrid(props: PropsType) {
 }
 
 const styles = StyleSheet.create({
-  mainViewStyle: { height: "100%", width: "100%" },
-  flatListStyle: {},
+  mainViewStyle: {
+    height: "100%",
+    width: "100%",
+  },
+  flatListStyle: {
+    marginTop: PixelRatio.roundToNearestPixel(93 / PixelRatio.get()),
+  },
   textOnEmpty: {
     fontSize: 15,
     textAlign: "center",

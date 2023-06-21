@@ -7,6 +7,17 @@
         <item name="android:windowLayoutInDisplayCutoutMode">
             shortEdges <!-- default, shortEdges, or never -->
         </item>
+
+
+        <item name="android:windowLightNavigationBar">false</item>
+
+        <item name="android:statusBarColor">
+            #FFFFFF
+        </item>
+        <!-- Optional: set the status bar light and content dark. -->
+        <item name="android:windowLightStatusBar">
+            true
+        </item>
     </style>
 
 </resources>

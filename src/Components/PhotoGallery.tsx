@@ -1,4 +1,4 @@
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, StyleProp, ViewStyle } from "react-native";
 
 import { useCallback, useState, useEffect } from "react";
 import PhotoGrid from "~/Components/PhotoGrid";
@@ -6,6 +6,7 @@ import PhotoSlider from "~/Components/PhotoSlider";
 import { PhotoType } from "~/Helpers/types";
 
 type PropsType = {
+  style?: StyleProp<ViewStyle>;
   photos: PhotoType[];
   onRefresh: () => void;
   contextLocation: string;
@@ -17,6 +18,7 @@ type PropsType = {
   deletePhotoLocal?: (photo: PhotoType) => void;
   deletePhotosServer?: (photos: PhotoType[]) => void;
   gridHeaderTextFunction?: (photosNb: number) => string;
+  onFullScreenChanged?: (fs: boolean) => void;
 };
 
 export default function PhotoGallery(props: PropsType) {
@@ -46,10 +48,11 @@ export default function PhotoGallery(props: PropsType) {
   );
 
   return (
-    <View style={styles.viewStyle}>
+    <View style={[styles.viewStyle, props.style]}>
       {switchingState.isPhotoSelected ? (
         <View style={styles.viewStyle}>
           <PhotoSlider
+            onFullScreenChanged={props.onFullScreenChanged}
             key={"photo_slider_" + props.contextLocation}
             id={"photo_slider_" + props.contextLocation}
             contextLocation={props.contextLocation}

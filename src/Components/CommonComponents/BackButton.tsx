@@ -1,4 +1,4 @@
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, PixelRatio } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Icon } from "@rneui/themed";
 import colors from "~/colors";
@@ -12,7 +12,11 @@ type PropsType = {
 export default function BackButton(props: PropsType) {
   const navigation = useNavigation();
   return (
-    <View>
+    <View
+      style={{
+        marginTop: PixelRatio.roundToNearestPixel(93 / PixelRatio.get()),
+      }}
+    >
       <TouchableHighlight
         style={[styles.backButtonStyle, props.style]}
         onPress={() => {
