@@ -41,9 +41,6 @@ function PhotoSlider(props: PropsType) {
   const validFlatListCurrentIndex =
     props.photos.length != 0 && flatListCurrentIndex < props.photos.length;
 
-  console.log(
-    `Name: ${props.photos[flatListCurrentIndex].image.fileName}\nPath: ${props.photos[flatListCurrentIndex].image.path}\nTaken: ${props.photos[flatListCurrentIndex].created}\nModified: ${props.photos[flatListCurrentIndex].modified}`
-  );
   useEffect(() => {
     if (
       validFlatListCurrentIndex &&
