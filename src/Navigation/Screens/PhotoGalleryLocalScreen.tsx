@@ -22,7 +22,6 @@ type PropsType = {};
 export default function PhotoGalleryLocalScreen(props: PropsType) {
   console.log("render screen local");
   const [hasPermissions, setHasPermissions] = useState<boolean>(true);
-  const [isFs, setFs] = useState<boolean>(false);
   const context = useMainContext();
 
   const getPermissions = useCallback(async () => {
@@ -39,19 +38,7 @@ export default function PhotoGalleryLocalScreen(props: PropsType) {
 
   return hasPermissions ? (
     <PhotoGallery
-      onFullScreenChanged={(fs: boolean) => {
-        setFs(fs);
-      }}
-      // style={{
-      //   marginTop: isFs
-      //     ? 50
-      //     : PixelRatio.roundToNearestPixel(93 / PixelRatio.get()),
-      //   marginBottom: isFs
-      //     ? 50
-      //     : PixelRatio.roundToNearestPixel(130 / PixelRatio.get()),
-      // }}
-
-      //style={{ marginTop: 0, marginBottom: 0 }}
+      style={{}}
       photos={context.photosLocal}
       onRefresh={context.onRefreshLocal}
       key={"gallery_local"}
