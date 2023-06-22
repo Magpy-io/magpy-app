@@ -7,6 +7,7 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 import { Icon } from "react-native-elements";
+import { formatDate } from "~/Helpers/date";
 import { PhotoType } from "~/Helpers/types";
 import GenericModal from "./CommonComponents/GenericModal";
 
@@ -30,8 +31,8 @@ export default function PhotoDetailsModal({
       />
       <PhotoInfo
         icon="history"
-        title={`Taken ${photo.created}`}
-        text={`Modified ${photo.modified}`}
+        title={`Taken on ${formatDate(photo.created)}`}
+        text={`Modified on ${formatDate(photo.modified)}`}
       />
       <PhotoInfo
         icon="cloud-done"
