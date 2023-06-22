@@ -9,6 +9,7 @@ import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableType;
+import com.facebook.react.bridge.UiThreadUtil;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.common.ReactConstants;
 import com.reactnativecommunity.cameraroll.Utils;
@@ -41,6 +42,9 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.annotation.RequiresApi;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 
 public class MainModule extends ReactContextBaseJavaModule{
     MainModule(ReactApplicationContext context) {
@@ -299,6 +303,36 @@ public class MainModule extends ReactContextBaseJavaModule{
             return;
         }
         SendingMediaForegroundService.getInstance().stopService();
+        promise.resolve(null);
+    }
+
+    @ReactMethod
+    public void enableFullScreen(Promise promise){
+        UiThreadUtil.runOnUiThread(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        WindowInsetsControllerCompat windowInsetsController =
+                                WindowCompat.getInsetsController(getCurrentActivity().getWindow(), getCurrentActivity().getWindow().getDecorView());
+                        windowInsetsController.hide(WindowInsetsCompat.Type.systemBars());
+                    }
+                }
+        );
+        promise.resolve(null);
+    }
+
+    @ReactMethod
+    public void disableFullScreen(Promise promise){
+        UiThreadUtil.runOnUiThread(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        WindowInsetsControllerCompat windowInsetsController =
+                                WindowCompat.getInsetsController(getCurrentActivity().getWindow(), getCurrentActivity().getWindow().getDecorView());
+                        windowInsetsController.show(WindowInsetsCompat.Type.systemBars());
+                    }
+                }
+        );
         promise.resolve(null);
     }
 }

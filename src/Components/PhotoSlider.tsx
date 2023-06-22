@@ -13,7 +13,8 @@ import ToolBar from "./PhotoComponents/ToolBar";
 import PhotoSliderCore from "./PhotoSliderCore";
 import { Text } from "react-native-elements";
 
-import FullScreen from "react-native-full-screen";
+import { NativeModules } from "react-native";
+const { MainModule } = NativeModules;
 
 type PropsType = {
   photos: Array<PhotoType>;
@@ -94,9 +95,9 @@ function PhotoSlider(props: PropsType) {
         onEndReached={props.fetchMore}
         onPhotoClick={() => {
           if (isFullScreen) {
-            FullScreen.offFullScreen();
+            MainModule.disableFullScreen();
           } else {
-            FullScreen.onFullScreen();
+            MainModule.enableFullScreen();
           }
           props?.onFullScreenChanged?.(!isFullScreen);
           setIsFullScreen((f) => !f);
