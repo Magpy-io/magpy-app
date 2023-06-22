@@ -12,6 +12,7 @@ import StatusBarComponent from "./PhotoComponents/StatusBarComponent";
 import ToolBar from "./PhotoComponents/ToolBar";
 import PhotoSliderCore from "./PhotoSliderCore";
 import { Text } from "react-native-elements";
+import PhotoDetailsModal from "./PhotoDetailsModal";
 
 type PropsType = {
   photos: Array<PhotoType>;
@@ -36,10 +37,13 @@ function PhotoSlider(props: PropsType) {
     props.startIndex
   );
   const [viewDetails, setViewDetails] = useState(false);
-
+  const [detailsModalVisible, setDetailsModalVisible] = useState(false);
   const validFlatListCurrentIndex =
     props.photos.length != 0 && flatListCurrentIndex < props.photos.length;
 
+  console.log(
+    `Name: ${props.photos[flatListCurrentIndex].image.fileName}\nPath: ${props.photos[flatListCurrentIndex].image.path}\nTaken: ${props.photos[flatListCurrentIndex].created}\nModified: ${props.photos[flatListCurrentIndex].modified}`
+  );
   useEffect(() => {
     if (
       validFlatListCurrentIndex &&
@@ -115,23 +119,33 @@ function PhotoSlider(props: PropsType) {
       )}
 
       {validFlatListCurrentIndex && (
-        <ToolBar
-          inDevice={props.photos[flatListCurrentIndex].inDevice}
-          inServer={props.photos[flatListCurrentIndex].inServer}
-          onAddLocal={() =>
-            props.addPhotoLocal?.(props.photos[flatListCurrentIndex])
-          }
-          onAddServer={() =>
-            props.addPhotoServer?.(props.photos[flatListCurrentIndex])
-          }
-          onDeleteLocal={() =>
-            props.deletePhotoLocal?.(props.photos[flatListCurrentIndex])
-          }
-          onDeleteServer={() =>
-            props.deletePhotoServer?.(props.photos[flatListCurrentIndex])
-          }
-          onDetails={() => setViewDetails((v) => !v)}
-        />
+        <>
+          <ToolBar
+            inDevice={props.photos[flatListCurrentIndex].inDevice}
+            inServer={props.photos[flatListCurrentIndex].inServer}
+            onAddLocal={() =>
+              props.addPhotoLocal?.(props.photos[flatListCurrentIndex])
+            }
+            onAddServer={() =>
+              props.addPhotoServer?.(props.photos[flatListCurrentIndex])
+            }
+            onDeleteLocal={() =>
+              props.deletePhotoLocal?.(props.photos[flatListCurrentIndex])
+            }
+            onDeleteServer={() =>
+              props.deletePhotoServer?.(props.photos[flatListCurrentIndex])
+            }
+            onDetails={() => {
+              setDetailsModalVisible(true);
+              console.log("details");
+            }}
+          />
+          <PhotoDetailsModal
+            modalVisible={detailsModalVisible}
+            handleModal={() => setDetailsModalVisible(!detailsModalVisible)}
+            photo={props.photos[flatListCurrentIndex]}
+          />
+        </>
       )}
     </View>
   );

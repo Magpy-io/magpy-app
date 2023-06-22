@@ -1,5 +1,5 @@
 //const HOST = "89.157.173.59";
-const HOST = "192.168.0.12";
+const HOST = "192.168.0.11";
 const PORT = "8000";
 const path = `http://${HOST}:${PORT}/`;
 
