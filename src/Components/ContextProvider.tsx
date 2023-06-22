@@ -7,7 +7,7 @@ import React, {
   useEffect,
 } from "react";
 
-import { NativeModules } from "react-native";
+import { DeviceEventEmitter, NativeModules } from "react-native";
 const { MainModule } = NativeModules;
 
 import RNFS from "react-native-fs";
@@ -144,15 +144,42 @@ const ContextProvider = (props: PropsType) => {
 
   const isrefreshPhotosAddingServerRunning = useRef(false);
 
+  const intervalIdForRefreshPhotosAddingServer = useRef<NodeJS.Timer>();
+
+  const intervalFunction = () => {
+    console.log("interval");
+    refreshPhotosAddingServer?.();
+  };
+
+  const intervalTimer = 5000;
+
   useEffect(() => {
-    console.log("useEffect");
-    const intervalId = setInterval(() => {
-      refreshPhotosAddingServer?.();
-    }, 2000);
+    intervalIdForRefreshPhotosAddingServer.current = setInterval(
+      intervalFunction,
+      intervalTimer
+    );
 
     return () => {
-      console.log("clearing ", intervalId);
-      clearInterval(intervalId);
+      clearInterval(intervalIdForRefreshPhotosAddingServer.current);
+    };
+  }, []);
+
+  useEffect(() => {
+    DeviceEventEmitter.addListener("PhotoUploaded", () => {
+      console.log("event");
+      refreshPhotosAddingServer?.();
+
+      if (intervalIdForRefreshPhotosAddingServer.current != null) {
+        clearInterval(intervalIdForRefreshPhotosAddingServer.current);
+        intervalIdForRefreshPhotosAddingServer.current = setInterval(
+          intervalFunction,
+          intervalTimer
+        );
+      }
+    });
+
+    return () => {
+      DeviceEventEmitter.removeAllListeners("PhotoUploaded");
     };
   }, []);
 

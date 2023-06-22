@@ -11,12 +11,18 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
 import com.facebook.react.HeadlessJsTaskService;
+import com.facebook.react.ReactInstanceManager;
+import com.facebook.react.bridge.ReactContext;
+import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.jstasks.HeadlessJsTaskConfig;
 import com.facebook.react.bridge.Arguments;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
 
 import java.util.Objects;
 
@@ -157,6 +163,24 @@ public class SendingMediaForegroundService extends HeadlessJsTaskService {
 
     }
 
+    private void sendEvent(String eventName, @Nullable WritableMap params){
+
+        ReactContext reactContext;
+        try{
+            ReactInstanceManager reactInstanceManager = getReactNativeHost().getReactInstanceManager();
+            reactContext = reactInstanceManager.getCurrentReactContext();
+        }catch (Exception e){
+            Log.e("Service", "Exception while getting reactContext : " + e.toString());
+            return;
+        }
+
+        if(reactContext != null) {
+            reactContext
+                    .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                    .emit(eventName, params);
+        }
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.M)
     public void onTaskFinished(String code){
 
@@ -176,6 +200,12 @@ public class SendingMediaForegroundService extends HeadlessJsTaskService {
             return;
         }
         index++;
+
+        WritableMap params = new WritableNativeMap();
+        params.putString("state", state);
+
+        sendEvent("PhotoUploaded", params);
+
 
         notificationBuilder
                 .setProgress(ids.length, index, false)
