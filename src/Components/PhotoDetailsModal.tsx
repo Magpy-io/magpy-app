@@ -7,7 +7,8 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 import { Icon } from "react-native-elements";
-import { formatDate } from "~/Helpers/date";
+import { formatDate } from "~/Helpers/Date";
+import { getReadableFileSizeString } from "~/Helpers/FileSizeFormat";
 import { PhotoType } from "~/Helpers/types";
 import GenericModal from "./CommonComponents/GenericModal";
 
@@ -27,23 +28,35 @@ export default function PhotoDetailsModal({
       <PhotoInfo
         icon="image"
         title={photo.image.fileName}
-        text={`${photo.image.width} x ${photo.image.height}`}
+        text={`${photo.image.width} x ${photo.image.height} px`}
       />
       <PhotoInfo
         icon="history"
         title={`Taken on ${formatDate(photo.created)}`}
-        text={`Modified on ${formatDate(photo.modified)}`}
+        text={
+          photo.modified
+            ? `Modified on ${formatDate(photo.modified)}`
+            : "Unmodified"
+        }
       />
-      <PhotoInfo
-        icon="cloud-done"
-        title={`Backed up ${photo.image.fileSize}`}
-        text={`In server`}
-      />
-      <PhotoInfo
-        icon="mobile-friendly"
-        title={`On device (${photo.image.fileSize})`}
-        text={`${photo.image.path}`}
-      />
+      {photo.inServer && (
+        <PhotoInfo
+          icon="cloud-done"
+          title={`Backed up (${getReadableFileSizeString(
+            photo.image.fileSize
+          )})`}
+          text={`In server`}
+        />
+      )}
+      {photo.inDevice && (
+        <PhotoInfo
+          icon="mobile-friendly"
+          title={`On device (${getReadableFileSizeString(
+            photo.image.fileSize
+          )})`}
+          text={`${photo.image.path.split("://")[1]}`}
+        />
+      )}
     </GenericModal>
   );
 }
