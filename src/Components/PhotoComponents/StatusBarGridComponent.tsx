@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, PixelRatio } from "react-native";
 
 import CancelButton from "~/Components/CommonComponents/CancelButton";
 import SelectAllButton from "~/Components/CommonComponents/SelectAllButton";
@@ -51,6 +51,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     position: "absolute",
     top: 0,
+    marginTop: PixelRatio.roundToNearestPixel(93 / PixelRatio.get()),
   },
   statusBarCancelButtonStyle: {},
   statusBarSelectAllButtonStyle: {},

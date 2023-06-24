@@ -1,4 +1,10 @@
-import { StyleSheet, Text, View, TouchableHighlight } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableHighlight,
+  PixelRatio,
+} from "react-native";
 
 import { Icon } from "@rneui/themed";
 import colors from "~/colors";
@@ -122,6 +128,7 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
     position: "absolute",
     bottom: 0,
+    marginBottom: PixelRatio.roundToNearestPixel(130 / PixelRatio.get()),
   },
   toolsView: {
     flex: 1,

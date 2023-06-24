@@ -35,6 +35,7 @@ function PhotoComponentForSlider(props: PropsType) {
     <TouchableWithoutFeedback
       onPress={() => props.onPress?.(props.photo)}
       onLongPress={() => props.onLongPress?.(props.photo)}
+      style={styles.touchableStyle}
     >
       <View style={styles.itemStyle}>
         <FastImage
@@ -48,10 +49,13 @@ function PhotoComponentForSlider(props: PropsType) {
 }
 
 const styles = StyleSheet.create({
+  touchableStyle: {},
+
   itemStyle: {
     padding: 1,
     justifyContent: "center",
-    width: Dimensions.get("screen").width,
+    width: Dimensions.get("window").width,
+    height: "100%",
     backgroundColor: "white",
   },
   imageStyle: {

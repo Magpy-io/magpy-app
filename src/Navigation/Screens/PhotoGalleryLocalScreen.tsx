@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { StyleSheet, Text } from "react-native";
+import { StyleSheet, Text, View, PixelRatio } from "react-native";
 
 import * as AndroidPermissions from "~/Helpers/GetPermissionsAndroid";
 
@@ -24,7 +24,7 @@ export default function PhotoGalleryLocalScreen(props: PropsType) {
   const [hasPermissions, setHasPermissions] = useState<boolean>(true);
   const context = useMainContext();
 
-  let getPermissions = useCallback(async () => {
+  const getPermissions = useCallback(async () => {
     const hasPerm =
       await AndroidPermissions.hasAndroidPermissionWriteExternalStorage();
     if (!hasPerm) {
@@ -38,6 +38,7 @@ export default function PhotoGalleryLocalScreen(props: PropsType) {
 
   return hasPermissions ? (
     <PhotoGallery
+      style={{}}
       photos={context.photosLocal}
       onRefresh={context.onRefreshLocal}
       key={"gallery_local"}

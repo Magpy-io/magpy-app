@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useRef } from "react";
 import { PhotoType } from "~/Helpers/types";
 import PhotoComponentForSlider from "./PhotoComponentForSlider";
 
-const ITEM_WIDTH = Dimensions.get("screen").width;
+const ITEM_WIDTH = Dimensions.get("window").width;
 
 function keyExtractor(item: PhotoType, index: number) {
   return `Photo_${item.image.fileName}_index_${index}`;
@@ -141,7 +141,7 @@ function PhotoSliderCore(props: PropsType) {
 }
 
 const styles = StyleSheet.create({
-  flatListStyle: {},
+  flatListStyle: { width: "100%" },
 });
 
 export default PhotoSliderCore;

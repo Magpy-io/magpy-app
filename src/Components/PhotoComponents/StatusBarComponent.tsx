@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, PixelRatio } from "react-native";
 
 import { Icon } from "@rneui/themed";
 import colors from "~/colors";
@@ -73,6 +73,7 @@ const StatusComponent = React.memo((props: StatusComponentProps) => {
       style={[
         styles.statusComponentStyle,
         {
+          marginTop: PixelRatio.roundToNearestPixel(93 / PixelRatio.get()),
           padding: 5,
           backgroundColor: props.valid
             ? VALID_BACKGROUND_COLOR
