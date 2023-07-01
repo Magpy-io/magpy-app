@@ -14,6 +14,8 @@ import PhotoSliderCore from "./PhotoSliderCore";
 import { Text } from "react-native-elements";
 import PhotoDetailsModal from "./PhotoDetailsModal";
 
+import { useMainContext } from "~/Components/ContextProvider";
+
 import { NativeModules } from "react-native";
 const { MainModule } = NativeModules;
 
@@ -25,17 +27,13 @@ type PropsType = {
   id: string;
   isSliding: boolean;
   onSwitchMode: (isPhotoSelected: boolean, index: number) => void;
-  RequestFullPhoto: (photo: PhotoType) => void;
-  fetchMore?: () => void;
-  addPhotoLocal?: (photo: PhotoType) => void;
-  addPhotoServer?: (photo: PhotoType) => void;
-  deletePhotoLocal?: (photo: PhotoType) => void;
-  deletePhotoServer?: (photo: PhotoType) => void;
-  onFullScreenChanged?: (fs: boolean) => void;
 };
 
 function PhotoSlider(props: PropsType) {
   console.log("render slider", props.contextLocation);
+
+  const context = useMainContext();
+
   const flatListCurrentIndexRef = useRef<number>(props.startIndex);
   const [flatListCurrentIndex, setFlatListCurrentIndex] = useState(
     props.startIndex
@@ -49,11 +47,17 @@ function PhotoSlider(props: PropsType) {
   useEffect(() => {
     if (
       validFlatListCurrentIndex &&
-      !props.photos[flatListCurrentIndex].inDevice
+      !props.photos[flatListCurrentIndex].inDevice &&
+      props.contextLocation == "server"
     ) {
-      props.RequestFullPhoto(props.photos[flatListCurrentIndex]);
+      context.RequestFullPhotoServer(props.photos[flatListCurrentIndex]);
     }
-  }, [props.photos, flatListCurrentIndex, validFlatListCurrentIndex]);
+  }, [
+    props.photos,
+    props.contextLocation,
+    flatListCurrentIndex,
+    validFlatListCurrentIndex,
+  ]);
 
   const onCurrentIndexChanged = useCallback((index: number) => {
     flatListCurrentIndexRef.current = index;
@@ -92,14 +96,13 @@ function PhotoSlider(props: PropsType) {
         photos={props.photos}
         startIndex={props.startIndex}
         onIndexChanged={onCurrentIndexChanged}
-        onEndReached={props.fetchMore}
+        //onEndReached={}
         onPhotoClick={() => {
           if (isFullScreen) {
             MainModule.disableFullScreen();
           } else {
             MainModule.enableFullScreen();
           }
-          props?.onFullScreenChanged?.(!isFullScreen);
           setIsFullScreen((f) => !f);
         }}
       />
@@ -131,33 +134,37 @@ function PhotoSlider(props: PropsType) {
 
       {validFlatListCurrentIndex && !isFullScreen && (
         <>
-        <ToolBar
-          inDevice={props.photos[flatListCurrentIndex].inDevice}
-          inServer={props.photos[flatListCurrentIndex].inServer}
-          onAddLocal={() =>
-            props.addPhotoLocal?.(props.photos[flatListCurrentIndex])
-          }
-          onAddServer={() =>
-            props.addPhotoServer?.(props.photos[flatListCurrentIndex])
-          }
-          onDeleteLocal={() =>
-            props.deletePhotoLocal?.(props.photos[flatListCurrentIndex])
-          }
-          onDeleteServer={() =>
-            props.deletePhotoServer?.(props.photos[flatListCurrentIndex])
-          }
-          onDetails={() => {
-            setDetailsModalVisible(true);
-            console.log("details");
-          }}
-        />
- 
+          <ToolBar
+            inDevice={props.photos[flatListCurrentIndex].inDevice}
+            inServer={props.photos[flatListCurrentIndex].inServer}
+            onAddLocal={() =>
+              context.addPhotosLocal?.([props.photos[flatListCurrentIndex]])
+            }
+            onAddServer={() =>
+              context.addPhotosServer?.([props.photos[flatListCurrentIndex]])
+            }
+            onDeleteLocal={() => {
+              if (props.contextLocation == "server") {
+                context.RequestCroppedPhotosServer([
+                  props.photos[flatListCurrentIndex],
+                ]);
+              }
+              context.deletePhotosLocal?.([props.photos[flatListCurrentIndex]]);
+            }}
+            onDeleteServer={() =>
+              context.deletePhotosServer?.([props.photos[flatListCurrentIndex]])
+            }
+            onDetails={() => {
+              setDetailsModalVisible(true);
+              console.log("details");
+            }}
+          />
+
           <PhotoDetailsModal
             modalVisible={detailsModalVisible}
             handleModal={() => setDetailsModalVisible(!detailsModalVisible)}
             photo={props.photos[flatListCurrentIndex]}
           />
-        
         </>
       )}
     </View>

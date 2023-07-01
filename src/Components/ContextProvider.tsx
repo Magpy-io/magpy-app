@@ -43,11 +43,10 @@ type contextType = {
   fetchMoreLocal: () => Promise<void>;
   fetchMoreServer: () => Promise<void>;
   RequestFullPhotoServer: (photo: PhotoType) => Promise<void>;
+  RequestCroppedPhotosServer: (photos: PhotoType[]) => Promise<void>;
   addPhotosLocal: (photos: PhotoType[]) => Promise<void>;
   addPhotosServer: (photos: PhotoType[]) => Promise<void>;
-  deletePhotosLocalFromLocal: (photos: PhotoType[]) => Promise<void>;
-  deletePhotoLocalFromServer: (photo: PhotoType) => Promise<void>;
-  deletePhotosLocalFromServer: (photos: PhotoType[]) => Promise<void>;
+  deletePhotosLocal: (photos: PhotoType[]) => Promise<void>;
   deletePhotosServer: (photos: PhotoType[]) => Promise<void>;
 };
 
@@ -410,95 +409,32 @@ const ContextProvider = (props: PropsType) => {
     }
   }, []);
 
-  const deletePhotosLocalFromLocal = useCallback(
-    async (photos: PhotoType[]) => {
-      try {
-        const uris = photos.map((photo) => photo.image.path);
-        let photosRemoved = true;
-
-        try {
-          await RemovePhotos(uris);
-        } catch (err: any) {
-          photosRemoved = false;
-          const code: ErrorCodes = err.code;
-
-          if (code != "ERROR_USER_REJECTED") {
-            throw err;
-          }
-        }
-
-        if (photosRemoved) {
-          dispatch({
-            type: Actions.deletePhotosLocalFromLocal,
-            payload: { photos: photos },
-          });
-        }
-      } catch (err) {
-        console.log(err);
-      }
-    },
-    []
-  );
-
-  const deletePhotoLocalFromServer = useCallback(async (photo: PhotoType) => {
+  const deletePhotosLocal = useCallback(async (photos: PhotoType[]) => {
     try {
-      RequestFullPhotoServer(photo);
-
-      let photoRemoved = true;
+      const uris = photos.map((photo) => photo.image.path);
+      let photosRemoved = true;
 
       try {
-        await RemovePhotos([photo.image.path]);
+        await RemovePhotos(uris);
       } catch (err: any) {
-        photoRemoved = false;
+        photosRemoved = false;
         const code: ErrorCodes = err.code;
 
         if (code != "ERROR_USER_REJECTED") {
           throw err;
         }
       }
-      if (photoRemoved) {
+
+      if (photosRemoved) {
         dispatch({
-          type: Actions.deletePhotosLocalFromServer,
-          payload: { photos: [photo] },
+          type: Actions.deletePhotosLocalFromLocal,
+          payload: { photos: photos },
         });
       }
     } catch (err) {
       console.log(err);
     }
   }, []);
-
-  const deletePhotosLocalFromServer = useCallback(
-    async (photos: PhotoType[]) => {
-      try {
-        RequestCroppedPhotosServer(photos);
-
-        const uris = photos.map((photo) => photo.image.path);
-
-        let photosRemoved = true;
-
-        try {
-          await RemovePhotos(uris);
-        } catch (err: any) {
-          photosRemoved = false;
-          const code: ErrorCodes = err.code;
-
-          if (code != "ERROR_USER_REJECTED") {
-            throw err;
-          }
-        }
-
-        if (photosRemoved) {
-          dispatch({
-            type: Actions.deletePhotosLocalFromServer,
-            payload: { photos: photos },
-          });
-        }
-      } catch (err) {
-        console.log(err);
-      }
-    },
-    []
-  );
 
   const deletePhotosServer = useCallback(async (photos: PhotoType[]) => {
     try {
@@ -569,11 +505,10 @@ const ContextProvider = (props: PropsType) => {
     fetchMoreLocal: fetchMoreLocal,
     fetchMoreServer: fetchMoreServer,
     RequestFullPhotoServer: RequestFullPhotoServer,
+    RequestCroppedPhotosServer: RequestCroppedPhotosServer,
     addPhotosLocal: addPhotosLocal,
     addPhotosServer: addPhotosServer,
-    deletePhotosLocalFromLocal: deletePhotosLocalFromLocal,
-    deletePhotoLocalFromServer: deletePhotoLocalFromServer,
-    deletePhotosLocalFromServer: deletePhotosLocalFromServer,
+    deletePhotosLocal: deletePhotosLocal,
     deletePhotosServer: deletePhotosServer,
   };
 
