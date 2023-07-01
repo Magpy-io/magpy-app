@@ -7,7 +7,7 @@ import React, {
   useEffect,
 } from "react";
 
-import { DeviceEventEmitter, NativeModules } from "react-native";
+import { NativeEventEmitter, NativeModules } from "react-native";
 const { MainModule } = NativeModules;
 
 import RNFS from "react-native-fs";
@@ -164,7 +164,8 @@ const ContextProvider = (props: PropsType) => {
   }, []);
 
   useEffect(() => {
-    DeviceEventEmitter.addListener("PhotoUploaded", () => {
+    const emitter = new NativeEventEmitter();
+    const subscription = emitter.addListener("PhotoUploaded", () => {
       console.log("event");
       refreshPhotosAddingServer?.();
 
@@ -178,7 +179,7 @@ const ContextProvider = (props: PropsType) => {
     });
 
     return () => {
-      DeviceEventEmitter.removeAllListeners("PhotoUploaded");
+      subscription.remove();
     };
   }, []);
 
