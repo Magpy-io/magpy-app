@@ -1,5 +1,7 @@
 package com.opencloudphotos;
+
 import com.facebook.common.logging.FLog;
+import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContext;
@@ -11,7 +13,10 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableType;
 import com.facebook.react.bridge.UiThreadUtil;
 import com.facebook.react.bridge.WritableArray;
+import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.common.ReactConstants;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.reactnativecommunity.cameraroll.Utils;
 
 import android.app.ActivityManager;
@@ -42,6 +47,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -57,6 +63,14 @@ public class MainModule extends ReactContextBaseJavaModule{
     @Override
     public String getName() {
         return "MainModule";
+    }
+
+    public static void sendEvent(ReactContext reactContext, String eventName, @Nullable WritableMap params){
+        if(reactContext != null) {
+            reactContext
+                    .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                    .emit(eventName, params);
+        }
     }
 
     private String getRestoredMediaAbsolutePathPrivate(){
@@ -336,5 +350,25 @@ public class MainModule extends ReactContextBaseJavaModule{
                 }
         );
         promise.resolve(null);
+    }
+
+    @ReactMethod
+    public void getWindowInsets(Promise promise){
+        WritableMap insets = new WritableNativeMap();
+        boolean valid = MyStaticClasses.GetWindowInsets.getTop() != null &&
+                MyStaticClasses.GetWindowInsets.getBottom() != null &&
+                MyStaticClasses.GetWindowInsets.getRight() != null &&
+                MyStaticClasses.GetWindowInsets.getLeft() != null;
+
+        insets.putBoolean("valid", valid);
+        if(valid){
+            insets.putInt("top", MyStaticClasses.GetWindowInsets.getTop());
+            insets.putInt("bottom", MyStaticClasses.GetWindowInsets.getBottom());
+            insets.putInt("right", MyStaticClasses.GetWindowInsets.getRight());
+            insets.putInt("left", MyStaticClasses.GetWindowInsets.getLeft());
+            insets.putBoolean("isFullScreen", MyStaticClasses.GetWindowInsets.IsFullScreen());
+        }
+
+        promise.resolve(insets);
     }
 }

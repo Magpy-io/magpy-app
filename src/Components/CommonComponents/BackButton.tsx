@@ -3,6 +3,7 @@ import { useNavigation } from "@react-navigation/native";
 import { Icon } from "@rneui/themed";
 import colors from "~/colors";
 import { TouchableHighlight } from "react-native-gesture-handler";
+import * as BarHeights from "~/Helpers/BarHeights";
 
 type PropsType = {
   style?: any;
@@ -14,7 +15,7 @@ export default function BackButton(props: PropsType) {
   return (
     <View
       style={{
-        marginTop: PixelRatio.roundToNearestPixel(93 / PixelRatio.get()),
+        marginTop: BarHeights.GetStatusBarHeight(),
       }}
     >
       <TouchableHighlight

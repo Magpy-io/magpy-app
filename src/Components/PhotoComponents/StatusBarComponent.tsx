@@ -5,6 +5,7 @@ import colors from "~/colors";
 import BackButton from "~/Components/CommonComponents/BackButton";
 import React from "react";
 import * as Progress from "react-native-progress";
+import * as BarHeights from "~/Helpers/BarHeights";
 
 type StatusBarComponentProps = {
   inDevice: boolean;
@@ -73,7 +74,7 @@ const StatusComponent = React.memo((props: StatusComponentProps) => {
       style={[
         styles.statusComponentStyle,
         {
-          marginTop: PixelRatio.roundToNearestPixel(93 / PixelRatio.get()),
+          marginTop: BarHeights.GetStatusBarHeight(),
           padding: 5,
           backgroundColor: props.valid
             ? VALID_BACKGROUND_COLOR

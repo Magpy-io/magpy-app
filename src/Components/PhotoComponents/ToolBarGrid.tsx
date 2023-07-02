@@ -9,6 +9,7 @@ import {
 import { Icon } from "@rneui/themed";
 import colors from "~/colors";
 import React from "react";
+import * as BarHeights from "~/Helpers/BarHeights";
 
 const ICON_SIZE = 20;
 const TEXT_SIZE = 10;
@@ -120,7 +121,7 @@ const styles = StyleSheet.create({
     width: "100%",
     backgroundColor: "transparent",
     position: "absolute",
-    bottom: PixelRatio.roundToNearestPixel(130 / PixelRatio.get()),
+    bottom: BarHeights.GetNavigatorBarHeight(),
     //marginBottom: ,
   },
   toolsView: {
