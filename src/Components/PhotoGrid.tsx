@@ -21,6 +21,8 @@ import PhotoComponentForGrid from "./PhotoComponentForGrid";
 import StatusBarGridComponent from "./PhotoComponents/StatusBarGridComponent";
 import ToolBarGrid from "./PhotoComponents/ToolBarGrid";
 
+import { useMainContext } from "~/Components/ContextProvider";
+
 const ITEM_HEIGHT = Dimensions.get("screen").width / 3;
 
 function keyExtractor(item: PhotoType) {
@@ -54,17 +56,14 @@ type PropsType = {
   contextLocation: string;
   id: string;
   onSwitchMode: (isPhotoSelected: boolean, index: number) => void;
-  onRefresh: () => void;
-  fetchMore?: () => void;
   headerDisplayTextFunction?: (photosNb: number) => string;
-  addPhotosServer?: (photos: PhotoType[]) => void;
-  addPhotosLocal?: (photos: PhotoType[]) => void;
-  deletePhotosLocal?: (photos: PhotoType[]) => void;
-  deletePhotosServer?: (photos: PhotoType[]) => void;
 };
 
 function PhotoGrid(props: PropsType) {
   console.log("render grid", props.contextLocation);
+
+  const context = useMainContext();
+
   const flatlistRef = useRef<FlatList>(null);
   const getPhotoIndexRef = useRef<(photo: PhotoType) => number>();
   const [isSelecting, setIsSelecting] = useState(false);
@@ -164,6 +163,14 @@ function PhotoGrid(props: PropsType) {
     correctStartIndex = Math.floor((props.photos.length - 1) / 3);
   }
 
+  const onRefresh = useCallback(() => {
+    if (props.contextLocation == "local") {
+      context.onRefreshLocal();
+    } else if (props.contextLocation == "server") {
+      context.onRefreshServer();
+    }
+  }, [props.contextLocation, context.onRefreshLocal, context.onRefreshServer]);
+
   // TODO change the numColumns to 1 and create a renderItem containing 3 photos
   // This will fix a bug in flatlist which makes it recreate all items each time one is added or removed from the top (indexes change for the rest)
   // with numColumns set to 1, this problem is fixed and the items are able to rerender as needed
@@ -182,8 +189,8 @@ function PhotoGrid(props: PropsType) {
         initialScrollIndex={correctStartIndex}
         keyExtractor={keyExtractor}
         onEndReachedThreshold={1}
-        onEndReached={props.fetchMore}
-        onRefresh={props.onRefresh}
+        //onEndReached={}
+        onRefresh={onRefresh}
         refreshing={false}
         numColumns={3}
         getItemLayout={getItemLayout}
@@ -203,19 +210,23 @@ function PhotoGrid(props: PropsType) {
           contextLocation={props.contextLocation}
           onAddLocal={() => {
             setIsSelecting(false);
-            return props.addPhotosLocal?.(Array.from(seletedIds.values()));
+            context.addPhotosLocal?.(Array.from(seletedIds.values()));
           }}
           onAddServer={() => {
             setIsSelecting(false);
-            return props.addPhotosServer?.(Array.from(seletedIds.values()));
+            context.addPhotosServer?.(Array.from(seletedIds.values()));
           }}
           onDeleteLocal={() => {
             setIsSelecting(false);
-            return props.deletePhotosLocal?.(Array.from(seletedIds.values()));
+            const photosToDelete = Array.from(seletedIds.values());
+            if (props.contextLocation == "server") {
+              context.RequestCroppedPhotosServer(photosToDelete);
+            }
+            context.deletePhotosLocal?.(photosToDelete);
           }}
           onDeleteServer={() => {
             setIsSelecting(false);
-            return props.deletePhotosServer?.(Array.from(seletedIds.values()));
+            context.deletePhotosServer?.(Array.from(seletedIds.values()));
           }}
         />
       )}

@@ -22,15 +22,8 @@ export default function PhotoGalleryScreen(props: PropsType) {
   return (
     <PhotoGallery
       photos={context.photosServer}
-      onRefresh={context.onRefreshServer}
       key={"gallery_server"}
       contextLocation={"server"}
-      RequestFullPhoto={context.RequestFullPhotoServer}
-      addPhotosLocal={context.addPhotosLocal}
-      addPhotosServer={context.addPhotosServer}
-      deletePhotosLocal={context.deletePhotosLocalFromServer}
-      deletePhotoLocal={context.deletePhotoLocalFromServer}
-      deletePhotosServer={context.deletePhotosServer}
       gridHeaderTextFunction={photosNbToString}
     />
   );

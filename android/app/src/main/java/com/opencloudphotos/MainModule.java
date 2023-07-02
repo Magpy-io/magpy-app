@@ -41,6 +41,7 @@ import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -52,6 +53,7 @@ public class MainModule extends ReactContextBaseJavaModule{
     }
 
 
+    @NonNull
     @Override
     public String getName() {
         return "MainModule";

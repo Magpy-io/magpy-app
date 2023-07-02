@@ -219,9 +219,8 @@ public class SendingMediaForegroundService extends HeadlessJsTaskService {
             // Stop the foreground service and remove its notification
             stopForeground(true);
             state = "INACTIVE";
+            //TODO Send event
         }
-
-        //TODO Send event
     }
 
     public void stopService(){

@@ -4,25 +4,20 @@ import { useCallback, useState, useEffect } from "react";
 import PhotoGrid from "~/Components/PhotoGrid";
 import PhotoSlider from "~/Components/PhotoSlider";
 import { PhotoType } from "~/Helpers/types";
+import { useMainContext } from "~/Components/ContextProvider";
 
 type PropsType = {
   style?: StyleProp<ViewStyle>;
   photos: PhotoType[];
-  onRefresh: () => void;
   contextLocation: string;
-  RequestFullPhoto: (photo: PhotoType) => void;
-  fetchMore?: () => void;
-  addPhotosLocal?: (photos: PhotoType[]) => void;
-  addPhotosServer?: (photos: PhotoType[]) => void;
-  deletePhotosLocal?: (photos: PhotoType[]) => void;
-  deletePhotoLocal?: (photo: PhotoType) => void;
-  deletePhotosServer?: (photos: PhotoType[]) => void;
   gridHeaderTextFunction?: (photosNb: number) => string;
-  onFullScreenChanged?: (fs: boolean) => void;
 };
 
 export default function PhotoGallery(props: PropsType) {
   console.log("render gallery", props.contextLocation);
+
+  const context = useMainContext();
+
   const [switchingState, setSwitchingState] = useState({
     isPhotoSelected: false,
     startIndexWhenSwitching: 0,
@@ -52,7 +47,6 @@ export default function PhotoGallery(props: PropsType) {
       {switchingState.isPhotoSelected ? (
         <View style={styles.viewStyle}>
           <PhotoSlider
-            onFullScreenChanged={props.onFullScreenChanged}
             key={"photo_slider_" + props.contextLocation}
             id={"photo_slider_" + props.contextLocation}
             contextLocation={props.contextLocation}
@@ -61,18 +55,6 @@ export default function PhotoGallery(props: PropsType) {
             photos={props.photos}
             startIndex={switchingState.startIndexWhenSwitching}
             onSwitchMode={onSwitchMode}
-            RequestFullPhoto={props.RequestFullPhoto}
-            fetchMore={props.fetchMore}
-            addPhotoLocal={(photo: PhotoType) =>
-              props.addPhotosLocal?.([photo])
-            }
-            addPhotoServer={(photo: PhotoType) =>
-              props.addPhotosServer?.([photo])
-            }
-            deletePhotoLocal={props.deletePhotoLocal}
-            deletePhotoServer={(photo: PhotoType) =>
-              props.deletePhotosServer?.([photo])
-            }
           />
           <PhotoGrid
             key={"photo_grid_" + props.contextLocation}
@@ -82,12 +64,6 @@ export default function PhotoGallery(props: PropsType) {
             photos={props.photos}
             startIndex={switchingState.startIndexWhenSwitching}
             onSwitchMode={onSwitchMode}
-            fetchMore={props.fetchMore}
-            onRefresh={props.onRefresh}
-            addPhotosServer={props.addPhotosServer}
-            addPhotosLocal={props.addPhotosLocal}
-            deletePhotosLocal={props.deletePhotosLocal}
-            deletePhotosServer={props.deletePhotosServer}
             headerDisplayTextFunction={props.gridHeaderTextFunction}
           />
         </View>
@@ -101,12 +77,6 @@ export default function PhotoGallery(props: PropsType) {
             photos={props.photos}
             startIndex={switchingState.startIndexWhenSwitching}
             onSwitchMode={onSwitchMode}
-            fetchMore={props.fetchMore}
-            onRefresh={props.onRefresh}
-            addPhotosServer={props.addPhotosServer}
-            addPhotosLocal={props.addPhotosLocal}
-            deletePhotosLocal={props.deletePhotosLocal}
-            deletePhotosServer={props.deletePhotosServer}
             headerDisplayTextFunction={props.gridHeaderTextFunction}
           />
           <PhotoSlider
@@ -118,18 +88,6 @@ export default function PhotoGallery(props: PropsType) {
             photos={props.photos}
             startIndex={switchingState.startIndexWhenSwitching}
             onSwitchMode={onSwitchMode}
-            RequestFullPhoto={props.RequestFullPhoto}
-            fetchMore={props.fetchMore}
-            addPhotoLocal={(photo: PhotoType) =>
-              props.addPhotosLocal?.([photo])
-            }
-            addPhotoServer={(photo: PhotoType) =>
-              props.addPhotosServer?.([photo])
-            }
-            deletePhotoLocal={props.deletePhotoLocal}
-            deletePhotoServer={(photo: PhotoType) =>
-              props.deletePhotosServer?.([photo])
-            }
           />
         </View>
       )}
