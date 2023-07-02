@@ -16,13 +16,24 @@ import androidx.annotation.RequiresApi;
 
 public class MainActivity extends ReactActivity {
 
+  public static void GetReactContext(){
+
+  }
+
   @RequiresApi(api = Build.VERSION_CODES.O)
   @Override
   public void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
       DeleteMediaModule.init(this);
 
+      // Set app fullscreen
       WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+  }
+
+  @Override
+  protected void onResume() {
+    super.onResume();
+    MyStaticClasses.GetWindowInsets.initGetWindowInsets(this);
   }
 
   /**

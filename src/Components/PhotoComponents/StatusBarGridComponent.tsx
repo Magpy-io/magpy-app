@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, PixelRatio } from "react-native";
 import CancelButton from "~/Components/CommonComponents/CancelButton";
 import SelectAllButton from "~/Components/CommonComponents/SelectAllButton";
 import React from "react";
+import * as BarHeights from "~/Helpers/BarHeights";
 
 type StatusBarComponentProps = {
   selectedNb: number;
@@ -51,7 +52,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     position: "absolute",
     top: 0,
-    marginTop: PixelRatio.roundToNearestPixel(93 / PixelRatio.get()),
+    marginTop: BarHeights.GetStatusBarHeight(),
   },
   statusBarCancelButtonStyle: {},
   statusBarSelectAllButtonStyle: {},

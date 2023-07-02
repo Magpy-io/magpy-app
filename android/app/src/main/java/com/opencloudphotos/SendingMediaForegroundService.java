@@ -174,11 +174,7 @@ public class SendingMediaForegroundService extends HeadlessJsTaskService {
             return;
         }
 
-        if(reactContext != null) {
-            reactContext
-                    .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-                    .emit(eventName, params);
-        }
+        MainModule.sendEvent(reactContext, eventName, params);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)

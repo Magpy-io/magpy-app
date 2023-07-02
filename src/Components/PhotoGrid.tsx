@@ -20,6 +20,7 @@ import { PhotoType } from "~/Helpers/types";
 import PhotoComponentForGrid from "./PhotoComponentForGrid";
 import StatusBarGridComponent from "./PhotoComponents/StatusBarGridComponent";
 import ToolBarGrid from "./PhotoComponents/ToolBarGrid";
+import * as BarHeights from "~/Helpers/BarHeights";
 
 import { useMainContext } from "~/Components/ContextProvider";
 
@@ -240,7 +241,8 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   flatListStyle: {
-    marginTop: PixelRatio.roundToNearestPixel(93 / PixelRatio.get()),
+    marginTop: BarHeights.GetStatusBarHeight(),
+    marginBottom: BarHeights.GetNavigatorBarHeight(),
   },
   textOnEmpty: {
     fontSize: 15,

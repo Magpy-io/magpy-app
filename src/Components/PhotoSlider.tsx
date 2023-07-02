@@ -13,10 +13,11 @@ import ToolBar from "./PhotoComponents/ToolBar";
 import PhotoSliderCore from "./PhotoSliderCore";
 import { Text } from "react-native-elements";
 import PhotoDetailsModal from "./PhotoDetailsModal";
+import * as BarHeights from "~/Helpers/BarHeights";
 
 import { useMainContext } from "~/Components/ContextProvider";
 
-import { NativeModules } from "react-native";
+import { NativeEventEmitter, NativeModules } from "react-native";
 const { MainModule } = NativeModules;
 
 type PropsType = {
@@ -89,6 +90,18 @@ function PhotoSlider(props: PropsType) {
       props.onSwitchMode(false, 0);
     }
   }, [props.photos.length, props.onSwitchMode]);
+
+  useEffect(() => {
+    const emitter = new NativeEventEmitter();
+    const subscription = emitter.addListener("FullScreenChanged", (param) => {
+      console.log("fullscreenChanged");
+      setIsFullScreen(param.isFullScreen);
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
 
   return (
     <View style={[styles.mainViewStyle, props.style]}>
