@@ -146,7 +146,7 @@ const ContextProvider = (props: PropsType) => {
   const intervalIdForRefreshPhotosAddingServer = useRef<NodeJS.Timer>();
 
   const intervalFunction = () => {
-    console.log("interval");
+    //console.log("interval");
     refreshPhotosAddingServer?.();
   };
 
