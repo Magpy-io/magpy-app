@@ -2,7 +2,7 @@ import { StyleSheet, FlatList, Dimensions, ViewToken } from "react-native";
 
 import React, { useCallback, useEffect, useRef } from "react";
 import { PhotoType } from "~/Helpers/types";
-import PhotoComponentForSlider from "./PhotoComponentForSlider";
+import PhotoComponentForSlider from "~/Components/PhotoComponentForSlider";
 
 const ITEM_WIDTH = Dimensions.get("window").width;
 
