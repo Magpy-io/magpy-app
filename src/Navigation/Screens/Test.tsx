@@ -7,7 +7,11 @@ import {
   Text,
 } from "react-native";
 import { useRef, useCallback, useEffect, useState } from "react";
-import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import {
+  Gesture,
+  GestureDetector,
+  TouchableWithoutFeedback,
+} from "react-native-gesture-handler";
 import Animated, {
   useSharedValue,
   withTiming,
@@ -162,16 +166,18 @@ function TestPhotoComponent(props: { photo: string }) {
   }));
 
   return (
-    <GestureDetector gesture={composed}>
-      <Animated.View style={[styles.itemStyle, animatedStyle]}>
-        <Image
-          source={{
-            uri: props.photo,
-          }}
-          resizeMode={"contain"}
-          style={[styles.imageStyle]}
-        />
-      </Animated.View>
-    </GestureDetector>
+    <TouchableWithoutFeedback onPress={() => console.log("touched")}>
+      <GestureDetector gesture={composed}>
+        <Animated.View style={[styles.itemStyle, animatedStyle]}>
+          <Image
+            source={{
+              uri: props.photo,
+            }}
+            resizeMode={"contain"}
+            style={[styles.imageStyle]}
+          />
+        </Animated.View>
+      </GestureDetector>
+    </TouchableWithoutFeedback>
   );
 }
