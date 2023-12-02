@@ -1,19 +1,43 @@
-//const HOST = "89.157.173.59";
-const HOST = "192.168.0.15";
-const PORT = "8000";
-const path = `http://${HOST}:${PORT}/`;
+import NetworkConfig from "~/Global/networkConfig";
+
+const path = () => {
+  if (!NetworkConfig.isSet) {
+    throw new Error("Tried to send request before setting up a server");
+  }
+  return `http://${NetworkConfig.ipAdress}:${NetworkConfig.port}/`;
+};
 
 const routes = {
-  getPhotos: path + "getPhotos/",
-  getPhotosById: path + "getPhotosById/",
-  getPhotosByPath: path + "getPhotosByPath/",
-  getPhotoPartById: path + "getPhotoPartById/",
-  getNumberPhotos: path + "getNumberPhotos/",
-  addPhoto: path + "addPhoto/",
-  addPhotoInit: path + "addPhotoInit/",
-  addPhotoPart: path + "addPhotoPart/",
-  updatePhotoPath: path + "updatePhotoPath/",
-  deletePhotosById: path + "deletePhotosById/",
+  getPhotos: () => {
+    return path() + "getPhotos/";
+  },
+  getPhotosById: () => {
+    return path() + "getPhotosById/";
+  },
+  getPhotosByPath: () => {
+    return path() + "getPhotosByPath/";
+  },
+  getPhotoPartById: () => {
+    return path() + "getPhotoPartById/";
+  },
+  getNumberPhotos: () => {
+    return path() + "getNumberPhotos/";
+  },
+  addPhoto: () => {
+    return path() + "addPhoto/";
+  },
+  addPhotoInit: () => {
+    return path() + "addPhotoInit/";
+  },
+  addPhotoPart: () => {
+    return path() + "addPhotoPart/";
+  },
+  updatePhotoPath: () => {
+    return path() + "updatePhotoPath/";
+  },
+  deletePhotosById: () => {
+    return path() + "deletePhotosById/";
+  },
 };
 
 type PhotoType = "data" | "thumbnail" | "compressed" | "original";
@@ -59,7 +83,7 @@ async function getPhotos(
   offset: number = 0,
   photoType: PhotoType
 ): Promise<GetPhotosReturnType> {
-  const response = await fetch(routes.getPhotos, {
+  const response = await fetch(routes.getPhotos(), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -87,7 +111,7 @@ async function getPhotosById(
   ids: Array<string>,
   photoType: PhotoType
 ): Promise<GetPhotosByIdReturnType> {
-  const response = await fetch(routes.getPhotosById, {
+  const response = await fetch(routes.getPhotosById(), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -111,7 +135,7 @@ async function getPhotosByPath(
   paths: Array<string>,
   photoType: PhotoType
 ): Promise<GetPhotosByPathReturnType> {
-  const response = await fetch(routes.getPhotosByPath, {
+  const response = await fetch(routes.getPhotosByPath(), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -134,7 +158,7 @@ async function getPhotoWithProgress(
   id: string,
   f: (progess: number, total: number) => void
 ): Promise<GetPhotoWithProgressReturnType> {
-  const response = await fetch(routes.getPhotoPartById, {
+  const response = await fetch(routes.getPhotoPartById(), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -152,7 +176,7 @@ async function getPhotoWithProgress(
 
   let responseI;
   for (let i = 1; i < totalNbParts; i++) {
-    responseI = await fetch(routes.getPhotoPartById, {
+    responseI = await fetch(routes.getPhotoPartById(), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -181,7 +205,7 @@ type GetNumberPhotosReturnType = {
 };
 
 async function getNumberPhotos(): Promise<GetNumberPhotosReturnType> {
-  const response = await fetch(routes.getNumberPhotos, {
+  const response = await fetch(routes.getNumberPhotos(), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -212,7 +236,7 @@ type AddPhotoReturnType = {
 };
 
 async function addPhoto(photo: PostPhotoFormat): Promise<AddPhotoReturnType> {
-  const response = await fetch(routes.addPhoto, {
+  const response = await fetch(routes.addPhoto(), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -240,7 +264,7 @@ async function addPhotoWithProgress(
 
   const base64ImageSplit = splitString(base64Image);
 
-  const response = await fetch(routes.addPhotoInit, {
+  const response = await fetch(routes.addPhotoInit(), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -264,7 +288,7 @@ async function addPhotoWithProgress(
 
   let responseI;
   for (let i = 0; i < base64ImageSplit.length; i++) {
-    responseI = await fetch(routes.addPhotoPart, {
+    responseI = await fetch(routes.addPhotoPart(), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -294,7 +318,7 @@ async function updatePhotoPath(
   id: string,
   path: string
 ): Promise<UpdatePhotoPathReturnType> {
-  const response = await fetch(routes.updatePhotoPath, {
+  const response = await fetch(routes.updatePhotoPath(), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -316,7 +340,7 @@ type DeletePhotosByIdReturnType = {
 async function deletePhotosById(
   ids: string[]
 ): Promise<DeletePhotosByIdReturnType> {
-  const response = await fetch(routes.deletePhotosById, {
+  const response = await fetch(routes.deletePhotosById(), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
