@@ -1701,6 +1701,13 @@
     "@types/react" "*"
     "@types/react-native" "*"
 
+"@types/react-native-zeroconf@^0.12.3":
+  version "0.12.3"
+  resolved "https://registry.yarnpkg.com/@types/react-native-zeroconf/-/react-native-zeroconf-0.12.3.tgz#543753b647e8134f22433cb701052e1cb4653275"
+  integrity sha512-IV9BSqbVf+I8ZNLMd4Vc8O3GPc4RVkHTlkGq7lHXaSd3egGZ9v2yoeNTZM2DNTNmFGb18Xn3mSYfAM8BkYLU1A==
+  dependencies:
+    "@types/node" "*"
+
 "@types/react-native@*", "@types/react-native@^0.70.6":
   version "0.70.7"
   resolved "https://registry.yarnpkg.com/@types/react-native/-/react-native-0.70.7.tgz#1708e5f746bbce2ea4e0bd5a2627560667804d46"
@@ -3367,6 +3374,11 @@ event-target-shim@^5.0.0, event-target-shim@^5.0.1:
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/event-target-shim/-/event-target-shim-5.0.1.tgz#5d4d3ebdf9583d63a5333ce2deb7480ab2b05789"
   integrity sha512-i/2XbnSz/uxRCU6+NdVJgKWDTM427+MqYbkQzD321DuCQJUqOuJKIA0IM2+W2xtYHdKOmZ4dR6fExsd4SXL+WQ==
+
+events@^3.0.0:
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/events/-/events-3.3.0.tgz#31a95ad0a924e2d2c419a813aeb2c4e878ea7400"
+  integrity sha512-mQw+2fkQbALzQ7V0MY0IqdnXNOeTtP4r0lN9z7AAawCXgqea7bDii20AYrIBrFd/Hx0M2Ocz6S111CaFkUcb0Q==
 
 exec-sh@^0.3.2:
   version "0.3.6"
@@ -6326,6 +6338,13 @@ react-native-vector-icons@^9.2.0:
   dependencies:
     prop-types "^15.7.2"
     yargs "^16.1.1"
+
+react-native-zeroconf@^0.13.8:
+  version "0.13.8"
+  resolved "https://registry.yarnpkg.com/react-native-zeroconf/-/react-native-zeroconf-0.13.8.tgz#62fe5279fdf81250a0da647454f2c3b8ee8cacae"
+  integrity sha512-frGS1xNbNCA7BfETSubNYODu7s7mlU55vgArEzZW9EuSQ8SYqlNQC5zpKHDZEAXy4fFqe+CgnMCxKAjQqYM6XA==
+  dependencies:
+    events "^3.0.0"
 
 react-native@0.70.6:
   version "0.70.6"

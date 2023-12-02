@@ -1,183 +1,120 @@
+import { useState, useEffect, useRef } from "react";
 import {
+  Platform,
   StyleSheet,
-  Dimensions,
-  FlatList,
-  View,
-  Image,
+  TouchableOpacity,
   Text,
+  SafeAreaView,
+  FlatList,
 } from "react-native";
-import { useRef, useCallback, useEffect, useState } from "react";
-import {
-  Gesture,
-  GestureDetector,
-  TouchableWithoutFeedback,
-} from "react-native-gesture-handler";
-import Animated, {
-  useSharedValue,
-  withTiming,
-  useAnimatedStyle,
-  runOnJS,
-} from "react-native-reanimated";
+import Zeroconf from "react-native-zeroconf";
+import type { Service } from "react-native-zeroconf";
 
-import { NativeEventEmitter, NativeModules } from "react-native";
-const { MainModule } = NativeModules;
-
-const ITEM_WIDTH = Dimensions.get("screen").width;
-
-function keyExtractor(item: string, index: number) {
-  return `Photo_${item}_index_${index}`;
-}
-
-function getItemLayout(data: any, index: number) {
-  return {
-    length: ITEM_WIDTH,
-    offset: ITEM_WIDTH * index,
-    index,
-  };
-}
-
-const H = Dimensions.get("screen").height;
-const W = Dimensions.get("screen").width;
+const zeroconf = new Zeroconf();
 
 export default function App() {
+  let timeout: NodeJS.Timeout;
+
+  const [isScanning, setIsScanning] = useState(false);
+  const [selectedService, setSelectedService] = useState(-1);
+  const [services, setServices] = useState<Service[]>(new Array<Service>());
+
   useEffect(() => {
-    MainModule.enableFullScreen();
+    refreshData();
+
+    zeroconf.on("start", () => {
+      setIsScanning(true);
+      console.log("[Start]");
+    });
+
+    zeroconf.on("stop", () => {
+      setIsScanning(false);
+      console.log("[Stop]");
+    });
+
+    zeroconf.on("resolved", (service) => {
+      setServices((oldServices) => {
+        return [...oldServices, service];
+      });
+      console.log("[Resolve]", JSON.stringify(service, null, 2));
+    });
+
+    zeroconf.on("error", (err) => {
+      setIsScanning(false);
+      console.log("[Error]", err);
+    });
   }, []);
 
-  const renderItem = ({ item, index }: { item: string; index: number }) => (
-    <TestPhotoComponent photo={item} />
-  );
+  const renderRow = ({ item, index }: { item: Service; index: number }) => {
+    const { name, fullName, host, port } = services[index];
+
+    return (
+      <TouchableOpacity onPress={() => setSelectedService(index)}>
+        <Text>{name}</Text>
+        <Text>{fullName}</Text>
+        <Text>{host}</Text>
+        <Text>{port}</Text>
+      </TouchableOpacity>
+    );
+  };
+
+  const refreshData = () => {
+    if (isScanning) {
+      return;
+    }
+
+    setServices([]);
+    zeroconf.scan("http", "tcp", "local.");
+
+    clearTimeout(timeout);
+    timeout = setTimeout(() => {
+      zeroconf.stop();
+    }, 5000);
+  };
+
+  if (selectedService >= 0) {
+    const service = services[selectedService];
+    return (
+      <SafeAreaView style={styles.container}>
+        <TouchableOpacity onPress={() => setSelectedService(-1)}>
+          <Text style={styles.closeButton}>{"CLOSE"}</Text>
+        </TouchableOpacity>
+
+        <Text style={styles.json}>{JSON.stringify(services, null, 2)}</Text>
+      </SafeAreaView>
+    );
+  }
 
   return (
-    <View style={styles.viewStyle}>
+    <SafeAreaView style={styles.container}>
+      <Text style={styles.state}>{isScanning ? "Scanning.." : "Stopped"}</Text>
+
       <FlatList
-        style={styles.flatListStyle}
-        data={[
-          "https://fastly.picsum.photos/id/237/200/300.jpg?hmac=TmmQSbShHz9CdQm0NkEjx1Dyh_Y984R9LpNrpvH2D_U",
-          "https://fastly.picsum.photos/id/186/200/300.jpg?hmac=OcvCqU_4x7ik3BASnw4WmwKaS-Sv167Nmf5CJoTrIUs",
-          "https://fastly.picsum.photos/id/237/200/300.jpg?hmac=TmmQSbShHz9CdQm0NkEjx1Dyh_Y984R9LpNrpvH2D_U",
-          "https://fastly.picsum.photos/id/237/200/300.jpg?hmac=TmmQSbShHz9CdQm0NkEjx1Dyh_Y984R9LpNrpvH2D_U",
-        ]}
-        renderItem={renderItem}
-        //initialNumToRender={10}
-        // viewabilityConfig={{
-        //   itemVisiblePercentThreshold: 90,
-        // }}
-        horizontal={true}
-        snapToAlignment="start"
-        disableIntervalMomentum={true}
-        decelerationRate={"normal"}
-        showsHorizontalScrollIndicator={false}
-        snapToInterval={ITEM_WIDTH}
-        keyExtractor={keyExtractor}
-        onEndReachedThreshold={5}
-        getItemLayout={getItemLayout}
+        data={services}
+        renderItem={renderRow}
+        keyExtractor={(key, index) => key.fullName + index.toString()}
+        onRefresh={refreshData}
+        refreshing={false}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  viewStyle: {
-    height: "100%",
-    width: "100%",
-    backgroundColor: "red",
+  container: {
+    flex: 1,
+    padding: 20,
   },
-  flatListStyle: { height: "100%", width: "100%", backgroundColor: "blue" },
-  itemStyle: {
-    justifyContent: "center",
-    // width: "100%",
-    backgroundColor: "white",
+  closeButton: {
+    padding: 20,
+    textAlign: "center",
   },
-  imageStyle: {
-    width: W,
-    height: "100%",
-    borderRadius: 0,
-    backgroundColor: "white",
+  json: {
+    padding: 10,
+  },
+  state: {
+    fontSize: 20,
+    textAlign: "center",
+    margin: 30,
   },
 });
-
-function TestPhotoComponent(props: { photo: string }) {
-  const position = useSharedValue(0);
-  const positionLast = useSharedValue(0);
-  const positionY = useSharedValue(0);
-  const positionYLast = useSharedValue(0);
-  const scale = useSharedValue(1);
-  const savedScale = useSharedValue(1);
-
-  const [en, setEn] = useState(false);
-
-  const panGesture = Gesture.Pan()
-    .enabled(en)
-    .onUpdate((e) => {
-      const newY = positionYLast.value + e.translationY / scale.value;
-      positionY.value = newY;
-      if (newY > (H * (scale.value - 1)) / 2 / scale.value) {
-        positionY.value = (H * (scale.value - 1)) / 2 / scale.value;
-      } else if (newY < (-H * (scale.value - 1)) / 2 / scale.value) {
-        positionY.value = (-H * (scale.value - 1)) / 2 / scale.value;
-      } else {
-        positionY.value = newY;
-      }
-
-      const newX = positionLast.value + e.translationX / scale.value;
-      if (newX > (W * (scale.value - 1)) / 2 / scale.value) {
-        position.value = (W * (scale.value - 1)) / 2 / scale.value;
-      } else if (newX < (-W * (scale.value - 1)) / 2 / scale.value) {
-        position.value = (-W * (scale.value - 1)) / 2 / scale.value;
-      } else {
-        position.value = newX;
-      }
-    })
-    .onEnd((e) => {
-      positionYLast.value = positionY.value;
-      positionLast.value = position.value;
-      console.log(positionLast.value, positionYLast.value);
-    });
-
-  const pinchGesture = Gesture.Pinch()
-    .onUpdate((e) => {
-      if (savedScale.value * e.scale < 1) {
-        scale.value = 1;
-      } else if (savedScale.value * e.scale > 5) {
-        scale.value = 5;
-      } else {
-        scale.value = savedScale.value * e.scale;
-      }
-    })
-    .onEnd(() => {
-      savedScale.value = scale.value;
-
-      if (scale.value > 1) {
-        runOnJS(setEn)(true);
-      } else {
-        runOnJS(setEn)(false);
-      }
-    });
-
-  const composed = Gesture.Simultaneous(panGesture, pinchGesture);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      { scale: scale.value },
-      { translateX: position.value },
-      { translateY: positionY.value },
-    ],
-  }));
-
-  return (
-    <TouchableWithoutFeedback onPress={() => console.log("touched")}>
-      <GestureDetector gesture={composed}>
-        <Animated.View style={[styles.itemStyle, animatedStyle]}>
-          <Image
-            source={{
-              uri: props.photo,
-            }}
-            resizeMode={"contain"}
-            style={[styles.imageStyle]}
-          />
-        </Animated.View>
-      </GestureDetector>
-    </TouchableWithoutFeedback>
-  );
-}
