@@ -10,7 +10,8 @@ import {
 } from "react-native";
 import Zeroconf from "react-native-zeroconf";
 import type { Service } from "react-native-zeroconf";
-import { useNavigation } from "@react-navigation/native";
+import { ParamListBase, useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import NetworkConfig from "~/Global/networkConfig";
 
 const zeroconf = new Zeroconf();
@@ -19,7 +20,7 @@ export default function App() {
   const [isScanning, setIsScanning] = useState(false);
   const [services, setServices] = useState<Service[]>(new Array<Service>());
 
-  const navigation = useNavigation();
+  const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
 
   useEffect(() => {
     refreshData();
