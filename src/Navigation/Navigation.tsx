@@ -7,6 +7,7 @@ import { createDrawerNavigator } from "@react-navigation/drawer";
 import PhotoGalleryServerScreen from "~/Navigation/Screens/PhotoGalleryServerScreen";
 import PhotoGalleryLocalScreen from "~/Navigation/Screens/PhotoGalleryLocalScreen";
 import TestScreen from "~/Navigation/Screens/Test";
+import ServerSelectScreen from "~/Navigation/Screens/ServerSelectScreen";
 
 import type { NavigatorScreenParams } from "@react-navigation/native";
 
@@ -18,10 +19,14 @@ const Navigation = () => {
         screenOptions={{
           headerShown: false,
         }}
-        initialRouteName="Server"
+        initialRouteName="ServerSelectScreen"
       >
         <Drawer.Screen name="Server" component={PhotoGalleryServerScreen} />
         <Drawer.Screen name="Local" component={PhotoGalleryLocalScreen} />
+        <Drawer.Screen
+          name="ServerSelectScreen"
+          component={ServerSelectScreen}
+        />
         <Drawer.Screen name="Test" component={TestScreen} />
       </Drawer.Navigator>
     </NavigationContainer>
