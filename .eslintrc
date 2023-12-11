@@ -1,0 +1,9 @@
+{
+    "extends": [
+        "eslint:recommended",
+        "@react-native-community",
+        "plugin:react-hooks/recommended",
+        "prettier"
+    ],
+    "rules": {}
+}
