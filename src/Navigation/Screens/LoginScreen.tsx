@@ -1,14 +1,29 @@
-import {StyleSheet, TextInput, View} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import {Text} from 'react-native-elements';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {appColors, colors} from '~/../styles/colors';
-import {spacing} from '~/../styles/spacing';
+import {appColors, colors} from '~/styles/colors';
+import {spacing} from '~/styles/spacing';
+import {Formik} from 'formik';
+import ViewWithGap from '~/Components/CommonComponents/ViewWithGap';
+import {PrimaryButton} from '~/Components/CommonComponents/Buttons';
+import {PasswordInput, TextInput} from '~/Components/CommonComponents/Inputs';
+import KeyboardDismissingView from '~/Components/CommonComponents/KeyboardDismissingView';
+import * as Yup from 'yup';
+
+const LoginSchema = Yup.object().shape({
+    email: Yup.string().email('Invalid email').required('No email provided'),
+    password: Yup.string()
+        .required('No password provided')
+        .min(5, 'Password is too short - should be at least 5 characters'),
+});
 
 export default function LoginScreen() {
     return (
         <SafeAreaView style={styles.container}>
-            <ScreenTitle title="Sign In" />
-            <LoginForm />
+            <KeyboardDismissingView>
+                <ScreenTitle title="Sign In" />
+                <LoginForm />
+            </KeyboardDismissingView>
         </SafeAreaView>
     );
 }
@@ -19,18 +34,36 @@ function ScreenTitle({title}: {title: string}) {
 
 function LoginForm() {
     return (
-        <View style={{paddingTop: spacing.spacing_xxl_3}}>
-            <TextInput
-                placeholder="Email"
-                style={{
-                    paddingLeft: spacing.spacing_l,
-                    borderColor: colors.COLOR_SECONDARY_300,
-                    borderWidth: 1,
-                    borderRadius: spacing.spacing_s,
-                }}
-                placeholderTextColor={colors.COLOR_SECONDARY_300}
-            />
-        </View>
+        <Formik
+            initialValues={{email: '', password: ''}}
+            validationSchema={LoginSchema}
+            onSubmit={values => console.log(values)}>
+            {({handleChange, handleBlur, handleSubmit, values, errors}) => (
+                <View>
+                    <ViewWithGap
+                        gap={spacing.spacing_m}
+                        style={{
+                            paddingTop: spacing.spacing_xxl_3,
+                            paddingBottom: spacing.spacing_xxl,
+                        }}>
+                        <TextInput
+                            placeholder="Email"
+                            onChangeText={handleChange('email')}
+                            onBlur={handleBlur('email')}
+                            value={values.email}
+                            error={errors.email}
+                        />
+                        <PasswordInput
+                            onChangeText={handleChange('password')}
+                            onBlur={handleBlur('password')}
+                            value={values.password}
+                            error={errors.password}
+                        />
+                    </ViewWithGap>
+                    <PrimaryButton title="Sign In" onPress={() => handleSubmit()} />
+                </View>
+            )}
+        </Formik>
     );
 }
 

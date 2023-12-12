@@ -13,6 +13,7 @@ export const spacing = {
     spacing_xxl_4: 84,
     spacing_xxl_5: 116,
     spacing_xxl_6: 148,
-    spacing_xxl_7: 212,
-    spacing_xxl_8: 276,
+    spacing_xxl_7: 180,
+    spacing_xxl_8: 212,
+    spacing_xxl_9: 276,
 };
