@@ -1,14 +1,15 @@
-import {StyleSheet, View} from 'react-native';
+import {Formik} from 'formik';
+import {useEffect, useState} from 'react';
+import {Keyboard, StyleSheet, View} from 'react-native';
 import {Text} from 'react-native-elements';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {appColors, colors} from '~/styles/colors';
-import {spacing} from '~/styles/spacing';
-import {Formik} from 'formik';
-import ViewWithGap from '~/Components/CommonComponents/ViewWithGap';
+import * as Yup from 'yup';
 import {PrimaryButton} from '~/Components/CommonComponents/Buttons';
 import {PasswordInput, TextInput} from '~/Components/CommonComponents/Inputs';
 import KeyboardDismissingView from '~/Components/CommonComponents/KeyboardDismissingView';
-import * as Yup from 'yup';
+import ViewWithGap from '~/Components/CommonComponents/ViewWithGap';
+import {appColors} from '~/styles/colors';
+import {spacing} from '~/styles/spacing';
 
 const LoginSchema = Yup.object().shape({
     email: Yup.string().email('Invalid email').required('No email provided'),
@@ -33,6 +34,22 @@ function ScreenTitle({title}: {title: string}) {
 }
 
 function LoginForm() {
+    const [showErrors, setShowErrors] = useState(false);
+
+    useEffect(() => {
+        const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
+            setShowErrors(false);
+        });
+        const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
+            setShowErrors(true);
+        });
+
+        return () => {
+            keyboardDidHideListener.remove();
+            keyboardDidShowListener.remove();
+        };
+    }, []);
+
     return (
         <Formik
             initialValues={{email: '', password: ''}}
@@ -52,15 +69,22 @@ function LoginForm() {
                             onBlur={handleBlur('email')}
                             value={values.email}
                             error={errors.email}
+                            showErrors={showErrors}
                         />
                         <PasswordInput
                             onChangeText={handleChange('password')}
                             onBlur={handleBlur('password')}
                             value={values.password}
                             error={errors.password}
+                            showErrors={showErrors}
                         />
                     </ViewWithGap>
-                    <PrimaryButton title="Sign In" onPress={() => handleSubmit()} />
+                    <PrimaryButton
+                        title="Sign In"
+                        onPress={() => {
+                            handleSubmit();
+                        }}
+                    />
                 </View>
             )}
         </Formik>

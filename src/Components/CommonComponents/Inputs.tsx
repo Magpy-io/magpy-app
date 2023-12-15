@@ -1,3 +1,4 @@
+import {useState} from 'react';
 import {
     TextInput as RNTextInput,
     TextInputProps as RNTextInputProps,
@@ -6,7 +7,6 @@ import {
 import {Icon, Text} from 'react-native-elements';
 import {colors} from '~/styles/colors';
 import {spacing} from '~/styles/spacing';
-import {useState} from 'react';
 
 function FormError({error}: {error: string | undefined}) {
     if (error) {
@@ -25,6 +25,7 @@ function FormError({error}: {error: string | undefined}) {
 
 type PasswordInputProps = {
     error: string | undefined;
+    showErrors: boolean;
 } & RNTextInputProps;
 
 export function PasswordInput(props: PasswordInputProps) {
@@ -64,13 +65,14 @@ export function PasswordInput(props: PasswordInputProps) {
                     }
                 />
             </View>
-            <FormError error={props.error} />
+            {props.showErrors && props.value !== '' && <FormError error={props.error} />}
         </View>
     );
 }
 
 type TextInputProps = {
     error: string | undefined;
+    showErrors: boolean;
 } & RNTextInputProps;
 
 export function TextInput(props: TextInputProps) {
@@ -86,7 +88,7 @@ export function TextInput(props: TextInputProps) {
                 placeholderTextColor={colors.COLOR_SECONDARY_300}
                 {...props}
             />
-            <FormError error={props.error} />
+            {props.showErrors && props.value !== '' && <FormError error={props.error} />}
         </View>
     );
 }
