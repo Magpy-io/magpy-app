@@ -15,11 +15,18 @@ import {appColors, colors} from '~/styles/colors';
 import {spacing} from '~/styles/spacing';
 import {typography, text} from '~/styles/typography';
 
+const regex =
+    /^(?=.[a-z])(?=.[A-Z])(?=.\d)(?=.[!@#$%^&()_-+={}[]\|:;'<>,.?\/])[a-zA-Z\d!@#$%^&()_-+={}[]\|:;'<>,.?\/]{8,16}$/;
 const LoginSchema = Yup.object().shape({
     email: Yup.string().email('Invalid email').required('No email provided'),
     password: Yup.string()
         .required('No password provided')
-        .min(5, 'Password is too short - should be at least 5 characters'),
+        .min(8, 'Password is too short - should be at least 8 characters')
+        .max(16, 'Password is too long - should be at most 16 characters')
+        .matches(
+            regex,
+            'Password must contain at least one uppercase, one number and one special character'
+        ),
 });
 
 export default function LoginScreen() {
