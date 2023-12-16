@@ -1,4 +1,3 @@
-import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import {useNavigation} from '@react-navigation/native';
 import {Formik} from 'formik';
 import {useEffect, useState} from 'react';
@@ -10,10 +9,11 @@ import {PrimaryButton} from '~/Components/CommonComponents/Buttons';
 import GoogleSignIn from '~/Components/CommonComponents/GoogleSignIn';
 import {PasswordInput, TextInput} from '~/Components/CommonComponents/Inputs';
 import KeyboardDismissingView from '~/Components/CommonComponents/KeyboardDismissingView';
+import ScreenTitle from '~/Components/CommonComponents/ScreenTitle';
 import ViewWithGap from '~/Components/CommonComponents/ViewWithGap';
 import {appColors, colors} from '~/styles/colors';
 import {spacing} from '~/styles/spacing';
-GoogleSignin.configure();
+import {typography, text} from '~/styles/typography';
 
 const LoginSchema = Yup.object().shape({
     email: Yup.string().email('Invalid email').required('No email provided'),
@@ -59,10 +59,6 @@ function LoginFooter() {
             </View>
         </View>
     );
-}
-
-function ScreenTitle({title}: {title: string}) {
-    return <Text style={styles.screenTitleStyle}>{title}</Text>;
 }
 
 function LoginForm() {
@@ -134,8 +130,8 @@ function ForgotPassword() {
             <Text
                 style={{
                     alignSelf: 'center',
-                    fontSize: 14,
                     color: colors.COLOR_PRIMARY_500,
+                    ...typography.medium,
                 }}>
                 Forgot password ?
             </Text>
@@ -152,13 +148,6 @@ const styles = StyleSheet.create({
         paddingBottom: spacing.spacing_xxl_5,
         paddingHorizontal: spacing.spacing_xl,
         alignItems: 'center',
-    },
-    screenTitleStyle: {
-        paddingTop: spacing.spacing_xxl_6,
-        alignSelf: 'center',
-        fontSize: 32,
-        fontWeight: '800',
-        color: appColors.TEXT_DARK,
     },
     container: {
         flex: 1,
