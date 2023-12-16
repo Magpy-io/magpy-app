@@ -2,6 +2,7 @@ import {useState} from 'react';
 import {
     TextInput as RNTextInput,
     TextInputProps as RNTextInputProps,
+    TouchableOpacity,
     View,
 } from 'react-native';
 import {Icon, Text} from 'react-native-elements';
@@ -33,6 +34,7 @@ export function PasswordInput(props: PasswordInputProps) {
     const togglePasswordVisibility = () => {
         setPasswordVisible(!passwordVisible);
     };
+    const showError = props.showErrors && props.value !== '';
     return (
         <View>
             <View
@@ -40,7 +42,7 @@ export function PasswordInput(props: PasswordInputProps) {
                     flexDirection: 'row',
                     justifyContent: 'space-between',
                     alignItems: 'center',
-                    paddingHorizontal: spacing.spacing_l,
+                    paddingLeft: spacing.spacing_l,
                     borderColor: colors.COLOR_SECONDARY_300,
                     borderWidth: 1,
                     borderRadius: spacing.spacing_s,
@@ -49,23 +51,33 @@ export function PasswordInput(props: PasswordInputProps) {
                     placeholder="Password"
                     placeholderTextColor={colors.COLOR_SECONDARY_300}
                     secureTextEntry={!passwordVisible}
-                    style={{flex: 1}}
+                    style={{flex: 1, height: spacing.spacing_xxl_3}}
                     {...props}
                 />
-                <Icon
-                    name={passwordVisible ? 'visibility-off' : 'visibility'}
-                    size={18}
+                <TouchableOpacity
                     onPress={togglePasswordVisibility}
-                    disabled={props.value === ''}
-                    disabledStyle={{backgroundColor: 'white'}}
-                    color={
-                        props.value === ''
-                            ? colors.COLOR_SECONDARY_300
-                            : colors.COLOR_SECONDARY_500
-                    }
-                />
+                    style={{
+                        paddingHorizontal: spacing.spacing_l,
+                        height: spacing.spacing_xxl_3,
+                        alignContent: 'center',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        alignSelf: 'center',
+                    }}>
+                    <Icon
+                        name={passwordVisible ? 'visibility-off' : 'visibility'}
+                        size={18}
+                        disabled={props.value === ''}
+                        disabledStyle={{backgroundColor: 'white'}}
+                        color={
+                            props.value === ''
+                                ? colors.COLOR_SECONDARY_300
+                                : colors.COLOR_SECONDARY_500
+                        }
+                    />
+                </TouchableOpacity>
             </View>
-            {props.showErrors && props.value !== '' && <FormError error={props.error} />}
+            {showError && <FormError error={props.error} />}
         </View>
     );
 }
@@ -76,6 +88,8 @@ type TextInputProps = {
 } & RNTextInputProps;
 
 export function TextInput(props: TextInputProps) {
+    const showError = props.showErrors && props.value !== '';
+
     return (
         <View>
             <RNTextInput
@@ -84,11 +98,12 @@ export function TextInput(props: TextInputProps) {
                     borderColor: colors.COLOR_SECONDARY_300,
                     borderWidth: 1,
                     borderRadius: spacing.spacing_s,
+                    height: spacing.spacing_xxl_3,
                 }}
                 placeholderTextColor={colors.COLOR_SECONDARY_300}
                 {...props}
             />
-            {props.showErrors && props.value !== '' && <FormError error={props.error} />}
+            {showError && <FormError error={props.error} />}
         </View>
     );
 }

@@ -1,4 +1,3 @@
-import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import {useNavigation} from '@react-navigation/native';
 import {Formik} from 'formik';
 import {useEffect, useState} from 'react';
@@ -13,47 +12,41 @@ import KeyboardDismissingView from '~/Components/CommonComponents/KeyboardDismis
 import ViewWithGap from '~/Components/CommonComponents/ViewWithGap';
 import {appColors, colors} from '~/styles/colors';
 import {spacing} from '~/styles/spacing';
-GoogleSignin.configure();
 
-const LoginSchema = Yup.object().shape({
+const RegisterSchema = Yup.object().shape({
+    name: Yup.string().required('No name provided'),
     email: Yup.string().email('Invalid email').required('No email provided'),
     password: Yup.string()
         .required('No password provided')
         .min(5, 'Password is too short - should be at least 5 characters'),
 });
 
-export default function LoginScreen() {
+export default function RegisterScreen() {
     return (
         <SafeAreaView style={styles.container}>
             <KeyboardDismissingView>
-                <ScreenTitle title="Sign In" />
-                <LoginForm />
+                <ScreenTitle title="Create Account" />
+                <RegisterForm />
             </KeyboardDismissingView>
-            <LoginFooter />
+            <RegisterFooter />
         </SafeAreaView>
     );
 }
 
-function LoginFooter() {
+function RegisterFooter() {
     const navigation = useNavigation();
     return (
         <View style={styles.loginFooterStyle}>
             <GoogleSignIn />
-            <View
-                style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                }}>
-                <Text style={{color: colors.COLOR_SECONDARY_500}}>
-                    Don't have an account ?{' '}
-                </Text>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <Text style={{color: colors.COLOR_SECONDARY_500}}>Already a client ? </Text>
                 <TouchableOpacity
                     onPress={() => {
-                        navigation.navigate('Register');
+                        navigation.navigate('Login');
                     }}
                     style={{paddingVertical: spacing.spacing_s}}>
                     <Text style={{color: colors.COLOR_PRIMARY_500, fontWeight: 'bold'}}>
-                        Register !
+                        Sign In !
                     </Text>
                 </TouchableOpacity>
             </View>
@@ -65,7 +58,7 @@ function ScreenTitle({title}: {title: string}) {
     return <Text style={styles.screenTitleStyle}>{title}</Text>;
 }
 
-function LoginForm() {
+function RegisterForm() {
     const [showErrors, setShowErrors] = useState(false);
 
     useEffect(() => {
@@ -84,8 +77,8 @@ function LoginForm() {
 
     return (
         <Formik
-            initialValues={{email: '', password: ''}}
-            validationSchema={LoginSchema}
+            initialValues={{name: '', email: '', password: ''}}
+            validationSchema={RegisterSchema}
             onSubmit={values => console.log(values)}>
             {({handleChange, handleBlur, handleSubmit, values, errors}) => (
                 <View>
@@ -93,7 +86,16 @@ function LoginForm() {
                         gap={spacing.spacing_m}
                         style={{
                             paddingTop: spacing.spacing_xxl_3,
+                            paddingBottom: spacing.spacing_xxl,
                         }}>
+                        <TextInput
+                            placeholder="Name"
+                            onChangeText={handleChange('name')}
+                            onBlur={handleBlur('name')}
+                            value={values.name}
+                            error={errors.name}
+                            showErrors={showErrors}
+                        />
                         <TextInput
                             placeholder="Email"
                             onChangeText={handleChange('email')}
@@ -110,9 +112,8 @@ function LoginForm() {
                             showErrors={showErrors}
                         />
                     </ViewWithGap>
-                    <ForgotPassword />
                     <PrimaryButton
-                        title="Sign In"
+                        title="Register"
                         onPress={() => {
                             handleSubmit();
                         }}
@@ -120,26 +121,6 @@ function LoginForm() {
                 </View>
             )}
         </Formik>
-    );
-}
-
-function ForgotPassword() {
-    return (
-        <TouchableOpacity
-            style={{
-                marginBottom: spacing.spacing_xxl,
-                paddingVertical: spacing.spacing_s,
-            }}
-            onPress={() => {}}>
-            <Text
-                style={{
-                    alignSelf: 'center',
-                    fontSize: 14,
-                    color: colors.COLOR_PRIMARY_500,
-                }}>
-                Forgot password ?
-            </Text>
-        </TouchableOpacity>
     );
 }
 

@@ -11,8 +11,25 @@ import ServerSelectScreen from '~/Navigation/Screens/ServerSelectScreen';
 import TestScreen from '~/Navigation/Screens/Test';
 
 import type {NavigatorScreenParams} from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import RegisterScreen from './Screens/RegisterScreen';
 
 const Drawer = createDrawerNavigator();
+
+const LoginStack = createNativeStackNavigator();
+
+function LoginStackNavigator() {
+    return (
+        <LoginStack.Navigator
+            screenOptions={{
+                headerShown: false,
+            }}>
+            <LoginStack.Screen name="Login" component={LoginScreen} />
+            <LoginStack.Screen name="Register" component={RegisterScreen} />
+        </LoginStack.Navigator>
+    );
+}
+
 const Navigation = () => {
     return (
         <NavigationContainer>
@@ -25,7 +42,7 @@ const Navigation = () => {
                 <Drawer.Screen name="Local" component={PhotoGalleryLocalScreen} />
                 <Drawer.Screen name="ServerSelectScreen" component={ServerSelectScreen} />
                 <Drawer.Screen name="Test" component={TestScreen} />
-                <Drawer.Screen name="Login" component={LoginScreen} />
+                <Drawer.Screen name="LoginStackNavigator" component={LoginStackNavigator} />
             </Drawer.Navigator>
         </NavigationContainer>
     );
