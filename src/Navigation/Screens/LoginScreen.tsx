@@ -13,20 +13,22 @@ import ScreenTitle from '~/Components/CommonComponents/ScreenTitle';
 import ViewWithGap from '~/Components/CommonComponents/ViewWithGap';
 import {appColors, colors} from '~/styles/colors';
 import {spacing} from '~/styles/spacing';
-import {typography, text} from '~/styles/typography';
+import {typography, textSize} from '~/styles/typography';
 
-const regex =
-    /^(?=.[a-z])(?=.[A-Z])(?=.\d)(?=.[!@#$%^&()_-+={}[]\|:;'<>,.?\/])[a-zA-Z\d!@#$%^&()_-+={}[]\|:;'<>,.?\/]{8,16}$/;
+const PASSWORD_REQUIREMENTS =
+    'Password should contain at least one uppercase, one number and one special character';
+const specialChars = "!@#$%^&()_-+={}[]|:;'<>,.?/";
+
 const LoginSchema = Yup.object().shape({
     email: Yup.string().email('Invalid email').required('No email provided'),
     password: Yup.string()
         .required('No password provided')
-        .min(8, 'Password is too short - should be at least 8 characters')
-        .max(16, 'Password is too long - should be at most 16 characters')
-        .matches(
-            regex,
-            'Password must contain at least one uppercase, one number and one special character'
-        ),
+        .min(8, 'Should be at least 8 characters')
+        .max(16, 'Should be at most 16 characters')
+        .matches(/^(?=.*[a-z])/, 'Should contain a lowercase character')
+        .matches(/^(?=.*[A-Z])/, 'Should contain a uppercase character')
+        .matches(/^(?=.*[0-9])/, 'Should contain a number'),
+    // .matches(/^(!@#$%^&()_-+={}[]|:;'<>,.?)/, 'Should contain a special character'),
 });
 
 export default function LoginScreen() {
@@ -69,22 +71,6 @@ function LoginFooter() {
 }
 
 function LoginForm() {
-    const [showErrors, setShowErrors] = useState(false);
-
-    useEffect(() => {
-        const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
-            setShowErrors(false);
-        });
-        const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
-            setShowErrors(true);
-        });
-
-        return () => {
-            keyboardDidHideListener.remove();
-            keyboardDidShowListener.remove();
-        };
-    }, []);
-
     return (
         <Formik
             initialValues={{email: '', password: ''}}
@@ -103,23 +89,23 @@ function LoginForm() {
                             onBlur={handleBlur('email')}
                             value={values.email}
                             error={errors.email}
-                            showErrors={showErrors}
+                            icon="mail"
                         />
                         <PasswordInput
                             onChangeText={handleChange('password')}
                             onBlur={handleBlur('password')}
                             value={values.password}
                             error={errors.password}
-                            showErrors={showErrors}
                         />
                     </ViewWithGap>
-                    <ForgotPassword />
                     <PrimaryButton
                         title="Sign In"
                         onPress={() => {
                             handleSubmit();
                         }}
+                        containerStyle={{marginTop: spacing.spacing_xxl}}
                     />
+                    <ForgotPassword />
                 </View>
             )}
         </Formik>
@@ -130,15 +116,14 @@ function ForgotPassword() {
     return (
         <TouchableOpacity
             style={{
-                marginBottom: spacing.spacing_xxl,
                 paddingVertical: spacing.spacing_s,
+                alignSelf: 'center',
             }}
             onPress={() => {}}>
             <Text
                 style={{
-                    alignSelf: 'center',
                     color: colors.COLOR_PRIMARY_500,
-                    ...typography.medium,
+                    ...textSize.medium,
                 }}>
                 Forgot password ?
             </Text>

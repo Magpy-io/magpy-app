@@ -91,7 +91,7 @@ function RegisterForm() {
                             onBlur={handleBlur('name')}
                             value={values.name}
                             error={errors.name}
-                            showErrors={showErrors}
+                            icon="person"
                         />
                         <TextInput
                             placeholder="Email"
@@ -99,14 +99,13 @@ function RegisterForm() {
                             onBlur={handleBlur('email')}
                             value={values.email}
                             error={errors.email}
-                            showErrors={showErrors}
+                            icon="mail"
                         />
                         <PasswordInput
                             onChangeText={handleChange('password')}
                             onBlur={handleBlur('password')}
                             value={values.password}
                             error={errors.password}
-                            showErrors={showErrors}
                         />
                     </ViewWithGap>
                     <PrimaryButton

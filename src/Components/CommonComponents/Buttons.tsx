@@ -5,16 +5,21 @@ import {spacing} from '~/styles/spacing';
 export function PrimaryButton(props: ButtonProps) {
     return (
         <Button
-            style={{}}
-            containerStyle={{
-                width: 180,
-                alignSelf: 'center',
-            }}
-            buttonStyle={{
-                backgroundColor: colors.COLOR_PRIMARY_500,
-                borderRadius: spacing.spacing_s,
-            }}
             {...props}
+            containerStyle={[
+                {
+                    width: 180,
+                    alignSelf: 'center',
+                },
+                props.containerStyle,
+            ]}
+            buttonStyle={[
+                {
+                    backgroundColor: colors.COLOR_PRIMARY_500,
+                    borderRadius: spacing.spacing_s,
+                },
+                props.buttonStyle,
+            ]}
         />
     );
 }

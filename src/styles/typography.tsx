@@ -1,4 +1,6 @@
-export const typography = {
+import {colors} from './colors';
+
+export const textSize = {
     small: {
         fontSize: 12,
     },
@@ -13,9 +15,15 @@ export const typography = {
     },
 };
 
-export const text = {
+export const typography = {
     sreenTitle: {
-        ...typography.extraLarge,
+        ...textSize.extraLarge,
         fontWeight: '800',
+    },
+    formError: {
+        color: colors.COLOR_ERROR_500,
+        fontWeight: '800',
+        fontSize: 13,
+        letterSpacing: 0.5,
     },
 };
