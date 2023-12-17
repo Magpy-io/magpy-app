@@ -11,6 +11,9 @@ import {colors} from '~/styles/colors';
 import {spacing} from '~/styles/spacing';
 import {typography, textSize} from '~/styles/typography';
 
+const PASSWORD_REQUIREMENTS =
+    'Should have at least one uppercase, one number and one special character';
+
 function FormError({error}: {error: string | undefined}) {
     if (error) {
         return (
@@ -18,12 +21,14 @@ function FormError({error}: {error: string | undefined}) {
                 style={{
                     paddingTop: spacing.spacing_xxs,
                     flexDirection: 'row',
-                    alignItems: 'center',
+                    alignItems: 'flex-start',
                 }}>
                 <Icon name="cancel" size={16} color={colors.COLOR_ERROR_500} />
                 <Text
                     style={{
                         paddingLeft: spacing.spacing_xxs,
+                        flex: 1,
+                        flexWrap: 'wrap',
                         ...typography.formError,
                     }}>
                     {error}
@@ -50,6 +55,8 @@ function ValidInputIndicator() {
 
 type PasswordInputProps = {
     error: string | undefined;
+    showPasswordRequirements?: boolean;
+    showValidation?: boolean;
 } & RNTextInputProps;
 
 export function PasswordInput(props: PasswordInputProps) {
@@ -78,6 +85,7 @@ export function PasswordInput(props: PasswordInputProps) {
                     secureTextEntry={!passwordVisible}
                     style={{flex: 1, height: spacing.spacing_xxl_3}}
                     ref={inputRef}
+                    autoCapitalize="none"
                     {...props}
                 />
                 {
@@ -104,7 +112,10 @@ export function PasswordInput(props: PasswordInputProps) {
                         />
                     </TouchableOpacity>
                 }
-                {props.value !== '' && !props.error && !inputRef.current?.isFocused() ? (
+                {props.showValidation &&
+                props.value !== '' &&
+                !props.error &&
+                !inputRef.current?.isFocused() ? (
                     <ValidInputIndicator />
                 ) : (
                     <View
@@ -127,8 +138,32 @@ export function PasswordInput(props: PasswordInputProps) {
                     </View>
                 )}
             </View>
-
+            {props.showPasswordRequirements && inputRef.current?.isFocused() && (
+                <PasswordRequirements />
+            )}
             {showError && <FormError error={props.error} />}
+        </View>
+    );
+}
+
+function PasswordRequirements() {
+    return (
+        <View
+            style={{
+                paddingTop: spacing.spacing_xxs,
+                flexDirection: 'row',
+                alignItems: 'flex-start',
+            }}>
+            <Icon name="info" size={16} color={colors.COLOR_SECONDARY_400} />
+            <Text
+                style={{
+                    flex: 1,
+                    flexWrap: 'wrap',
+                    paddingLeft: spacing.spacing_xxs,
+                    ...typography.formInfo,
+                }}>
+                {PASSWORD_REQUIREMENTS}
+            </Text>
         </View>
     );
 }
@@ -136,6 +171,7 @@ export function PasswordInput(props: PasswordInputProps) {
 type TextInputProps = {
     error: string | undefined;
     icon: string;
+    showValidation?: boolean;
 } & RNTextInputProps;
 
 export function TextInput(props: TextInputProps) {
@@ -160,7 +196,10 @@ export function TextInput(props: TextInputProps) {
                     ref={inputRef}
                     {...props}
                 />
-                {props.value !== '' && !props.error && !inputRef.current?.isFocused() ? (
+                {props.showValidation &&
+                props.value !== '' &&
+                !props.error &&
+                !inputRef.current?.isFocused() ? (
                     <ValidInputIndicator />
                 ) : (
                     <View

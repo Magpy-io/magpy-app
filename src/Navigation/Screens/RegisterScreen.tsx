@@ -13,13 +13,23 @@ import ScreenTitle from '~/Components/CommonComponents/ScreenTitle';
 import ViewWithGap from '~/Components/CommonComponents/ViewWithGap';
 import {appColors, colors} from '~/styles/colors';
 import {spacing} from '~/styles/spacing';
+import validator from 'validator';
+
+const specialChars = /(?=.*[!@#$%^&*()_\-+={}[\]\\|:;'<>,.?\/])/;
 
 const RegisterSchema = Yup.object().shape({
-    name: Yup.string().required('No name provided'),
-    email: Yup.string().email('Invalid email').required('No email provided'),
+    name: Yup.string().required('No name provided').min(3, 'Should be at least 3 characters'),
+    email: Yup.string()
+        .required('No email provided')
+        .test('validateEmail', 'Invalid email', value => validator.isEmail(value)),
     password: Yup.string()
         .required('No password provided')
-        .min(5, 'Password is too short - should be at least 5 characters'),
+        .min(8, 'Should be at least 8 characters')
+        .max(16, 'Should be at most 16 characters')
+        .matches(/^(?=.*[a-z])/, 'Should contain a lowercase character')
+        .matches(/^(?=.*[A-Z])/, 'Should contain a uppercase character')
+        .matches(/^(?=.*[0-9])/, 'Should contain a number')
+        .matches(specialChars, 'Should contain a special character'),
 });
 
 export default function RegisterScreen() {
@@ -92,6 +102,7 @@ function RegisterForm() {
                             value={values.name}
                             error={errors.name}
                             icon="person"
+                            showValidation
                         />
                         <TextInput
                             placeholder="Email"
@@ -100,12 +111,15 @@ function RegisterForm() {
                             value={values.email}
                             error={errors.email}
                             icon="mail"
+                            showValidation
                         />
                         <PasswordInput
                             onChangeText={handleChange('password')}
                             onBlur={handleBlur('password')}
                             value={values.password}
                             error={errors.password}
+                            showPasswordRequirements
+                            showValidation
                         />
                     </ViewWithGap>
                     <PrimaryButton

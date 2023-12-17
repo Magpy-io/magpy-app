@@ -14,21 +14,13 @@ import ViewWithGap from '~/Components/CommonComponents/ViewWithGap';
 import {appColors, colors} from '~/styles/colors';
 import {spacing} from '~/styles/spacing';
 import {typography, textSize} from '~/styles/typography';
-
-const PASSWORD_REQUIREMENTS =
-    'Password should contain at least one uppercase, one number and one special character';
-const specialChars = "!@#$%^&()_-+={}[]|:;'<>,.?/";
+import validator from 'validator';
 
 const LoginSchema = Yup.object().shape({
-    email: Yup.string().email('Invalid email').required('No email provided'),
-    password: Yup.string()
-        .required('No password provided')
-        .min(8, 'Should be at least 8 characters')
-        .max(16, 'Should be at most 16 characters')
-        .matches(/^(?=.*[a-z])/, 'Should contain a lowercase character')
-        .matches(/^(?=.*[A-Z])/, 'Should contain a uppercase character')
-        .matches(/^(?=.*[0-9])/, 'Should contain a number'),
-    // .matches(/^(!@#$%^&()_-+={}[]|:;'<>,.?)/, 'Should contain a special character'),
+    email: Yup.string()
+        .required('No email provided')
+        .test('validateEmail', 'Invalid email', value => validator.isEmail(value)),
+    password: Yup.string().required('No password provided'),
 });
 
 export default function LoginScreen() {

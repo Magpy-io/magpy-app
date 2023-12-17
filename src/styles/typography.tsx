@@ -26,4 +26,10 @@ export const typography = {
         fontSize: 13,
         letterSpacing: 0.5,
     },
+    formInfo: {
+        color: colors.COLOR_SECONDARY_400,
+        fontWeight: '800',
+        fontSize: 13,
+        letterSpacing: 0.5,
+    },
 };
