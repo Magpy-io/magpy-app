@@ -12,7 +12,7 @@ const styles = StyleSheet.create({
     screenTitleStyle: {
         paddingTop: spacing.spacing_xxl_6,
         alignSelf: 'center',
-        ...typography.sreenTitle,
+        ...typography.screenTitle,
         color: appColors.TEXT_DARK,
     },
 });

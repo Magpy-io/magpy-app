@@ -1,3 +1,4 @@
+import {StyleProp, TextStyle} from 'react-native';
 import {colors} from './colors';
 
 export const textSize = {
@@ -15,8 +16,8 @@ export const textSize = {
     },
 };
 
-export const typography = {
-    sreenTitle: {
+export const typography: any = {
+    screenTitle: {
         ...textSize.extraLarge,
         fontWeight: '800',
     },
