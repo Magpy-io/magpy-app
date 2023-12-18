@@ -14,6 +14,8 @@ import ViewWithGap from '~/Components/CommonComponents/ViewWithGap';
 import {appColors, colors} from '~/styles/colors';
 import {spacing} from '~/styles/spacing';
 import validator from 'validator';
+import {ErrorBackendUnreachable} from '~/Helpers/ExceptionTypes';
+import * as QueriesBackend from '~/Helpers/QueriesBackend';
 
 const specialChars = /(?=.*[!@#$%^&*()_\-+={}[\]\\|:;'<>,.?\/])/;
 
@@ -86,7 +88,18 @@ function RegisterForm() {
         <Formik
             initialValues={{name: '', email: '', password: ''}}
             validationSchema={RegisterSchema}
-            onSubmit={values => console.log(values)}>
+            onSubmit={async values => {
+                try {
+                    const ret = await QueriesBackend.register(values);
+                    console.log(ret.message);
+                } catch (err) {
+                    if (err instanceof ErrorBackendUnreachable) {
+                        console.log('Backend unreachable');
+                    } else {
+                        console.log(err);
+                    }
+                }
+            }}>
             {({handleChange, handleBlur, handleSubmit, values, errors}) => (
                 <View>
                     <ViewWithGap
