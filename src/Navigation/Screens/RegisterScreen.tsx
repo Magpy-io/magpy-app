@@ -14,8 +14,8 @@ import ViewWithGap from '~/Components/CommonComponents/ViewWithGap';
 import {appColors, colors} from '~/styles/colors';
 import {spacing} from '~/styles/spacing';
 import validator from 'validator';
-import {ErrorBackendUnreachable} from '~/Helpers/ExceptionTypes';
-import * as QueriesBackend from '~/Helpers/QueriesBackend';
+
+import * as QueriesBackend from '~/Helpers/backendImportedQueries';
 
 const specialChars = /(?=.*[!@#$%^&*()_\-+={}[\]\\|:;'<>,.?\/])/;
 
@@ -90,10 +90,11 @@ function RegisterForm() {
             validationSchema={RegisterSchema}
             onSubmit={async values => {
                 try {
+                    QueriesBackend.SetPath('http://192.168.0.15:8001/');
                     const ret = await QueriesBackend.register(values);
                     console.log(ret.message);
                 } catch (err) {
-                    if (err instanceof ErrorBackendUnreachable) {
+                    if (err instanceof QueriesBackend.ErrorBackendUnreachable) {
                         console.log('Backend unreachable');
                     } else {
                         console.log(err);
