@@ -1,25 +1,26 @@
+import {StyleSheet} from 'react-native';
 import {Button, ButtonProps, Text} from 'react-native-elements';
-import {colors} from '~/styles/colors';
+import {appColors, colors} from '~/styles/colors';
 import {spacing} from '~/styles/spacing';
 
 export function PrimaryButton(props: ButtonProps) {
     return (
         <Button
             {...props}
-            containerStyle={[
-                {
-                    width: 180,
-                    alignSelf: 'center',
-                },
-                props.containerStyle,
-            ]}
-            buttonStyle={[
-                {
-                    backgroundColor: colors.COLOR_PRIMARY_500,
-                    borderRadius: spacing.spacing_s,
-                },
-                props.buttonStyle,
-            ]}
+            containerStyle={[styles.containerStyle, props.containerStyle]}
+            buttonStyle={[styles.buttonStyle, props.buttonStyle]}
         />
     );
 }
+
+const styles = StyleSheet.create({
+    buttonStyle: {
+        backgroundColor: appColors.PRIMARY,
+        borderRadius: spacing.spacing_s,
+        paddingVertical: spacing.spacing_s,
+        paddingHorizontal: spacing.spacing_xl,
+    },
+    containerStyle: {
+        alignSelf: 'center',
+    },
+});

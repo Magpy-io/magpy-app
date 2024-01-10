@@ -52,13 +52,13 @@ function RegisterFooter() {
         <View style={styles.loginFooterStyle}>
             <GoogleSignIn />
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <Text style={{color: colors.COLOR_SECONDARY_500}}>Already a client ? </Text>
+                <Text style={{color: appColors.TEXT}}>Already a client ? </Text>
                 <TouchableOpacity
                     onPress={() => {
                         navigation.navigate('Login');
                     }}
                     style={{paddingVertical: spacing.spacing_s}}>
-                    <Text style={{color: colors.COLOR_PRIMARY_500, fontWeight: 'bold'}}>
+                    <Text style={{color: appColors.ACCENT, fontWeight: 'bold'}}>
                         Sign In !
                     </Text>
                 </TouchableOpacity>
@@ -161,6 +161,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         paddingHorizontal: spacing.spacing_xl,
-        backgroundColor: appColors.BACKGROUND_LIGHT,
+        backgroundColor: appColors.BACKGROUND,
     },
 });

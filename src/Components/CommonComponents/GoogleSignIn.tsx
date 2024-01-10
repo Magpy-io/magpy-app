@@ -1,6 +1,6 @@
 import {StyleSheet, Text, TouchableOpacity} from 'react-native';
 import {Icon} from 'react-native-elements';
-import {colors} from '~/styles/colors';
+import {appColors, colors} from '~/styles/colors';
 import {spacing} from '~/styles/spacing';
 import ViewWithGap from './ViewWithGap';
 
@@ -22,12 +22,13 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     textStyle: {
-        color: colors.COLOR_SECONDARY_400,
+        color: appColors.TEXT_LIGHT,
+        textTransform: 'uppercase',
     },
     buttonStyle: {
         borderRadius: spacing.spacing_s,
-        borderColor: colors.COLOR_SECONDARY_200,
-        borderWidth: 2,
+        borderColor: appColors.TEXT_LIGHT,
+        borderWidth: 1,
         padding: spacing.spacing_s,
         width: '100%',
     },

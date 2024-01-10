@@ -27,7 +27,7 @@ export default function LoginScreen() {
     return (
         <SafeAreaView style={styles.container}>
             <KeyboardDismissingView>
-                <ScreenTitle title="Sign In" />
+                <ScreenTitle title="Login to your account" />
                 <LoginForm />
             </KeyboardDismissingView>
             <LoginFooter />
@@ -45,15 +45,13 @@ function LoginFooter() {
                     flexDirection: 'row',
                     alignItems: 'center',
                 }}>
-                <Text style={{color: colors.COLOR_SECONDARY_500}}>
-                    Don't have an account ?{' '}
-                </Text>
+                <Text style={{color: appColors.TEXT}}>Don't have an account ? </Text>
                 <TouchableOpacity
                     onPress={() => {
                         navigation.navigate('Register');
                     }}
                     style={{paddingVertical: spacing.spacing_s}}>
-                    <Text style={{color: colors.COLOR_PRIMARY_500, fontWeight: 'bold'}}>
+                    <Text style={{color: appColors.ACCENT, fontWeight: 'bold'}}>
                         Register !
                     </Text>
                 </TouchableOpacity>
@@ -83,12 +81,15 @@ function LoginForm() {
                             error={errors.email}
                             icon="mail"
                         />
-                        <PasswordInput
-                            onChangeText={handleChange('password')}
-                            onBlur={handleBlur('password')}
-                            value={values.password}
-                            error={errors.password}
-                        />
+                        <>
+                            <PasswordInput
+                                onChangeText={handleChange('password')}
+                                onBlur={handleBlur('password')}
+                                value={values.password}
+                                error={errors.password}
+                            />
+                            <ForgotPassword />
+                        </>
                     </ViewWithGap>
                     <PrimaryButton
                         title="Sign In"
@@ -96,8 +97,8 @@ function LoginForm() {
                             handleSubmit();
                         }}
                         containerStyle={{marginTop: spacing.spacing_xxl}}
+                        buttonStyle={{paddingHorizontal: spacing.spacing_xxl_2}}
                     />
-                    <ForgotPassword />
                 </View>
             )}
         </Formik>
@@ -114,7 +115,8 @@ function ForgotPassword() {
             onPress={() => {}}>
             <Text
                 style={{
-                    color: colors.COLOR_PRIMARY_500,
+                    color: appColors.ACCENT,
+                    fontWeight: 'bold',
                     ...textSize.medium,
                 }}>
                 Forgot password ?
@@ -136,6 +138,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         paddingHorizontal: spacing.spacing_xl,
-        backgroundColor: appColors.BACKGROUND_LIGHT,
+        backgroundColor: appColors.BACKGROUND,
     },
 });

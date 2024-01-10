@@ -7,7 +7,7 @@ import {
     View,
 } from 'react-native';
 import {Icon, Text} from 'react-native-elements';
-import {colors} from '~/styles/colors';
+import {appColors, colors} from '~/styles/colors';
 import {spacing} from '~/styles/spacing';
 import {typography, textSize} from '~/styles/typography';
 
@@ -75,13 +75,13 @@ export function PasswordInput(props: PasswordInputProps) {
                     justifyContent: 'space-between',
                     alignItems: 'center',
                     paddingLeft: spacing.spacing_xxl_2,
-                    borderColor: colors.COLOR_SECONDARY_300,
+                    borderColor: appColors.FORM_BORDER,
                     borderWidth: 1,
                     borderRadius: spacing.spacing_s,
                 }}>
                 <RNTextInput
                     placeholder="Password"
-                    placeholderTextColor={colors.COLOR_SECONDARY_300}
+                    placeholderTextColor={appColors.TEXT_LIGHT}
                     secureTextEntry={!passwordVisible}
                     style={{flex: 1, height: spacing.spacing_xxl_3}}
                     ref={inputRef}
@@ -101,14 +101,10 @@ export function PasswordInput(props: PasswordInputProps) {
                         }}>
                         <Icon
                             name={passwordVisible ? 'visibility-off' : 'visibility'}
-                            size={18}
+                            size={16}
                             disabled={props.value === ''}
                             disabledStyle={{backgroundColor: 'white'}}
-                            color={
-                                props.value === ''
-                                    ? colors.COLOR_SECONDARY_300
-                                    : colors.COLOR_SECONDARY_500
-                            }
+                            color={props.value === '' ? appColors.TEXT_LIGHT : appColors.TEXT}
                         />
                     </TouchableOpacity>
                 }
@@ -129,11 +125,7 @@ export function PasswordInput(props: PasswordInputProps) {
                         <Icon
                             name="lock"
                             size={16}
-                            color={
-                                props.value === ''
-                                    ? colors.COLOR_SECONDARY_300
-                                    : colors.COLOR_SECONDARY_500
-                            }
+                            color={props.value === '' ? appColors.TEXT_LIGHT : appColors.TEXT}
                         />
                     </View>
                 )}
@@ -154,7 +146,7 @@ function PasswordRequirements() {
                 flexDirection: 'row',
                 alignItems: 'flex-start',
             }}>
-            <Icon name="info" size={16} color={colors.COLOR_SECONDARY_400} />
+            <Icon name="info" size={16} color={appColors.TEXT_LIGHT} />
             <Text
                 style={{
                     flex: 1,
@@ -183,7 +175,7 @@ export function TextInput(props: TextInputProps) {
                 style={{
                     flexDirection: 'row',
                     paddingLeft: spacing.spacing_xxl_2,
-                    borderColor: colors.COLOR_SECONDARY_300,
+                    borderColor: appColors.FORM_BORDER,
                     borderWidth: 1,
                     borderRadius: spacing.spacing_s,
                     height: spacing.spacing_xxl_3,
@@ -192,7 +184,7 @@ export function TextInput(props: TextInputProps) {
                     style={{
                         flex: 1,
                     }}
-                    placeholderTextColor={colors.COLOR_SECONDARY_300}
+                    placeholderTextColor={appColors.TEXT_LIGHT}
                     ref={inputRef}
                     {...props}
                 />
@@ -213,11 +205,7 @@ export function TextInput(props: TextInputProps) {
                         <Icon
                             name={props.icon}
                             size={16}
-                            color={
-                                props.value === ''
-                                    ? colors.COLOR_SECONDARY_300
-                                    : colors.COLOR_SECONDARY_500
-                            }
+                            color={props.value === '' ? appColors.TEXT_LIGHT : appColors.TEXT}
                         />
                     </View>
                 )}

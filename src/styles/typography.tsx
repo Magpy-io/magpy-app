@@ -1,5 +1,5 @@
 import {StyleProp, TextStyle} from 'react-native';
-import {colors} from './colors';
+import {appColors, colors} from './colors';
 
 export const textSize = {
     small: {
@@ -12,24 +12,27 @@ export const textSize = {
         fontSize: 16,
     },
     extraLarge: {
+        fontSize: 20,
+    },
+    extraLarge2: {
         fontSize: 32,
     },
 };
 
 export const typography: any = {
     screenTitle: {
-        ...textSize.extraLarge,
-        fontWeight: '800',
+        ...textSize.extraLarge2,
+        fontWeight: 'normal',
     },
     formError: {
         color: colors.COLOR_ERROR_500,
-        fontWeight: '800',
+        fontWeight: 'bold',
         fontSize: 13,
         letterSpacing: 0.5,
     },
     formInfo: {
-        color: colors.COLOR_SECONDARY_400,
-        fontWeight: '800',
+        color: appColors.TEXT_LIGHT,
+        fontWeight: 'bold',
         fontSize: 13,
         letterSpacing: 0.5,
     },
