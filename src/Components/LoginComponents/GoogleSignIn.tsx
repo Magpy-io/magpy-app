@@ -2,7 +2,7 @@ import {StyleSheet, Text, TouchableOpacity} from 'react-native';
 import {Icon} from 'react-native-elements';
 import {appColors, colors} from '~/styles/colors';
 import {spacing} from '~/styles/spacing';
-import ViewWithGap from './ViewWithGap';
+import ViewWithGap from '../CommonComponents/ViewWithGap';
 
 export default function GoogleSignIn() {
     return (

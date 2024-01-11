@@ -54,6 +54,7 @@ export const appColors = {
     BACKGROUND: colors.WHITE,
     TEXT: colors.DARK,
     TEXT_LIGHT: colors.LIGHT_GREEN,
+    TEXT_INVERSE: colors.WHITE,
     PRIMARY: colors.DARK,
     ACCENT: colors.ORANGE,
     FORM_BORDER: colors.LIGHT_GREEN,
