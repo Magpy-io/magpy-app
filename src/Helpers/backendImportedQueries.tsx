@@ -1,23 +1,34 @@
 import axios, {AxiosResponse} from 'axios';
 
-let path: string = '';
-
-let UserToken = '';
-let ServerToken = '';
-
 export function SetPath(path_p: string) {
     if (typeof path_p !== 'string') {
-        throw new Error('path_p parameter a string');
+        throw new Error('path_p parameter must be astring');
+    }
+
+    if (path_p[path_p.length - 1] != '/') {
+        path_p += '/';
     }
 
     path = path_p;
 }
+
+let path: string = '';
+
+let UserToken = '';
+let ServerToken = '';
 
 export function GetUserToken(): string {
     if (!UserToken) {
         throw new ErrorNoUserToken();
     }
     return UserToken;
+}
+
+export function SetUserToken(token: string) {
+    if (typeof token !== 'string') {
+        throw new Error('token parameter must be a string');
+    }
+    UserToken = token;
 }
 
 export function HasUserToken(): boolean {
@@ -32,6 +43,13 @@ export function GetServerToken(): string {
         throw new ErrorNoServerToken();
     }
     return ServerToken;
+}
+
+export function SetServerToken(token: string) {
+    if (typeof token !== 'string') {
+        throw new Error('token parameter must be a string');
+    }
+    ServerToken = token;
 }
 
 export function HasServerToken(): boolean {
@@ -76,6 +94,14 @@ const routes = {
         checkPathExists();
         return path + 'getServerInfo/';
     },
+    deleteServer: () => {
+        checkPathExists();
+        return path + 'deleteServer/';
+    },
+    updateServerData: () => {
+        checkPathExists();
+        return path + 'updateServerData/';
+    },
 };
 
 type ErrorBadRequest = 'BAD_REQUEST';
@@ -86,6 +112,7 @@ type ErrorInvalidEmail = 'INVALID_EMAIL';
 type ErrorInvalidName = 'INVALID_NAME';
 type ErrorInvalidPassword = 'INVALID_PASSWORD';
 type ErrorInvalidIpAddress = 'INVALID_IP_ADDRESS';
+type ErrorInvalidServerName = 'INVALID_SERVER_NAME';
 type ErrorInvalidKeyFormat = 'INVALID_KEY_FORMAT';
 type ErrorNoAssociatedServer = 'NO_ASSOCIATED_SERVER';
 type ErrorAuthorizationFailed = 'AUTHORIZATION_FAILED';
@@ -115,7 +142,7 @@ export type ServerResponseError<Errors> = {
     errorCode: Errors | ErrorBadRequest | ErrorServerError;
 };
 
-export type EndpointMethodsResponseType<T, U> = Promise<T | ServerResponseError<U>>;
+export type EndpointMethodsResponseType<T, U> = T | ServerResponseError<U>;
 
 // Register
 export type RegisterRequestData = {
@@ -132,9 +159,11 @@ export type RegisterResponseErrorTypes =
     | ErrorInvalidName
     | ErrorInvalidPassword;
 
-export async function register(
-    data: RegisterRequestData
-): EndpointMethodsResponseType<RegisterResponseData, RegisterResponseErrorTypes> {
+export type RegisterResponseType = EndpointMethodsResponseType<
+    RegisterResponseData,
+    RegisterResponseErrorTypes
+>;
+export async function registerPost(data: RegisterRequestData): Promise<RegisterResponseType> {
     try {
         const response = await axios.post(routes.registerUser(), data);
         return response.data;
@@ -153,9 +182,12 @@ export type LoginResponseData = ServerResponseMessage;
 
 export type LoginResponseErrorTypes = ErrorInvalidCredentials;
 
-export async function login(
-    data: LoginRequestData
-): EndpointMethodsResponseType<LoginResponseData, LoginResponseErrorTypes> {
+export type LoginResponseType = EndpointMethodsResponseType<
+    LoginResponseData,
+    LoginResponseErrorTypes
+>;
+
+export async function loginPost(data: LoginRequestData): Promise<LoginResponseType> {
     try {
         const response = await axios.post(routes.loginUser(), data);
         UserToken = extractToken(response);
@@ -166,7 +198,7 @@ export async function login(
 }
 
 // WhoAmI
-export type WhoAmIRequestData = {};
+export type WhoAmIRequestData = void;
 
 export type WhoAmIResponseData = ServerResponseData<{
     user: {_id: string; email: string};
@@ -174,9 +206,12 @@ export type WhoAmIResponseData = ServerResponseData<{
 
 export type WhoAmIResponseErrorTypes = ErrorsAuthorization;
 
-export async function whoAmI(
-    data: WhoAmIRequestData
-): EndpointMethodsResponseType<WhoAmIResponseData, WhoAmIResponseErrorTypes> {
+export type WhoAmIResponseType = EndpointMethodsResponseType<
+    WhoAmIResponseData,
+    WhoAmIResponseErrorTypes
+>;
+
+export async function whoAmIPost(data: WhoAmIRequestData): Promise<WhoAmIResponseType> {
     verifyHasUserToken();
     try {
         const response = await axios.post(routes.whoAmI(), data, userAuthorizationObject());
@@ -187,7 +222,7 @@ export async function whoAmI(
 }
 
 // GetMyServerInfo
-export type GetMyServerInfoRequestData = {};
+export type GetMyServerInfoRequestData = void;
 
 export type GetMyServerInfoResponseData = ServerResponseData<{
     server: {_id: string; name: string; ip: string};
@@ -195,12 +230,14 @@ export type GetMyServerInfoResponseData = ServerResponseData<{
 
 export type GetMyServerInfoResponseErrorTypes = ErrorNoAssociatedServer | ErrorsAuthorization;
 
-export async function getMyServerInfo(
-    data: GetMyServerInfoRequestData
-): EndpointMethodsResponseType<
+export type GetMyServerInfoResponseType = EndpointMethodsResponseType<
     GetMyServerInfoResponseData,
     GetMyServerInfoResponseErrorTypes
-> {
+>;
+
+export async function getMyServerInfoPost(
+    data: GetMyServerInfoRequestData
+): Promise<GetMyServerInfoResponseType> {
     verifyHasUserToken();
     try {
         const response = await axios.post(
@@ -227,12 +264,18 @@ export type RegisterServerResponseData = ServerResponseData<{
 
 export type RegisterServerResponseErrorTypes =
     | ErrorInvalidIpAddress
+    | ErrorInvalidServerName
     | ErrorInvalidKeyFormat
     | ErrorsAuthorization;
 
-export async function registerServer(
+export type RegisterServerResponseType = EndpointMethodsResponseType<
+    RegisterServerResponseData,
+    RegisterServerResponseErrorTypes
+>;
+
+export async function registerServerPost(
     data: RegisterServerRequestData
-): EndpointMethodsResponseType<RegisterServerRequestData, RegisterServerResponseErrorTypes> {
+): Promise<RegisterServerResponseType> {
     verifyHasUserToken();
     try {
         const response = await axios.post(
@@ -256,9 +299,14 @@ export type GetServerTokenResponseData = ServerResponseMessage;
 
 export type GetServerTokenResponseErrorTypes = ErrorInvalidCredentials;
 
-export async function getServerToken(
+export type GetServerTokenResponseType = EndpointMethodsResponseType<
+    GetServerTokenResponseData,
+    GetServerTokenResponseErrorTypes
+>;
+
+export async function getServerTokenPost(
     data: GetServerTokenRequestData
-): EndpointMethodsResponseType<GetServerTokenResponseData, GetServerTokenResponseErrorTypes> {
+): Promise<GetServerTokenResponseType> {
     try {
         const response = await axios.post(routes.getServerToken(), data);
         ServerToken = extractToken(response);
@@ -269,21 +317,92 @@ export async function getServerToken(
 }
 
 // GetServerInfo
-export type GetServerInfoRequestData = {};
+export type GetServerInfoRequestData = void;
 
 export type GetServerInfoResponseData = ServerResponseData<{
-    server: {_id: string; name: string; owner: string};
+    server: {
+        _id: string;
+        name: string;
+        owner: {_id: string; name: string; email: string} | null;
+    };
 }>;
 
 export type GetServerInfoResponseErrorTypes = ErrorsAuthorization;
 
-export async function getServerInfo(
+export type GetServerInfoResponseType = EndpointMethodsResponseType<
+    GetServerInfoResponseData,
+    GetServerInfoResponseErrorTypes
+>;
+
+export async function getServerInfoPost(
     data: GetServerInfoRequestData
-): EndpointMethodsResponseType<GetServerInfoResponseData, GetServerInfoResponseErrorTypes> {
+): Promise<GetServerInfoResponseType> {
     verifyHasServerToken();
     try {
         const response = await axios.post(
             routes.getServerInfo(),
+            data,
+            serverAuthorizationObject()
+        );
+        return response.data;
+    } catch (err: any) {
+        return handleAxiosError(err);
+    }
+}
+
+// DeleteServer
+export type DeleteServerRequestData = void;
+
+export type DeleteServerResponseData = ServerResponseMessage;
+
+export type DeleteServerResponseErrorTypes = ErrorsAuthorization;
+
+export type DeleteServerResponseType = EndpointMethodsResponseType<
+    DeleteServerResponseData,
+    DeleteServerResponseErrorTypes
+>;
+
+export async function DeleteServerPost(
+    data: DeleteServerRequestData
+): Promise<DeleteServerResponseType> {
+    verifyHasServerToken();
+    try {
+        const response = await axios.post(
+            routes.deleteServer(),
+            data,
+            serverAuthorizationObject()
+        );
+        return response.data;
+    } catch (err: any) {
+        return handleAxiosError(err);
+    }
+}
+
+// UpdateServerData
+export type UpdateServerDataRequestData = {
+    name?: string;
+    ipAddress?: string;
+};
+
+export type UpdateServerDataResponseData = ServerResponseMessage;
+
+export type UpdateServerDataResponseErrorTypes =
+    | ErrorInvalidIpAddress
+    | ErrorInvalidServerName
+    | ErrorsAuthorization;
+
+export type UpdateServerDataResponseType = EndpointMethodsResponseType<
+    UpdateServerDataResponseData,
+    UpdateServerDataResponseErrorTypes
+>;
+
+export async function UpdateServerDataPost(
+    data: UpdateServerDataRequestData
+): Promise<UpdateServerDataResponseType> {
+    verifyHasServerToken();
+    try {
+        const response = await axios.post(
+            routes.updateServerData(),
             data,
             serverAuthorizationObject()
         );

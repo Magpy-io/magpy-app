@@ -10,12 +10,14 @@ import PhotoGalleryServerScreen from '~/Navigation/Screens/PhotoGalleryServerScr
 import ServerSelectScreen from '~/Navigation/Screens/ServerSelectScreen';
 import TestScreen from '~/Navigation/Screens/Test';
 
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import type {NavigatorScreenParams} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import RegisterScreen from './Screens/RegisterScreen';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {Icon} from 'react-native-elements';
+import {useAuthContext} from '~/Components/AuthContext';
 import {appColors, colors} from '~/styles/colors';
+import RegisterScreen from './Screens/RegisterScreen';
+import SplashScreen from './Screens/SplashScreen';
 
 const Drawer = createDrawerNavigator();
 
@@ -96,11 +98,18 @@ function TabNavigator() {
     );
 }
 
+const Root = () => {
+    const {isAuthenticated, loading} = useAuthContext();
+
+    if (loading) return <SplashScreen />;
+    if (isAuthenticated) return <TabNavigator />;
+    return <LoginStackNavigator />;
+};
+
 const Navigation = () => {
-    const isSignedIn = true;
     return (
         <NavigationContainer>
-            {isSignedIn ? <TabNavigator /> : <LoginStackNavigator />}
+            <Root />
         </NavigationContainer>
     );
 };

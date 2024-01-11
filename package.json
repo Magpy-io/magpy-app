@@ -11,6 +11,7 @@
     },
     "dependencies": {
         "@notifee/react-native": "^7.6.1",
+        "@react-native-async-storage/async-storage": "^1.21.0",
         "@react-native-camera-roll/camera-roll": "^5.6.0",
         "@react-native-google-signin/google-signin": "^10.1.1",
         "@react-navigation/bottom-tabs": "^6.5.11",

@@ -10,6 +10,7 @@ import {spacing} from '~/styles/spacing';
 import {PasswordInput} from '~/Components/LoginComponents/PasswordInput';
 import TextInput from '~/Components/LoginComponents/TextInput';
 import * as QueriesBackend from '~/Helpers/backendImportedQueries';
+import {useAuthContext} from '../AuthContext';
 
 const specialChars = /(?=.*[!@#$%^&*()_\-+={}[\]\\|:;'<>,.?\/])/;
 
@@ -30,6 +31,7 @@ const RegisterSchema = Yup.object().shape({
 
 export default function RegisterForm() {
     const [showErrors, setShowErrors] = useState(false);
+    const {authenticate} = useAuthContext();
 
     useEffect(() => {
         const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
@@ -45,23 +47,38 @@ export default function RegisterForm() {
         };
     }, []);
 
+    const onSubmit = async (values: {name: string; email: string; password: string}) => {
+        try {
+            const ret = await QueriesBackend.registerPost(values);
+            console.log(ret.message);
+            if (ret.ok) {
+                try {
+                    const loginRet = await QueriesBackend.loginPost({
+                        email: values.email,
+                        password: values.password,
+                    });
+                    console.log('login result', loginRet);
+                    if (loginRet.ok) authenticate();
+                } catch (err) {
+                    console.log('login Err', err);
+                }
+            } else {
+                console.log('Register error', ret.message);
+            }
+        } catch (err) {
+            if (err instanceof QueriesBackend.ErrorBackendUnreachable) {
+                console.log('Backend unreachable');
+            } else {
+                console.log(err);
+            }
+        }
+    };
+
     return (
         <Formik
             initialValues={{name: '', email: '', password: ''}}
             validationSchema={RegisterSchema}
-            onSubmit={async values => {
-                try {
-                    QueriesBackend.SetPath('http://192.168.0.15:8001/');
-                    const ret = await QueriesBackend.register(values);
-                    console.log(ret.message);
-                } catch (err) {
-                    if (err instanceof QueriesBackend.ErrorBackendUnreachable) {
-                        console.log('Backend unreachable');
-                    } else {
-                        console.log(err);
-                    }
-                }
-            }}>
+            onSubmit={onSubmit}>
             {({handleChange, handleBlur, handleSubmit, values, errors}) => (
                 <View>
                     <ViewWithGap gap={spacing.spacing_m} style={styles.viewStyle}>

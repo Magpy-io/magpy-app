@@ -8,9 +8,11 @@ import {PrimaryButtonExtraWide} from '~/Components/CommonComponents/Buttons';
 import ViewWithGap from '~/Components/CommonComponents/ViewWithGap';
 import {PasswordInput} from '~/Components/LoginComponents/PasswordInput';
 import TextInput from '~/Components/LoginComponents/TextInput';
+import * as QueriesBackend from '~/Helpers/backendImportedQueries';
 import {appColors} from '~/styles/colors';
 import {spacing} from '~/styles/spacing';
 import {textSize} from '~/styles/typography';
+import {useAuthContext} from '../AuthContext';
 
 const LoginSchema = Yup.object().shape({
     email: Yup.string()
@@ -20,11 +22,20 @@ const LoginSchema = Yup.object().shape({
 });
 
 export default function LoginForm() {
+    const {authenticate} = useAuthContext();
+    const onSubmit = async (values: {email: string; password: string}) => {
+        try {
+            const loginRet = await QueriesBackend.loginPost(values);
+            if (loginRet.ok) authenticate();
+        } catch (err) {
+            console.log('Login Error', err);
+        }
+    };
     return (
         <Formik
             initialValues={{email: '', password: ''}}
             validationSchema={LoginSchema}
-            onSubmit={values => console.log(values)}>
+            onSubmit={onSubmit}>
             {({handleChange, handleBlur, handleSubmit, values, errors}) => (
                 <View>
                     <ViewWithGap gap={spacing.spacing_m} style={styles.formView}>
