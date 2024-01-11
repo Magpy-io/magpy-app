@@ -1813,6 +1813,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@react-navigation/bottom-tabs@npm:^6.5.11":
+  version: 6.5.11
+  resolution: "@react-navigation/bottom-tabs@npm:6.5.11"
+  dependencies:
+    "@react-navigation/elements": "npm:^1.3.21"
+    color: "npm:^4.2.3"
+    warn-once: "npm:^0.1.0"
+  peerDependencies:
+    "@react-navigation/native": ^6.0.0
+    react: "*"
+    react-native: "*"
+    react-native-safe-area-context: ">= 3.0.0"
+    react-native-screens: ">= 3.0.0"
+  checksum: 63a3db2924a65757f39ee129caafabf1584e562b18648f9048e7dadcc00bf4adac4dedf13c7732737abb84d3f0cd7c5b3e8cda1431c67823c5f73793a59aeecc
+  languageName: node
+  linkType: hard
+
 "@react-navigation/core@npm:^6.4.10":
   version: 6.4.10
   resolution: "@react-navigation/core@npm:6.4.10"
@@ -2486,6 +2503,7 @@ __metadata:
     "@react-native-camera-roll/camera-roll": "npm:^5.6.0"
     "@react-native-community/eslint-config": "npm:^2.0.0"
     "@react-native-google-signin/google-signin": "npm:^10.1.1"
+    "@react-navigation/bottom-tabs": "npm:^6.5.11"
     "@react-navigation/drawer": "npm:^6.5.6"
     "@react-navigation/material-top-tabs": "npm:^6.5.0"
     "@react-navigation/native": "npm:^6.1.1"
