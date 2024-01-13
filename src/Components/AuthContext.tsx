@@ -1,5 +1,5 @@
-import {createContext, useContext, useEffect, useState} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {createContext, useContext, useEffect, useState} from 'react';
 import * as QueriesBackend from '~/Helpers/backendImportedQueries';
 
 type ContextType = {
@@ -7,6 +7,7 @@ type ContextType = {
     isAuthenticated: boolean;
     user: any;
     loading: boolean;
+    logout: () => Promise<void>;
 };
 
 const AuthContext = createContext<ContextType | undefined>(undefined);
@@ -32,6 +33,15 @@ const getStoredToken = async () => {
     }
 };
 
+const clearAll = async () => {
+    try {
+        await AsyncStorage.clear();
+        console.log('Clearing Auth token from AsyncStorage');
+    } catch (e) {
+        console.log('Error clearing Auth Token from AsyncStorage', e);
+    }
+};
+
 const AuthProvider = ({children}: {children: any}) => {
     const [user, setUser] = useState<any>();
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -44,6 +54,7 @@ const AuthProvider = ({children}: {children: any}) => {
                 QueriesBackend.SetUserToken(t);
                 try {
                     const ret = await QueriesBackend.whoAmIPost();
+                    console.log('Who am I ret', ret);
                     if (ret.ok) {
                         setUser(ret.data.user);
                         setIsAuthenticated(true);
@@ -61,7 +72,9 @@ const AuthProvider = ({children}: {children: any}) => {
 
     const authenticate = async function () {
         const token = QueriesBackend.GetUserToken();
+        console.log('Authenticate, getToken', token);
         const ret = await QueriesBackend.whoAmIPost();
+        console.log('Authenticate, whoAmI', ret);
         if (ret.ok) {
             storeToken(token);
             setUser(ret.data.user);
@@ -69,11 +82,19 @@ const AuthProvider = ({children}: {children: any}) => {
         }
     };
 
+    const logout = async function () {
+        setUser(null);
+        setIsAuthenticated(false);
+        await clearAll();
+        QueriesBackend.SetUserToken('');
+    };
+
     const value = {
         authenticate: authenticate,
         isAuthenticated: isAuthenticated,
         user: user,
         loading: loading,
+        logout: logout,
     };
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
@@ -84,4 +105,4 @@ function useAuthContext() {
     return context;
 }
 
-export {useAuthContext, AuthProvider};
+export {AuthProvider, useAuthContext};

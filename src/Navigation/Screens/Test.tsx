@@ -1,25 +1,13 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {StyleSheet, View} from 'react-native';
 import {Button} from 'react-native-elements';
+import {useAuthContext} from '~/Components/AuthContext';
 
-const clearAll = async () => {
-    try {
-        await AsyncStorage.clear();
-    } catch (e) {
-        // clear error
-    }
-
-    console.log('Done.');
-};
 export default function App() {
+    const {logout} = useAuthContext();
+
     return (
         <View style={styles.container}>
-            <Button
-                title="Log out"
-                onPress={async () => {
-                    await clearAll();
-                }}
-            />
+            <Button title="Log out" onPress={logout} />
         </View>
     );
 }
