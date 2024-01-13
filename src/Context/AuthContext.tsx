@@ -72,7 +72,6 @@ const AuthProvider = ({children}: {children: any}) => {
             setLoading(false);
         }
 
-        SetPath('http://192.168.0.15:8001/');
         retrieveToken();
     }, []);
 

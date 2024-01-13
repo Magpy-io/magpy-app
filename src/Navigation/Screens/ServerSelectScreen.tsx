@@ -9,20 +9,22 @@ import {
 } from 'react-native';
 import type {Service} from 'react-native-zeroconf';
 import Zeroconf from 'react-native-zeroconf';
-import {SetPath} from '~/Helpers/serverImportedQueries';
+import {ClaimServerPost, SetPath} from '~/Helpers/serverImportedQueries';
 import {appColors} from '~/styles/colors';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {spacing} from '~/styles/spacing';
 import ServerComponent from '~/Components/SelectServerComponents.tsx/ServerComponent';
 import ServersList from '~/Components/SelectServerComponents.tsx/ServersList';
 import {typography} from '~/styles/typography';
+import {GetUserToken} from '~/Helpers/backendImportedQueries';
+import {useServerContext} from '~/Context/ServerContext';
 
 const zeroconf = new Zeroconf();
 export default function ServerSelectScreen() {
     const [isScanning, setIsScanning] = useState(false);
     const [services, setServices] = useState<Service[]>(new Array<Service>());
+    const {claimServer} = useServerContext();
 
-    console.log('services', services.length);
     useEffect(() => {
         refreshData();
 
@@ -36,7 +38,6 @@ export default function ServerSelectScreen() {
 
         zeroconf.on('resolved', service => {
             if (true) {
-                console.log('Resolves service', service.name);
                 setServices(oldServices => {
                     return [...oldServices, service];
                 });
@@ -65,8 +66,8 @@ export default function ServerSelectScreen() {
         }, 5000);
     };
 
-    const onSelectServer = (service: Service) => {
-        SetPath(service.host + ':' + service.port);
+    const onSelectServer = async (service: Service) => {
+        await claimServer('http://' + service.host + ':' + service.port);
     };
 
     return (
