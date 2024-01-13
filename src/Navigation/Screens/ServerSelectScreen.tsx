@@ -1,27 +1,28 @@
-import {useState, useEffect, useRef} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
-    Platform,
-    StyleSheet,
-    TouchableOpacity,
-    Text,
-    SafeAreaView,
+    ActivityIndicator,
     FlatList,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
     View,
 } from 'react-native';
-import Zeroconf from 'react-native-zeroconf';
 import type {Service} from 'react-native-zeroconf';
-import {ParamListBase, useNavigation} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import Zeroconf from 'react-native-zeroconf';
 import {SetPath} from '~/Helpers/serverImportedQueries';
+import {appColors} from '~/styles/colors';
+import {SafeAreaView} from 'react-native-safe-area-context';
+import {spacing} from '~/styles/spacing';
+import ServerComponent from '~/Components/SelectServerComponents.tsx/ServerComponent';
+import ServersList from '~/Components/SelectServerComponents.tsx/ServersList';
+import {typography} from '~/styles/typography';
 
 const zeroconf = new Zeroconf();
-
-export default function App() {
+export default function ServerSelectScreen() {
     const [isScanning, setIsScanning] = useState(false);
     const [services, setServices] = useState<Service[]>(new Array<Service>());
 
-    const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
-
+    console.log('services', services.length);
     useEffect(() => {
         refreshData();
 
@@ -34,7 +35,8 @@ export default function App() {
         });
 
         zeroconf.on('resolved', service => {
-            if (service.name.startsWith('OpenCloud-server')) {
+            if (true) {
+                console.log('Resolves service', service.name);
                 setServices(oldServices => {
                     return [...oldServices, service];
                 });
@@ -45,30 +47,17 @@ export default function App() {
             setIsScanning(false);
             console.log('[Error]', err);
         });
+        return () => {
+            zeroconf.removeDeviceListeners();
+        };
     }, []);
-
-    const renderRow = ({item, index}: {item: Service; index: number}) => {
-        const {name, host, port} = services[index];
-
-        return (
-            <TouchableOpacity
-                onPress={() => {
-                    SetPath(host + ':' + port);
-                    navigation.navigate('Server');
-                }}>
-                <Text>{name}</Text>
-                <Text>{host}</Text>
-                <Text>{port}</Text>
-            </TouchableOpacity>
-        );
-    };
 
     const refreshData = () => {
         if (isScanning) {
             return;
         }
-
         setServices([]);
+
         zeroconf.scan('http', 'tcp', 'local.');
 
         setTimeout(() => {
@@ -76,48 +65,51 @@ export default function App() {
         }, 5000);
     };
 
+    const onSelectServer = (service: Service) => {
+        SetPath(service.host + ':' + service.port);
+    };
+
     return (
         <SafeAreaView style={styles.container}>
-            <FlatList
-                data={services}
-                renderItem={renderRow}
-                keyExtractor={(key, index) => key.fullName + index.toString()}
-                onRefresh={refreshData}
-                refreshing={false}
-                ItemSeparatorComponent={() => {
-                    return (
-                        <View
-                            style={{
-                                height: 1,
-                                width: '100%',
-                                backgroundColor: 'black',
-                                marginVertical: 10,
-                            }}
-                        />
-                    );
-                }}
+            <ServersList
+                services={services}
+                refreshData={refreshData}
+                header={<Header isScanning={isScanning} />}
+                onSelectServer={onSelectServer}
             />
-            <Text style={styles.state}>{isScanning ? 'Scanning...' : ''}</Text>
         </SafeAreaView>
     );
 }
 
+function Header({isScanning}: {isScanning: boolean}) {
+    const title = isScanning ? 'Searching for your local server' : 'Select your local server';
+    return (
+        <View style={styles.headerView}>
+            {isScanning && (
+                <ActivityIndicator style={styles.indicatorStyle} color={appColors.PRIMARY} />
+            )}
+            <Text style={styles.title}>{title}</Text>
+        </View>
+    );
+}
+
 const styles = StyleSheet.create({
+    indicatorStyle: {
+        position: 'absolute',
+        top: spacing.spacing_xxl_4,
+        alignSelf: 'center',
+    },
+    headerView: {
+        paddingBottom: spacing.spacing_xxl,
+        paddingTop: spacing.spacing_xxl_5,
+    },
+    title: {
+        paddingHorizontal: spacing.spacing_xxl,
+        textAlign: 'center',
+        ...typography.screenTitle,
+    },
     container: {
         flex: 1,
-        paddingHorizontal: 20,
-        paddingVertical: 60,
-    },
-    closeButton: {
-        padding: 20,
-        textAlign: 'center',
-    },
-    json: {
-        padding: 10,
-    },
-    state: {
-        fontSize: 20,
-        textAlign: 'center',
-        margin: 30,
+        backgroundColor: appColors.BACKGROUND,
     },
 });

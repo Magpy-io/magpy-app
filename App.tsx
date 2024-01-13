@@ -1,16 +1,19 @@
 import React from 'react';
-import Navigation from '~/Navigation/Navigation';
 import {ContextProvider} from '~/Components/ContextProvider';
+import {AuthProvider} from '~/Context/AuthContext';
+import {ServerProvider} from '~/Context/ServerContext';
 import {ConfigModules} from '~/Global/configModules';
-import {AuthProvider} from '~/Components/AuthContext';
+import Navigation from '~/Navigation/Navigation';
 
 const App = () => {
     ConfigModules();
     return (
         <AuthProvider>
-            <ContextProvider>
-                <Navigation />
-            </ContextProvider>
+            <ServerProvider>
+                <ContextProvider>
+                    <Navigation />
+                </ContextProvider>
+            </ServerProvider>
         </AuthProvider>
     );
 };

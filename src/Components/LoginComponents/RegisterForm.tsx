@@ -10,7 +10,7 @@ import {spacing} from '~/styles/spacing';
 import {PasswordInput} from '~/Components/LoginComponents/PasswordInput';
 import TextInput from '~/Components/LoginComponents/TextInput';
 import * as QueriesBackend from '~/Helpers/backendImportedQueries';
-import {useAuthContext} from '../AuthContext';
+import {useAuthContext} from '../../Context/AuthContext';
 
 const specialChars = /(?=.*[!@#$%^&*()_\-+={}[\]\\|:;'<>,.?\/])/;
 

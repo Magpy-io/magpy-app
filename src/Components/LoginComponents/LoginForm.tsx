@@ -8,11 +8,11 @@ import {PrimaryButtonExtraWide} from '~/Components/CommonComponents/Buttons';
 import ViewWithGap from '~/Components/CommonComponents/ViewWithGap';
 import {PasswordInput} from '~/Components/LoginComponents/PasswordInput';
 import TextInput from '~/Components/LoginComponents/TextInput';
+import {useAuthContext} from '~/Context/AuthContext';
 import * as QueriesBackend from '~/Helpers/backendImportedQueries';
 import {appColors} from '~/styles/colors';
 import {spacing} from '~/styles/spacing';
 import {textSize} from '~/styles/typography';
-import {useAuthContext} from '../AuthContext';
 
 const LoginSchema = Yup.object().shape({
     email: Yup.string()

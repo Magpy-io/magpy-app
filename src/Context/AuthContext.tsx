@@ -1,13 +1,19 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {createContext, useContext, useEffect, useState} from 'react';
-import * as QueriesBackend from '~/Helpers/backendImportedQueries';
+import {
+    GetUserToken,
+    SetPath,
+    SetUserToken,
+    UserType,
+    whoAmIPost,
+} from '~/Helpers/backendImportedQueries';
 
 type ContextType = {
     authenticate: () => Promise<void>;
     isAuthenticated: boolean;
-    user: any;
     loading: boolean;
     logout: () => Promise<void>;
+    user?: UserType | null;
 };
 
 const AuthContext = createContext<ContextType | undefined>(undefined);
@@ -43,7 +49,7 @@ const clearAll = async () => {
 };
 
 const AuthProvider = ({children}: {children: any}) => {
-    const [user, setUser] = useState<any>();
+    const [user, setUser] = useState<UserType | null>();
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [loading, setLoading] = useState(true);
 
@@ -51,9 +57,9 @@ const AuthProvider = ({children}: {children: any}) => {
         async function retrieveToken() {
             const t = await getStoredToken();
             if (t) {
-                QueriesBackend.SetUserToken(t);
+                SetUserToken(t);
                 try {
-                    const ret = await QueriesBackend.whoAmIPost();
+                    const ret = await whoAmIPost();
                     console.log('Who am I ret', ret);
                     if (ret.ok) {
                         setUser(ret.data.user);
@@ -66,14 +72,14 @@ const AuthProvider = ({children}: {children: any}) => {
             setLoading(false);
         }
 
-        QueriesBackend.SetPath('http://192.168.0.15:8001/');
+        SetPath('http://192.168.0.15:8001/');
         retrieveToken();
     }, []);
 
     const authenticate = async function () {
-        const token = QueriesBackend.GetUserToken();
+        const token = GetUserToken();
         console.log('Authenticate, getToken', token);
-        const ret = await QueriesBackend.whoAmIPost();
+        const ret = await whoAmIPost();
         console.log('Authenticate, whoAmI', ret);
         if (ret.ok) {
             storeToken(token);
@@ -86,7 +92,7 @@ const AuthProvider = ({children}: {children: any}) => {
         setUser(null);
         setIsAuthenticated(false);
         await clearAll();
-        QueriesBackend.SetUserToken('');
+        SetUserToken('');
     };
 
     const value = {

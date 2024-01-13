@@ -2,25 +2,25 @@ import React, {
     createContext,
     useCallback,
     useContext,
+    useEffect,
     useReducer,
     useRef,
-    useEffect,
 } from 'react';
 
 import {NativeEventEmitter, NativeModules} from 'react-native';
 const {MainModule} = NativeModules;
 
-import RNFS from 'react-native-fs';
 import {ErrorCodes} from 'react-native-delete-media';
+import RNFS from 'react-native-fs';
 
 import {PhotoType} from '~/Helpers/types';
 
 import {GetMorePhotosLocal, GetMorePhotosServer} from '~/Helpers/GetMorePhotos';
 
+import {RemovePhotos, addPhoto, addPhotoToCache, clearCache} from '~/Helpers/GetGalleryPhotos';
 import * as Queries from '~/Helpers/Queries';
-import {addPhoto, RemovePhotos, clearCache, addPhotoToCache} from '~/Helpers/GetGalleryPhotos';
 
-import {GlobalReducer, initialState, Actions, Action} from '~/Components/ContextReducer';
+import {Action, Actions, GlobalReducer, initialState} from '~/Components/ContextReducer';
 
 type contextType = {
     photosLocal: Array<PhotoType>;

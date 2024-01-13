@@ -1,8 +1,8 @@
 import {PhotoIdentifier} from '@react-native-camera-roll/camera-roll';
-import {GetPhotos} from '~/Helpers/GetGalleryPhotos';
-import {PhotoType} from '~/Helpers/types';
-import * as Queries from '~/Helpers/Queries';
 import RNFS from 'react-native-fs';
+import {GetPhotos} from '~/Helpers/GetGalleryPhotos';
+import * as Queries from '~/Helpers/Queries';
+import {PhotoType} from '~/Helpers/types';
 
 type GetMorePhotosReturnType = {
     photos: PhotoType[];
@@ -25,10 +25,23 @@ async function GetMorePhotosLocal(
 
     while (!foundAnyPhotoNotInServer && !photosFromDevice.endReached) {
         photosFromDevice = await GetPhotos(n, totalOffset);
+        // photosExistInServer = await Queries.GetPhotosByPathPost({
+        //     paths: photosFromDevice.edges.map(edge => edge.node.image.uri),
+        //     photoType: 'data',
+        // });
+
         photosExistInServer = await Queries.GetPhotosByPathPost({
-            paths: photosFromDevice.edges.map(edge => edge.node.image.uri),
+            photosData: photosFromDevice.edges.map(edge => {
+                return {
+                    path: edge.node.image.uri,
+                    size: edge.node.image.fileSize,
+                    date: edge.node.timestamp,
+                };
+            }),
             photoType: 'data',
         });
+
+        console.log('photosExistInServer', photosExistInServer);
 
         if (!photosExistInServer.ok) {
             console.log(photosExistInServer.errorCode);

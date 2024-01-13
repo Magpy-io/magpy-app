@@ -23,6 +23,7 @@ export const typography: any = {
     screenTitle: {
         ...textSize.extraLarge2,
         fontWeight: 'normal',
+        color: appColors.TEXT,
     },
     formError: {
         color: colors.COLOR_ERROR_500,

@@ -1,5 +1,18 @@
 import axios, {AxiosResponse} from 'axios';
 
+export type UserType = {
+    _id: string;
+    email: string;
+    name: string;
+};
+
+export type ServerType = {
+    _id: string;
+    name: string;
+    ip: string;
+    owner: UserType | null;
+};
+
 export function SetPath(path_p: string) {
     if (typeof path_p !== 'string') {
         throw new Error('path_p parameter must be astring');
@@ -200,14 +213,14 @@ export async function loginPost(data: LoginRequestData): Promise<LoginResponseTy
 // WhoAmI
 export type WhoAmIRequestData = void;
 
-export type WhoAmIResponseData = ServerResponseData<{
-    user: {_id: string; email: string};
-}>;
+export type WhoAmIResponseData = {
+    user: UserType;
+};
 
 export type WhoAmIResponseErrorTypes = ErrorsAuthorization;
 
 export type WhoAmIResponseType = EndpointMethodsResponseType<
-    WhoAmIResponseData,
+    ServerResponseData<WhoAmIResponseData>,
     WhoAmIResponseErrorTypes
 >;
 
@@ -224,14 +237,14 @@ export async function whoAmIPost(data: WhoAmIRequestData): Promise<WhoAmIRespons
 // GetMyServerInfo
 export type GetMyServerInfoRequestData = void;
 
-export type GetMyServerInfoResponseData = ServerResponseData<{
-    server: {_id: string; name: string; ip: string};
-}>;
+export type GetMyServerInfoResponseData = {
+    server: ServerType;
+};
 
 export type GetMyServerInfoResponseErrorTypes = ErrorNoAssociatedServer | ErrorsAuthorization;
 
 export type GetMyServerInfoResponseType = EndpointMethodsResponseType<
-    GetMyServerInfoResponseData,
+    ServerResponseData<GetMyServerInfoResponseData>,
     GetMyServerInfoResponseErrorTypes
 >;
 
@@ -258,9 +271,9 @@ export type RegisterServerRequestData = {
     serverKey: string;
 };
 
-export type RegisterServerResponseData = ServerResponseData<{
-    server: {_id: string};
-}>;
+export type RegisterServerResponseData = {
+    server: ServerType;
+};
 
 export type RegisterServerResponseErrorTypes =
     | ErrorInvalidIpAddress
@@ -269,7 +282,7 @@ export type RegisterServerResponseErrorTypes =
     | ErrorsAuthorization;
 
 export type RegisterServerResponseType = EndpointMethodsResponseType<
-    RegisterServerResponseData,
+    ServerResponseData<RegisterServerResponseData>,
     RegisterServerResponseErrorTypes
 >;
 
@@ -319,18 +332,14 @@ export async function getServerTokenPost(
 // GetServerInfo
 export type GetServerInfoRequestData = void;
 
-export type GetServerInfoResponseData = ServerResponseData<{
-    server: {
-        _id: string;
-        name: string;
-        owner: {_id: string; name: string; email: string} | null;
-    };
-}>;
+export type GetServerInfoResponseData = {
+    server: ServerType;
+};
 
 export type GetServerInfoResponseErrorTypes = ErrorsAuthorization;
 
 export type GetServerInfoResponseType = EndpointMethodsResponseType<
-    GetServerInfoResponseData,
+    ServerResponseData<GetServerInfoResponseData>,
     GetServerInfoResponseErrorTypes
 >;
 
