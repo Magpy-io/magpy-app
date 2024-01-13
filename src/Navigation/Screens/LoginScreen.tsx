@@ -1,4 +1,5 @@
 import {useNavigation} from '@react-navigation/native';
+import {StackNavigationProp} from '@react-navigation/stack';
 import React from 'react';
 import {StyleSheet, TouchableOpacity, View} from 'react-native';
 import {Text} from 'react-native-elements';
@@ -9,6 +10,7 @@ import GoogleSignIn from '~/Components/LoginComponents/GoogleSignIn';
 import LoginForm from '~/Components/LoginComponents/LoginForm';
 import {appColors} from '~/styles/colors';
 import {spacing} from '~/styles/spacing';
+import {LoginStackParamList} from '../NavigationParams';
 
 export default function LoginScreen() {
     return (
@@ -23,7 +25,7 @@ export default function LoginScreen() {
 }
 
 function LoginFooter() {
-    const navigation = useNavigation();
+    const navigation = useNavigation<StackNavigationProp<LoginStackParamList>>();
     return (
         <View style={styles.loginFooterStyle}>
             <GoogleSignIn />

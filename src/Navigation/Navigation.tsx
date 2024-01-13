@@ -1,9 +1,6 @@
 import React from 'react';
 
 import {NavigationContainer} from '@react-navigation/native';
-
-import {createDrawerNavigator} from '@react-navigation/drawer';
-//Screens
 import LoginScreen from '~/Navigation/Screens/LoginScreen';
 import PhotoGalleryLocalScreen from '~/Navigation/Screens/PhotoGalleryLocalScreen';
 import PhotoGalleryServerScreen from '~/Navigation/Screens/PhotoGalleryServerScreen';
@@ -16,12 +13,11 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {Icon} from 'react-native-elements';
 import {useAuthContext} from '~/Components/AuthContext';
 import {appColors, colors} from '~/styles/colors';
+import {LoginStackParamList} from './NavigationParams';
 import RegisterScreen from './Screens/RegisterScreen';
 import SplashScreen from './Screens/SplashScreen';
 
-const Drawer = createDrawerNavigator();
-
-const LoginStack = createNativeStackNavigator();
+const LoginStack = createNativeStackNavigator<LoginStackParamList>();
 function LoginStackNavigator() {
     return (
         <LoginStack.Navigator

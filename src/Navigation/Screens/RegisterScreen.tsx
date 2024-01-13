@@ -1,14 +1,16 @@
 import {useNavigation} from '@react-navigation/native';
+import {StackNavigationProp} from '@react-navigation/stack';
 import React from 'react';
-import {Keyboard, StyleSheet, TouchableOpacity, View} from 'react-native';
+import {StyleSheet, TouchableOpacity, View} from 'react-native';
 import {Text} from 'react-native-elements';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import KeyboardDismissingView from '~/Components/CommonComponents/KeyboardDismissingView';
 import ScreenTitle from '~/Components/CommonComponents/ScreenTitle';
-import {appColors, colors} from '~/styles/colors';
-import {spacing} from '~/styles/spacing';
 import GoogleSignIn from '~/Components/LoginComponents/GoogleSignIn';
 import RegisterForm from '~/Components/LoginComponents/RegisterForm';
+import {appColors} from '~/styles/colors';
+import {spacing} from '~/styles/spacing';
+import {LoginStackParamList} from '../NavigationParams';
 
 export default function RegisterScreen() {
     return (
@@ -23,7 +25,7 @@ export default function RegisterScreen() {
 }
 
 function RegisterFooter() {
-    const navigation = useNavigation();
+    const navigation = useNavigation<StackNavigationProp<LoginStackParamList>>();
     return (
         <View style={styles.loginFooterStyle}>
             <GoogleSignIn />
