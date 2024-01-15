@@ -19,52 +19,20 @@ import {typography} from '~/styles/typography';
 import {GetUserToken} from '~/Helpers/backendImportedQueries';
 import {useServerContext} from '~/Context/ServerContext';
 
-const zeroconf = new Zeroconf();
+function withoutDuplicates(services: Service[]) {
+    let newServices: Service[] = [];
+    services.map(s => {
+        const found =
+            newServices.filter(
+                service => service.port === s.port && service.fullName === s.fullName
+            )?.length > 0;
+        if (!found) newServices.push(s);
+    });
+    return newServices;
+}
+
 export default function ServerSelectScreen() {
-    const [isScanning, setIsScanning] = useState(false);
-    const [services, setServices] = useState<Service[]>(new Array<Service>());
-    const {claimServer} = useServerContext();
-
-    useEffect(() => {
-        refreshData();
-
-        zeroconf.on('start', () => {
-            setIsScanning(true);
-        });
-
-        zeroconf.on('stop', () => {
-            setIsScanning(false);
-        });
-
-        zeroconf.on('resolved', service => {
-            if (true) {
-                setServices(oldServices => {
-                    return [...oldServices, service];
-                });
-            }
-        });
-
-        zeroconf.on('error', err => {
-            setIsScanning(false);
-            console.log('[Error]', err);
-        });
-        return () => {
-            zeroconf.removeDeviceListeners();
-        };
-    }, []);
-
-    const refreshData = () => {
-        if (isScanning) {
-            return;
-        }
-        setServices([]);
-
-        zeroconf.scan('http', 'tcp', 'local.');
-
-        setTimeout(() => {
-            zeroconf.stop();
-        }, 5000);
-    };
+    const {claimServer, localServers, isScanning, refreshData} = useServerContext();
 
     const onSelectServer = async (service: Service) => {
         await claimServer('http://' + service.host + ':' + service.port);
@@ -73,7 +41,7 @@ export default function ServerSelectScreen() {
     return (
         <SafeAreaView style={styles.container}>
             <ServersList
-                services={services}
+                services={localServers}
                 refreshData={refreshData}
                 header={<Header isScanning={isScanning} />}
                 onSelectServer={onSelectServer}

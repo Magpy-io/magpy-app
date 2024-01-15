@@ -12,6 +12,7 @@ type ContextType = {
     authenticate: () => Promise<void>;
     isAuthenticated: boolean;
     loading: boolean;
+    token: string | null;
     logout: () => Promise<void>;
     user?: UserType | null;
 };
@@ -52,6 +53,7 @@ const AuthProvider = ({children}: {children: any}) => {
     const [user, setUser] = useState<UserType | null>();
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [token, setToken] = useState<string | null>(null);
 
     useEffect(() => {
         async function retrieveToken() {
@@ -63,6 +65,7 @@ const AuthProvider = ({children}: {children: any}) => {
                     console.log('Who am I ret', ret);
                     if (ret.ok) {
                         setUser(ret.data.user);
+                        setToken(t);
                         setIsAuthenticated(true);
                     }
                 } catch (err) {
@@ -82,6 +85,7 @@ const AuthProvider = ({children}: {children: any}) => {
         console.log('Authenticate, whoAmI', ret);
         if (ret.ok) {
             storeToken(token);
+            setToken(token);
             setUser(ret.data.user);
             setIsAuthenticated(true);
         }
@@ -90,6 +94,7 @@ const AuthProvider = ({children}: {children: any}) => {
     const logout = async function () {
         setUser(null);
         setIsAuthenticated(false);
+        setToken(null);
         await clearAll();
         SetUserToken('');
     };
@@ -98,6 +103,7 @@ const AuthProvider = ({children}: {children: any}) => {
         authenticate: authenticate,
         isAuthenticated: isAuthenticated,
         user: user,
+        token: token,
         loading: loading,
         logout: logout,
     };

@@ -6,12 +6,7 @@ import {appColors} from '~/styles/colors';
 import {spacing} from '~/styles/spacing';
 import {textSize} from '~/styles/typography';
 import {ArrowIcon} from '../CommonComponents/Icons';
-
-function getServerName(serviceName: string) {
-    const prefix = 'OpenCloudServer';
-    const serverName = serviceName.split(prefix).pop();
-    return serverName;
-}
+import {getServerName} from '~/Helpers/selectServerHelpers';
 
 type ServerComponentProps = {
     onSelectServer: (service: Service) => void;
