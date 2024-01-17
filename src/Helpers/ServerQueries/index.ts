@@ -18,6 +18,6 @@ export * as UpdateServerPath from "./endpoints/updateServerPath";
 export * as WhoAmI from "./endpoints/whoAmI";
 
 export * as Types from "./Types";
-export * as UserTokenManager from "./UserTokenManager";
+export * as TokenManager from "./TokenManager";
 
 export { SetPath, GetPath } from "./PathManager";

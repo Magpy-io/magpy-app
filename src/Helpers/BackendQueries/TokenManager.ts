@@ -48,7 +48,7 @@ export function HasServerToken(): boolean {
 export function userAuthorizationObject() {
   return {
     headers: {
-      Authorization: `Bearer ${UserToken}`,
+      "x-authorization": `Bearer ${UserToken}`,
     },
   };
 }
@@ -62,7 +62,7 @@ export function verifyHasUserToken() {
 export function serverAuthorizationObject() {
   return {
     headers: {
-      Authorization: `Bearer ${ServerToken}`,
+      "x-authorization": `Bearer ${ServerToken}`,
     },
   };
 }
@@ -74,7 +74,7 @@ export function verifyHasServerToken() {
 }
 
 export function extractToken(response: AxiosResponse<any, any>) {
-  return response.headers["authorization"].toString().split(" ")[1];
+  return response.headers["x-authorization"].toString().split(" ")[1];
 }
 
 export class ErrorNoUserToken extends Error {
