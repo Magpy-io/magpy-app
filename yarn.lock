@@ -2297,6 +2297,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/text-encoding@npm:^0":
+  version: 0.0.39
+  resolution: "@types/text-encoding@npm:0.0.39"
+  checksum: 51bd2a4a9a66d3c5706814b97fd6ad1ad7d7244099f16e19d9d181db6668860668830bd4c5579d3cf9f3ddeab8c49075ef7af38112b61835e2e29202ce113e3b
+  languageName: node
+  linkType: hard
+
 "@types/uuid@npm:^9":
   version: 9.0.7
   resolution: "@types/uuid@npm:9.0.7"
@@ -2580,6 +2587,7 @@ __metadata:
     "@types/react-native": "npm:^0.70.6"
     "@types/react-native-zeroconf": "npm:^0.12.3"
     "@types/react-test-renderer": "npm:^18.0.0"
+    "@types/text-encoding": "npm:^0"
     "@types/uuid": "npm:^9"
     "@types/validator": "npm:^13.11.7"
     "@typescript-eslint/eslint-plugin": "npm:^5.37.0"
@@ -2587,6 +2595,7 @@ __metadata:
     axios: "npm:^1.6.2"
     babel-jest: "npm:^26.6.3"
     babel-plugin-module-resolver: "npm:^4.1.0"
+    big-integer: "npm:^1.6.52"
     eslint: "npm:^8.29.0"
     eslint-plugin-react-hooks: "npm:^4.6.0"
     formik: "npm:^2.4.5"
@@ -2613,6 +2622,7 @@ __metadata:
     react-native-vector-icons: "npm:^9.2.0"
     react-native-zeroconf: "npm:^0.13.8"
     react-test-renderer: "npm:18.1.0"
+    text-encoding: "npm:^0.7.0"
     typescript: "npm:^4.8.3"
     uuid: "npm:^9.0.1"
     validator: "npm:^13.11.0"
@@ -3285,6 +3295,13 @@ __metadata:
     mixin-deep: "npm:^1.2.0"
     pascalcase: "npm:^0.1.1"
   checksum: 30a2c0675eb52136b05ef496feb41574d9f0bb2d6d677761da579c00a841523fccf07f1dbabec2337b5f5750f428683b8ca60d89e56a1052c4ae1c0cd05de64d
+  languageName: node
+  linkType: hard
+
+"big-integer@npm:^1.6.52":
+  version: 1.6.52
+  resolution: "big-integer@npm:1.6.52"
+  checksum: 9604224b4c2ab3c43c075d92da15863077a9f59e5d4205f4e7e76acd0cd47e8d469ec5e5dba8d9b32aa233951893b29329ca56ac80c20ce094b4a647a66abae0
   languageName: node
   linkType: hard
 
@@ -10525,6 +10542,13 @@ __metadata:
     glob: "npm:^7.1.4"
     minimatch: "npm:^3.0.4"
   checksum: 019d33d81adff3f9f1bfcff18125fb2d3c65564f437d9be539270ee74b994986abb8260c7c2ce90e8f30162178b09dbbce33c6389273afac4f36069c48521f57
+  languageName: node
+  linkType: hard
+
+"text-encoding@npm:^0.7.0":
+  version: 0.7.0
+  resolution: "text-encoding@npm:0.7.0"
+  checksum: 6c20f5d19f996501677cc60b79bc4af550f840b426eacc5f67bd2bd5a7a7a058ab58679f851e0afee879aaaaf7fdb95cfe4de35ab29f9b34f9ce2a7b8de9bacb
   languageName: node
   linkType: hard
 
