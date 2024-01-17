@@ -1,7 +1,7 @@
 import {createContext, useContext, useEffect, useMemo, useState} from 'react';
-import {GetUserToken, ServerType, getMyServerInfoPost} from '~/Helpers/backendImportedQueries';
+import {Types, GetMyServerInfo} from '~/Helpers/BackendQueries';
 import {useAuthContext} from './AuthContext';
-import {ClaimServerPost, GetTokenPost, SetPath} from '~/Helpers/serverImportedQueries';
+import {ClaimServer, GetToken, SetPath} from '~/Helpers/ServerQueries';
 import Zeroconf, {Service} from 'react-native-zeroconf';
 import {getOnlyOurServers} from '~/Helpers/selectServerHelpers';
 import useLocalServers from '~/Hooks/useLocalServers';
@@ -9,7 +9,7 @@ const zeroconf = new Zeroconf();
 
 type ContextType = {
     hasServer: boolean;
-    server?: ServerType;
+    server?: Types.ServerType;
     claimServer: (path: string) => Promise<void>;
     localServers: Service[];
     isScanning: boolean;
@@ -20,21 +20,21 @@ const ServerContext = createContext<ContextType | undefined>(undefined);
 
 const ServerProvider = ({children}: {children: any}) => {
     const {isAuthenticated, token} = useAuthContext();
-    const [server, setServer] = useState<ServerType>();
+    const [server, setServer] = useState<Types.ServerType>();
     const hasServer = useMemo(() => server != null, [server]);
     const {localServers, isScanning, refreshData} = useLocalServers(zeroconf);
 
     useEffect(() => {
         async function GetServer() {
             try {
-                const serverInfo = await getMyServerInfoPost();
+                const serverInfo = await GetMyServerInfo.Post();
                 console.log('HELLO', serverInfo);
                 if (serverInfo.ok) {
                     const ourServers = getOnlyOurServers(localServers);
                     console.log('ourServers', ourServers);
                     const promises = ourServers.map(s => {
                         SetPath(`http://${s.host}:${s.port}`);
-                        return GetTokenPost({userToken: token as string});
+                        return GetToken.Post({userToken: token as string});
                     });
                     const results = await Promise.all(promises);
                     console.log('results', results);
@@ -45,8 +45,11 @@ const ServerProvider = ({children}: {children: any}) => {
                         }
                     });
                     if (myServer) {
-                        SetPath(`http://${myServer.host}:${myServer.port}`);
                         setServer(serverInfo.data.server);
+                        SetPath(`http://${myServer.host}:${myServer.port}`);
+                    } else {
+                        //TODO Add port (isn't returned by request now)
+                        SetPath(`http://${serverInfo.data.server.ipPublic}:8000`);
                     }
                 }
             } catch (e) {
@@ -59,13 +62,13 @@ const ServerProvider = ({children}: {children: any}) => {
     }, [isAuthenticated, localServers]);
 
     async function claimServer(path: string) {
+        if (!token) return;
         SetPath(path);
-        const token = GetUserToken();
         try {
-            const ret = await ClaimServerPost({userToken: token});
+            const ret = await ClaimServer.Post({userToken: token});
             console.log('Claim Server ret', ret);
             if (ret.ok) {
-                const serverInfo = await getMyServerInfoPost();
+                const serverInfo = await GetMyServerInfo.Post();
                 console.log('Server Info', serverInfo);
                 if (serverInfo.ok) {
                     setServer(serverInfo.data.server);

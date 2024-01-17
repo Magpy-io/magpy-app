@@ -1,4 +1,4 @@
-import {SetPath} from '~/Helpers/backendImportedQueries';
+import {SetPath} from '~/Helpers/BackendQueries';
 import * as config from '~/Config/config';
 
 export function ConfigModules() {

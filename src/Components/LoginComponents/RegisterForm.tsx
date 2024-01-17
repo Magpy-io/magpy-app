@@ -9,7 +9,8 @@ import {spacing} from '~/styles/spacing';
 
 import {PasswordInput} from '~/Components/LoginComponents/PasswordInput';
 import TextInput from '~/Components/LoginComponents/TextInput';
-import * as QueriesBackend from '~/Helpers/backendImportedQueries';
+import {Register, Login} from '~/Helpers/BackendQueries';
+import {ErrorBackendUnreachable} from '~/Helpers/BackendQueries/ExceptionsManager';
 import {useAuthContext} from '../../Context/AuthContext';
 
 const specialChars = /(?=.*[!@#$%^&*()_\-+={}[\]\\|:;'<>,.?\/])/;
@@ -49,11 +50,10 @@ export default function RegisterForm() {
 
     const onSubmit = async (values: {name: string; email: string; password: string}) => {
         try {
-            const ret = await QueriesBackend.registerPost(values);
-            console.log(ret.message);
+            const ret = await Register.Post(values);
             if (ret.ok) {
                 try {
-                    const loginRet = await QueriesBackend.loginPost({
+                    const loginRet = await Login.Post({
                         email: values.email,
                         password: values.password,
                     });
@@ -66,7 +66,7 @@ export default function RegisterForm() {
                 console.log('Register error', ret.message);
             }
         } catch (err) {
-            if (err instanceof QueriesBackend.ErrorBackendUnreachable) {
+            if (err instanceof ErrorBackendUnreachable) {
                 console.log('Backend unreachable');
             } else {
                 console.log(err);

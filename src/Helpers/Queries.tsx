@@ -1,9 +1,8 @@
-import * as ServerQueries from '~/Helpers/serverImportedQueries';
-
-export * from '~/Helpers/serverImportedQueries';
+import {uniqueDeviceId} from '~/Config/config';
+import {GetPhotoPartById, AddPhotoInit, AddPhotoPart} from '~/Helpers/ServerQueries';
 
 async function getPhotoWithProgress(id: string, f?: (progess: number, total: number) => void) {
-    const response = await ServerQueries.GetPhotoPartByIdPost({id: id, part: 0});
+    const response = await GetPhotoPartById.Post({id: id, part: 0});
 
     if (!response.ok) {
         return response;
@@ -13,9 +12,9 @@ async function getPhotoWithProgress(id: string, f?: (progess: number, total: num
 
     const image64Parts = [response.data.photo.image64];
 
-    let responseI: ServerQueries.GetPhotoPartByIdResponseType;
+    let responseI: GetPhotoPartById.ResponseType;
     for (let i = 1; i < totalNbParts; i++) {
-        responseI = await ServerQueries.GetPhotoPartByIdPost({id: id, part: i});
+        responseI = await GetPhotoPartById.Post({id: id, part: i});
 
         if (!responseI.ok) {
             return responseI;
@@ -30,14 +29,14 @@ async function getPhotoWithProgress(id: string, f?: (progess: number, total: num
 }
 
 async function addPhotoWithProgress(
-    photo: ServerQueries.AddPhotoRequestData,
+    photo: AddPhotoInit.RequestData & {image64: string},
     f?: (progess: number, total: number) => void
 ) {
     const base64Image = photo.image64;
 
     const base64ImageSplit = splitString(base64Image);
 
-    const response = await ServerQueries.AddPhotoInitPost({
+    const response = await AddPhotoInit.Post({
         name: photo.name,
         fileSize: photo.fileSize,
         width: photo.width,
@@ -45,6 +44,7 @@ async function addPhotoWithProgress(
         date: photo.date,
         path: photo.path,
         image64Len: base64Image.length,
+        deviceUniqueId: uniqueDeviceId,
     });
 
     if (!response.ok) {
@@ -55,7 +55,7 @@ async function addPhotoWithProgress(
 
     let responseI;
     for (let i = 0; i < base64ImageSplit.length; i++) {
-        responseI = await ServerQueries.AddPhotoPartPost({
+        responseI = await AddPhotoPart.Post({
             id: id,
             partNumber: i,
             partSize: base64ImageSplit[i].length,
@@ -68,7 +68,7 @@ async function addPhotoWithProgress(
 
         f?.(i, base64ImageSplit.length);
     }
-    return responseI as ServerQueries.AddPhotoPartResponseType;
+    return responseI as AddPhotoPart.ResponseType;
 }
 
 function splitString(str: string) {

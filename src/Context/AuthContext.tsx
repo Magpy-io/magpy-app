@@ -1,12 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {createContext, useContext, useEffect, useState} from 'react';
-import {
-    GetUserToken,
-    SetPath,
-    SetUserToken,
-    UserType,
-    whoAmIPost,
-} from '~/Helpers/backendImportedQueries';
+import {WhoAmI, TokenManager, Types} from '~/Helpers/BackendQueries';
 
 type ContextType = {
     authenticate: () => Promise<void>;
@@ -14,7 +8,7 @@ type ContextType = {
     loading: boolean;
     token: string | null;
     logout: () => Promise<void>;
-    user?: UserType | null;
+    user?: Types.UserType | null;
 };
 
 const AuthContext = createContext<ContextType | undefined>(undefined);
@@ -50,7 +44,7 @@ const clearAll = async () => {
 };
 
 const AuthProvider = ({children}: {children: any}) => {
-    const [user, setUser] = useState<UserType | null>();
+    const [user, setUser] = useState<Types.UserType | null>();
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [loading, setLoading] = useState(true);
     const [token, setToken] = useState<string | null>(null);
@@ -59,9 +53,9 @@ const AuthProvider = ({children}: {children: any}) => {
         async function retrieveToken() {
             const t = await getStoredToken();
             if (t) {
-                SetUserToken(t);
+                TokenManager.SetUserToken(t);
                 try {
-                    const ret = await whoAmIPost();
+                    const ret = await WhoAmI.Post();
                     console.log('Who am I ret', ret);
                     if (ret.ok) {
                         setUser(ret.data.user);
@@ -79,9 +73,9 @@ const AuthProvider = ({children}: {children: any}) => {
     }, []);
 
     const authenticate = async function () {
-        const token = GetUserToken();
+        const token = TokenManager.GetUserToken();
         console.log('Authenticate, getToken', token);
-        const ret = await whoAmIPost();
+        const ret = await WhoAmI.Post();
         console.log('Authenticate, whoAmI', ret);
         if (ret.ok) {
             storeToken(token);
@@ -96,7 +90,7 @@ const AuthProvider = ({children}: {children: any}) => {
         setIsAuthenticated(false);
         setToken(null);
         await clearAll();
-        SetUserToken('');
+        TokenManager.SetUserToken('');
     };
 
     const value = {

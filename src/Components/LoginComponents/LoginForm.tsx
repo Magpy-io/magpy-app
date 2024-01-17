@@ -9,10 +9,10 @@ import ViewWithGap from '~/Components/CommonComponents/ViewWithGap';
 import {PasswordInput} from '~/Components/LoginComponents/PasswordInput';
 import TextInput from '~/Components/LoginComponents/TextInput';
 import {useAuthContext} from '~/Context/AuthContext';
-import * as QueriesBackend from '~/Helpers/backendImportedQueries';
 import {appColors} from '~/styles/colors';
 import {spacing} from '~/styles/spacing';
 import {textSize} from '~/styles/typography';
+import {Login} from '~/Helpers/BackendQueries';
 
 const LoginSchema = Yup.object().shape({
     email: Yup.string()
@@ -25,7 +25,7 @@ export default function LoginForm() {
     const {authenticate} = useAuthContext();
     const onSubmit = async (values: {email: string; password: string}) => {
         try {
-            const loginRet = await QueriesBackend.loginPost(values);
+            const loginRet = await Login.Post(values);
             if (loginRet.ok) authenticate();
         } catch (err) {
             console.log('Login Error', err);

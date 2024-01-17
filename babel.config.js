@@ -12,6 +12,7 @@ module.exports = {
       },
     ],
     "jest-hoist",
+    "@babel/plugin-transform-export-namespace-from",
     "react-native-reanimated/plugin",
   ],
 };

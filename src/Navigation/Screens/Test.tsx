@@ -1,11 +1,11 @@
 import {StyleSheet, View} from 'react-native';
 import {Button, Text} from 'react-native-elements';
 import {useAuthContext} from '~/Context/AuthContext';
-import * as QueriesBackend from '~/Helpers/backendImportedQueries';
+import {TokenManager} from '~/Helpers/BackendQueries';
 
 export default function App() {
     const {logout, user} = useAuthContext();
-    const token = QueriesBackend.GetUserToken();
+    const token = TokenManager.GetUserToken();
     return (
         <View style={styles.container}>
             <Button title="Log out" onPress={logout} />

@@ -8,28 +8,12 @@ import {
     View,
 } from 'react-native';
 import type {Service} from 'react-native-zeroconf';
-import Zeroconf from 'react-native-zeroconf';
-import {ClaimServerPost, SetPath} from '~/Helpers/serverImportedQueries';
 import {appColors} from '~/styles/colors';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {spacing} from '~/styles/spacing';
-import ServerComponent from '~/Components/SelectServerComponents.tsx/ServerComponent';
 import ServersList from '~/Components/SelectServerComponents.tsx/ServersList';
 import {typography} from '~/styles/typography';
-import {GetUserToken} from '~/Helpers/backendImportedQueries';
 import {useServerContext} from '~/Context/ServerContext';
-
-function withoutDuplicates(services: Service[]) {
-    let newServices: Service[] = [];
-    services.map(s => {
-        const found =
-            newServices.filter(
-                service => service.port === s.port && service.fullName === s.fullName
-            )?.length > 0;
-        if (!found) newServices.push(s);
-    });
-    return newServices;
-}
 
 export default function ServerSelectScreen() {
     const {claimServer, localServers, isScanning, refreshData} = useServerContext();
