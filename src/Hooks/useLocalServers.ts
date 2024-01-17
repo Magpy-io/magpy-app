@@ -1,11 +1,13 @@
 import {useEffect, useState} from 'react';
 import Zeroconf, {Service} from 'react-native-zeroconf';
 
-export default function useLocalServers(zeroconf: Zeroconf) {
+const zeroconf = new Zeroconf();
+
+export default function useLocalServers() {
     const [localServers, setLocalServers] = useState<Service[]>([]);
     const [isScanning, setIsScanning] = useState(false);
+
     useEffect(() => {
-        refreshData();
         zeroconf.on('start', () => {
             setIsScanning(true);
         });
@@ -30,17 +32,23 @@ export default function useLocalServers(zeroconf: Zeroconf) {
 
     const refreshData = () => {
         if (isScanning) {
-            return;
+            zeroconf.stop();
         }
         setLocalServers([]);
         zeroconf.scan('http', 'tcp', 'local.');
         setTimeout(() => {
             zeroconf.stop();
-        }, 5000);
+        }, 10000);
     };
+
+    const stopSearch = () => {
+        zeroconf.stop();
+    };
+
     return {
         localServers,
         isScanning,
         refreshData,
+        stopSearch,
     };
 }
