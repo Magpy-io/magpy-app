@@ -43,7 +43,10 @@ const ServerClaimProvider = ({children}: {children: any}) => {
     }, [token]);
 
     async function claimServer(path: string) {
-        if (!token) return;
+        if (!token) {
+            return;
+        }
+
         SetPath(path);
         try {
             const ret = await ClaimServer.Post({userToken: token});
@@ -53,6 +56,7 @@ const ServerClaimProvider = ({children}: {children: any}) => {
                 console.log('Server Info', serverInfo);
                 if (serverInfo.ok) {
                     setServer(serverInfo.data.server);
+                    setHasServer(true);
                 }
             }
         } catch (err) {
