@@ -26,6 +26,7 @@ export default function ServerSelectScreen() {
     };
 
     useEffect(() => {
+        console.log('Refresh');
         refreshData();
     }, []);
 

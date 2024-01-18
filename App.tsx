@@ -2,6 +2,7 @@ import React from 'react';
 import {ContextProvider} from '~/Components/ContextProvider';
 import {AuthProvider} from '~/Context/AuthContext';
 import {ServerClaimProvider} from '~/Context/ServerClaimContext';
+import {ServerProvider} from '~/Context/ServerContext';
 import {ConfigModules} from '~/Global/configModules';
 import Navigation from '~/Navigation/Navigation';
 
@@ -23,9 +24,11 @@ const App = () => {
     return (
         <AuthProvider>
             <ServerClaimProvider>
-                <ContextProvider>
-                    <Navigation />
-                </ContextProvider>
+                <ServerProvider>
+                    <ContextProvider>
+                        <Navigation />
+                    </ContextProvider>
+                </ServerProvider>
             </ServerClaimProvider>
         </AuthProvider>
     );

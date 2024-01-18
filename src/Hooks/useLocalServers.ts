@@ -18,7 +18,7 @@ export default function useLocalServers() {
             setIsScanning(false);
         });
         zeroconf.on('resolved', service => {
-            console.log('resolved', service.name);
+            // console.log('resolved', service.name);
             if (service.name.startsWith(serverMdnsPrefix)) {
                 setLocalServers(oldServers => {
                     return [

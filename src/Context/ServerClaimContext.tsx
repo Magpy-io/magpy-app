@@ -50,7 +50,7 @@ const ServerClaimProvider = ({children}: {children: any}) => {
         SetPath(path);
         try {
             const ret = await ClaimServer.Post({userToken: token});
-            console.log('Claim Server ret', ret);
+            console.log('Claim Server ret with token', token, ret);
             if (ret.ok) {
                 const serverInfo = await GetMyServerInfo.Post();
                 console.log('Server Info', serverInfo);

@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {createContext, useContext, useEffect, useState} from 'react';
+import {clearAll, getStoredToken, storeToken} from '~/Helpers/AsyncStorage';
 import {WhoAmI, TokenManager, Types} from '~/Helpers/BackendQueries';
 
 type ContextType = {
@@ -11,36 +12,6 @@ type ContextType = {
 };
 
 const AuthContext = createContext<ContextType | undefined>(undefined);
-
-const storeToken = async (value: string) => {
-    try {
-        //console.log('Saving token in AsyncStorage', value);
-        //await AsyncStorage.setItem('authToken', value);
-    } catch (e) {
-        console.log('Error saving Auth Token in AsyncStorage', e);
-    }
-};
-
-const getStoredToken = async () => {
-    try {
-        const value = await AsyncStorage.getItem('authToken');
-        if (value !== null) {
-            console.log('Getting token from AsyncStorage', value);
-            return value;
-        }
-    } catch (e) {
-        console.log('Error reading Auth Token from AsyncStorage', e);
-    }
-};
-
-const clearAll = async () => {
-    try {
-        await AsyncStorage.clear();
-        console.log('Clearing Auth token from AsyncStorage');
-    } catch (e) {
-        console.log('Error clearing Auth Token from AsyncStorage', e);
-    }
-};
 
 const AuthProvider = ({children}: {children: any}) => {
     const [user, setUser] = useState<Types.UserType | null>();
