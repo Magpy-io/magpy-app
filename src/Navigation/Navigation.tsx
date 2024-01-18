@@ -12,7 +12,7 @@ import type {NavigatorScreenParams} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {Icon} from 'react-native-elements';
 import {useAuthContext} from '~/Context/AuthContext';
-import {useServerContext} from '~/Context/ServerContext';
+import {useServerClaimContext} from '~/Context/ServerClaimContext';
 import {appColors, colors} from '~/styles/colors';
 import {LoginStackParamList} from './NavigationParams';
 import RegisterScreen from './Screens/RegisterScreen';
@@ -95,18 +95,19 @@ function TabNavigator() {
 }
 
 const AuthenticatedNavigator = () => {
-    const {hasServer} = useServerContext();
+    const {hasServer} = useServerClaimContext();
     if (hasServer) {
         return <TabNavigator />;
     } else {
         return <ServerSelectScreen />;
     }
 };
+
 const Root = () => {
-    const {isAuthenticated, loading} = useAuthContext();
+    const {token, loading} = useAuthContext();
 
     if (loading) return <SplashScreen />;
-    if (!isAuthenticated) {
+    if (!token) {
         return <LoginStackNavigator />;
     } else {
         return <AuthenticatedNavigator />;

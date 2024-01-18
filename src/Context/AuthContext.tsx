@@ -4,7 +4,6 @@ import {WhoAmI, TokenManager, Types} from '~/Helpers/BackendQueries';
 
 type ContextType = {
     authenticate: () => Promise<void>;
-    isAuthenticated: boolean;
     loading: boolean;
     token: string | null;
     logout: () => Promise<void>;
@@ -15,8 +14,8 @@ const AuthContext = createContext<ContextType | undefined>(undefined);
 
 const storeToken = async (value: string) => {
     try {
-        console.log('Saving token in AsyncStorage', value);
-        await AsyncStorage.setItem('authToken', value);
+        //console.log('Saving token in AsyncStorage', value);
+        //await AsyncStorage.setItem('authToken', value);
     } catch (e) {
         console.log('Error saving Auth Token in AsyncStorage', e);
     }
@@ -45,7 +44,6 @@ const clearAll = async () => {
 
 const AuthProvider = ({children}: {children: any}) => {
     const [user, setUser] = useState<Types.UserType | null>();
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [loading, setLoading] = useState(true);
     const [token, setToken] = useState<string | null>(null);
 
@@ -60,7 +58,6 @@ const AuthProvider = ({children}: {children: any}) => {
                     if (ret.ok) {
                         setUser(ret.data.user);
                         setToken(t);
-                        setIsAuthenticated(true);
                     }
                 } catch (err) {
                     console.log('Error in WhoAmI', err);
@@ -81,13 +78,11 @@ const AuthProvider = ({children}: {children: any}) => {
             storeToken(token);
             setToken(token);
             setUser(ret.data.user);
-            setIsAuthenticated(true);
         }
     };
 
     const logout = async function () {
         setUser(null);
-        setIsAuthenticated(false);
         setToken(null);
         await clearAll();
         TokenManager.SetUserToken('');
@@ -95,7 +90,6 @@ const AuthProvider = ({children}: {children: any}) => {
 
     const value = {
         authenticate: authenticate,
-        isAuthenticated: isAuthenticated,
         user: user,
         token: token,
         loading: loading,

@@ -1,25 +1,29 @@
 import React from 'react';
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {Icon} from 'react-native-elements';
-import type {Service} from 'react-native-zeroconf';
 import {appColors} from '~/styles/colors';
 import {spacing} from '~/styles/spacing';
 import {textSize} from '~/styles/typography';
 import {ArrowIcon} from '../CommonComponents/Icons';
-import {getServerName} from '~/Helpers/selectServerHelpers';
 
 type ServerComponentProps = {
-    onSelectServer: (service: Service) => void;
-    service: Service;
+    onSelectServer: () => void;
+    name: string;
+    ip: string;
+    port: string;
 };
 
-export default function ServerComponent({onSelectServer, service}: ServerComponentProps) {
-    const ServerName = getServerName(service.name);
-    const IpAddress = `${service.host}: ${service.port}`;
+export default function ServerComponent({
+    onSelectServer,
+    name,
+    ip,
+    port,
+}: ServerComponentProps) {
+    const IpAddress = `${ip}: ${port}`;
     return (
-        <TouchableOpacity onPress={() => onSelectServer(service)} style={styles.viewStyle}>
+        <TouchableOpacity onPress={() => onSelectServer()} style={styles.viewStyle}>
             <View>
-                <Text style={styles.name}>{ServerName}</Text>
+                <Text style={styles.name}>{name}</Text>
                 <Text style={styles.ipAddress}>{IpAddress}</Text>
             </View>
             <ArrowIcon />

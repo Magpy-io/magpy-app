@@ -1,10 +1,13 @@
 import {useEffect, useState} from 'react';
 import Zeroconf, {Service} from 'react-native-zeroconf';
+import {serverMdnsPrefix} from '~/Config/config';
 
 const zeroconf = new Zeroconf();
 
+export type Server = {name: string; ip: string; port: string};
+
 export default function useLocalServers() {
-    const [localServers, setLocalServers] = useState<Service[]>([]);
+    const [localServers, setLocalServers] = useState<Server[]>([]);
     const [isScanning, setIsScanning] = useState(false);
 
     useEffect(() => {
@@ -15,10 +18,17 @@ export default function useLocalServers() {
             setIsScanning(false);
         });
         zeroconf.on('resolved', service => {
-            if (true) {
-                console.log('resolved', service.name);
-                setLocalServers(oldServices => {
-                    return [...oldServices, service];
+            console.log('resolved', service.name);
+            if (service.name.startsWith(serverMdnsPrefix)) {
+                setLocalServers(oldServers => {
+                    return [
+                        ...oldServers,
+                        {
+                            name: service.name.replace(serverMdnsPrefix, ''),
+                            ip: service.host,
+                            port: service.port.toString(),
+                        },
+                    ];
                 });
             }
         });
@@ -38,7 +48,7 @@ export default function useLocalServers() {
         zeroconf.scan('http', 'tcp', 'local.');
         setTimeout(() => {
             zeroconf.stop();
-        }, 10000);
+        }, 5000);
     };
 
     const stopSearch = () => {

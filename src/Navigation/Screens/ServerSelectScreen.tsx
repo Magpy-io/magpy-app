@@ -7,25 +7,32 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
-import type {Service} from 'react-native-zeroconf';
+
 import {appColors} from '~/styles/colors';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {spacing} from '~/styles/spacing';
 import ServersList from '~/Components/SelectServerComponents.tsx/ServersList';
+
 import {typography} from '~/styles/typography';
-import {useServerContext} from '~/Context/ServerContext';
+import {useServerClaimContext} from '~/Context/ServerClaimContext';
+import {Server} from '~/Hooks/useLocalServers';
 
 export default function ServerSelectScreen() {
-    const {claimServer, localServers, isScanning, refreshData} = useServerContext();
+    const {claimServer, localServers, isScanning, refreshData, hasServer} =
+        useServerClaimContext();
 
-    const onSelectServer = async (service: Service) => {
-        await claimServer('http://' + service.host + ':' + service.port);
+    const onSelectServer = async (server: Server) => {
+        await claimServer('http://' + server.ip + ':' + server.port);
     };
+
+    useEffect(() => {
+        refreshData();
+    }, []);
 
     return (
         <SafeAreaView style={styles.container}>
             <ServersList
-                services={localServers}
+                servers={localServers}
                 refreshData={refreshData}
                 header={<Header isScanning={isScanning} />}
                 onSelectServer={onSelectServer}

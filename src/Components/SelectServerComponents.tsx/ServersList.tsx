@@ -1,32 +1,39 @@
 import React from 'react';
 import {FlatList, StyleSheet, View} from 'react-native';
-import type {Service} from 'react-native-zeroconf';
 import ServerComponent from '~/Components/SelectServerComponents.tsx/ServerComponent';
+import {Server} from '~/Hooks/useLocalServers';
 import {appColors} from '~/styles/colors';
 import {spacing} from '~/styles/spacing';
 
 type ServersListProps = {
-    services: Service[];
+    servers: Server[];
     refreshData: () => void;
     header: React.JSX.Element;
-    onSelectServer: (service: Service) => void;
+    onSelectServer: (server: Server) => void;
 };
 
 export default function ServersList({
-    services,
+    servers,
     refreshData,
     header,
     onSelectServer,
 }: ServersListProps) {
-    const renderRow = ({item, index}: {item: Service; index: number}) => {
-        return <ServerComponent service={services[index]} onSelectServer={onSelectServer} />;
+    const renderRow = ({item, index}: {item: Server; index: number}) => {
+        return (
+            <ServerComponent
+                ip={item.ip}
+                name={item.name}
+                port={item.port}
+                onSelectServer={() => onSelectServer(item)}
+            />
+        );
     };
 
     return (
         <FlatList
-            data={services}
+            data={servers}
             renderItem={renderRow}
-            keyExtractor={(key, index) => key.fullName + index.toString()}
+            keyExtractor={(key, index) => key.ip + index.toString()}
             onRefresh={refreshData}
             refreshing={false}
             ListHeaderComponent={header}
