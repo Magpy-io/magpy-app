@@ -12,28 +12,28 @@ export function GetWindowHeight() {
 }
 
 export function GetStatusBarHeight() {
-    // const insets = MainModule.getWindowInsets();
-    // if (insets.valid) {
-    //   return PixelRatio.roundToNearestPixel(insets.top / PixelRatio.get());
-    // } else {
-    //   return StatusBar.currentHeight || 24;
-    // }
+    const insets = MainModule.getWindowInsets();
+    if (insets.valid) {
+        return PixelRatio.roundToNearestPixel(insets.top / PixelRatio.get());
+    } else {
+        return StatusBar.currentHeight || 24;
+    }
 }
 
 export function GetNavigatorBarHeight() {
-    // const insets = MainModule.getWindowInsets();
-    // if (insets.valid) {
-    //   return PixelRatio.roundToNearestPixel(insets.bottom / PixelRatio.get());
-    // } else {
-    //   return GetScreenHeight() - GetWindowHeight() - GetStatusBarHeight();
-    // }
+    const insets = MainModule.getWindowInsets();
+    if (insets.valid) {
+        return PixelRatio.roundToNearestPixel(insets.bottom / PixelRatio.get());
+    } else {
+        return GetScreenHeight() - GetWindowHeight() - GetStatusBarHeight();
+    }
 }
 
 export function GetIsFullScreen() {
-    // const insets = MainModule.getWindowInsets();
-    // if (insets.valid) {
-    //   return insets.isFullScreen;
-    // } else {
-    //   return false;
-    // }
+    const insets = MainModule.getWindowInsets();
+    if (insets.valid) {
+        return insets.isFullScreen;
+    } else {
+        return false;
+    }
 }

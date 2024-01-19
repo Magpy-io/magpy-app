@@ -459,7 +459,7 @@ const ContextProvider = (props: PropsType) => {
 
             isrefreshPhotosAddingServerRunning.current = true;
 
-            const serviceState = 'INACTIVE'; // await MainModule.getServiceState();
+            const serviceState = await MainModule.getServiceState();
 
             //console.log("service is", serviceState);
 
@@ -467,8 +467,8 @@ const ContextProvider = (props: PropsType) => {
                 return;
             }
 
-            const ids = []; //await MainModule.getIds();
-            const currentIndex = 0; //await MainModule.getCurrentIndex();
+            const ids = await MainModule.getIds();
+            const currentIndex = await MainModule.getCurrentIndex();
 
             dispatch({
                 type: Actions.updatePhotosFromService,
@@ -476,7 +476,7 @@ const ContextProvider = (props: PropsType) => {
             });
 
             if (serviceState == 'INACTIVE' || serviceState == 'FAILED') {
-                //await MainModule.stopSendingMediaService();
+                await MainModule.stopSendingMediaService();
                 dispatch({
                     type: Actions.clearAllLoadingLocal,
                     payload: {},
