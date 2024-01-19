@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import Zeroconf, {Service} from 'react-native-zeroconf';
+import Zeroconf from 'react-native-zeroconf';
 import {serverMdnsPrefix} from '~/Config/config';
 
 const zeroconf = new Zeroconf();

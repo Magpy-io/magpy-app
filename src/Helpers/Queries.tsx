@@ -29,7 +29,15 @@ async function getPhotoWithProgress(id: string, f?: (progess: number, total: num
 }
 
 async function addPhotoWithProgress(
-    photo: AddPhotoInit.RequestData & {image64: string},
+    photo: {
+        date: string;
+        fileSize: number;
+        height: number;
+        name: string;
+        path: string;
+        width: number;
+        image64: string;
+    },
     f?: (progess: number, total: number) => void
 ) {
     const base64Image = photo.image64;
