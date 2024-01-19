@@ -154,6 +154,10 @@ function PhotoGrid(props: PropsType) {
         correctStartIndex = Math.floor((props.photos.length - 1) / 3);
     }
 
+    if (correctStartIndex < 0) {
+        correctStartIndex = 0;
+    }
+
     const onRefresh = useCallback(() => {
         if (props.contextLocation == 'local') {
             context.onRefreshLocal();

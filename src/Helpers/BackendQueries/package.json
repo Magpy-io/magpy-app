@@ -1,0 +1,11 @@
+{
+    "name": "backend-queries",
+    "description": "General purpose node utilities",
+    "version": "9.3.0",
+    "repository": "git://github.com/hapijs/hoek",
+    "main": "index.ts",
+    "keywords": [
+        "utilities"
+    ],
+    "license": "BSD-3-Clause"
+}
