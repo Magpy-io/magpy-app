@@ -1,8 +1,13 @@
 import {PhotoIdentifier} from '@react-native-camera-roll/camera-roll';
 import RNFS from 'react-native-fs';
-import {GetPhotos} from '~/Helpers/GetGalleryPhotos';
-import * as Queries from '~/Helpers/Queries';
+import {uniqueDeviceId} from '~/Config/config';
+import {GetPhotos as GalleryGetPhotos} from '~/Helpers/GetGalleryPhotos';
 import {PhotoType} from '~/Helpers/types';
+import {
+    GetPhotosByPath,
+    GetPhotos as ServerQueiresGetPhotos,
+    GetPhotosById,
+} from './ServerQueries';
 
 type GetMorePhotosReturnType = {
     photos: PhotoType[];
@@ -19,29 +24,28 @@ async function GetMorePhotosLocal(
         edges: new Array<PhotoIdentifier>(),
         endReached: false,
     };
-    let photosExistInServer: Queries.GetPhotosByPathResponseType | undefined;
+    let photosExistInServer: GetPhotosByPath.ResponseType | undefined;
 
     let totalOffset = offset;
 
     while (!foundAnyPhotoNotInServer && !photosFromDevice.endReached) {
-        photosFromDevice = await GetPhotos(n, totalOffset);
+        photosFromDevice = await GalleryGetPhotos(n, totalOffset);
         // photosExistInServer = await Queries.GetPhotosByPathPost({
         //     paths: photosFromDevice.edges.map(edge => edge.node.image.uri),
         //     photoType: 'data',
         // });
 
-        photosExistInServer = await Queries.GetPhotosByPathPost({
+        photosExistInServer = await GetPhotosByPath.Post({
             photosData: photosFromDevice.edges.map(edge => {
                 return {
                     path: edge.node.image.uri,
-                    size: edge.node.image.fileSize,
-                    date: edge.node.timestamp,
+                    size: edge.node.image.fileSize ?? 0,
+                    date: new Date(edge.node.timestamp * 1000).toISOString(),
                 };
             }),
             photoType: 'data',
+            deviceUniqueId: uniqueDeviceId,
         });
-
-        console.log('photosExistInServer', photosExistInServer);
 
         if (!photosExistInServer.ok) {
             console.log(photosExistInServer.errorCode);
@@ -74,6 +78,8 @@ async function GetMorePhotosLocal(
 
     const photos = photosNotInServer.map((edge, index) => {
         const photo = edge.node;
+
+        photo.modificationTimestamp;
         const photoObject: PhotoType = {
             inDevice: true,
             inServer: false,
@@ -88,8 +94,8 @@ async function GetMorePhotosLocal(
             },
             id: `local_${photo.image.uri}`,
             album: photo.group_name,
-            created: new Date(photo.timestamp * 1000).toJSON(),
-            modified: new Date(((photo as any).modified as number) * 1000).toJSON(),
+            created: new Date(photo.timestamp * 1000).toISOString(),
+            modified: new Date(photo.modificationTimestamp * 1000).toISOString(),
             syncDate: '',
             type: photo.type,
             isLoading: false,
@@ -109,7 +115,7 @@ async function GetMorePhotosServer(
     n: number,
     offset: number
 ): Promise<GetMorePhotosReturnType> {
-    const photosData = await Queries.GetPhotosPost({
+    const photosData = await ServerQueiresGetPhotos.Post({
         number: n,
         offset: offset,
         photoType: 'data',
@@ -134,7 +140,13 @@ async function GetMorePhotosServer(
 
     const filesExist = await Promise.all(
         photosData.data.photos.map(photo => {
-            return RNFS.exists(photo.meta.clientPath);
+            const clientPath = photo.meta.clientPaths.find(
+                e => e.deviceUniqueId == uniqueDeviceId
+            )?.path;
+            if (!clientPath) {
+                return false;
+            }
+            return RNFS.exists(clientPath);
         })
     );
 
@@ -151,7 +163,7 @@ async function GetMorePhotosServer(
         images64Formated.length = photosData.data.photos.length;
         images64Formated.fill('');
     } else {
-        const images64Res = await Queries.GetPhotosByIdPost({
+        const images64Res = await GetPhotosById.Post({
             ids: ids,
             photoType: 'thumbnail',
         });
@@ -190,7 +202,8 @@ async function GetMorePhotosServer(
                 fileName: photo.meta.name,
                 height: photo.meta.height,
                 width: photo.meta.width,
-                path: photo.meta.clientPath,
+                path: photo.meta.clientPaths.find(e => e.deviceUniqueId == uniqueDeviceId)
+                    ?.path,
                 pathCache: '',
                 image64: filesExist[index]
                     ? ''

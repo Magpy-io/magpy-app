@@ -20,7 +20,7 @@ const ServerContext = createContext<ContextType | undefined>(undefined);
 async function TryServerAddress(ip: string, port: string, token: string) {
     console.log('Trying address :', ip, port);
     try {
-        SetPath(`http://${ip}:${80}`);
+        SetPath(`http://${ip}:${port}`);
         const res = await GetToken.Post({userToken: token});
         if (res.ok) {
             console.log("Bingo, it's: ", ip, port);
@@ -109,6 +109,9 @@ const ServerProvider = ({children}: {children: any}) => {
                     port: myPotentialServer.server.port,
                 });
                 setIsServerReachable(true);
+                SetPath(
+                    `http://${myPotentialServer.server.ip}:${myPotentialServer.server.port}`
+                );
             }
         }
         if (!isServerReachable && !!token && !isScanning) {

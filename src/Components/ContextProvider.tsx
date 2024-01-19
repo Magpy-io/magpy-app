@@ -21,6 +21,13 @@ import {RemovePhotos, addPhoto, addPhotoToCache, clearCache} from '~/Helpers/Get
 import * as Queries from '~/Helpers/Queries';
 
 import {Action, Actions, GlobalReducer, initialState} from '~/Components/ContextReducer';
+import {
+    DeletePhotosById,
+    GetPath,
+    GetPhotosById,
+    UpdatePhotoPath,
+} from '~/Helpers/ServerQueries';
+import {uniqueDeviceId} from '~/Config/config';
 
 type contextType = {
     photosLocal: Array<PhotoType>;
@@ -42,6 +49,9 @@ const ITEMS_TO_LOAD_PER_END_REACHED_LOCAL = 3000;
 const ITEMS_TO_LOAD_PER_END_REACHED_SERVER = 3000;
 
 const addSinglePhotoServer = async (photo: PhotoType, dispatch: React.Dispatch<Action>) => {
+    if (!photo.image.path) {
+        return;
+    }
     const res = await RNFS.readFile(photo.image.path, 'base64');
 
     const result = await Queries.addPhotoWithProgress(
@@ -96,7 +106,11 @@ const addSinglePhotoLocal = async (photo: PhotoType, dispatch: React.Dispatch<Ac
         payload: {photo: photo, isLoading: false, p: 0},
     });
 
-    const result1 = await Queries.UpdatePhotoPathPost({id: photo.id, path: newUri});
+    const result1 = await UpdatePhotoPath.Post({
+        id: photo.id,
+        path: newUri,
+        deviceUniqueId: uniqueDeviceId,
+    });
 
     if (!result1.ok) {
         console.log(result1.errorCode);
@@ -175,6 +189,7 @@ const ContextProvider = (props: PropsType) => {
 
     const onRefreshServer = useCallback(async () => {
         try {
+            console.log(GetPath());
             await clearCache();
             const newPhotos = await GetMorePhotosServer(
                 ITEMS_TO_LOAD_PER_END_REACHED_SERVER,
@@ -235,7 +250,7 @@ const ContextProvider = (props: PropsType) => {
             return;
         }
         try {
-            const result = await Queries.GetPhotosByIdPost({
+            const result = await GetPhotosById.Post({
                 ids: [photo.id],
                 photoType: 'compressed',
             });
@@ -268,7 +283,7 @@ const ContextProvider = (props: PropsType) => {
     const RequestCroppedPhotosServer = useCallback(async (photos: PhotoType[]) => {
         try {
             const ids = photos.map(photo => photo.id);
-            const result = await Queries.GetPhotosByIdPost({ids: ids, photoType: 'thumbnail'});
+            const result = await GetPhotosById.Post({ids: ids, photoType: 'thumbnail'});
 
             if (!result.ok) {
                 console.log(result.errorCode);
@@ -425,7 +440,7 @@ const ContextProvider = (props: PropsType) => {
                 payload: {ids: ids},
             });
 
-            const result = await Queries.DeletePhotosByIdPost({ids: ids});
+            const result = await DeletePhotosById.Post({ids: ids});
 
             if (!result.ok) {
                 console.log(result.errorCode);
