@@ -7,7 +7,6 @@ import {TokenManager} from '~/Helpers/BackendQueries';
 export default function App() {
     const {logout, user} = useAuthContext();
     const {isServerReachable} = useServerContext();
-    const token = TokenManager.GetUserToken();
     return (
         <View style={styles.container}>
             <Button title="Log out" onPress={logout} />

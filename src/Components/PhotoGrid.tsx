@@ -39,10 +39,6 @@ const listHeaderComponent = (props: {displayText: string}) => {
     );
 };
 
-const listFooterComponent = () => {
-    return <View style={styles.viewFooter}></View>;
-};
-
 type PropsType = {
     photos: Array<PhotoType>;
     style?: StyleProp<ViewStyle>;
@@ -186,7 +182,6 @@ function PhotoGrid(props: PropsType) {
                 numColumns={3}
                 getItemLayout={getItemLayout}
                 ListHeaderComponent={HeaderListComponent}
-                ListFooterComponent={listFooterComponent}
             />
 
             {isSelecting && (
@@ -226,22 +221,20 @@ function PhotoGrid(props: PropsType) {
 }
 
 const styles = StyleSheet.create({
-    mainViewStyle: {
-        height: '100%',
-        width: '100%',
-    },
-    flatListStyle: {
-        marginTop: BarHeights.GetStatusBarHeight(),
-        marginBottom: BarHeights.GetNavigatorBarHeight(),
-    },
+    mainViewStyle: {},
+    flatListStyle: {},
     textOnEmpty: {
         fontSize: 15,
         textAlign: 'center',
     },
     viewOnEmpty: {},
-    viewHeader: {paddingVertical: 30},
-    textHeader: {fontSize: 17, textAlign: 'center'},
-    viewFooter: {marginVertical: 35},
+    viewHeader: {
+        paddingVertical: 30,
+    },
+    textHeader: {
+        fontSize: 17,
+        textAlign: 'center',
+    },
 });
 
 export default PhotoGrid;

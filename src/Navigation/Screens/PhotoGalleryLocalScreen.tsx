@@ -5,6 +5,8 @@ import * as AndroidPermissions from '~/Helpers/GetPermissionsAndroid';
 
 import {useMainContext} from '~/Components/ContextProvider';
 import PhotoGallery from '~/Components/PhotoGallery';
+import {SafeAreaView} from 'react-native-safe-area-context';
+import {appColors} from '~/styles/colors';
 
 function photosNbToString(n: number) {
     if (!n) {
@@ -34,20 +36,26 @@ export default function PhotoGalleryLocalScreen(props: PropsType) {
         getPermissions();
     }, []);
 
-    return hasPermissions ? (
-        <PhotoGallery
-            style={{}}
-            photos={context.photosLocal}
-            key={'gallery_local'}
-            contextLocation={'local'}
-            gridHeaderTextFunction={photosNbToString}
-        />
-    ) : (
-        <Text>Permissions needed</Text>
+    return (
+        <SafeAreaView style={styles.container}>
+            {hasPermissions ? (
+                <PhotoGallery
+                    style={{}}
+                    photos={context.photosLocal}
+                    key={'gallery_local'}
+                    contextLocation={'local'}
+                    gridHeaderTextFunction={photosNbToString}
+                />
+            ) : (
+                <Text>Permissions needed</Text>
+            )}
+        </SafeAreaView>
     );
 }
 
 const styles = StyleSheet.create({
-    viewHeader: {paddingVertical: 30},
-    textHeader: {fontSize: 17, textAlign: 'center'},
+    container: {
+        flex: 1,
+        backgroundColor: appColors.BACKGROUND,
+    },
 });
