@@ -1,5 +1,3 @@
-import Joi from 'joi';
-
 import {
   ErrorPathAccessDenied,
   ErrorPathFolderDoesNotExist,
@@ -8,12 +6,6 @@ import {
 import { TokenAuthentification } from '../Types';
 
 export type ResponseData = string;
-
-export const RequestSchema = Joi.object({
-  path: Joi.string().optional(),
-})
-  .options({ presence: 'required' })
-  .meta({ className: 'RequestData' });
 
 export type ResponseErrorTypes =
   | ErrorPathFolderDoesNotExist

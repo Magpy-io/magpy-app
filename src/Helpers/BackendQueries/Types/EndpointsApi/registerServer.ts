@@ -1,5 +1,3 @@
-import Joi from 'joi';
-
 import {
   ErrorInvalidIpAddress,
   ErrorInvalidKeyFormat,
@@ -12,18 +10,6 @@ import { ServerType, TokenAuthentification } from '../Types';
 export type ResponseData = {
   server: ServerType;
 };
-
-export const RequestSchema = Joi.object({
-  name: Joi.string(),
-  ipAddressPublic: Joi.string(),
-  ipAddressPrivate: Joi.string(),
-  port: Joi.string(),
-  serverKey: Joi.string(),
-})
-  .options({
-    presence: 'required',
-  })
-  .meta({ className: 'RequestData' });
 
 export type ResponseErrorTypes =
   | ErrorInvalidIpAddress

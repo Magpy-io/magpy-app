@@ -1,18 +1,7 @@
-import Joi from 'joi';
-
 import { ErrorInvalidCredentials } from '../ErrorTypes';
 import { TokenAuthentification } from '../Types';
 
 export type ResponseData = string;
-
-export const RequestSchema = Joi.object({
-  id: Joi.string(),
-  key: Joi.string(),
-})
-  .options({
-    presence: 'required',
-  })
-  .meta({ className: 'RequestData' });
 
 export type ResponseErrorTypes = ErrorInvalidCredentials;
 

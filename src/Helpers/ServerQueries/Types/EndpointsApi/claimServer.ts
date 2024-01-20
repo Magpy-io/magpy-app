@@ -1,5 +1,3 @@
-import Joi from 'joi';
-
 import {
   ErrorAuthorizationBackendExpired,
   ErrorAuthorizationBackendFailed,
@@ -9,12 +7,6 @@ import {
 import { TokenAuthentification } from '../Types';
 
 export type ResponseData = string;
-
-export const RequestSchema = Joi.object({
-  userToken: Joi.string(),
-})
-  .options({ presence: 'required' })
-  .meta({ className: 'RequestData' });
 
 export type ResponseErrorTypes =
   | ErrorBackendServerUnreachable

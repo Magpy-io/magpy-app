@@ -1,17 +1,9 @@
-import Joi from 'joi';
-
 import { ErrorsAuthorization } from '../ErrorTypes';
 import { ServerType, TokenAuthentification } from '../Types';
 
 export type ResponseData = {
   server: ServerType;
 };
-
-export const RequestSchema = Joi.object()
-  .options({
-    presence: 'required',
-  })
-  .meta({ className: 'RequestData' });
 
 export type ResponseErrorTypes = ErrorsAuthorization;
 

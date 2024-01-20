@@ -1,5 +1,3 @@
-import Joi from 'joi';
-
 import {
   ErrorIdNotFound,
   ErrorInvalidPartNumber,
@@ -13,15 +11,6 @@ export type ResponseData = {
   part: number;
   totalNbOfParts: number;
 };
-
-export const RequestSchema = Joi.object({
-  id: Joi.string().uuid({
-    version: 'uuidv4',
-  }),
-  part: Joi.number().integer(),
-})
-  .options({ presence: 'required' })
-  .meta({ className: 'RequestData' });
 
 export type ResponseErrorTypes =
   | ErrorInvalidPartNumber
