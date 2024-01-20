@@ -117,7 +117,8 @@ const Root = () => {
 const Navigation = () => {
     return (
         <NavigationContainer>
-            <Root />
+            {/* <Root /> */}
+            <SettingsStackNavigator />
         </NavigationContainer>
     );
 };
