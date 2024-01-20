@@ -1,11 +1,11 @@
 {
-    "trailingComma": "es5",
-    "printWidth": 95,
-    "tabWidth": 4,
-    "singleQuote": true,
-    "bracketSpacing": false,
-    "importOrder": ["^react$|^react-native$", "^[A-Za-z].*|^@.*", "^[~].*", "^[./]"],
-    "importOrderSeparation": true,
-    "arrowParens": "avoid",
-    "bracketSameLine": true
+  "trailingComma": "es5",
+  "printWidth": 95,
+  "tabWidth": 2,
+  "singleQuote": true,
+  "bracketSpacing": true,
+  "importOrder": ["^react$|^react-native$", "^[A-Za-z].*|^@.*", "^[~].*", "^[./]"],
+  "importOrderSeparation": true,
+  "arrowParens": "avoid",
+  "bracketSameLine": true
 }
