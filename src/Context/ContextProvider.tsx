@@ -11,8 +11,8 @@ import { NativeEventEmitter, NativeModules } from 'react-native';
 import { ErrorCodes } from 'react-native-delete-media';
 import RNFS from 'react-native-fs';
 
-import { Action, Actions, GlobalReducer, initialState } from '~/Components/ContextReducer';
 import { uniqueDeviceId } from '~/Config/config';
+import { Action, Actions, GlobalReducer, initialState } from '~/Context/ContextReducer';
 import {
   RemovePhotos,
   addPhoto,

@@ -1,5 +1,5 @@
 import React from 'react';
-import { PixelRatio, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, ViewStyle } from 'react-native';
 
 import CancelButton from '~/Components/CommonComponents/CancelButton';
 import SelectAllButton from '~/Components/CommonComponents/SelectAllButton';
@@ -7,7 +7,7 @@ import * as BarHeights from '~/Helpers/BarHeights';
 
 type StatusBarComponentProps = {
   selectedNb: number;
-  style?: any;
+  style?: ViewStyle;
   onCancelButton?: () => void;
   onSelectAllButton?: () => void;
 };

@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 import { Dimensions, FlatList, StyleSheet, ViewToken } from 'react-native';
 
-import PhotoComponentForSlider from '~/Components/PhotoComponentForSlider';
 import { PhotoType } from '~/Helpers/types';
+
+import PhotoComponentForSlider from './PhotoComponentForSlider';
 
 const ITEM_WIDTH = Dimensions.get('window').width;
 
@@ -10,7 +11,7 @@ function keyExtractor(item: PhotoType, index: number) {
   return `Photo_${item.image.fileName}_index_${index}`;
 }
 
-function getItemLayout(data: any, index: number) {
+function getItemLayout(data: ArrayLike<PhotoType> | null | undefined, index: number) {
   return {
     length: ITEM_WIDTH,
     offset: ITEM_WIDTH * index,
@@ -27,25 +28,32 @@ type PropsType = {
   onPhotoLongClick?: (item: PhotoType) => void;
 };
 
-function PhotoSliderCore(props: PropsType) {
+function PhotoSliderCore({
+  onIndexChanged,
+  onPhotoClick,
+  onPhotoLongClick,
+  startIndex,
+  photos,
+  ...props
+}: PropsType) {
   const flatlistRef = useRef<FlatList>(null);
-  const flatListCurrentIndexRef = useRef<number>(props.startIndex);
+  const flatListCurrentIndexRef = useRef<number>(startIndex);
 
   const renderItem = useCallback(
-    ({ item, index }: { item: PhotoType; index: number }) => (
+    ({ item }: { item: PhotoType; index: number }) => (
       <PhotoComponentForSlider
         photo={item}
-        onPress={props.onPhotoClick}
-        onLongPress={props.onPhotoLongClick}
+        onPress={onPhotoClick}
+        onLongPress={onPhotoLongClick}
       />
     ),
-    [props.onPhotoClick, props.onPhotoLongClick],
+    [onPhotoClick, onPhotoLongClick],
   );
 
-  let correctStartIndex = props.startIndex;
+  let correctStartIndex = startIndex;
 
-  if (props.startIndex >= props.photos.length) {
-    correctStartIndex = props.photos.length - 1;
+  if (startIndex >= photos.length) {
+    correctStartIndex = photos.length - 1;
   }
 
   if (correctStartIndex < 0) {
@@ -54,28 +62,27 @@ function PhotoSliderCore(props: PropsType) {
 
   const onFlatListCurrentIndexChanged = useCallback(
     (index: number) => {
-      props.onIndexChanged?.(index);
+      onIndexChanged?.(index);
     },
-    [props.onIndexChanged],
+    [onIndexChanged],
   );
 
   const onViewableItemsChangedCallBack = useCallback(
-    ({ viewableItems, changed }: { viewableItems: ViewToken[]; changed: ViewToken[] }) => {
+    ({ viewableItems }: { viewableItems: ViewToken[]; changed: ViewToken[] }) => {
       if (viewableItems.length == 1) {
         const index = viewableItems[0].index ?? 0;
         flatListCurrentIndexRef.current = index;
         onFlatListCurrentIndexChanged(index);
       }
     },
-    [],
+    [onFlatListCurrentIndexChanged],
   );
 
   useEffect(() => {
-    if (props.photos.length == 0) {
+    if (photos.length == 0) {
       return;
     }
-    const indexOutOfRange =
-      flatListCurrentIndexRef.current >= props.photos.length || props.startIndex < 0;
+    const indexOutOfRange = flatListCurrentIndexRef.current >= photos.length || startIndex < 0;
 
     let indexToScroll = flatListCurrentIndexRef.current;
 
@@ -83,8 +90,8 @@ function PhotoSliderCore(props: PropsType) {
       indexToScroll = 0;
     }
 
-    if (flatListCurrentIndexRef.current >= props.photos.length) {
-      indexToScroll = props.photos.length - 1;
+    if (flatListCurrentIndexRef.current >= photos.length) {
+      indexToScroll = photos.length - 1;
     }
 
     if (indexOutOfRange) {
@@ -93,9 +100,9 @@ function PhotoSliderCore(props: PropsType) {
         index: indexToScroll,
       });
     }
-  }, [props.photos.length, props.startIndex]);
+  }, [photos.length, startIndex]);
 
-  const startIndexOutOfRange = props.startIndex >= props.photos.length;
+  const startIndexOutOfRange = startIndex >= photos.length;
 
   useEffect(() => {
     if (startIndexOutOfRange) {
@@ -103,15 +110,15 @@ function PhotoSliderCore(props: PropsType) {
     }
     flatlistRef.current?.scrollToIndex({
       animated: false,
-      index: props.startIndex,
+      index: startIndex,
     });
-  }, [startIndexOutOfRange, props.startIndex]);
+  }, [startIndexOutOfRange, startIndex]);
 
   return (
     <FlatList
       style={styles.flatListStyle}
       ref={flatlistRef}
-      data={props.photos}
+      data={photos}
       renderItem={renderItem}
       initialNumToRender={10}
       initialScrollIndex={correctStartIndex}

@@ -1,7 +1,7 @@
-import { useEffect } from 'react';
+import React from 'react';
 
-import { useMainContext } from '~/Components/ContextProvider';
 import PhotoGallery from '~/Components/PhotoGallery';
+import { useMainContext } from '~/Context/ContextProvider';
 
 function photosNbToString(n: number) {
   if (!n) {

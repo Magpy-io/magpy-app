@@ -1,22 +1,20 @@
-import { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 
-import { useMainContext } from '~/Components/ContextProvider';
-import PhotoGrid from '~/Components/PhotoGrid';
-import PhotoSlider from '~/Components/PhotoSlider';
 import { PhotoType } from '~/Helpers/types';
 
-type PropsType = {
+import PhotoGridController from './PhotoComponents/grid/PhotoGridController';
+import PhotoSlider from './PhotoComponents/slider/PhotoSlider';
+
+type PhotoGalleryPropsType = {
   style?: StyleProp<ViewStyle>;
   photos: PhotoType[];
   contextLocation: string;
   gridHeaderTextFunction?: (photosNb: number) => string;
 };
 
-export default function PhotoGallery(props: PropsType) {
+export default function PhotoGallery(props: PhotoGalleryPropsType) {
   console.log('render gallery', props.contextLocation);
-
-  const context = useMainContext();
 
   const [switchingState, setSwitchingState] = useState({
     isPhotoSelected: false,
@@ -50,7 +48,7 @@ export default function PhotoGallery(props: PropsType) {
             startIndex={switchingState.startIndexWhenSwitching}
             onSwitchMode={onSwitchMode}
           />
-          <PhotoGrid
+          <PhotoGridController
             key={'photo_grid_' + props.contextLocation}
             id={'photo_grid_' + props.contextLocation}
             contextLocation={props.contextLocation}
@@ -63,7 +61,7 @@ export default function PhotoGallery(props: PropsType) {
         </View>
       ) : (
         <View style={styles.viewStyle}>
-          <PhotoGrid
+          <PhotoGridController
             key={'photo_grid_' + props.contextLocation}
             id={'photo_grid_' + props.contextLocation}
             contextLocation={props.contextLocation}
@@ -91,9 +89,6 @@ export default function PhotoGallery(props: PropsType) {
 
 const styles = StyleSheet.create({
   viewStyle: {
-    position: 'absolute',
-    top: 0,
-    height: '100%',
-    width: '100%',
+    flex: 1,
   },
 });

@@ -1,5 +1,5 @@
 import React from 'react';
-import { PixelRatio, StyleSheet, Text, TouchableHighlight, View } from 'react-native';
+import { StyleSheet, Text, TouchableHighlight, View, ViewStyle } from 'react-native';
 
 import { Icon } from '@rneui/themed';
 
@@ -12,8 +12,9 @@ const TOOLBAR_COLOR = '#ffffff';
 const TOOL_COLOR = '#4d4d4d';
 
 type ToolBarProps = {
-  style?: any;
-  contextLocation: string;
+  inDevice: boolean;
+  inServer: boolean;
+  style?: ViewStyle;
   onDeleteLocal?: () => void;
   onAddLocal?: () => void;
   onDeleteServer?: () => void;
@@ -22,12 +23,16 @@ type ToolBarProps = {
   onDetails?: () => void;
 };
 
-function ToolBarGrid(props: ToolBarProps) {
+function ToolBar(props: ToolBarProps) {
   return (
     <View style={[styles.toolBarView, props.style]}>
       <View style={styles.toolsView}>
-        {props.contextLocation == 'local' ? (
-          <ToolComponent icon="backup" text="Back up" onPress={() => props.onAddServer?.()} />
+        {props.inDevice ? (
+          <ToolComponent
+            icon="mobile-off"
+            text="Delete from device"
+            onPress={() => props.onDeleteLocal?.()}
+          />
         ) : (
           <ToolComponent
             icon="system-update"
@@ -35,19 +40,17 @@ function ToolBarGrid(props: ToolBarProps) {
             onPress={() => props.onAddLocal?.()}
           />
         )}
-        <ToolComponent
-          icon="mobile-off"
-          text="Delete from device"
-          onPress={() => props.onDeleteLocal?.()}
-        />
-        {props.contextLocation == 'server' && (
+        {props.inServer ? (
           <ToolComponent
             icon="delete"
             text="Delete from server"
             onPress={() => props.onDeleteServer?.()}
           />
+        ) : (
+          <ToolComponent icon="backup" text="Back up" onPress={() => props.onAddServer?.()} />
         )}
         <ToolComponent icon="share" text="Share" onPress={() => props.onShare?.()} />
+        <ToolComponent icon="info" text="Details" onPress={() => props.onDetails?.()} />
       </View>
     </View>
   );
@@ -60,7 +63,7 @@ type ToolComponentProps = {
   onPress: () => void;
 };
 
-const ToolComponent = React.memo((props: ToolComponentProps) => {
+const ToolComponent = React.memo(function ToolComponent(props: ToolComponentProps) {
   return (
     <TouchableHighlight
       onPress={props.onPress}
@@ -105,8 +108,8 @@ const styles = StyleSheet.create({
     width: '100%',
     backgroundColor: 'transparent',
     position: 'absolute',
-    bottom: BarHeights.GetNavigatorBarHeight(),
-    //marginBottom: ,
+    bottom: 0,
+    marginBottom: BarHeights.GetNavigatorBarHeight(),
   },
   toolsView: {
     flex: 1,
@@ -116,4 +119,4 @@ const styles = StyleSheet.create({
   iconContainerStyle: {},
 });
 
-export default React.memo(ToolBarGrid);
+export default React.memo(ToolBar);

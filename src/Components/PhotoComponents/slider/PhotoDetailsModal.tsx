@@ -7,7 +7,7 @@ import { formatDate } from '~/Helpers/Date';
 import { getReadableFileSizeString } from '~/Helpers/FileSizeFormat';
 import { PhotoType } from '~/Helpers/types';
 
-import GenericModal from './CommonComponents/GenericModal';
+import GenericModal from '../../CommonComponents/GenericModal';
 
 type PhotoDetailsModalProps = {
   modalVisible: boolean;
@@ -22,30 +22,32 @@ export default function PhotoDetailsModal({
 }: PhotoDetailsModalProps) {
   return (
     <GenericModal modalVisible={modalVisible} handleModal={handleModal}>
-      <PhotoInfo
-        icon="image"
-        title={photo.image.fileName}
-        text={`${photo.image.width} x ${photo.image.height} px`}
-      />
-      <PhotoInfo
-        icon="history"
-        title={`Taken on ${formatDate(photo.created)}`}
-        text={photo.modified ? `Modified on ${formatDate(photo.modified)}` : 'Unmodified'}
-      />
-      {photo.inServer && (
+      <>
         <PhotoInfo
-          icon="cloud-done"
-          title={`Backed up (${getReadableFileSizeString(photo.image.fileSize)})`}
-          text={`In server`}
+          icon="image"
+          title={photo.image.fileName}
+          text={`${photo.image.width} x ${photo.image.height} px`}
         />
-      )}
-      {photo.inDevice && (
         <PhotoInfo
-          icon="mobile-friendly"
-          title={`On device (${getReadableFileSizeString(photo.image.fileSize)})`}
-          text={`${photo.image.path.split('://')[1]}`}
+          icon="history"
+          title={`Taken on ${formatDate(photo.created)}`}
+          text={photo.modified ? `Modified on ${formatDate(photo.modified)}` : 'Unmodified'}
         />
-      )}
+        {photo.inServer && (
+          <PhotoInfo
+            icon="cloud-done"
+            title={`Backed up (${getReadableFileSizeString(photo.image.fileSize)})`}
+            text={`In server`}
+          />
+        )}
+        {photo.inDevice && (
+          <PhotoInfo
+            icon="mobile-friendly"
+            title={`On device (${getReadableFileSizeString(photo.image.fileSize)})`}
+            text={`${photo?.image?.path?.split('://')?.[1]}`}
+          />
+        )}
+      </>
     </GenericModal>
   );
 }

@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { StyleSheet, Text } from 'react-native';
+import { Text } from 'react-native';
 
-import { useMainContext } from '~/Components/ContextProvider';
 import PhotoGallery from '~/Components/PhotoGallery';
+import { useMainContext } from '~/Context/ContextProvider';
 import * as AndroidPermissions from '~/Helpers/GetPermissionsAndroid';
 
 function photosNbToString(n: number) {
@@ -15,9 +15,7 @@ function photosNbToString(n: number) {
   return `${n} Photos ready for backup.`;
 }
 
-type PropsType = {};
-
-export default function PhotoGalleryLocalScreen(props: PropsType) {
+export default function PhotoGalleryLocalScreen() {
   console.log('render screen local');
   const [hasPermissions, setHasPermissions] = useState<boolean>(true);
   const context = useMainContext();
@@ -30,23 +28,24 @@ export default function PhotoGalleryLocalScreen(props: PropsType) {
   }, []);
 
   useEffect(() => {
-    getPermissions();
-  }, []);
+    getPermissions().catch(e => {
+      console.log('Error getting permissions', e);
+    });
+  }, [getPermissions]);
 
-  return hasPermissions ? (
-    <PhotoGallery
-      style={{}}
-      photos={context.photosLocal}
-      key={'gallery_local'}
-      contextLocation={'local'}
-      gridHeaderTextFunction={photosNbToString}
-    />
-  ) : (
-    <Text>Permissions needed</Text>
+  return (
+    <>
+      {hasPermissions ? (
+        <PhotoGallery
+          style={{}}
+          photos={context.photosLocal}
+          key={'gallery_local'}
+          contextLocation={'local'}
+          gridHeaderTextFunction={photosNbToString}
+        />
+      ) : (
+        <Text>Permissions needed</Text>
+      )}
+    </>
   );
 }
-
-const styles = StyleSheet.create({
-  viewHeader: { paddingVertical: 30 },
-  textHeader: { fontSize: 17, textAlign: 'center' },
-});

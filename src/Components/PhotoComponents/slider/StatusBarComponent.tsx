@@ -1,5 +1,5 @@
 import React from 'react';
-import { PixelRatio, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, ViewStyle } from 'react-native';
 
 import { Icon } from '@rneui/themed';
 import * as Progress from 'react-native-progress';
@@ -13,7 +13,7 @@ type StatusBarComponentProps = {
   inServer: boolean;
   isLoading: boolean;
   loadingPercentage: number;
-  style?: any;
+  style?: ViewStyle;
   onBackButton?: () => void;
 };
 
@@ -67,7 +67,7 @@ const VALID_BACKGROUND_COLOR = colors.lightSuccess;
 const INVALID_COLOR = 'black';
 const INVALID_BACKGROUND_COLOR = colors.greyBackgroundColor;
 
-const StatusComponent = React.memo((props: StatusComponentProps) => {
+const StatusComponent = React.memo(function StatusComponent(props: StatusComponentProps) {
   return (
     <View
       style={[
