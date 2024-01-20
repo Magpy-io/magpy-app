@@ -8,29 +8,9 @@ module.exports = {
     'eslint:recommended',
     'plugin:react/recommended',
     'plugin:react-hooks/recommended',
-    'plugin:import/warnings',
     'prettier',
   ],
   rules: {
-    'import/order': [
-      'error',
-      {
-        groups: ['builtin', 'external', 'internal'],
-        pathGroups: [
-          {
-            pattern: 'react',
-            group: 'external',
-            position: 'before',
-          },
-        ],
-        pathGroupsExcludedImportTypes: ['react'],
-        'newlines-between': 'always',
-        alphabetize: {
-          order: 'asc',
-          caseInsensitive: true,
-        },
-      },
-    ],
     'unused-imports/no-unused-imports': 'error',
     'unused-imports/no-unused-vars': 'off',
   },
@@ -50,14 +30,7 @@ module.exports = {
       },
     },
   ],
-  plugins: [
-    'react',
-    'react-hooks',
-    '@typescript-eslint',
-    'import',
-    'unused-imports',
-    'prettier',
-  ],
+  plugins: ['react', 'react-hooks', '@typescript-eslint', 'unused-imports', 'prettier'],
   settings: {
     react: {
       version: 'detect',
