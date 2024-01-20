@@ -1,4 +1,4 @@
-import { DateTime } from "luxon";
+import { DateTime } from 'luxon';
 
 // Converts a string (2023-06-22T14:43:51.880Z) to a DateTime object
 export function DateTimeFromIso(date: string) {

@@ -1,6 +1,7 @@
-import Joi from "joi";
-import { ErrorServerNotClaimed, ErrorsAuthorization } from "../ErrorTypes";
-import { TokenAuthentification } from "../Types";
+import Joi from 'joi';
+
+import { ErrorServerNotClaimed, ErrorsAuthorization } from '../ErrorTypes';
+import { TokenAuthentification } from '../Types';
 
 export type ResponseData = {
   number: number;
@@ -8,15 +9,15 @@ export type ResponseData = {
 
 export const RequestSchema = Joi.object()
   .options({
-    presence: "required",
+    presence: 'required',
   })
-  .meta({ className: "RequestData" });
+  .meta({ className: 'RequestData' });
 
 export type ResponseErrorTypes = ErrorServerNotClaimed | ErrorsAuthorization;
 
-export const endpoint = "getNumberPhotos";
+export const endpoint = 'getNumberPhotos';
 
-export const tokenAuth: TokenAuthentification = "yes";
+export const tokenAuth: TokenAuthentification = 'yes';
 
 //auto-generated file using "yarn types"
-export * from "../RequestTypes/getNumberPhotos";
+export * from '../RequestTypes/getNumberPhotos';

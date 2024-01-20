@@ -16,8 +16,8 @@ export type ServerType = {
 };
 
 export type TokenAuthentification =
-  | "no"
-  | "user"
-  | "server"
-  | "set-token-user"
-  | "set-token-server";
+  | 'no'
+  | 'user'
+  | 'server'
+  | 'set-token-user'
+  | 'set-token-server';

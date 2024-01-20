@@ -1,27 +1,28 @@
-import Joi from "joi";
+import Joi from 'joi';
+
 import {
+  ErrorBackendServerUnreachable,
   ErrorInvalidName,
   ErrorsNotFromLocal,
-  ErrorBackendServerUnreachable,
-} from "../ErrorTypes";
-import { TokenAuthentification } from "../Types";
+} from '../ErrorTypes';
+import { TokenAuthentification } from '../Types';
 
 export type ResponseData = string;
 
 export const RequestSchema = Joi.object({
   name: Joi.string().optional(),
 })
-  .options({ presence: "required" })
-  .meta({ className: "RequestData" });
+  .options({ presence: 'required' })
+  .meta({ className: 'RequestData' });
 
 export type ResponseErrorTypes =
   | ErrorInvalidName
   | ErrorsNotFromLocal
   | ErrorBackendServerUnreachable;
 
-export const endpoint = "updateServerName";
+export const endpoint = 'updateServerName';
 
-export const tokenAuth: TokenAuthentification = "no";
+export const tokenAuth: TokenAuthentification = 'no';
 
 //auto-generated file using "yarn types"
-export * from "../RequestTypes/updateServerName";
+export * from '../RequestTypes/updateServerName';

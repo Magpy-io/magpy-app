@@ -1,6 +1,6 @@
-import { DeletePhotosById } from "../Types/";
-import { GeneratePostRequest } from "../RequestsManager";
-import { ResponseTypeFrom } from "../Types/ApiGlobalTypes";
+import { GeneratePostRequest } from '../RequestsManager';
+import { DeletePhotosById } from '../Types/';
+import { ResponseTypeFrom } from '../Types/ApiGlobalTypes';
 
 export const Post = GeneratePostRequest<
   DeletePhotosById.RequestData,
@@ -13,4 +13,4 @@ export type ResponseType = ResponseTypeFrom<
   DeletePhotosById.ResponseErrorTypes
 >;
 
-export * from "../Types/EndpointsApi/deletePhotosById";
+export * from '../Types/EndpointsApi/deletePhotosById';

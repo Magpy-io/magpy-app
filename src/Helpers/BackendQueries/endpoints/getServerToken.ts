@@ -1,6 +1,6 @@
-import { GetServerToken } from "../Types/";
-import { ResponseTypeFrom } from "../Types/ApiGlobalTypes";
-import { GeneratePostRequest } from "../RequestsManager";
+import { GeneratePostRequest } from '../RequestsManager';
+import { GetServerToken } from '../Types/';
+import { ResponseTypeFrom } from '../Types/ApiGlobalTypes';
 
 export const Post = GeneratePostRequest<
   GetServerToken.RequestData,
@@ -13,4 +13,4 @@ export type ResponseType = ResponseTypeFrom<
   GetServerToken.ResponseErrorTypes
 >;
 
-export * from "../Types/EndpointsApi/getServerToken";
+export * from '../Types/EndpointsApi/getServerToken';

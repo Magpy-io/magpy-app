@@ -1,7 +1,7 @@
-import { WhoAmI } from "../../Types/";
-import { ResponseTypeFrom } from "../../Types/ApiGlobalTypes";
-import * as mockValues from "../mockValues";
-import { verifyHasUserToken, GetUserToken } from "../../TokenManager";
+import { GetUserToken, verifyHasUserToken } from '../../TokenManager';
+import { WhoAmI } from '../../Types/';
+import { ResponseTypeFrom } from '../../Types/ApiGlobalTypes';
+import * as mockValues from '../mockValues';
 
 export const Post = async (data: WhoAmI.RequestData): Promise<ResponseType> => {
   verifyHasUserToken();
@@ -14,8 +14,8 @@ export const Post = async (data: WhoAmI.RequestData): Promise<ResponseType> => {
   if (GetUserToken() == mockValues.expiredUserToken) {
     return {
       ok: false,
-      errorCode: "AUTHORIZATION_EXPIRED",
-      message: "",
+      errorCode: 'AUTHORIZATION_EXPIRED',
+      message: '',
     };
   }
 
@@ -25,8 +25,8 @@ export const Post = async (data: WhoAmI.RequestData): Promise<ResponseType> => {
   ) {
     return {
       ok: false,
-      errorCode: "AUTHORIZATION_FAILED",
-      message: "",
+      errorCode: 'AUTHORIZATION_FAILED',
+      message: '',
     };
   }
 
@@ -35,9 +35,7 @@ export const Post = async (data: WhoAmI.RequestData): Promise<ResponseType> => {
     data: {
       user: {
         _id:
-          GetUserToken() == mockValues.validUserToken
-            ? mockValues.userId
-            : mockValues.userId2,
+          GetUserToken() == mockValues.validUserToken ? mockValues.userId : mockValues.userId2,
         email: mockValues.validUserEmail,
         name: mockValues.validUserName,
         serverId: mockValues.serverId,
@@ -46,9 +44,6 @@ export const Post = async (data: WhoAmI.RequestData): Promise<ResponseType> => {
   };
 };
 
-export type ResponseType = ResponseTypeFrom<
-  WhoAmI.ResponseData,
-  WhoAmI.ResponseErrorTypes
->;
+export type ResponseType = ResponseTypeFrom<WhoAmI.ResponseData, WhoAmI.ResponseErrorTypes>;
 
-export * from "../../Types/EndpointsApi/whoAmI";
+export * from '../../Types/EndpointsApi/whoAmI';

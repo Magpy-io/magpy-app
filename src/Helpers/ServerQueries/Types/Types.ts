@@ -1,9 +1,4 @@
-export const PhotoTypesArray = [
-  "data",
-  "thumbnail",
-  "compressed",
-  "original",
-] as const;
+export const PhotoTypesArray = ['data', 'thumbnail', 'compressed', 'original'] as const;
 
 export type PhotoTypes = (typeof PhotoTypesArray)[number];
 
@@ -22,4 +17,4 @@ export type APIPhoto = {
   image64: string;
 };
 
-export type TokenAuthentification = "no" | "yes" | "set-token";
+export type TokenAuthentification = 'no' | 'yes' | 'set-token';

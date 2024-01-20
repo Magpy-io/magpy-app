@@ -1,20 +1,15 @@
-import {
-  StyleSheet,
-  Text,
-  View,
-  TouchableHighlight,
-  PixelRatio,
-} from "react-native";
+import React from 'react';
+import { PixelRatio, StyleSheet, Text, TouchableHighlight, View } from 'react-native';
 
-import { Icon } from "@rneui/themed";
-import colors from "~/colors";
-import React from "react";
-import * as BarHeights from "~/Helpers/BarHeights";
+import { Icon } from '@rneui/themed';
+
+import * as BarHeights from '~/Helpers/BarHeights';
+import colors from '~/colors';
 
 const ICON_SIZE = 20;
 const TEXT_SIZE = 10;
-const TOOLBAR_COLOR = "#ffffff";
-const TOOL_COLOR = "#4d4d4d";
+const TOOLBAR_COLOR = '#ffffff';
+const TOOL_COLOR = '#4d4d4d';
 
 type ToolBarProps = {
   style?: any;
@@ -31,12 +26,8 @@ function ToolBarGrid(props: ToolBarProps) {
   return (
     <View style={[styles.toolBarView, props.style]}>
       <View style={styles.toolsView}>
-        {props.contextLocation == "local" ? (
-          <ToolComponent
-            icon="backup"
-            text="Back up"
-            onPress={() => props.onAddServer?.()}
-          />
+        {props.contextLocation == 'local' ? (
+          <ToolComponent icon="backup" text="Back up" onPress={() => props.onAddServer?.()} />
         ) : (
           <ToolComponent
             icon="system-update"
@@ -49,18 +40,14 @@ function ToolBarGrid(props: ToolBarProps) {
           text="Delete from device"
           onPress={() => props.onDeleteLocal?.()}
         />
-        {props.contextLocation == "server" && (
+        {props.contextLocation == 'server' && (
           <ToolComponent
             icon="delete"
             text="Delete from server"
             onPress={() => props.onDeleteServer?.()}
           />
         )}
-        <ToolComponent
-          icon="share"
-          text="Share"
-          onPress={() => props.onShare?.()}
-        />
+        <ToolComponent icon="share" text="Share" onPress={() => props.onShare?.()} />
       </View>
     </View>
   );
@@ -82,15 +69,13 @@ const ToolComponent = React.memo((props: ToolComponentProps) => {
         padding: 5,
         paddingVertical: 8,
       }}
-      underlayColor={colors.underlayColor}
-    >
+      underlayColor={colors.underlayColor}>
       <View
         style={{
           flex: 1,
-          alignItems: "center",
+          alignItems: 'center',
           // justifyContent: "center",
-        }}
-      >
+        }}>
         <Icon
           name={props.icon}
           color={TOOL_COLOR}
@@ -104,10 +89,9 @@ const ToolComponent = React.memo((props: ToolComponentProps) => {
               paddingTop: 2,
               maxWidth: 70,
               fontSize: props.textSize ?? TEXT_SIZE,
-              fontWeight: "700",
-              textAlign: "center",
-            }}
-          >
+              fontWeight: '700',
+              textAlign: 'center',
+            }}>
             {props.text}
           </Text>
         ) : null}
@@ -118,15 +102,15 @@ const ToolComponent = React.memo((props: ToolComponentProps) => {
 
 const styles = StyleSheet.create({
   toolBarView: {
-    width: "100%",
-    backgroundColor: "transparent",
-    position: "absolute",
+    width: '100%',
+    backgroundColor: 'transparent',
+    position: 'absolute',
     bottom: BarHeights.GetNavigatorBarHeight(),
     //marginBottom: ,
   },
   toolsView: {
     flex: 1,
-    flexDirection: "row",
+    flexDirection: 'row',
     backgroundColor: TOOLBAR_COLOR,
   },
   iconContainerStyle: {},

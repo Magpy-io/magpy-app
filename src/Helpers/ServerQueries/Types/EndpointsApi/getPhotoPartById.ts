@@ -1,11 +1,12 @@
-import Joi from "joi";
+import Joi from 'joi';
+
 import {
-  ErrorServerNotClaimed,
-  ErrorsAuthorization,
   ErrorIdNotFound,
   ErrorInvalidPartNumber,
-} from "../ErrorTypes";
-import { APIPhoto, TokenAuthentification } from "../Types";
+  ErrorServerNotClaimed,
+  ErrorsAuthorization,
+} from '../ErrorTypes';
+import { APIPhoto, TokenAuthentification } from '../Types';
 
 export type ResponseData = {
   photo: APIPhoto;
@@ -15,12 +16,12 @@ export type ResponseData = {
 
 export const RequestSchema = Joi.object({
   id: Joi.string().uuid({
-    version: "uuidv4",
+    version: 'uuidv4',
   }),
   part: Joi.number().integer(),
 })
-  .options({ presence: "required" })
-  .meta({ className: "RequestData" });
+  .options({ presence: 'required' })
+  .meta({ className: 'RequestData' });
 
 export type ResponseErrorTypes =
   | ErrorInvalidPartNumber
@@ -28,9 +29,9 @@ export type ResponseErrorTypes =
   | ErrorServerNotClaimed
   | ErrorsAuthorization;
 
-export const endpoint = "getPhotoPartById";
+export const endpoint = 'getPhotoPartById';
 
-export const tokenAuth: TokenAuthentification = "yes";
+export const tokenAuth: TokenAuthentification = 'yes';
 
 //auto-generated file using "yarn types"
-export * from "../RequestTypes/getPhotoPartById";
+export * from '../RequestTypes/getPhotoPartById';

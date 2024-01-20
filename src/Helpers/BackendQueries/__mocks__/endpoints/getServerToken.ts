@@ -1,25 +1,20 @@
-import { GetServerToken } from "../../Types/";
-import { ResponseTypeFrom } from "../../Types/ApiGlobalTypes";
-import * as mockValues from "../mockValues";
-import { SetServerToken } from "../../TokenManager";
+import { SetServerToken } from '../../TokenManager';
+import { GetServerToken } from '../../Types/';
+import { ResponseTypeFrom } from '../../Types/ApiGlobalTypes';
+import * as mockValues from '../mockValues';
 
-export const Post = async (
-  data: GetServerToken.RequestData
-): Promise<ResponseType> => {
+export const Post = async (data: GetServerToken.RequestData): Promise<ResponseType> => {
   await mockValues.timeout(10);
   const f = mockValues.checkFails();
   if (f) {
     return f;
   }
 
-  if (
-    data.key != mockValues.validKey &&
-    data.key != mockValues.validRandomKey
-  ) {
+  if (data.key != mockValues.validKey && data.key != mockValues.validRandomKey) {
     return {
       ok: false,
-      errorCode: "INVALID_CREDENTIALS",
-      message: "",
+      errorCode: 'INVALID_CREDENTIALS',
+      message: '',
     };
   }
 
@@ -27,7 +22,7 @@ export const Post = async (
 
   return {
     ok: true,
-    data: "",
+    data: '',
   };
 };
 
@@ -36,4 +31,4 @@ export type ResponseType = ResponseTypeFrom<
   GetServerToken.ResponseErrorTypes
 >;
 
-export * from "../../Types/EndpointsApi/getServerToken";
+export * from '../../Types/EndpointsApi/getServerToken';

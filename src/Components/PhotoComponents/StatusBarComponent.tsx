@@ -1,11 +1,12 @@
-import { StyleSheet, Text, View, PixelRatio } from "react-native";
+import React from 'react';
+import { PixelRatio, StyleSheet, Text, View } from 'react-native';
 
-import { Icon } from "@rneui/themed";
-import colors from "~/colors";
-import BackButton from "~/Components/CommonComponents/BackButton";
-import React from "react";
-import * as Progress from "react-native-progress";
-import * as BarHeights from "~/Helpers/BarHeights";
+import { Icon } from '@rneui/themed';
+import * as Progress from 'react-native-progress';
+
+import BackButton from '~/Components/CommonComponents/BackButton';
+import * as BarHeights from '~/Helpers/BarHeights';
+import colors from '~/colors';
 
 type StatusBarComponentProps = {
   inDevice: boolean;
@@ -17,13 +18,11 @@ type StatusBarComponentProps = {
 };
 
 function StatusBarComponent(props: StatusBarComponentProps) {
-  const deviceStatusText = props.inDevice ? "On device" : "Not on device";
-  const serverStatusText = props.inServer ? "Backed up" : "Not backed up";
+  const deviceStatusText = props.inDevice ? 'On device' : 'Not on device';
+  const serverStatusText = props.inServer ? 'Backed up' : 'Not backed up';
 
-  const deviceStatusIcon = props.inDevice
-    ? "mobile-friendly"
-    : "phonelink-erase";
-  const serverStatusIcon = props.inServer ? "cloud-done" : "cloud-off";
+  const deviceStatusIcon = props.inDevice ? 'mobile-friendly' : 'phonelink-erase';
+  const serverStatusIcon = props.inServer ? 'cloud-done' : 'cloud-off';
 
   return (
     <View style={[styles.StatusBarStyle, props.style]}>
@@ -36,8 +35,8 @@ function StatusBarComponent(props: StatusBarComponentProps) {
             style={styles.pieStyle}
             progress={props.loadingPercentage}
             size={30}
-            borderColor={"#d6d6d6"}
-            color={"#d6d6d6"}
+            borderColor={'#d6d6d6'}
+            color={'#d6d6d6'}
           />
         ) : (
           <></>
@@ -65,7 +64,7 @@ type StatusComponentProps = {
 
 const VALID_COLOR = colors.success;
 const VALID_BACKGROUND_COLOR = colors.lightSuccess;
-const INVALID_COLOR = "black";
+const INVALID_COLOR = 'black';
 const INVALID_BACKGROUND_COLOR = colors.greyBackgroundColor;
 
 const StatusComponent = React.memo((props: StatusComponentProps) => {
@@ -76,12 +75,9 @@ const StatusComponent = React.memo((props: StatusComponentProps) => {
         {
           marginTop: BarHeights.GetStatusBarHeight(),
           padding: 5,
-          backgroundColor: props.valid
-            ? VALID_BACKGROUND_COLOR
-            : INVALID_BACKGROUND_COLOR,
+          backgroundColor: props.valid ? VALID_BACKGROUND_COLOR : INVALID_BACKGROUND_COLOR,
         },
-      ]}
-    >
+      ]}>
       <Icon
         name={props.icon}
         containerStyle={{}}
@@ -90,12 +86,11 @@ const StatusComponent = React.memo((props: StatusComponentProps) => {
       />
       <Text
         style={{
-          fontWeight: "bold",
+          fontWeight: 'bold',
           color: props.valid ? VALID_COLOR : INVALID_COLOR,
           fontSize: 15,
           marginLeft: 3,
-        }}
-      >
+        }}>
         {props.text}
       </Text>
     </View>
@@ -105,21 +100,21 @@ const StatusComponent = React.memo((props: StatusComponentProps) => {
 const styles = StyleSheet.create({
   StatusBarStyle: {
     padding: 5,
-    width: "100%",
-    backgroundColor: "white",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    position: "absolute",
+    width: '100%',
+    backgroundColor: 'white',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    position: 'absolute',
     top: 0,
   },
   statusBarBackButtonStyle: {},
   statusBarComponentStyle: {
-    flexDirection: "row",
+    flexDirection: 'row',
   },
   statusComponentStyle: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     borderRadius: 3,
     marginHorizontal: 3,
   },

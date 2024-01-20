@@ -1,10 +1,8 @@
-import { Register } from "../../Types/";
-import { ResponseTypeFrom } from "../../Types/ApiGlobalTypes";
-import * as mockValues from "../mockValues";
+import { Register } from '../../Types/';
+import { ResponseTypeFrom } from '../../Types/ApiGlobalTypes';
+import * as mockValues from '../mockValues';
 
-export const Post = async (
-  data: Register.RequestData
-): Promise<ResponseType> => {
+export const Post = async (data: Register.RequestData): Promise<ResponseType> => {
   await mockValues.timeout(10);
   const f = mockValues.checkFails();
   if (f) {
@@ -14,8 +12,8 @@ export const Post = async (
   if (data.email == mockValues.userEmailTaken) {
     return {
       ok: false,
-      errorCode: "EMAIL_TAKEN",
-      message: "",
+      errorCode: 'EMAIL_TAKEN',
+      message: '',
     };
   }
 
@@ -25,14 +23,14 @@ export const Post = async (
   ) {
     return {
       ok: false,
-      errorCode: "INVALID_EMAIL",
-      message: "",
+      errorCode: 'INVALID_EMAIL',
+      message: '',
     };
   }
 
   return {
     ok: true,
-    data: "",
+    data: '',
   };
 };
 
@@ -41,4 +39,4 @@ export type ResponseType = ResponseTypeFrom<
   Register.ResponseErrorTypes
 >;
 
-export * from "../../Types/EndpointsApi/register";
+export * from '../../Types/EndpointsApi/register';

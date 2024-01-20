@@ -1,7 +1,7 @@
-import { Login } from "../../Types/";
-import { ResponseTypeFrom } from "../../Types/ApiGlobalTypes";
-import * as mockValues from "../mockValues";
-import { SetUserToken } from "../../TokenManager";
+import { SetUserToken } from '../../TokenManager';
+import { Login } from '../../Types/';
+import { ResponseTypeFrom } from '../../Types/ApiGlobalTypes';
+import * as mockValues from '../mockValues';
 
 export const Post = async (data: Login.RequestData): Promise<ResponseType> => {
   await mockValues.timeout(10);
@@ -16,8 +16,8 @@ export const Post = async (data: Login.RequestData): Promise<ResponseType> => {
   ) {
     return {
       ok: false,
-      errorCode: "INVALID_CREDENTIALS",
-      message: "",
+      errorCode: 'INVALID_CREDENTIALS',
+      message: '',
     };
   }
 
@@ -25,13 +25,10 @@ export const Post = async (data: Login.RequestData): Promise<ResponseType> => {
 
   return {
     ok: true,
-    data: "",
+    data: '',
   };
 };
 
-export type ResponseType = ResponseTypeFrom<
-  Login.ResponseData,
-  Login.ResponseErrorTypes
->;
+export type ResponseType = ResponseTypeFrom<Login.ResponseData, Login.ResponseErrorTypes>;
 
-export * from "../../Types/EndpointsApi/login";
+export * from '../../Types/EndpointsApi/login';

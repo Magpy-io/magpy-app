@@ -1,6 +1,6 @@
-import { WhoAmI } from "../Types/";
-import { GeneratePostRequest } from "../RequestsManager";
-import { ResponseTypeFrom } from "../Types/ApiGlobalTypes";
+import { GeneratePostRequest } from '../RequestsManager';
+import { WhoAmI } from '../Types/';
+import { ResponseTypeFrom } from '../Types/ApiGlobalTypes';
 
 export const Post = GeneratePostRequest<
   WhoAmI.RequestData,
@@ -8,9 +8,6 @@ export const Post = GeneratePostRequest<
   WhoAmI.ResponseErrorTypes
 >(WhoAmI.endpoint, WhoAmI.tokenAuth);
 
-export type ResponseType = ResponseTypeFrom<
-  WhoAmI.ResponseData,
-  WhoAmI.ResponseErrorTypes
->;
+export type ResponseType = ResponseTypeFrom<WhoAmI.ResponseData, WhoAmI.ResponseErrorTypes>;
 
-export * from "../Types/EndpointsApi/whoAmI";
+export * from '../Types/EndpointsApi/whoAmI';

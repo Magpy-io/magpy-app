@@ -1,9 +1,7 @@
-import Joi from "joi";
-import {
-  ErrorsNotFromLocal,
-  ErrorBackendServerUnreachable,
-} from "../ErrorTypes";
-import { TokenAuthentification } from "../Types";
+import Joi from 'joi';
+
+import { ErrorBackendServerUnreachable, ErrorsNotFromLocal } from '../ErrorTypes';
+import { TokenAuthentification } from '../Types';
 
 export type ResponseData = {
   storagePath: string;
@@ -13,17 +11,15 @@ export type ResponseData = {
 
 export const RequestSchema = Joi.object()
   .options({
-    presence: "required",
+    presence: 'required',
   })
-  .meta({ className: "RequestData" });
+  .meta({ className: 'RequestData' });
 
-export type ResponseErrorTypes =
-  | ErrorsNotFromLocal
-  | ErrorBackendServerUnreachable;
+export type ResponseErrorTypes = ErrorsNotFromLocal | ErrorBackendServerUnreachable;
 
-export const endpoint = "getServerInfo";
+export const endpoint = 'getServerInfo';
 
-export const tokenAuth: TokenAuthentification = "no";
+export const tokenAuth: TokenAuthentification = 'no';
 
 //auto-generated file using "yarn types"
-export * from "../RequestTypes/getServerInfo";
+export * from '../RequestTypes/getServerInfo';

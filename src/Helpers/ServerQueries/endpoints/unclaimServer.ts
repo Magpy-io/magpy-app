@@ -1,6 +1,6 @@
-import { UnclaimServer } from "../Types/";
-import { GeneratePostRequest } from "../RequestsManager";
-import { ResponseTypeFrom } from "../Types/ApiGlobalTypes";
+import { GeneratePostRequest } from '../RequestsManager';
+import { UnclaimServer } from '../Types/';
+import { ResponseTypeFrom } from '../Types/ApiGlobalTypes';
 
 export const Post = GeneratePostRequest<
   UnclaimServer.RequestData,
@@ -13,4 +13,4 @@ export type ResponseType = ResponseTypeFrom<
   UnclaimServer.ResponseErrorTypes
 >;
 
-export * from "../Types/EndpointsApi/unclaimServer";
+export * from '../Types/EndpointsApi/unclaimServer';

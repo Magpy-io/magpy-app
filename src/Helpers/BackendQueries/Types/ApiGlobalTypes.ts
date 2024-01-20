@@ -1,4 +1,4 @@
-import { ErrorBadRequest, ErrorServerError } from "./ErrorTypes";
+import { ErrorBadRequest, ErrorServerError } from './ErrorTypes';
 
 export type ServerResponseData<T> = {
   ok: true;
@@ -13,5 +13,7 @@ export type ServerResponseError<Errors> = {
 
 export type EndpointMethodsResponseType<T, U> = T | ServerResponseError<U>;
 
-export type ResponseTypeFrom<DataType, ErrorTypes> =
-  EndpointMethodsResponseType<ServerResponseData<DataType>, ErrorTypes>;
+export type ResponseTypeFrom<DataType, ErrorTypes> = EndpointMethodsResponseType<
+  ServerResponseData<DataType>,
+  ErrorTypes
+>;

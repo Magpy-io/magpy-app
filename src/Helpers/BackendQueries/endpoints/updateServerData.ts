@@ -1,6 +1,6 @@
-import { UpdateServerData } from "../Types/";
-import { ResponseTypeFrom } from "../Types/ApiGlobalTypes";
-import { GeneratePostRequest } from "../RequestsManager";
+import { GeneratePostRequest } from '../RequestsManager';
+import { UpdateServerData } from '../Types/';
+import { ResponseTypeFrom } from '../Types/ApiGlobalTypes';
 
 export const Post = GeneratePostRequest<
   UpdateServerData.RequestData,
@@ -13,4 +13,4 @@ export type ResponseType = ResponseTypeFrom<
   UpdateServerData.ResponseErrorTypes
 >;
 
-export * from "../Types/EndpointsApi/updateServerData";
+export * from '../Types/EndpointsApi/updateServerData';

@@ -1,11 +1,12 @@
-import Joi from "joi";
+import Joi from 'joi';
+
 import {
   ErrorInvalidIpAddress,
   ErrorInvalidPort,
   ErrorInvalidServerName,
   ErrorsAuthorization,
-} from "../ErrorTypes";
-import { TokenAuthentification } from "../Types";
+} from '../ErrorTypes';
+import { TokenAuthentification } from '../Types';
 
 export type ResponseData = string;
 
@@ -16,9 +17,9 @@ export const RequestSchema = Joi.object({
   port: Joi.string().optional(),
 })
   .options({
-    presence: "required",
+    presence: 'required',
   })
-  .meta({ className: "RequestData" });
+  .meta({ className: 'RequestData' });
 
 export type ResponseErrorTypes =
   | ErrorInvalidIpAddress
@@ -26,9 +27,9 @@ export type ResponseErrorTypes =
   | ErrorsAuthorization
   | ErrorInvalidPort;
 
-export const endpoint = "updateServerData";
+export const endpoint = 'updateServerData';
 
-export const tokenAuth: TokenAuthentification = "server";
+export const tokenAuth: TokenAuthentification = 'server';
 
 //auto-generated file using "yarn types"
-export * from "../RequestTypes/updateServerData";
+export * from '../RequestTypes/updateServerData';

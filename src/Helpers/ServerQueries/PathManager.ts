@@ -1,12 +1,12 @@
-let path: string = "";
+let path: string = '';
 
 export function SetPath(path_p: string) {
-  if (typeof path_p !== "string") {
-    throw new Error("path_p parameter must be astring");
+  if (typeof path_p !== 'string') {
+    throw new Error('path_p parameter must be astring');
   }
 
-  if (path_p[path_p.length - 1] != "/") {
-    path_p += "/";
+  if (path_p[path_p.length - 1] != '/') {
+    path_p += '/';
   }
 
   path = path_p;
@@ -18,7 +18,7 @@ export function GetPath() {
 }
 
 export function getPathWithEndpoint(endpoint: string) {
-  return GetPath() + endpoint + "/";
+  return GetPath() + endpoint + '/';
 }
 
 function checkPathExists() {
@@ -30,6 +30,6 @@ function checkPathExists() {
 export class ErrorPathNotSet extends Error {
   constructor() {
     super();
-    this.message = "You need to set a path before runing any requests";
+    this.message = 'You need to set a path before runing any requests';
   }
 }

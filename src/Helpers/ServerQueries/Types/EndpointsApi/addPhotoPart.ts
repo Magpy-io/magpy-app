@@ -1,12 +1,13 @@
-import Joi from "joi";
+import Joi from 'joi';
+
 import {
-  ErrorPhotoSizeExceeded,
   ErrorMissingParts,
+  ErrorPhotoSizeExceeded,
   ErrorPhotoTransferNotFound,
   ErrorServerNotClaimed,
   ErrorsAuthorization,
-} from "../ErrorTypes";
-import { APIPhoto, TokenAuthentification } from "../Types";
+} from '../ErrorTypes';
+import { APIPhoto, TokenAuthentification } from '../Types';
 
 export type ResponseData =
   | {
@@ -23,14 +24,14 @@ export type ResponseData =
 
 export const RequestSchema = Joi.object({
   id: Joi.string().uuid({
-    version: "uuidv4",
+    version: 'uuidv4',
   }),
   partNumber: Joi.number().integer(),
   partSize: Joi.number().integer(),
   photoPart: Joi.string(),
 })
-  .options({ presence: "required" })
-  .meta({ className: "RequestData" });
+  .options({ presence: 'required' })
+  .meta({ className: 'RequestData' });
 
 export type ResponseErrorTypes =
   | ErrorPhotoSizeExceeded
@@ -39,9 +40,9 @@ export type ResponseErrorTypes =
   | ErrorServerNotClaimed
   | ErrorsAuthorization;
 
-export const endpoint = "addPhotoPart";
+export const endpoint = 'addPhotoPart';
 
-export const tokenAuth: TokenAuthentification = "yes";
+export const tokenAuth: TokenAuthentification = 'yes';
 
 //auto-generated file using "yarn types"
-export * from "../RequestTypes/addPhotoPart";
+export * from '../RequestTypes/addPhotoPart';

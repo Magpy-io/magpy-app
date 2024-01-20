@@ -1,4 +1,4 @@
-import { PhotoType } from "~/Helpers/types";
+import { PhotoType } from '~/Helpers/types';
 
 type stateType = {
   photosLocal: Array<PhotoType>;
@@ -19,21 +19,21 @@ const initialState = {
 };
 
 enum Actions {
-  setNewPhotosLocal = "SET_NEW_PHOTOS_LOCAL",
-  setNewPhotosServer = "SET_NEW_PHOTOS_SERVER",
-  addToPhotosLocal = "ADD_TO_PHOTOS_LOCAL",
-  addToPhotosServer = "ADD_TO_PHOTOS_SERVER",
-  addFullPhotoById = "ADD_FULL_PHOTO_BY_ID",
-  addPhotoLocal = "ADD_PHOTO_LOCAL",
-  addPhotoServer = "ADD_PHOTO_SERVER",
-  deletePhotosLocalFromLocal = "DELETE_PHOTOS_LOCAL_FROM_LOCAL",
-  deletePhotosLocalFromServer = "DELETE_PHOTOS_LOCAL_FROM_SERVER",
-  deletePhotosServer = "DELETE_PHOTOS_SERVER",
-  updatePhotoProgress = "UPDATE_PHOTO_PROGRESS",
-  updatePhotoProgressServer = "UPDATE_PHOTO_PROGRESS_SERVER",
-  addCroppedPhotos = "ADD_CROPPED_PHOTOS",
-  updatePhotosFromService = "UPDATE_PHOTOS_FROM_SERVICE",
-  clearAllLoadingLocal = "CLEAR_ALL_LOADING_LOCAL",
+  setNewPhotosLocal = 'SET_NEW_PHOTOS_LOCAL',
+  setNewPhotosServer = 'SET_NEW_PHOTOS_SERVER',
+  addToPhotosLocal = 'ADD_TO_PHOTOS_LOCAL',
+  addToPhotosServer = 'ADD_TO_PHOTOS_SERVER',
+  addFullPhotoById = 'ADD_FULL_PHOTO_BY_ID',
+  addPhotoLocal = 'ADD_PHOTO_LOCAL',
+  addPhotoServer = 'ADD_PHOTO_SERVER',
+  deletePhotosLocalFromLocal = 'DELETE_PHOTOS_LOCAL_FROM_LOCAL',
+  deletePhotosLocalFromServer = 'DELETE_PHOTOS_LOCAL_FROM_SERVER',
+  deletePhotosServer = 'DELETE_PHOTOS_SERVER',
+  updatePhotoProgress = 'UPDATE_PHOTO_PROGRESS',
+  updatePhotoProgressServer = 'UPDATE_PHOTO_PROGRESS_SERVER',
+  addCroppedPhotos = 'ADD_CROPPED_PHOTOS',
+  updatePhotosFromService = 'UPDATE_PHOTOS_FROM_SERVICE',
+  clearAllLoadingLocal = 'CLEAR_ALL_LOADING_LOCAL',
 }
 
 type Action = {
@@ -64,10 +64,7 @@ function GlobalReducer(prevState: stateType, action: Action) {
       const newState = { ...prevState };
       newState.nextOffsetLocal = action.payload.newPhotos.nextOffset;
       newState.endReachedLocal = action.payload.newPhotos.endReached;
-      newState.photosLocal = [
-        ...prevState.photosLocal,
-        ...action.payload.newPhotos.photos,
-      ];
+      newState.photosLocal = [...prevState.photosLocal, ...action.payload.newPhotos.photos];
       return newState;
     }
 
@@ -75,10 +72,7 @@ function GlobalReducer(prevState: stateType, action: Action) {
       const newState = { ...prevState };
       newState.nextOffsetServer = action.payload.newPhotos.nextOffset;
       newState.endReachedServer = action.payload.newPhotos.endReached;
-      newState.photosServer = [
-        ...prevState.photosServer,
-        ...action.payload.newPhotos.photos,
-      ];
+      newState.photosServer = [...prevState.photosServer, ...action.payload.newPhotos.photos];
       return newState;
     }
 
@@ -86,7 +80,7 @@ function GlobalReducer(prevState: stateType, action: Action) {
       const newState = { ...prevState };
       const newPhotosServer = [...newState.photosServer];
       const findCorrespondingPhotoIndex = newPhotosServer.findIndex(
-        (photo) => photo.id == action.payload.photo.id
+        photo => photo.id == action.payload.photo.id,
       );
       if (findCorrespondingPhotoIndex >= 0) {
         const newPhoto = { ...newPhotosServer[findCorrespondingPhotoIndex] };
@@ -103,7 +97,7 @@ function GlobalReducer(prevState: stateType, action: Action) {
       const newState = { ...prevState };
       const newPhotosServer = [...newState.photosServer];
       const findCorrespondingPhoto = newPhotosServer.find(
-        (photo) => photo.id == action.payload.photo.id
+        photo => photo.id == action.payload.photo.id,
       );
       if (findCorrespondingPhoto) {
         findCorrespondingPhoto.inDevice = true;
@@ -118,7 +112,7 @@ function GlobalReducer(prevState: stateType, action: Action) {
       const newState = { ...prevState };
       const newPhotosLocal = [...newState.photosLocal];
       const findCorrespondingPhotoIndex = newPhotosLocal.findIndex(
-        (photo) => photo.id == action.payload.photo.id
+        photo => photo.id == action.payload.photo.id,
       );
       if (findCorrespondingPhotoIndex >= 0) {
         newPhotosLocal.splice(findCorrespondingPhotoIndex, 1);
@@ -132,13 +126,9 @@ function GlobalReducer(prevState: stateType, action: Action) {
     case Actions.deletePhotosLocalFromLocal: {
       const newState = { ...prevState };
 
-      const ids: string[] = action.payload.photos.map(
-        (photo: PhotoType) => photo.id
-      );
+      const ids: string[] = action.payload.photos.map((photo: PhotoType) => photo.id);
 
-      newState.photosLocal = newState.photosLocal.filter(
-        (photo) => !ids.includes(photo.id)
-      );
+      newState.photosLocal = newState.photosLocal.filter(photo => !ids.includes(photo.id));
 
       return newState;
     }
@@ -148,12 +138,10 @@ function GlobalReducer(prevState: stateType, action: Action) {
 
       const newPhotosServer = [...newState.photosServer];
 
-      const ids: string[] = action.payload.photos.map(
-        (photo: PhotoType) => photo.id
-      );
+      const ids: string[] = action.payload.photos.map((photo: PhotoType) => photo.id);
 
-      ids.forEach((id) => {
-        const photo = newPhotosServer.find((v) => v.id == id);
+      ids.forEach(id => {
+        const photo = newPhotosServer.find(v => v.id == id);
         if (photo) {
           photo.inDevice = false;
         }
@@ -167,7 +155,7 @@ function GlobalReducer(prevState: stateType, action: Action) {
       const newState = { ...prevState };
 
       newState.photosServer = newState.photosServer.filter(
-        (photo) => !action.payload.ids.includes(photo.id)
+        photo => !action.payload.ids.includes(photo.id),
       );
 
       return newState;
@@ -177,7 +165,7 @@ function GlobalReducer(prevState: stateType, action: Action) {
       const newState = { ...prevState };
       const newPhotosLocal = [...newState.photosLocal];
       const findCorrespondingPhotoIndex = newPhotosLocal.findIndex(
-        (photo) => photo.id == action.payload.photo.id
+        photo => photo.id == action.payload.photo.id,
       );
       if (findCorrespondingPhotoIndex >= 0) {
         const newPhoto = { ...newPhotosLocal[findCorrespondingPhotoIndex] };
@@ -196,7 +184,7 @@ function GlobalReducer(prevState: stateType, action: Action) {
 
       const newPhotosServer = [...newState.photosServer];
       action.payload.images64.forEach((requestPhoto: any) => {
-        const index = newPhotosServer.findIndex((v) => v.id == requestPhoto.id);
+        const index = newPhotosServer.findIndex(v => v.id == requestPhoto.id);
 
         if (index >= 0) {
           const newPhoto = { ...newPhotosServer[index] };
@@ -213,7 +201,7 @@ function GlobalReducer(prevState: stateType, action: Action) {
       const newState = { ...prevState };
       const newPhotosServer = [...newState.photosServer];
       const findCorrespondingPhotoIndex = newPhotosServer.findIndex(
-        (photo) => photo.id == action.payload.photo.id
+        photo => photo.id == action.payload.photo.id,
       );
       if (findCorrespondingPhotoIndex >= 0) {
         const newPhoto = { ...newPhotosServer[findCorrespondingPhotoIndex] };
@@ -234,14 +222,12 @@ function GlobalReducer(prevState: stateType, action: Action) {
       const currentIndex = action.payload.currentIndex;
       const idsSliced = ids.slice(0, currentIndex);
 
-      const newPhotosLocalFiltered = newPhotosLocal.filter((photo) => {
+      const newPhotosLocalFiltered = newPhotosLocal.filter(photo => {
         return !idsSliced.includes(photo.id);
       });
 
       for (let i = currentIndex; i < ids.length; i++) {
-        const index = newPhotosLocalFiltered.findIndex(
-          (photo) => photo.id == ids[i]
-        );
+        const index = newPhotosLocalFiltered.findIndex(photo => photo.id == ids[i]);
 
         if (index >= 0) {
           if (!newPhotosLocalFiltered[index].isLoading) {

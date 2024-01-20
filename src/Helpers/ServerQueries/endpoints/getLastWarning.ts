@@ -1,6 +1,6 @@
-import { GetLastWarning } from "../Types/";
-import { GeneratePostRequest } from "../RequestsManager";
-import { ResponseTypeFrom } from "../Types/ApiGlobalTypes";
+import { GeneratePostRequest } from '../RequestsManager';
+import { GetLastWarning } from '../Types/';
+import { ResponseTypeFrom } from '../Types/ApiGlobalTypes';
 
 export const Post = GeneratePostRequest<
   GetLastWarning.RequestData,
@@ -13,4 +13,4 @@ export type ResponseType = ResponseTypeFrom<
   GetLastWarning.ResponseErrorTypes
 >;
 
-export * from "../Types/EndpointsApi/getLastWarning";
+export * from '../Types/EndpointsApi/getLastWarning';

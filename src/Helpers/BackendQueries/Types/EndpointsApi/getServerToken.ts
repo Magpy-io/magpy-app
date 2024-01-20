@@ -1,6 +1,7 @@
-import Joi from "joi";
-import { ErrorInvalidCredentials } from "../ErrorTypes";
-import { TokenAuthentification } from "../Types";
+import Joi from 'joi';
+
+import { ErrorInvalidCredentials } from '../ErrorTypes';
+import { TokenAuthentification } from '../Types';
 
 export type ResponseData = string;
 
@@ -9,15 +10,15 @@ export const RequestSchema = Joi.object({
   key: Joi.string(),
 })
   .options({
-    presence: "required",
+    presence: 'required',
   })
-  .meta({ className: "RequestData" });
+  .meta({ className: 'RequestData' });
 
 export type ResponseErrorTypes = ErrorInvalidCredentials;
 
-export const endpoint = "getServerToken";
+export const endpoint = 'getServerToken';
 
-export const tokenAuth: TokenAuthentification = "set-token-server";
+export const tokenAuth: TokenAuthentification = 'set-token-server';
 
 //auto-generated file using "yarn types"
-export * from "../RequestTypes/getServerToken";
+export * from '../RequestTypes/getServerToken';

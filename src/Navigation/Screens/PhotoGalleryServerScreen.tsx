@@ -1,14 +1,14 @@
-import PhotoGallery from "~/Components/PhotoGallery";
+import { useEffect } from 'react';
 
-import { useMainContext } from "~/Components/ContextProvider";
-import { useEffect } from "react";
+import { useMainContext } from '~/Components/ContextProvider';
+import PhotoGallery from '~/Components/PhotoGallery';
 
 function photosNbToString(n: number) {
   if (!n) {
-    return "No backed up photos";
+    return 'No backed up photos';
   }
   if (n == 1) {
-    return "1 Photo in server";
+    return '1 Photo in server';
   }
   return `${n} Photos in server`;
 }
@@ -16,14 +16,14 @@ function photosNbToString(n: number) {
 type PropsType = {};
 
 export default function PhotoGalleryScreen(props: PropsType) {
-  console.log("render screen server");
+  console.log('render screen server');
   const context = useMainContext();
 
   return (
     <PhotoGallery
       photos={context.photosServer}
-      key={"gallery_server"}
-      contextLocation={"server"}
+      key={'gallery_server'}
+      contextLocation={'server'}
       gridHeaderTextFunction={photosNbToString}
     />
   );

@@ -1,6 +1,6 @@
-import { AxiosResponse } from "axios";
+import { AxiosResponse } from 'axios';
 
-let UserToken = "";
+let UserToken = '';
 
 export function GetUserToken(): string {
   if (!UserToken) {
@@ -10,8 +10,8 @@ export function GetUserToken(): string {
 }
 
 export function SetUserToken(token: string) {
-  if (typeof token !== "string") {
-    throw new Error("token parameter must be a string");
+  if (typeof token !== 'string') {
+    throw new Error('token parameter must be a string');
   }
   UserToken = token;
 }
@@ -26,7 +26,7 @@ export function HasUserToken(): boolean {
 export function userAuthorizationObject() {
   return {
     headers: {
-      "x-authorization": `Bearer ${UserToken}`,
+      'x-authorization': `Bearer ${UserToken}`,
     },
   };
 }
@@ -38,12 +38,12 @@ export function verifyHasUserToken() {
 }
 
 export function extractToken(response: AxiosResponse<any, any>) {
-  return response.headers["x-authorization"].toString().split(" ")[1];
+  return response.headers['x-authorization'].toString().split(' ')[1];
 }
 
 export class ErrorNoUserToken extends Error {
   constructor() {
     super();
-    this.message = "You need a user token before making any requests";
+    this.message = 'You need a user token before making any requests';
   }
 }

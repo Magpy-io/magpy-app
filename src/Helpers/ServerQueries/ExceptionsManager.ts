@@ -1,9 +1,9 @@
-import { ServerResponseError } from "./Types/ApiGlobalTypes";
+import { ServerResponseError } from './Types/ApiGlobalTypes';
 
 export class ErrorBackendUnreachable extends Error {
   constructor() {
     super();
-    this.message = "Server is unreachable";
+    this.message = 'Server is unreachable';
   }
 }
 

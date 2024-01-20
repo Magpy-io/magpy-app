@@ -1,29 +1,23 @@
-import Joi from "joi";
-import {
-  ErrorIdNotFound,
-  ErrorServerNotClaimed,
-  ErrorsAuthorization,
-} from "../ErrorTypes";
-import { TokenAuthentification } from "../Types";
+import Joi from 'joi';
+
+import { ErrorIdNotFound, ErrorServerNotClaimed, ErrorsAuthorization } from '../ErrorTypes';
+import { TokenAuthentification } from '../Types';
 
 export type ResponseData = string;
 
 export const RequestSchema = Joi.object({
-  id: Joi.string().uuid({ version: "uuidv4" }),
+  id: Joi.string().uuid({ version: 'uuidv4' }),
   path: Joi.string(),
-  deviceUniqueId: Joi.string().uuid({ version: "uuidv4" }),
+  deviceUniqueId: Joi.string().uuid({ version: 'uuidv4' }),
 })
-  .options({ presence: "required" })
-  .meta({ className: "RequestData" });
+  .options({ presence: 'required' })
+  .meta({ className: 'RequestData' });
 
-export type ResponseErrorTypes =
-  | ErrorIdNotFound
-  | ErrorServerNotClaimed
-  | ErrorsAuthorization;
+export type ResponseErrorTypes = ErrorIdNotFound | ErrorServerNotClaimed | ErrorsAuthorization;
 
-export const endpoint = "updatePhotoPath";
+export const endpoint = 'updatePhotoPath';
 
-export const tokenAuth: TokenAuthentification = "yes";
+export const tokenAuth: TokenAuthentification = 'yes';
 
 //auto-generated file using "yarn types"
-export * from "../RequestTypes/updatePhotoPath";
+export * from '../RequestTypes/updatePhotoPath';

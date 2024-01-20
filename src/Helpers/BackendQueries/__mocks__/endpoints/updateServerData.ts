@@ -1,11 +1,9 @@
-import { UpdateServerData } from "../../Types/";
-import { ResponseTypeFrom } from "../../Types/ApiGlobalTypes";
-import * as mockValues from "../mockValues";
-import { verifyHasServerToken, GetServerToken } from "../../TokenManager";
+import { GetServerToken, verifyHasServerToken } from '../../TokenManager';
+import { UpdateServerData } from '../../Types/';
+import { ResponseTypeFrom } from '../../Types/ApiGlobalTypes';
+import * as mockValues from '../mockValues';
 
-export const Post = async (
-  data: UpdateServerData.RequestData
-): Promise<ResponseType> => {
+export const Post = async (data: UpdateServerData.RequestData): Promise<ResponseType> => {
   verifyHasServerToken();
   await mockValues.timeout(10);
   const f = mockValues.checkFails();
@@ -16,22 +14,22 @@ export const Post = async (
   if (GetServerToken() == mockValues.expiredServerToken) {
     return {
       ok: false,
-      errorCode: "AUTHORIZATION_EXPIRED",
-      message: "",
+      errorCode: 'AUTHORIZATION_EXPIRED',
+      message: '',
     };
   }
 
   if (GetServerToken() != mockValues.validServerToken) {
     return {
       ok: false,
-      errorCode: "AUTHORIZATION_FAILED",
-      message: "",
+      errorCode: 'AUTHORIZATION_FAILED',
+      message: '',
     };
   }
 
   return {
     ok: true,
-    data: "",
+    data: '',
   };
 };
 
@@ -40,4 +38,4 @@ export type ResponseType = ResponseTypeFrom<
   UpdateServerData.ResponseErrorTypes
 >;
 
-export * from "../../Types/EndpointsApi/updateServerData";
+export * from '../../Types/EndpointsApi/updateServerData';

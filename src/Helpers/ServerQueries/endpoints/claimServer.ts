@@ -1,6 +1,6 @@
-import { ClaimServer } from "../Types/";
-import { GeneratePostRequest } from "../RequestsManager";
-import { ResponseTypeFrom } from "../Types/ApiGlobalTypes";
+import { GeneratePostRequest } from '../RequestsManager';
+import { ClaimServer } from '../Types/';
+import { ResponseTypeFrom } from '../Types/ApiGlobalTypes';
 
 export const Post = GeneratePostRequest<
   ClaimServer.RequestData,
@@ -13,4 +13,4 @@ export type ResponseType = ResponseTypeFrom<
   ClaimServer.ResponseErrorTypes
 >;
 
-export * from "../Types/EndpointsApi/claimServer";
+export * from '../Types/EndpointsApi/claimServer';

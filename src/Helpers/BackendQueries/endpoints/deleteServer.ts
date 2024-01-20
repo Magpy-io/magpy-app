@@ -1,6 +1,6 @@
-import { DeleteServer } from "../Types/";
-import { ResponseTypeFrom } from "../Types/ApiGlobalTypes";
-import { GeneratePostRequest } from "../RequestsManager";
+import { GeneratePostRequest } from '../RequestsManager';
+import { DeleteServer } from '../Types/';
+import { ResponseTypeFrom } from '../Types/ApiGlobalTypes';
 
 export const Post = GeneratePostRequest<
   DeleteServer.RequestData,
@@ -13,4 +13,4 @@ export type ResponseType = ResponseTypeFrom<
   DeleteServer.ResponseErrorTypes
 >;
 
-export * from "../Types/EndpointsApi/deleteServer";
+export * from '../Types/EndpointsApi/deleteServer';

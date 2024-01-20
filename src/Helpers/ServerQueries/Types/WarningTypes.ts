@@ -1,4 +1,4 @@
-import { APIPhoto } from "./Types";
+import { APIPhoto } from './Types';
 
 export type WarningFormat<Code, Data> = { code: Code; data: Data };
 
@@ -8,6 +8,6 @@ export type WarningPhotosNotOnDiskDeletedDataType = {
   photosDeleted: Array<APIPhoto>;
 };
 export type WarningPhotosNotOnDiskDeletedType = WarningFormat<
-  "PHOTOS_NOT_ON_DISK_DELETED",
+  'PHOTOS_NOT_ON_DISK_DELETED',
   WarningPhotosNotOnDiskDeletedDataType
 >;

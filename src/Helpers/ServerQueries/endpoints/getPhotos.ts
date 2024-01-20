@@ -1,6 +1,6 @@
-import { GetPhotos } from "../Types/";
-import { GeneratePostRequest } from "../RequestsManager";
-import { ResponseTypeFrom } from "../Types/ApiGlobalTypes";
+import { GeneratePostRequest } from '../RequestsManager';
+import { GetPhotos } from '../Types/';
+import { ResponseTypeFrom } from '../Types/ApiGlobalTypes';
 
 export const Post = GeneratePostRequest<
   GetPhotos.RequestData,
@@ -13,4 +13,4 @@ export type ResponseType = ResponseTypeFrom<
   GetPhotos.ResponseErrorTypes
 >;
 
-export * from "../Types/EndpointsApi/getPhotos";
+export * from '../Types/EndpointsApi/getPhotos';

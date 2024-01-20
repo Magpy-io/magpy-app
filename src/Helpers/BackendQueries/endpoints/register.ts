@@ -1,6 +1,6 @@
-import { Register } from "../Types/";
-import { ResponseTypeFrom } from "../Types/ApiGlobalTypes";
-import { GeneratePostRequest } from "../RequestsManager";
+import { GeneratePostRequest } from '../RequestsManager';
+import { Register } from '../Types/';
+import { ResponseTypeFrom } from '../Types/ApiGlobalTypes';
 
 export const Post = GeneratePostRequest<
   Register.RequestData,
@@ -13,4 +13,4 @@ export type ResponseType = ResponseTypeFrom<
   Register.ResponseErrorTypes
 >;
 
-export * from "../Types/EndpointsApi/register";
+export * from '../Types/EndpointsApi/register';

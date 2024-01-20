@@ -1,6 +1,7 @@
-import Joi from "joi";
-import { ErrorServerNotClaimed, ErrorsAuthorization } from "../ErrorTypes";
-import { APIPhoto, TokenAuthentification } from "../Types";
+import Joi from 'joi';
+
+import { ErrorServerNotClaimed, ErrorsAuthorization } from '../ErrorTypes';
+import { APIPhoto, TokenAuthentification } from '../Types';
 
 export type ResponseData = {
   photo: APIPhoto;
@@ -16,14 +17,14 @@ export const RequestSchema = Joi.object({
   image64: Joi.string().base64(),
   deviceUniqueId: Joi.string(),
 })
-  .options({ presence: "required" })
-  .meta({ className: "RequestData" });
+  .options({ presence: 'required' })
+  .meta({ className: 'RequestData' });
 
 export type ResponseErrorTypes = ErrorServerNotClaimed | ErrorsAuthorization;
 
-export const endpoint = "addPhoto";
+export const endpoint = 'addPhoto';
 
-export const tokenAuth: TokenAuthentification = "yes";
+export const tokenAuth: TokenAuthentification = 'yes';
 
 //auto-generated file using "yarn types"
-export * from "../RequestTypes/addPhoto";
+export * from '../RequestTypes/addPhoto';

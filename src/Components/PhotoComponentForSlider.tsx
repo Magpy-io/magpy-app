@@ -1,24 +1,23 @@
-import React, { useMemo, useState } from "react";
-import { StyleSheet, View, Dimensions } from "react-native";
+import React, { useMemo, useState } from 'react';
+import { Dimensions, StyleSheet, View } from 'react-native';
 
+import FastImage from 'react-native-fast-image';
 import {
   Gesture,
   GestureDetector,
   TouchableWithoutFeedback,
-} from "react-native-gesture-handler";
+} from 'react-native-gesture-handler';
 import Animated, {
+  runOnJS,
+  useAnimatedStyle,
   useSharedValue,
   withTiming,
-  useAnimatedStyle,
-  runOnJS,
-} from "react-native-reanimated";
+} from 'react-native-reanimated';
 
-import FastImage from "react-native-fast-image";
+import { PhotoType } from '~/Helpers/types';
 
-import { PhotoType } from "~/Helpers/types";
-
-const H = Dimensions.get("screen").height;
-const W = Dimensions.get("screen").width;
+const H = Dimensions.get('screen').height;
+const W = Dimensions.get('screen').width;
 
 type PropsType = {
   photo: PhotoType;
@@ -52,7 +51,7 @@ function PhotoComponentForSlider(props: PropsType) {
 
   const panGesture = Gesture.Pan()
     .enabled(en)
-    .onUpdate((e) => {
+    .onUpdate(e => {
       const newY = positionYLast.value + e.translationY / scale.value;
       positionY.value = newY;
       if (newY > (H * (scale.value - 1)) / 2 / scale.value) {
@@ -72,14 +71,14 @@ function PhotoComponentForSlider(props: PropsType) {
         position.value = newX;
       }
     })
-    .onEnd((e) => {
+    .onEnd(e => {
       positionYLast.value = positionY.value;
       positionLast.value = position.value;
       console.log(positionLast.value, positionYLast.value);
     });
 
   const pinchGesture = Gesture.Pinch()
-    .onUpdate((e) => {
+    .onUpdate(e => {
       if (savedScale.value * e.scale < 1) {
         scale.value = 1;
       } else if (savedScale.value * e.scale > 5) {
@@ -112,8 +111,7 @@ function PhotoComponentForSlider(props: PropsType) {
     <TouchableWithoutFeedback
       onPress={() => props.onPress?.(props.photo)}
       onLongPress={() => props.onLongPress?.(props.photo)}
-      style={styles.touchableStyle}
-    >
+      style={styles.touchableStyle}>
       <GestureDetector gesture={composed}>
         <Animated.View style={[styles.itemStyle, animatedStyle]}>
           <FastImage
@@ -132,16 +130,16 @@ const styles = StyleSheet.create({
 
   itemStyle: {
     padding: 1,
-    justifyContent: "center",
+    justifyContent: 'center',
     width: W,
-    height: "100%",
-    backgroundColor: "white",
+    height: '100%',
+    backgroundColor: 'white',
   },
   imageStyle: {
-    width: "100%",
-    height: "100%",
+    width: '100%',
+    height: '100%',
     borderRadius: 0,
-    backgroundColor: "white",
+    backgroundColor: 'white',
   },
 });
 

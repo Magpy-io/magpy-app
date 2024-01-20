@@ -1,9 +1,9 @@
-import { StyleSheet, Text, View, PixelRatio } from "react-native";
+import React from 'react';
+import { PixelRatio, StyleSheet, Text, View } from 'react-native';
 
-import CancelButton from "~/Components/CommonComponents/CancelButton";
-import SelectAllButton from "~/Components/CommonComponents/SelectAllButton";
-import React from "react";
-import * as BarHeights from "~/Helpers/BarHeights";
+import CancelButton from '~/Components/CommonComponents/CancelButton';
+import SelectAllButton from '~/Components/CommonComponents/SelectAllButton';
+import * as BarHeights from '~/Helpers/BarHeights';
 
 type StatusBarComponentProps = {
   selectedNb: number;
@@ -14,11 +14,11 @@ type StatusBarComponentProps = {
 
 function selectedElementsToString(n: number) {
   if (!n) {
-    return "No Elements Selected";
+    return 'No Elements Selected';
   }
 
   if (n == 1) {
-    return "1 Element Selected";
+    return '1 Element Selected';
   }
 
   return `${n} Elements Selected`;
@@ -45,12 +45,12 @@ function StatusBarGridComponent(props: StatusBarComponentProps) {
 const styles = StyleSheet.create({
   StatusBarStyle: {
     padding: 5,
-    width: "100%",
-    backgroundColor: "white",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    position: "absolute",
+    width: '100%',
+    backgroundColor: 'white',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    position: 'absolute',
     top: 0,
     marginTop: BarHeights.GetStatusBarHeight(),
   },
@@ -58,8 +58,8 @@ const styles = StyleSheet.create({
   statusBarSelectAllButtonStyle: {},
   textElementsSelectedStyle: {
     fontSize: 20,
-    fontWeight: "bold",
-    color: "black",
+    fontWeight: 'bold',
+    color: 'black',
   },
 });
 

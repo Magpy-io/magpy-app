@@ -1,10 +1,10 @@
-import { StyleSheet, View, StyleProp, ViewStyle } from "react-native";
+import { useCallback, useEffect, useState } from 'react';
+import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 
-import { useCallback, useState, useEffect } from "react";
-import PhotoGrid from "~/Components/PhotoGrid";
-import PhotoSlider from "~/Components/PhotoSlider";
-import { PhotoType } from "~/Helpers/types";
-import { useMainContext } from "~/Components/ContextProvider";
+import { useMainContext } from '~/Components/ContextProvider';
+import PhotoGrid from '~/Components/PhotoGrid';
+import PhotoSlider from '~/Components/PhotoSlider';
+import { PhotoType } from '~/Helpers/types';
 
 type PropsType = {
   style?: StyleProp<ViewStyle>;
@@ -14,7 +14,7 @@ type PropsType = {
 };
 
 export default function PhotoGallery(props: PropsType) {
-  console.log("render gallery", props.contextLocation);
+  console.log('render gallery', props.contextLocation);
 
   const context = useMainContext();
 
@@ -23,32 +23,26 @@ export default function PhotoGallery(props: PropsType) {
     startIndexWhenSwitching: 0,
   });
 
-  const onSwitchMode = useCallback(
-    (isPhotoSelected: boolean, index: number) => {
-      setSwitchingState((s) => {
-        if (
-          s.isPhotoSelected != isPhotoSelected ||
-          s.startIndexWhenSwitching != index
-        ) {
-          return {
-            isPhotoSelected: isPhotoSelected,
-            startIndexWhenSwitching: index,
-          };
-        } else {
-          return s;
-        }
-      });
-    },
-    []
-  );
+  const onSwitchMode = useCallback((isPhotoSelected: boolean, index: number) => {
+    setSwitchingState(s => {
+      if (s.isPhotoSelected != isPhotoSelected || s.startIndexWhenSwitching != index) {
+        return {
+          isPhotoSelected: isPhotoSelected,
+          startIndexWhenSwitching: index,
+        };
+      } else {
+        return s;
+      }
+    });
+  }, []);
 
   return (
     <View style={[styles.viewStyle, props.style]}>
       {switchingState.isPhotoSelected ? (
         <View style={styles.viewStyle}>
           <PhotoSlider
-            key={"photo_slider_" + props.contextLocation}
-            id={"photo_slider_" + props.contextLocation}
+            key={'photo_slider_' + props.contextLocation}
+            id={'photo_slider_' + props.contextLocation}
             contextLocation={props.contextLocation}
             isSliding={switchingState.isPhotoSelected}
             style={{}}
@@ -57,8 +51,8 @@ export default function PhotoGallery(props: PropsType) {
             onSwitchMode={onSwitchMode}
           />
           <PhotoGrid
-            key={"photo_grid_" + props.contextLocation}
-            id={"photo_grid_" + props.contextLocation}
+            key={'photo_grid_' + props.contextLocation}
+            id={'photo_grid_' + props.contextLocation}
             contextLocation={props.contextLocation}
             style={{}}
             photos={props.photos}
@@ -70,8 +64,8 @@ export default function PhotoGallery(props: PropsType) {
       ) : (
         <View style={styles.viewStyle}>
           <PhotoGrid
-            key={"photo_grid_" + props.contextLocation}
-            id={"photo_grid_" + props.contextLocation}
+            key={'photo_grid_' + props.contextLocation}
+            id={'photo_grid_' + props.contextLocation}
             contextLocation={props.contextLocation}
             style={{}}
             photos={props.photos}
@@ -80,8 +74,8 @@ export default function PhotoGallery(props: PropsType) {
             headerDisplayTextFunction={props.gridHeaderTextFunction}
           />
           <PhotoSlider
-            key={"photo_slider_" + props.contextLocation}
-            id={"photo_slider_" + props.contextLocation}
+            key={'photo_slider_' + props.contextLocation}
+            id={'photo_slider_' + props.contextLocation}
             contextLocation={props.contextLocation}
             isSliding={switchingState.isPhotoSelected}
             style={{}}
@@ -97,9 +91,9 @@ export default function PhotoGallery(props: PropsType) {
 
 const styles = StyleSheet.create({
   viewStyle: {
-    position: "absolute",
+    position: 'absolute',
     top: 0,
-    height: "100%",
-    width: "100%",
+    height: '100%',
+    width: '100%',
   },
 });

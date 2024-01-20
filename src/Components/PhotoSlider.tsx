@@ -1,23 +1,18 @@
-import {
-  StyleSheet,
-  BackHandler,
-  View,
-  StyleProp,
-  ViewStyle,
-} from "react-native";
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { BackHandler, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
+import { NativeEventEmitter, NativeModules } from 'react-native';
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import { PhotoType } from "~/Helpers/types";
-import StatusBarComponent from "./PhotoComponents/StatusBarComponent";
-import ToolBar from "./PhotoComponents/ToolBar";
-import PhotoSliderCore from "./PhotoSliderCore";
-import { Text } from "react-native-elements";
-import PhotoDetailsModal from "./PhotoDetailsModal";
-import * as BarHeights from "~/Helpers/BarHeights";
+import { Text } from 'react-native-elements';
 
-import { useMainContext } from "~/Components/ContextProvider";
+import { useMainContext } from '~/Components/ContextProvider';
+import * as BarHeights from '~/Helpers/BarHeights';
+import { PhotoType } from '~/Helpers/types';
 
-import { NativeEventEmitter, NativeModules } from "react-native";
+import StatusBarComponent from './PhotoComponents/StatusBarComponent';
+import ToolBar from './PhotoComponents/ToolBar';
+import PhotoDetailsModal from './PhotoDetailsModal';
+import PhotoSliderCore from './PhotoSliderCore';
+
 const { MainModule } = NativeModules;
 
 type PropsType = {
@@ -31,14 +26,12 @@ type PropsType = {
 };
 
 function PhotoSlider(props: PropsType) {
-  console.log("render slider", props.contextLocation);
+  console.log('render slider', props.contextLocation);
 
   const context = useMainContext();
 
   const flatListCurrentIndexRef = useRef<number>(props.startIndex);
-  const [flatListCurrentIndex, setFlatListCurrentIndex] = useState(
-    props.startIndex
-  );
+  const [flatListCurrentIndex, setFlatListCurrentIndex] = useState(props.startIndex);
   const [viewDetails, setViewDetails] = useState(false);
   const [detailsModalVisible, setDetailsModalVisible] = useState(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
@@ -49,16 +42,11 @@ function PhotoSlider(props: PropsType) {
     if (
       validFlatListCurrentIndex &&
       !props.photos[flatListCurrentIndex].inDevice &&
-      props.contextLocation == "server"
+      props.contextLocation == 'server'
     ) {
       context.RequestFullPhotoServer(props.photos[flatListCurrentIndex]);
     }
-  }, [
-    props.photos,
-    props.contextLocation,
-    flatListCurrentIndex,
-    validFlatListCurrentIndex,
-  ]);
+  }, [props.photos, props.contextLocation, flatListCurrentIndex, validFlatListCurrentIndex]);
 
   const onCurrentIndexChanged = useCallback((index: number) => {
     flatListCurrentIndexRef.current = index;
@@ -75,10 +63,7 @@ function PhotoSlider(props: PropsType) {
         return false;
       }
     };
-    const backHandler = BackHandler.addEventListener(
-      "hardwareBackPress",
-      backAction
-    );
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
 
     return () => {
       return backHandler.remove();
@@ -93,8 +78,8 @@ function PhotoSlider(props: PropsType) {
 
   useEffect(() => {
     const emitter = new NativeEventEmitter();
-    const subscription = emitter.addListener("FullScreenChanged", (param) => {
-      console.log("fullscreenChanged");
+    const subscription = emitter.addListener('FullScreenChanged', param => {
+      console.log('fullscreenChanged');
       setIsFullScreen(param.isFullScreen);
     });
 
@@ -116,19 +101,18 @@ function PhotoSlider(props: PropsType) {
           } else {
             MainModule.enableFullScreen();
           }
-          setIsFullScreen((f) => !f);
+          setIsFullScreen(f => !f);
         }}
       />
 
       {validFlatListCurrentIndex && viewDetails && (
         <View
           style={{
-            backgroundColor: "white",
-            position: "absolute",
-            top: "50%",
+            backgroundColor: 'white',
+            position: 'absolute',
+            top: '50%',
             padding: 10,
-          }}
-        >
+          }}>
           <Text>{`Name: ${props.photos[flatListCurrentIndex].image.fileName}\nPath: ${props.photos[flatListCurrentIndex].image.path}\nTaken: ${props.photos[flatListCurrentIndex].created}\nModified: ${props.photos[flatListCurrentIndex].modified}`}</Text>
         </View>
       )}
@@ -138,9 +122,7 @@ function PhotoSlider(props: PropsType) {
           inDevice={props.photos[flatListCurrentIndex].inDevice}
           inServer={props.photos[flatListCurrentIndex].inServer}
           isLoading={props.photos[flatListCurrentIndex].isLoading}
-          loadingPercentage={
-            props.photos[flatListCurrentIndex].loadingPercentage
-          }
+          loadingPercentage={props.photos[flatListCurrentIndex].loadingPercentage}
           onBackButton={() => props.onSwitchMode(false, flatListCurrentIndex)}
         />
       )}
@@ -150,17 +132,11 @@ function PhotoSlider(props: PropsType) {
           <ToolBar
             inDevice={props.photos[flatListCurrentIndex].inDevice}
             inServer={props.photos[flatListCurrentIndex].inServer}
-            onAddLocal={() =>
-              context.addPhotosLocal?.([props.photos[flatListCurrentIndex]])
-            }
-            onAddServer={() =>
-              context.addPhotosServer?.([props.photos[flatListCurrentIndex]])
-            }
+            onAddLocal={() => context.addPhotosLocal?.([props.photos[flatListCurrentIndex]])}
+            onAddServer={() => context.addPhotosServer?.([props.photos[flatListCurrentIndex]])}
             onDeleteLocal={() => {
-              if (props.contextLocation == "server") {
-                context.RequestCroppedPhotosServer([
-                  props.photos[flatListCurrentIndex],
-                ]);
+              if (props.contextLocation == 'server') {
+                context.RequestCroppedPhotosServer([props.photos[flatListCurrentIndex]]);
               }
               context.deletePhotosLocal?.([props.photos[flatListCurrentIndex]]);
             }}
@@ -169,7 +145,7 @@ function PhotoSlider(props: PropsType) {
             }
             onDetails={() => {
               setDetailsModalVisible(true);
-              console.log("details");
+              console.log('details');
             }}
           />
 
@@ -186,8 +162,8 @@ function PhotoSlider(props: PropsType) {
 
 const styles = StyleSheet.create({
   mainViewStyle: {
-    height: "100%",
-    width: "100%",
+    height: '100%',
+    width: '100%',
   },
 });
 

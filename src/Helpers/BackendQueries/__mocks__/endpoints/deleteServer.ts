@@ -1,11 +1,9 @@
-import { DeleteServer } from "../../Types/";
-import { ResponseTypeFrom } from "../../Types/ApiGlobalTypes";
-import * as mockValues from "../mockValues";
-import { GetServerToken, verifyHasServerToken } from "../../TokenManager";
+import { GetServerToken, verifyHasServerToken } from '../../TokenManager';
+import { DeleteServer } from '../../Types/';
+import { ResponseTypeFrom } from '../../Types/ApiGlobalTypes';
+import * as mockValues from '../mockValues';
 
-export const Post = async (
-  data?: DeleteServer.RequestData
-): Promise<ResponseType> => {
+export const Post = async (data?: DeleteServer.RequestData): Promise<ResponseType> => {
   verifyHasServerToken();
   await mockValues.timeout(10);
   const f = mockValues.checkFails();
@@ -16,22 +14,22 @@ export const Post = async (
   if (GetServerToken() == mockValues.expiredServerToken) {
     return {
       ok: false,
-      errorCode: "AUTHORIZATION_EXPIRED",
-      message: "",
+      errorCode: 'AUTHORIZATION_EXPIRED',
+      message: '',
     };
   }
 
   if (GetServerToken() != mockValues.validServerToken) {
     return {
       ok: false,
-      errorCode: "AUTHORIZATION_FAILED",
-      message: "",
+      errorCode: 'AUTHORIZATION_FAILED',
+      message: '',
     };
   }
 
   return {
     ok: true,
-    data: "",
+    data: '',
   };
 };
 
@@ -40,4 +38,4 @@ export type ResponseType = ResponseTypeFrom<
   DeleteServer.ResponseErrorTypes
 >;
 
-export * from "../../Types/EndpointsApi/deleteServer";
+export * from '../../Types/EndpointsApi/deleteServer';

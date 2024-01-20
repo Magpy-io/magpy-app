@@ -1,11 +1,9 @@
-import { GetServerInfo } from "../../Types/";
-import { ResponseTypeFrom } from "../../Types/ApiGlobalTypes";
-import * as mockValues from "../mockValues";
-import { GetServerToken, verifyHasServerToken } from "../../TokenManager";
+import { GetServerToken, verifyHasServerToken } from '../../TokenManager';
+import { GetServerInfo } from '../../Types/';
+import { ResponseTypeFrom } from '../../Types/ApiGlobalTypes';
+import * as mockValues from '../mockValues';
 
-export const Post = async (
-  data?: GetServerInfo.RequestData
-): Promise<ResponseType> => {
+export const Post = async (data?: GetServerInfo.RequestData): Promise<ResponseType> => {
   verifyHasServerToken();
   await mockValues.timeout(10);
   const f = mockValues.checkFails();
@@ -16,16 +14,16 @@ export const Post = async (
   if (GetServerToken() == mockValues.expiredServerToken) {
     return {
       ok: false,
-      errorCode: "AUTHORIZATION_EXPIRED",
-      message: "",
+      errorCode: 'AUTHORIZATION_EXPIRED',
+      message: '',
     };
   }
 
   if (GetServerToken() != mockValues.validServerToken) {
     return {
       ok: false,
-      errorCode: "AUTHORIZATION_FAILED",
-      message: "",
+      errorCode: 'AUTHORIZATION_FAILED',
+      message: '',
     };
   }
 
@@ -34,10 +32,10 @@ export const Post = async (
     data: {
       server: {
         _id: mockValues.serverId,
-        name: "MyLocalServer",
-        ipPublic: "0.0.0.0",
-        ipPrivate: "0.0.0.0",
-        port: "0000",
+        name: 'MyLocalServer',
+        ipPublic: '0.0.0.0',
+        ipPrivate: '0.0.0.0',
+        port: '0000',
         owner: {
           _id: mockValues.userId,
           name: mockValues.validUserName,
@@ -54,4 +52,4 @@ export type ResponseType = ResponseTypeFrom<
   GetServerInfo.ResponseErrorTypes
 >;
 
-export * from "../../Types/EndpointsApi/getServerInfo";
+export * from '../../Types/EndpointsApi/getServerInfo';

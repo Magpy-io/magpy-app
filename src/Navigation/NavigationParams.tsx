@@ -1,5 +1,5 @@
 export type LoginStackParamList = {
-    Login: undefined;
-    Register: undefined;
-    ServerSelect: undefined;
+  Login: undefined;
+  Register: undefined;
+  ServerSelect: undefined;
 };

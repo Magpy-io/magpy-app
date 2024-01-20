@@ -1,6 +1,6 @@
-import { Login } from "../Types/";
-import { ResponseTypeFrom } from "../Types/ApiGlobalTypes";
-import { GeneratePostRequest } from "../RequestsManager";
+import { GeneratePostRequest } from '../RequestsManager';
+import { Login } from '../Types/';
+import { ResponseTypeFrom } from '../Types/ApiGlobalTypes';
 
 export const Post = GeneratePostRequest<
   Login.RequestData,
@@ -8,9 +8,6 @@ export const Post = GeneratePostRequest<
   Login.ResponseErrorTypes
 >(Login.endpoint, Login.tokenAuth);
 
-export type ResponseType = ResponseTypeFrom<
-  Login.ResponseData,
-  Login.ResponseErrorTypes
->;
+export type ResponseType = ResponseTypeFrom<Login.ResponseData, Login.ResponseErrorTypes>;
 
-export * from "../Types/EndpointsApi/login";
+export * from '../Types/EndpointsApi/login';
