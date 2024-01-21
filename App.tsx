@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { AuthProvider } from '~/Context/AuthContext';
 import { ContextProvider } from '~/Context/ContextProvider';
@@ -17,7 +18,9 @@ function App(): React.JSX.Element {
         <ServerClaimProvider>
           <ServerProvider>
             <ContextProvider>
-              <Navigation />
+              <SafeAreaProvider>
+                <Navigation />
+              </SafeAreaProvider>
             </ContextProvider>
           </ServerProvider>
         </ServerClaimProvider>

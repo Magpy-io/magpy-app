@@ -58,6 +58,7 @@ export const appColors = {
   PRIMARY: colors.DARK,
   ACCENT: colors.ORANGE,
   FORM_BORDER: colors.LIGHT_GREEN,
+  UNDERLAY: colors.LIGHT_GREY,
 };
 
 export const colorNames = {

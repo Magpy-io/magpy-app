@@ -57,7 +57,7 @@ export default function TabBar() {
     return <View />;
   }
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView edges={['bottom']} style={styles.container}>
       <View style={[styles.tabView]}>
         {routes.map(route => {
           return (

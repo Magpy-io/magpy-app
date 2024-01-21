@@ -2,14 +2,9 @@ import React from 'react';
 import { StyleSheet, Text, TouchableHighlight, View, ViewStyle } from 'react-native';
 
 import { Icon } from '@rneui/themed';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { colorsOld as colors } from '~/styles/colors';
-
-const ICON_SIZE = 20;
-const TEXT_SIZE = 10;
-const TOOLBAR_COLOR = '#ffffff';
-const TOOL_COLOR = '#4d4d4d';
+import { appColors } from '~/styles/colors';
 
 type ToolBarProps = {
   inDevice: boolean;
@@ -24,8 +19,9 @@ type ToolBarProps = {
 };
 
 function ToolBar(props: ToolBarProps) {
+  const insets = useSafeAreaInsets();
   return (
-    <SafeAreaView style={[styles.toolBarView, props.style]}>
+    <View style={[styles.toolBarView, props.style, { paddingBottom: insets.bottom }]}>
       <View style={styles.toolsView}>
         {props.inDevice ? (
           <ToolComponent
@@ -52,14 +48,13 @@ function ToolBar(props: ToolBarProps) {
         <ToolComponent icon="share" text="Share" onPress={() => props.onShare?.()} />
         <ToolComponent icon="info" text="Details" onPress={() => props.onDetails?.()} />
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
 type ToolComponentProps = {
   icon: string;
   text?: string;
-  textSize?: number;
   onPress: () => void;
 };
 
@@ -67,53 +62,50 @@ const ToolComponent = React.memo(function ToolComponent(props: ToolComponentProp
   return (
     <TouchableHighlight
       onPress={props.onPress}
-      style={{
-        flex: 1,
-        padding: 5,
-        paddingVertical: 8,
-      }}
-      underlayColor={colors.underlayColor}>
-      <View
-        style={{
-          flex: 1,
-          alignItems: 'center',
-          // justifyContent: "center",
-        }}>
+      style={styles.toolComponent}
+      underlayColor={appColors.UNDERLAY}>
+      <View style={styles.iconTextView}>
         <Icon
           name={props.icon}
           color={TOOL_COLOR}
           size={ICON_SIZE}
           containerStyle={styles.iconContainerStyle}
         />
-        {props.text ? (
-          <Text
-            style={{
-              color: TOOL_COLOR,
-              paddingTop: 2,
-              maxWidth: 70,
-              fontSize: props.textSize ?? TEXT_SIZE,
-              fontWeight: '700',
-              textAlign: 'center',
-            }}>
-            {props.text}
-          </Text>
-        ) : null}
+        {props.text ? <Text style={styles.textStyle}>{props.text}</Text> : null}
       </View>
     </TouchableHighlight>
   );
 });
 
+const ICON_SIZE = 20;
+const TEXT_SIZE = 10;
+const TOOLBAR_COLOR = appColors.BACKGROUND;
+const TOOL_COLOR = appColors.TEXT;
+
 const styles = StyleSheet.create({
+  textStyle: {
+    color: TOOL_COLOR,
+    maxWidth: '70%',
+    fontSize: TEXT_SIZE,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  iconTextView: {
+    alignItems: 'center',
+  },
+  toolComponent: {
+    flex: 1,
+  },
   toolBarView: {
     width: '100%',
-    backgroundColor: 'transparent',
     position: 'absolute',
+    backgroundColor: TOOLBAR_COLOR,
     bottom: 0,
   },
   toolsView: {
-    flex: 1,
+    height: 80,
     flexDirection: 'row',
-    backgroundColor: TOOLBAR_COLOR,
+    alignItems: 'center',
   },
   iconContainerStyle: {},
 });
