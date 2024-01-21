@@ -4,7 +4,6 @@ import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Icon, Text } from 'react-native-elements';
 
 import { TabName, useTabNavigationContext } from '~/Context/TabNavigationContext';
-import * as BarHeights from '~/Helpers/BarHeights';
 import { appColors, colors } from '~/styles/colors';
 
 type IconType = { name: string; type: string };
@@ -84,7 +83,9 @@ function TabElement({ routeName, icon, iconFocused }: TabElementProps) {
   const focused = useMemo(() => focusedTab === routeName, [focusedTab, routeName]);
 
   const onPress = () => {
-    if (!focused) navigateTo(routeName);
+    if (!focused) {
+      navigateTo(routeName);
+    }
   };
 
   return (
@@ -124,7 +125,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     flexDirection: 'row',
     justifyContent: 'space-evenly',
-    paddingBottom: BarHeights.GetNavigatorBarHeight(),
+    paddingBottom: 20, //TODO Bar height here
   },
   container: {
     position: 'absolute',
