@@ -1,23 +1,24 @@
 import React from 'react';
+import { View } from 'react-native';
 
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import type { NavigatorScreenParams } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { Icon } from 'react-native-elements';
 
 import { useAuthContext } from '~/Context/AuthContext';
 import { useServerClaimContext } from '~/Context/ServerClaimContext';
+import { TabNavigationProvider } from '~/Context/TabNavigationContext';
 import LoginScreen from '~/Navigation/Screens/LoginScreen';
 import PhotoGalleryLocalScreen from '~/Navigation/Screens/PhotoGalleryLocalScreen';
 import PhotoGalleryServerScreen from '~/Navigation/Screens/PhotoGalleryServerScreen';
 import ServerSelectScreen from '~/Navigation/Screens/ServerSelectScreen';
-import TestScreen from '~/Navigation/Screens/Test';
-import { appColors, colors } from '~/styles/colors';
+import SettingsTab from '~/Navigation/Screens/SettingsTab';
 
 import { LoginStackParamList } from './NavigationParams';
+import AccountSettingsScreen from './Screens/AccountSettingsScreen';
 import RegisterScreen from './Screens/RegisterScreen';
 import SplashScreen from './Screens/SplashScreen';
+import TabBar from './TabBar';
 
 const LoginStack = createNativeStackNavigator<LoginStackParamList>();
 function LoginStackNavigator() {
@@ -32,27 +33,6 @@ function LoginStackNavigator() {
   );
 }
 
-const HomeStack = createNativeStackNavigator();
-function HomeStackNavigator() {
-  return (
-    <HomeStack.Navigator
-      screenOptions={{
-        headerShown: false,
-      }}>
-      <HomeStack.Screen name="Local" component={PhotoGalleryLocalScreen} />
-    </HomeStack.Navigator>
-  );
-}
-
-const ServerStack = createNativeStackNavigator();
-function ServerStackNavigator() {
-  return (
-    <ServerStack.Navigator screenOptions={{ headerShown: false }}>
-      <ServerStack.Screen name="ServerScreen" component={PhotoGalleryServerScreen} />
-    </ServerStack.Navigator>
-  );
-}
-
 const SettingsStack = createNativeStackNavigator();
 function SettingsStackNavigator() {
   return (
@@ -60,44 +40,53 @@ function SettingsStackNavigator() {
       screenOptions={{
         headerShown: false,
       }}>
-      <SettingsStack.Screen name="Test" component={TestScreen} />
+      <SettingsStack.Screen name="AccountSettings" component={AccountSettingsScreen} />
+      <SettingsStack.Screen name="ServerSettings" component={AccountSettingsScreen} />
+      <SettingsStack.Screen name="Preferences" component={AccountSettingsScreen} />
     </SettingsStack.Navigator>
   );
 }
 
-const Tab = createBottomTabNavigator();
-function TabNavigator() {
+export enum Tab {
+  Server = 'Server',
+  Home = 'Home',
+  Settings = 'Settings',
+}
+
+const TabStack = createNativeStackNavigator();
+function TabStackNavigator() {
   return (
-    <Tab.Navigator
-      screenOptions={({ route }) => ({
-        tabBarIcon: ({ focused, color, size }) => {
-          let iconName = 'home-outline';
-          if (route.name === 'Home') {
-            iconName = focused ? 'home-sharp' : 'home-outline';
-          } else if (route.name === 'Settings') {
-            iconName = focused ? 'settings-sharp' : 'settings-outline';
-          } else if (route.name === 'Server') {
-            iconName = focused ? 'server-sharp' : 'server-outline';
-          }
-          return <Icon name={iconName} type="ionicon" size={size} color={color} />;
-        },
-        tabBarActiveTintColor: appColors.PRIMARY,
-        tabBarInactiveTintColor: colors.LIGHT_GREEN,
-        tabBarStyle: { height: 120, paddingTop: 8 },
-        tabBarLabelStyle: { fontSize: 10, paddingBottom: 12, fontWeight: 'bold' },
+    <View style={{ flex: 1 }}>
+      <TabStack.Navigator
+        screenOptions={{
+          headerShown: false,
+        }}>
+        <TabStack.Screen name={Tab.Home} component={PhotoGalleryLocalScreen} />
+        <TabStack.Screen name={Tab.Server} component={PhotoGalleryServerScreen} />
+        <TabStack.Screen name={Tab.Settings} component={SettingsTab} />
+      </TabStack.Navigator>
+      <TabBar />
+    </View>
+  );
+}
+
+const ParentStack = createNativeStackNavigator();
+function ParentStackNavigator() {
+  return (
+    <ParentStack.Navigator
+      screenOptions={{
         headerShown: false,
-      })}>
-      <Tab.Screen name="Server" component={ServerStackNavigator} />
-      <Tab.Screen name="Home" component={HomeStackNavigator} />
-      <Tab.Screen name="Settings" component={SettingsStackNavigator} />
-    </Tab.Navigator>
+      }}>
+      <ParentStack.Screen name="Tabs" component={TabStackNavigator} />
+      <ParentStack.Screen name="SettingsStackNavigator" component={SettingsStackNavigator} />
+    </ParentStack.Navigator>
   );
 }
 
 const AuthenticatedNavigator = () => {
   const { hasServer } = useServerClaimContext();
   if (hasServer) {
-    return <TabNavigator />;
+    return <ParentStackNavigator />;
   } else {
     return <ServerSelectScreen />;
   }
@@ -117,7 +106,9 @@ const Root = () => {
 const Navigation = () => {
   return (
     <NavigationContainer>
-      <Root />
+      <TabNavigationProvider>
+        <Root />
+      </TabNavigationProvider>
     </NavigationContainer>
   );
 };

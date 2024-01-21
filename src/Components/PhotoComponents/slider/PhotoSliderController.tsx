@@ -3,6 +3,7 @@ import { BackHandler, StyleProp, StyleSheet, View, ViewStyle } from 'react-nativ
 import { NativeEventEmitter, NativeModules } from 'react-native';
 
 import { useMainContext } from '~/Context/ContextProvider';
+import { useTabNavigationContext } from '~/Context/TabNavigationContext';
 import { PhotoType } from '~/Helpers/types';
 
 import PhotoDetailsModal from './PhotoDetailsModal';
@@ -44,6 +45,7 @@ export default function PhotoSlider({
   const [detailsModalVisible, setDetailsModalVisible] = useState(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
   const validFlatListCurrentIndex = photos.length != 0 && flatListCurrentIndex < photos.length;
+  const { hideTab, showTab } = useTabNavigationContext();
 
   useEffect(() => {
     if (
@@ -72,6 +74,7 @@ export default function PhotoSlider({
     const backAction = () => {
       if (props.isSliding) {
         onSwitchMode(false, flatListCurrentIndexRef.current);
+        showTab();
         backHandler.remove();
         return true;
       } else {
@@ -83,7 +86,7 @@ export default function PhotoSlider({
     return () => {
       return backHandler.remove();
     };
-  }, [onSwitchMode, props.isSliding]);
+  }, [onSwitchMode, props.isSliding, showTab]);
 
   useEffect(() => {
     if (photos.length == 0) {
@@ -146,6 +149,11 @@ export default function PhotoSlider({
     setIsFullScreen(f => !f);
   };
 
+  const onStatusBarBackButton = () => {
+    onSwitchMode(false, flatListCurrentIndex);
+    showTab();
+  };
+
   return (
     <View style={[styles.mainViewStyle, props.style]}>
       <PhotoSliderComponent
@@ -162,7 +170,7 @@ export default function PhotoSlider({
           inServer={photos[flatListCurrentIndex].inServer}
           isLoading={photos[flatListCurrentIndex].isLoading}
           loadingPercentage={photos[flatListCurrentIndex].loadingPercentage}
-          onBackButton={() => onSwitchMode(false, flatListCurrentIndex)}
+          onBackButton={onStatusBarBackButton}
         />
       )}
 

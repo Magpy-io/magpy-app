@@ -2,6 +2,7 @@ import React, { useCallback, useRef, useState } from 'react';
 import { StyleProp, ViewStyle } from 'react-native';
 
 import { useMainContext } from '~/Context/ContextProvider';
+import { useTabNavigationContext } from '~/Context/TabNavigationContext';
 import { PhotoType } from '~/Helpers/types';
 
 import PhotoGridComponent from './PhotoGridComponent';
@@ -36,6 +37,7 @@ export default function PhotoGridController({
   const getPhotoIndexRef = useRef<(photo: PhotoType) => number>();
   const [isSelecting, setIsSelecting] = useState(false);
   const [seletedIds, setSelectedIds] = useState<Map<string, PhotoType>>(new Map());
+  const { hideTab } = useTabNavigationContext();
 
   getPhotoIndexRef.current = (item: PhotoType) => {
     let index = props.photos.findIndex(photo => photo.id == item.id);
@@ -60,10 +62,11 @@ export default function PhotoGridController({
           }
         });
       } else {
+        hideTab();
         onSwitchMode(true, getPhotoIndexRef.current?.(item) || 0);
       }
     },
-    [onSwitchMode, isSelecting],
+    [isSelecting, hideTab, onSwitchMode],
   );
 
   const onRenderItemLongPress = useCallback(
