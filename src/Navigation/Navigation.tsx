@@ -7,7 +7,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import { useAuthContext } from '~/Context/AuthContext';
 import { useServerClaimContext } from '~/Context/ServerClaimContext';
-import { TabNavigationProvider } from '~/Context/TabNavigationContext';
+import { TabName, TabNavigationProvider } from '~/Context/TabNavigationContext';
 import LoginScreen from '~/Navigation/Screens/LoginScreen';
 import PhotoGalleryLocalScreen from '~/Navigation/Screens/PhotoGalleryLocalScreen';
 import PhotoGalleryServerScreen from '~/Navigation/Screens/PhotoGalleryServerScreen';
@@ -47,12 +47,6 @@ function SettingsStackNavigator() {
   );
 }
 
-export enum Tab {
-  Server = 'Server',
-  Home = 'Home',
-  Settings = 'Settings',
-}
-
 const TabStack = createNativeStackNavigator();
 function TabStackNavigator() {
   return (
@@ -61,9 +55,9 @@ function TabStackNavigator() {
         screenOptions={{
           headerShown: false,
         }}>
-        <TabStack.Screen name={Tab.Home} component={PhotoGalleryLocalScreen} />
-        <TabStack.Screen name={Tab.Server} component={PhotoGalleryServerScreen} />
-        <TabStack.Screen name={Tab.Settings} component={SettingsTab} />
+        <TabStack.Screen name={TabName.Home} component={PhotoGalleryLocalScreen} />
+        <TabStack.Screen name={TabName.Server} component={PhotoGalleryServerScreen} />
+        <TabStack.Screen name={TabName.Settings} component={SettingsTab} />
       </TabStack.Navigator>
       <TabBar />
     </View>

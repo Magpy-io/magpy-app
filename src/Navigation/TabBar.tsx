@@ -1,24 +1,22 @@
-import React from 'react';
-import { StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
+import React, { useMemo } from 'react';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
 import { Icon, Text } from 'react-native-elements';
 
-import { useTabNavigationContext } from '~/Context/TabNavigationContext';
+import { TabName, useTabNavigationContext } from '~/Context/TabNavigationContext';
 import * as BarHeights from '~/Helpers/BarHeights';
 import { appColors, colors } from '~/styles/colors';
 
-import { Tab } from './Navigation';
-
 type IconType = { name: string; type: string };
 type RouteType = {
-  name: Tab;
+  name: TabName;
   icon: IconType;
   iconFocused: IconType;
 };
 
 const routes: RouteType[] = [
   {
-    name: Tab.Server,
+    name: TabName.Server,
     icon: {
       name: 'server-outline',
       type: 'ionicon',
@@ -29,7 +27,7 @@ const routes: RouteType[] = [
     },
   },
   {
-    name: Tab.Home,
+    name: TabName.Home,
     icon: {
       name: 'home-outline',
       type: 'ionicon',
@@ -40,7 +38,7 @@ const routes: RouteType[] = [
     },
   },
   {
-    name: Tab.Settings,
+    name: TabName.Settings,
     icon: {
       name: 'settings-outline',
       type: 'ionicon',
@@ -53,7 +51,7 @@ const routes: RouteType[] = [
 ];
 
 export default function TabBar() {
-  const { focusedTab, hidden } = useTabNavigationContext();
+  const { hidden } = useTabNavigationContext();
   if (hidden) {
     return <View />;
   }
@@ -67,7 +65,6 @@ export default function TabBar() {
               routeName={route.name}
               icon={route.icon}
               iconFocused={route.iconFocused}
-              focused={focusedTab === route.name}
             />
           );
         })}
@@ -77,17 +74,21 @@ export default function TabBar() {
 }
 
 type TabElementProps = {
-  routeName: Tab;
+  routeName: TabName;
   icon: IconType;
   iconFocused: IconType;
-  focused: boolean;
 };
 
-function TabElement({ routeName, icon, iconFocused, focused }: TabElementProps) {
-  const { navigateTo } = useTabNavigationContext();
-  console.log('routename', routeName);
+function TabElement({ routeName, icon, iconFocused }: TabElementProps) {
+  const { navigateTo, focusedTab } = useTabNavigationContext();
+  const focused = useMemo(() => focusedTab === routeName, [focusedTab, routeName]);
+
+  const onPress = () => {
+    if (!focused) navigateTo(routeName);
+  };
+
   return (
-    <TouchableWithoutFeedback style={{ flex: 1 }} onPress={() => navigateTo(routeName)}>
+    <TouchableOpacity style={{ flex: 1 }} onPress={onPress}>
       <View style={styles.tabElementView}>
         <Icon
           name={focused ? iconFocused.name : icon.name}
@@ -99,7 +100,7 @@ function TabElement({ routeName, icon, iconFocused, focused }: TabElementProps) 
           {routeName}
         </Text>
       </View>
-    </TouchableWithoutFeedback>
+    </TouchableOpacity>
   );
 }
 

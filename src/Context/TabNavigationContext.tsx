@@ -3,11 +3,15 @@ import React from 'react';
 
 import { CommonActions, useNavigation } from '@react-navigation/native';
 
-import { Tab } from '~/Navigation/Navigation';
+export enum TabName {
+  Server = 'Server',
+  Home = 'Home',
+  Settings = 'Settings',
+}
 
 type ContextType = {
-  focusedTab: Tab;
-  navigateTo: (tabName: Tab) => void;
+  focusedTab: TabName;
+  navigateTo: (tabName: TabName) => void;
   hidden: boolean;
   hideTab: () => void;
   showTab: () => void;
@@ -17,13 +21,13 @@ const TabNavigationContext = createContext<ContextType | undefined>(undefined);
 
 const TabNavigationProvider = ({ children }: { children: any }) => {
   const navigation = useNavigation();
-  const [focusedTab, setFocusedTab] = useState('Home');
+  const [focusedTab, setFocusedTab] = useState(TabName.Home);
   const [hidden, setHidden] = useState(false);
   const hideTab = useCallback(() => setHidden(true), []);
   const showTab = useCallback(() => setHidden(false), []);
 
   const navigateTo = useCallback(
-    (tabName: Tab) => {
+    (tabName: TabName) => {
       setFocusedTab(tabName);
       navigation.dispatch(
         CommonActions.reset({
