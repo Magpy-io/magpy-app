@@ -2,8 +2,8 @@ import React from 'react';
 
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
-import { ContextProvider } from '~/Components/ContextProvider';
 import { AuthProvider } from '~/Context/AuthContext';
+import { ContextProvider } from '~/Context/ContextProvider';
 import { ServerClaimProvider } from '~/Context/ServerClaimContext';
 import { ServerProvider } from '~/Context/ServerContext';
 import { ConfigModules } from '~/Global/configModules';

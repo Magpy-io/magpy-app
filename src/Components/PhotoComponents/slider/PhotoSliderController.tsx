@@ -6,7 +6,7 @@ import { useMainContext } from '~/Context/ContextProvider';
 import { PhotoType } from '~/Helpers/types';
 
 import PhotoDetailsModal from './PhotoDetailsModal';
-import PhotoSliderCore from './PhotoSliderCore';
+import PhotoSliderComponent from './PhotoSliderComponent';
 import StatusBarComponent from './StatusBarComponent';
 import ToolBar from './ToolBar';
 
@@ -22,7 +22,12 @@ type PropsType = {
   onSwitchMode: (isPhotoSelected: boolean, index: number) => void;
 };
 
-function PhotoSlider({ photos, contextLocation, onSwitchMode, ...props }: PropsType) {
+export default function PhotoSlider({
+  photos,
+  contextLocation,
+  onSwitchMode,
+  ...props
+}: PropsType) {
   console.log('render slider', contextLocation);
 
   const {
@@ -143,7 +148,7 @@ function PhotoSlider({ photos, contextLocation, onSwitchMode, ...props }: PropsT
 
   return (
     <View style={[styles.mainViewStyle, props.style]}>
-      <PhotoSliderCore
+      <PhotoSliderComponent
         photos={photos}
         startIndex={props.startIndex}
         onIndexChanged={onCurrentIndexChanged}
@@ -193,5 +198,3 @@ const styles = StyleSheet.create({
     width: '100%',
   },
 });
-
-export default PhotoSlider;

@@ -3,7 +3,6 @@ import { StyleSheet, Text, TouchableHighlight, View, ViewStyle } from 'react-nat
 
 import { Icon } from '@rneui/themed';
 
-import * as BarHeights from '~/Helpers/BarHeights';
 import colors from '~/colors';
 
 const ICON_SIZE = 20;
@@ -109,7 +108,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     position: 'absolute',
     bottom: 0,
-    marginBottom: BarHeights.GetNavigatorBarHeight(),
   },
   toolsView: {
     flex: 1,

@@ -28,7 +28,7 @@ type PropsType = {
   onPhotoLongClick?: (item: PhotoType) => void;
 };
 
-function PhotoSliderCore({
+export default function PhotoSliderComponent({
   onIndexChanged,
   onPhotoClick,
   onPhotoLongClick,
@@ -143,5 +143,3 @@ function PhotoSliderCore({
 const styles = StyleSheet.create({
   flatListStyle: { width: '100%' },
 });
-
-export default PhotoSliderCore;

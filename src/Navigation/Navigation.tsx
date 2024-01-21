@@ -40,7 +40,6 @@ function HomeStackNavigator() {
         headerShown: false,
       }}>
       <HomeStack.Screen name="Local" component={PhotoGalleryLocalScreen} />
-      <HomeStack.Screen name="RegisterScreen" component={RegisterScreen} />
     </HomeStack.Navigator>
   );
 }
