@@ -2,8 +2,10 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { BackHandler, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import { NativeEventEmitter, NativeModules } from 'react-native';
 
-import { useMainContext } from '~/Context/ContextProvider';
+import { usePhotosFunctions } from '~/Context/PhotosContextHooks';
 import { useTabNavigationContext } from '~/Context/TabNavigationContext';
+import { useBackgroundService } from '~/Context/useBackgroundService';
+import { usePhotosDownloading } from '~/Context/usePhotosDownloading';
 import { PhotoType } from '~/Helpers/types';
 
 import PhotoDetailsModal from './PhotoDetailsModal';
@@ -32,13 +34,14 @@ export default function PhotoSlider({
   console.log('render slider', contextLocation);
 
   const {
-    RequestFullPhotoServer,
-    addPhotosLocal,
-    addPhotosServer,
-    deletePhotosLocal,
-    deletePhotosServer,
-    RequestCroppedPhotosServer,
-  } = useMainContext();
+    RequestCompressedPhotoServer,
+    DeletePhotosLocal,
+    DeletePhotosServer,
+    RequestThumbnailPhotosServer,
+  } = usePhotosFunctions();
+
+  const { SendPhotoToBackgroundServiceForUpload } = useBackgroundService();
+  const { AddPhotosLocal } = usePhotosDownloading();
 
   const flatListCurrentIndexRef = useRef<number>(props.startIndex);
   const [flatListCurrentIndex, setFlatListCurrentIndex] = useState(props.startIndex);
@@ -53,7 +56,7 @@ export default function PhotoSlider({
       !photos[flatListCurrentIndex].inDevice &&
       contextLocation == 'server'
     ) {
-      RequestFullPhotoServer(photos[flatListCurrentIndex]).catch(e =>
+      RequestCompressedPhotoServer(photos[flatListCurrentIndex]).catch(e =>
         console.log('Error : RequestFullPhotoServer', e),
       );
     }
@@ -62,7 +65,7 @@ export default function PhotoSlider({
     contextLocation,
     flatListCurrentIndex,
     validFlatListCurrentIndex,
-    RequestFullPhotoServer,
+    RequestCompressedPhotoServer,
   ]);
 
   const onCurrentIndexChanged = useCallback((index: number) => {
@@ -110,30 +113,30 @@ export default function PhotoSlider({
   }, []);
 
   const onAddLocal = () => {
-    addPhotosLocal?.([photos[flatListCurrentIndex]]).catch(e =>
+    AddPhotosLocal?.([photos[flatListCurrentIndex]]).catch(e =>
       console.log('Error : addPhotosLocal', e),
     );
   };
 
   const onAddServer = () => {
-    addPhotosServer?.([photos[flatListCurrentIndex]]).catch(e =>
+    SendPhotoToBackgroundServiceForUpload?.([photos[flatListCurrentIndex]]).catch(e =>
       console.log('Error : addPhotosServer', e),
     );
   };
 
   const onDeleteLocal = () => {
     if (contextLocation == 'server') {
-      RequestCroppedPhotosServer([photos[flatListCurrentIndex]]).catch(e =>
+      RequestThumbnailPhotosServer([photos[flatListCurrentIndex]]).catch(e =>
         console.log('Error : RequestCroppedPhotosServer', e),
       );
     }
-    deletePhotosLocal?.([photos[flatListCurrentIndex]]).catch(e =>
+    DeletePhotosLocal?.([photos[flatListCurrentIndex]]).catch(e =>
       console.log('Error : deletePhotosLocal', e),
     );
   };
 
   const onDeleteServer = () => {
-    deletePhotosServer?.([photos[flatListCurrentIndex]]).catch(e => {
+    DeletePhotosServer?.([photos[flatListCurrentIndex]]).catch(e => {
       console.log('Error: deletePhotosServer', e);
     });
   };

@@ -19,7 +19,7 @@ export default function PhotoGalleryScreen() {
 
   return (
     <PhotoGallery
-      photos={context.photosServer}
+      photos={context.photosState.photosServer}
       key={'gallery_server'}
       contextLocation={'server'}
       gridHeaderTextFunction={photosNbToString}

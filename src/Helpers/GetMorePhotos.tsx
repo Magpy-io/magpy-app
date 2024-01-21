@@ -32,10 +32,6 @@ async function GetMorePhotosLocal(
 
   while (!foundAnyPhotoNotInServer && !photosFromDevice.endReached) {
     photosFromDevice = await GalleryGetPhotos(n, totalOffset);
-    // photosExistInServer = await Queries.GetPhotosByPathPost({
-    //     paths: photosFromDevice.edges.map(edge => edge.node.image.uri),
-    //     photoType: 'data',
-    // });
 
     photosExistInServer = await GetPhotosByPath.Post({
       photosData: photosFromDevice.edges.map(edge => {

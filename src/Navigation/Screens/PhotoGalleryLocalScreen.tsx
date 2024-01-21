@@ -38,7 +38,7 @@ export default function PhotoGalleryLocalScreen() {
       {hasPermissions ? (
         <PhotoGallery
           style={{}}
-          photos={context.photosLocal}
+          photos={context.photosState.photosLocal}
           key={'gallery_local'}
           contextLocation={'local'}
           gridHeaderTextFunction={photosNbToString}

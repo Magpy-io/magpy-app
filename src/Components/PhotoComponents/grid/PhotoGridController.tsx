@@ -1,8 +1,10 @@
 import React, { useCallback, useRef, useState } from 'react';
 import { StyleProp, ViewStyle } from 'react-native';
 
-import { useMainContext } from '~/Context/ContextProvider';
+import { usePhotosFunctions } from '~/Context/PhotosContextHooks';
 import { useTabNavigationContext } from '~/Context/TabNavigationContext';
+import { useBackgroundService } from '~/Context/useBackgroundService';
+import { usePhotosDownloading } from '~/Context/usePhotosDownloading';
 import { PhotoType } from '~/Helpers/types';
 
 import PhotoGridComponent from './PhotoGridComponent';
@@ -23,16 +25,16 @@ export default function PhotoGridController({
   ...props
 }: PropsType) {
   console.log('render grid', contextLocation);
-
   const {
-    onRefreshLocal,
-    onRefreshServer,
-    addPhotosLocal,
-    deletePhotosServer,
-    deletePhotosLocal,
-    addPhotosServer,
-    RequestCroppedPhotosServer,
-  } = useMainContext();
+    RefreshPhotosLocal,
+    RefreshPhotosServer,
+    DeletePhotosLocal,
+    DeletePhotosServer,
+    RequestThumbnailPhotosServer,
+  } = usePhotosFunctions();
+
+  const { SendPhotoToBackgroundServiceForUpload } = useBackgroundService();
+  const { AddPhotosLocal } = usePhotosDownloading();
 
   const getPhotoIndexRef = useRef<(photo: PhotoType) => number>();
   const [isSelecting, setIsSelecting] = useState(false);
@@ -111,45 +113,45 @@ export default function PhotoGridController({
 
   const onRefresh = useCallback(() => {
     if (contextLocation == 'local') {
-      onRefreshLocal().catch(e => console.log('Error : onRefreshLocal', e));
+      RefreshPhotosLocal().catch(e => console.log('Error : onRefreshLocal', e));
     } else if (contextLocation == 'server') {
-      onRefreshServer().catch(e => console.log('Error : onRefreshServer', e));
+      RefreshPhotosServer().catch(e => console.log('Error : onRefreshServer', e));
     }
-  }, [contextLocation, onRefreshLocal, onRefreshServer]);
+  }, [RefreshPhotosLocal, RefreshPhotosServer, contextLocation]);
 
   const onAddLocal = useCallback(() => {
     setIsSelecting(false);
-    addPhotosLocal?.(Array.from(seletedIds.values())).catch(e =>
+    AddPhotosLocal?.(Array.from(seletedIds.values())).catch(e =>
       console.log('Error : addPhotosLocal', e),
     );
-  }, [addPhotosLocal, seletedIds]);
+  }, [AddPhotosLocal, seletedIds]);
 
   const onAddServer = useCallback(() => {
     setIsSelecting(false);
-    addPhotosServer?.(Array.from(seletedIds.values())).catch(e =>
+    SendPhotoToBackgroundServiceForUpload?.(Array.from(seletedIds.values())).catch(e =>
       console.log('Error : addPhotosServer', e),
     );
-  }, [addPhotosServer, seletedIds]);
+  }, [SendPhotoToBackgroundServiceForUpload, seletedIds]);
 
   const onDeleteLocal = useCallback(() => {
     setIsSelecting(false);
     const photosToDelete = Array.from(seletedIds.values());
     if (contextLocation == 'server') {
-      RequestCroppedPhotosServer(photosToDelete).catch(e =>
+      RequestThumbnailPhotosServer(photosToDelete).catch(e =>
         console.log('Error : RequestCroppedPhotosServer', e),
       );
     }
-    deletePhotosLocal?.(photosToDelete).catch(e =>
+    DeletePhotosLocal?.(photosToDelete).catch(e =>
       console.log('Error : deletePhotosLocal', e),
     );
-  }, [RequestCroppedPhotosServer, contextLocation, deletePhotosLocal, seletedIds]);
+  }, [DeletePhotosLocal, RequestThumbnailPhotosServer, contextLocation, seletedIds]);
 
   const onDeleteServer = useCallback(() => {
     setIsSelecting(false);
-    deletePhotosServer?.(Array.from(seletedIds.values())).catch(e =>
+    DeletePhotosServer?.(Array.from(seletedIds.values())).catch(e =>
       console.log('Error : deletePhotosServer', e),
     );
-  }, [deletePhotosServer, seletedIds]);
+  }, [DeletePhotosServer, seletedIds]);
 
   return (
     <PhotoGridComponent

@@ -1,6 +1,6 @@
 import { PhotoType } from '~/Helpers/types';
 
-type stateType = {
+export type PhotosStateType = {
   photosLocal: Array<PhotoType>;
   nextOffsetLocal: number;
   endReachedLocal: boolean;
@@ -41,7 +41,7 @@ type Action = {
   payload?: unknown;
 };
 
-function GlobalReducer(prevState: stateType, action: Action) {
+function GlobalReducer(prevState: PhotosStateType, action: Action) {
   switch (action.type) {
     case Actions.setNewPhotosLocal: {
       const payload = action.payload as {
