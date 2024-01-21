@@ -2,6 +2,7 @@ import React from 'react';
 import { StyleSheet, Text, TouchableHighlight, View, ViewStyle } from 'react-native';
 
 import { Icon } from '@rneui/themed';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { colorsOld as colors } from '~/styles/colors';
 
@@ -24,7 +25,7 @@ type ToolBarProps = {
 
 function ToolBar(props: ToolBarProps) {
   return (
-    <View style={[styles.toolBarView, props.style]}>
+    <SafeAreaView style={[styles.toolBarView, props.style]}>
       <View style={styles.toolsView}>
         {props.inDevice ? (
           <ToolComponent
@@ -51,7 +52,7 @@ function ToolBar(props: ToolBarProps) {
         <ToolComponent icon="share" text="Share" onPress={() => props.onShare?.()} />
         <ToolComponent icon="info" text="Details" onPress={() => props.onDetails?.()} />
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 

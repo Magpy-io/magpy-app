@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
 import { Icon, Text } from 'react-native-elements';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { TabName, useTabNavigationContext } from '~/Context/TabNavigationContext';
 import { appColors, colors } from '~/styles/colors';
@@ -52,14 +52,13 @@ const routes: RouteType[] = [
 
 export default function TabBar() {
   const { hidden } = useTabNavigationContext();
-  const insets = useSafeAreaInsets();
 
   if (hidden) {
     return <View />;
   }
   return (
-    <View style={styles.container}>
-      <View style={[styles.tabView, { paddingBottom: insets.bottom }]}>
+    <SafeAreaView style={styles.container}>
+      <View style={[styles.tabView]}>
         {routes.map(route => {
           return (
             <TabElement
@@ -71,7 +70,7 @@ export default function TabBar() {
           );
         })}
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -124,11 +123,10 @@ const styles = StyleSheet.create({
     paddingTop: 4,
   },
   tabView: {
-    height: 120,
+    height: 80,
     backgroundColor: 'white',
     flexDirection: 'row',
     justifyContent: 'space-evenly',
-    // paddingBottom: 20, //TODO Bar height here
   },
   container: {
     position: 'absolute',

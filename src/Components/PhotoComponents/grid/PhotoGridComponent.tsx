@@ -1,7 +1,8 @@
 import React, { useCallback, useRef } from 'react';
-import { Dimensions, FlatList, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
+import { Dimensions, FlatList, StyleProp, StyleSheet, ViewStyle } from 'react-native';
 
-import * as BarHeights from '~/Helpers/BarHeights';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
 import { PhotoType } from '~/Helpers/types';
 
 import PhotoComponentForGrid from './PhotoComponentForGrid';
@@ -80,7 +81,7 @@ export default function PhotoGridComponent({
   // This will also fix that when less than 3 photos are in a row, the 2 or 1 photo will stretch to fill all horizontal space.
 
   return (
-    <View style={[styles.mainViewStyle, style]}>
+    <SafeAreaView style={[styles.mainViewStyle, style]}>
       <FlatList
         ref={flatlistRef}
         style={styles.flatListStyle}
@@ -110,7 +111,7 @@ export default function PhotoGridComponent({
         isSelecting={isSelecting}
         selectedIds={selectedIds}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -119,8 +120,5 @@ const styles = StyleSheet.create({
     height: '100%',
     width: '100%',
   },
-  flatListStyle: {
-    marginTop: BarHeights.GetStatusBarHeight(),
-    // marginBottom: BarHeights.GetNavigatorBarHeight(),
-  },
+  flatListStyle: {},
 });

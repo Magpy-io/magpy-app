@@ -1,8 +1,9 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 
 import { useNavigation } from '@react-navigation/native';
 import { Button, Text } from 'react-native-elements';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useAuthContext } from '~/Context/AuthContext';
 import { useServerContext } from '~/Context/ServerContext';
@@ -12,7 +13,7 @@ export default function App() {
   const { isServerReachable } = useServerContext();
   const navigation = useNavigation();
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Button
         title="Account Settings"
         onPress={() =>
@@ -23,14 +24,13 @@ export default function App() {
       <Text>{user?.email}</Text>
       <Text>{isServerReachable ? 'Server reachable' : 'Unreachable'}</Text>
       <Button title="Log out" onPress={logout} />
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 20,
-    paddingVertical: 60,
+    padding: 20,
   },
 });

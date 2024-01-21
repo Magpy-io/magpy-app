@@ -22,6 +22,7 @@ function getItemLayout(data: ArrayLike<PhotoType> | null | undefined, index: num
 type PropsType = {
   photos: PhotoType[];
   startIndex: number;
+  isFullScreen: boolean;
   onIndexChanged?: (index: number) => void;
   onEndReached?: () => void;
   onPhotoClick?: (item: PhotoType) => void;
@@ -34,6 +35,7 @@ export default function PhotoSliderComponent({
   onPhotoLongClick,
   startIndex,
   photos,
+  isFullScreen,
   ...props
 }: PropsType) {
   const flatlistRef = useRef<FlatList>(null);
@@ -45,9 +47,10 @@ export default function PhotoSliderComponent({
         photo={item}
         onPress={onPhotoClick}
         onLongPress={onPhotoLongClick}
+        isFullScreen={isFullScreen}
       />
     ),
-    [onPhotoClick, onPhotoLongClick],
+    [isFullScreen, onPhotoClick, onPhotoLongClick],
   );
 
   let correctStartIndex = startIndex;

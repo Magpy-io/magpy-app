@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { StyleSheet, Text, View, ViewStyle } from 'react-native';
 
 import { Icon } from '@rneui/themed';
 import * as Progress from 'react-native-progress';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import BackButton from '~/Components/CommonComponents/BackButton';
-import * as BarHeights from '~/Helpers/BarHeights';
 import { colorsOld as colors } from '~/styles/colors';
 
 type StatusBarComponentProps = {
@@ -25,7 +25,7 @@ function StatusBarComponent(props: StatusBarComponentProps) {
   const serverStatusIcon = props.inServer ? 'cloud-done' : 'cloud-off';
 
   return (
-    <View style={[styles.StatusBarStyle, props.style]}>
+    <SafeAreaView style={[styles.StatusBarStyle, props.style]}>
       <View style={styles.statusBarBackButtonStyle}>
         <BackButton onPress={props.onBackButton} />
       </View>
@@ -52,7 +52,7 @@ function StatusBarComponent(props: StatusBarComponentProps) {
           valid={props.inServer}
         />
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -68,20 +68,11 @@ const INVALID_COLOR = 'black';
 const INVALID_BACKGROUND_COLOR = colors.greyBackgroundColor;
 
 const StatusComponent = React.memo(function StatusComponent(props: StatusComponentProps) {
-  const [marginTop, setMarginTom] = useState(0);
-
-  useEffect(() => {
-    BarHeights.GetNavigatorBarHeight()
-      .then(v => setMarginTom(v))
-      .catch(console.log);
-  });
-
   return (
     <View
       style={[
         styles.statusComponentStyle,
         {
-          marginTop: marginTop,
           padding: 5,
           backgroundColor: props.valid ? VALID_BACKGROUND_COLOR : INVALID_BACKGROUND_COLOR,
         },

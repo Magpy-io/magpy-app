@@ -45,7 +45,7 @@ export default function PhotoSlider({
   const [detailsModalVisible, setDetailsModalVisible] = useState(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
   const validFlatListCurrentIndex = photos.length != 0 && flatListCurrentIndex < photos.length;
-  const { hideTab, showTab } = useTabNavigationContext();
+  const { showTab } = useTabNavigationContext();
 
   useEffect(() => {
     if (
@@ -162,6 +162,7 @@ export default function PhotoSlider({
         onPhotoClick={() => {
           onPressPhoto().catch(console.log);
         }}
+        isFullScreen={isFullScreen}
       />
 
       {validFlatListCurrentIndex && !isFullScreen && (

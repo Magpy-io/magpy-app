@@ -16,6 +16,7 @@ const W = Dimensions.get('screen').width;
 
 type PropsType = {
   photo: PhotoType;
+  isFullScreen: boolean;
   onPress?: (item: PhotoType) => void;
   onLongPress?: (item: PhotoType) => void;
 };
@@ -112,7 +113,10 @@ function PhotoComponentForSlider(props: PropsType) {
           <FastImage
             source={{ uri: uriSource }}
             resizeMode={FastImage.resizeMode.contain}
-            style={styles.imageStyle}
+            style={[
+              styles.imageStyle,
+              props.isFullScreen ? { backgroundColor: 'black' } : { backgroundColor: 'white' },
+            ]}
           />
         </Animated.View>
       </GestureDetector>
@@ -124,17 +128,14 @@ const styles = StyleSheet.create({
   touchableStyle: {},
 
   itemStyle: {
-    padding: 1,
-    justifyContent: 'center',
     width: W,
-    height: '100%',
-    backgroundColor: 'white',
+    height: H,
   },
   imageStyle: {
     width: '100%',
     height: '100%',
     borderRadius: 0,
-    backgroundColor: 'white',
+    backgroundColor: 'red',
   },
 });
 
