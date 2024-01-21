@@ -5,7 +5,7 @@ import { TouchableHighlight } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Icon } from '@rneui/themed';
 
-import { colorsOld as colors } from '~/styles/colors';
+import { appColors } from '~/styles/colors';
 
 type PropsType = {
   style?: ViewStyle;
@@ -25,14 +25,20 @@ export default function BackButton(props: PropsType) {
             navigation.goBack();
           }
         }}
-        underlayColor={colors.underlayColor}>
-        <Icon name="arrow-back" color={'black'} size={26} style={styles.backIconStyle} />
+        underlayColor={appColors.UNDERLAY}>
+        <Icon
+          name="chevron-back"
+          type="ionicon"
+          color={appColors.TEXT}
+          size={26}
+          style={styles.backIconStyle}
+        />
       </TouchableHighlight>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  backButtonStyle: { padding: 5 },
+  backButtonStyle: { padding: 14 },
   backIconStyle: {},
 });

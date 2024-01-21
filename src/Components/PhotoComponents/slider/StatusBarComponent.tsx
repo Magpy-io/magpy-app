@@ -1,12 +1,11 @@
 import React from 'react';
-import { StyleSheet, Text, View, ViewStyle } from 'react-native';
+import { StyleSheet, View, ViewStyle } from 'react-native';
 
 import { Icon } from '@rneui/themed';
-import * as Progress from 'react-native-progress';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import BackButton from '~/Components/CommonComponents/BackButton';
-import { colorsOld as colors } from '~/styles/colors';
+import { appColors } from '~/styles/colors';
 
 type StatusBarComponentProps = {
   inDevice: boolean;
@@ -22,34 +21,24 @@ function StatusBarComponent(props: StatusBarComponentProps) {
   const serverStatusText = props.inServer ? 'Backed up' : 'Not backed up';
 
   const deviceStatusIcon = props.inDevice ? 'mobile-friendly' : 'phonelink-erase';
-  const serverStatusIcon = props.inServer ? 'cloud-done' : 'cloud-off';
+  const serverStatusIcon = props.inServer ? 'cloud-done-outline' : 'cloud-offline-outline';
 
   return (
-    <SafeAreaView style={[styles.StatusBarStyle, props.style]}>
+    <SafeAreaView edges={['top']} style={[styles.StatusBarStyle, props.style]}>
       <View style={styles.statusBarBackButtonStyle}>
         <BackButton onPress={props.onBackButton} />
       </View>
       <View style={styles.statusBarComponentStyle}>
-        {props.isLoading ? (
-          <Progress.Pie
-            style={styles.pieStyle}
-            progress={props.loadingPercentage}
-            size={30}
-            borderColor={'#d6d6d6'}
-            color={'#d6d6d6'}
-          />
-        ) : (
-          <></>
-        )}
+        <StatusComponent
+          icon={serverStatusIcon}
+          type="ionicon"
+          text={serverStatusText}
+          valid={props.inServer}
+        />
         <StatusComponent
           icon={deviceStatusIcon}
           text={deviceStatusText}
           valid={props.inDevice}
-        />
-        <StatusComponent
-          icon={serverStatusIcon}
-          text={serverStatusText}
-          valid={props.inServer}
         />
       </View>
     </SafeAreaView>
@@ -60,47 +49,30 @@ type StatusComponentProps = {
   icon: string;
   text: string;
   valid: boolean;
+  type?: string;
 };
-
-const VALID_COLOR = colors.success;
-const VALID_BACKGROUND_COLOR = colors.lightSuccess;
-const INVALID_COLOR = 'black';
-const INVALID_BACKGROUND_COLOR = colors.greyBackgroundColor;
 
 const StatusComponent = React.memo(function StatusComponent(props: StatusComponentProps) {
   return (
-    <View
-      style={[
-        styles.statusComponentStyle,
-        {
-          padding: 5,
-          backgroundColor: props.valid ? VALID_BACKGROUND_COLOR : INVALID_BACKGROUND_COLOR,
-        },
-      ]}>
+    <View style={styles.statusComponentStyle}>
       <Icon
         name={props.icon}
+        type={props.type ?? 'material'}
         containerStyle={{}}
-        size={15}
+        size={26}
         color={props.valid ? VALID_COLOR : INVALID_COLOR}
       />
-      <Text
-        style={{
-          fontWeight: 'bold',
-          color: props.valid ? VALID_COLOR : INVALID_COLOR,
-          fontSize: 15,
-          marginLeft: 3,
-        }}>
-        {props.text}
-      </Text>
     </View>
   );
 });
 
+const VALID_COLOR = appColors.PRIMARY;
+const INVALID_COLOR = appColors.TEXT_LIGHT;
+
 const styles = StyleSheet.create({
   StatusBarStyle: {
-    padding: 5,
     width: '100%',
-    backgroundColor: 'white',
+    backgroundColor: appColors.BACKGROUND,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -110,14 +82,10 @@ const styles = StyleSheet.create({
   statusBarBackButtonStyle: {},
   statusBarComponentStyle: {
     flexDirection: 'row',
+    gap: 20,
+    padding: 20,
   },
-  statusComponentStyle: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderRadius: 3,
-    marginHorizontal: 3,
-  },
-  pieStyle: { marginRight: 10 },
+  statusComponentStyle: {},
 });
 
 export default React.memo(StatusBarComponent);

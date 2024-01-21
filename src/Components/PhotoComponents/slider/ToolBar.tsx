@@ -19,6 +19,8 @@ type ToolBarProps = {
 };
 
 function ToolBar(props: ToolBarProps) {
+  // Using insets here instead of SafeAreaView makes the toolBar not slide which I prefer, but not necessary
+  // Feel free to experiment
   const insets = useSafeAreaInsets();
   return (
     <View style={[styles.toolBarView, props.style, { paddingBottom: insets.bottom }]}>
@@ -26,12 +28,14 @@ function ToolBar(props: ToolBarProps) {
         {props.inDevice ? (
           <ToolComponent
             icon="mobile-off"
+            type="material"
             text="Delete from device"
             onPress={() => props.onDeleteLocal?.()}
           />
         ) : (
           <ToolComponent
             icon="system-update"
+            type="material"
             text="Save to device"
             onPress={() => props.onAddLocal?.()}
           />
@@ -39,14 +43,30 @@ function ToolBar(props: ToolBarProps) {
         {props.inServer ? (
           <ToolComponent
             icon="delete"
+            type="material"
             text="Delete from server"
             onPress={() => props.onDeleteServer?.()}
           />
         ) : (
-          <ToolComponent icon="backup" text="Back up" onPress={() => props.onAddServer?.()} />
+          <ToolComponent
+            icon="backup"
+            type="material"
+            text="Back up"
+            onPress={() => props.onAddServer?.()}
+          />
         )}
-        <ToolComponent icon="share" text="Share" onPress={() => props.onShare?.()} />
-        <ToolComponent icon="info" text="Details" onPress={() => props.onDetails?.()} />
+        <ToolComponent
+          icon="share"
+          type="material"
+          text="Share"
+          onPress={() => props.onShare?.()}
+        />
+        <ToolComponent
+          icon="info"
+          type="material"
+          text="Details"
+          onPress={() => props.onDetails?.()}
+        />
       </View>
     </View>
   );
@@ -54,6 +74,7 @@ function ToolBar(props: ToolBarProps) {
 
 type ToolComponentProps = {
   icon: string;
+  type: string;
   text?: string;
   onPress: () => void;
 };
@@ -67,6 +88,7 @@ const ToolComponent = React.memo(function ToolComponent(props: ToolComponentProp
       <View style={styles.iconTextView}>
         <Icon
           name={props.icon}
+          type={props.type}
           color={TOOL_COLOR}
           size={ICON_SIZE}
           containerStyle={styles.iconContainerStyle}
@@ -77,7 +99,7 @@ const ToolComponent = React.memo(function ToolComponent(props: ToolComponentProp
   );
 });
 
-const ICON_SIZE = 20;
+const ICON_SIZE = 22;
 const TEXT_SIZE = 10;
 const TOOLBAR_COLOR = appColors.BACKGROUND;
 const TOOL_COLOR = appColors.TEXT;
@@ -89,6 +111,7 @@ const styles = StyleSheet.create({
     fontSize: TEXT_SIZE,
     fontWeight: 'bold',
     textAlign: 'center',
+    paddingTop: 4,
   },
   iconTextView: {
     alignItems: 'center',
