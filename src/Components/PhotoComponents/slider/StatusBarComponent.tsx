@@ -2,16 +2,19 @@ import React from 'react';
 import { StyleSheet, View, ViewStyle } from 'react-native';
 
 import { Icon } from '@rneui/themed';
+import { Text } from 'react-native-elements';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import BackButton from '~/Components/CommonComponents/BackButton';
 import { appColors } from '~/styles/colors';
+import { typography } from '~/styles/typography';
 
 type StatusBarComponentProps = {
   inDevice: boolean;
   inServer: boolean;
   isLoading: boolean;
   loadingPercentage: number;
+  title: string;
   style?: ViewStyle;
   onBackButton?: () => void;
 };
@@ -25,8 +28,9 @@ function StatusBarComponent(props: StatusBarComponentProps) {
 
   return (
     <SafeAreaView edges={['top']} style={[styles.StatusBarStyle, props.style]}>
-      <View style={styles.statusBarBackButtonStyle}>
+      <View style={styles.BackButtonTitleView}>
         <BackButton onPress={props.onBackButton} />
+        <Text style={styles.title}>{props.title}</Text>
       </View>
       <View style={styles.statusBarComponentStyle}>
         <StatusComponent
@@ -70,6 +74,9 @@ const VALID_COLOR = appColors.PRIMARY;
 const INVALID_COLOR = appColors.TEXT_LIGHT;
 
 const styles = StyleSheet.create({
+  title: {
+    ...typography.largeText,
+  },
   StatusBarStyle: {
     width: '100%',
     backgroundColor: appColors.BACKGROUND,
@@ -79,7 +86,11 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
   },
-  statusBarBackButtonStyle: {},
+  BackButtonTitleView: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
   statusBarComponentStyle: {
     flexDirection: 'row',
     gap: 20,

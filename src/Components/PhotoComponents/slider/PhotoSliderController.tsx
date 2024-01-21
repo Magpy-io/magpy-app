@@ -4,6 +4,7 @@ import { NativeEventEmitter, NativeModules } from 'react-native';
 
 import { useMainContext } from '~/Context/ContextProvider';
 import { useTabNavigationContext } from '~/Context/TabNavigationContext';
+import { formatDate } from '~/Helpers/Date';
 import { PhotoType } from '~/Helpers/types';
 
 import PhotoDetailsModal from './PhotoDetailsModal';
@@ -171,6 +172,7 @@ export default function PhotoSlider({
           inServer={photos[flatListCurrentIndex].inServer}
           isLoading={photos[flatListCurrentIndex].isLoading}
           loadingPercentage={photos[flatListCurrentIndex].loadingPercentage}
+          title={formatDate(photos[flatListCurrentIndex].created)}
           onBackButton={onStatusBarBackButton}
         />
       )}

@@ -24,6 +24,8 @@ export const typography: {
   screenTitle: TextStyle;
   formError: TextStyle;
   formInfo: TextStyle;
+  mediumText: TextStyle;
+  largeText: TextStyle;
 } = {
   screenTitle: {
     ...textSize.extraLarge2,
@@ -35,6 +37,14 @@ export const typography: {
     fontWeight: 'bold',
     fontSize: 13,
     letterSpacing: 0.5,
+  },
+  mediumText: {
+    ...textSize.medium,
+    color: appColors.TEXT,
+  },
+  largeText: {
+    ...textSize.large,
+    color: appColors.TEXT,
   },
   formInfo: {
     color: appColors.TEXT_LIGHT,

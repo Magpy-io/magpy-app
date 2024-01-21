@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
     color: TOOL_COLOR,
     maxWidth: '70%',
     fontSize: TEXT_SIZE,
-    fontWeight: 'bold',
+    fontWeight: 'normal',
     textAlign: 'center',
     paddingTop: 4,
   },
