@@ -114,7 +114,9 @@ const styles = StyleSheet.create({
     paddingTop: 4,
   },
   iconTextView: {
+    flex: 1,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   toolComponent: {
     flex: 1,
