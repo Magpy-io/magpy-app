@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, ViewStyle } from 'react-native';
 
 import { Icon } from '@rneui/themed';
@@ -68,12 +68,20 @@ const INVALID_COLOR = 'black';
 const INVALID_BACKGROUND_COLOR = colors.greyBackgroundColor;
 
 const StatusComponent = React.memo(function StatusComponent(props: StatusComponentProps) {
+  const [marginTop, setMarginTom] = useState(0);
+
+  useEffect(() => {
+    BarHeights.GetNavigatorBarHeight()
+      .then(v => setMarginTom(v))
+      .catch(console.log);
+  });
+
   return (
     <View
       style={[
         styles.statusComponentStyle,
         {
-          marginTop: BarHeights.GetStatusBarHeight(),
+          marginTop: marginTop,
           padding: 5,
           backgroundColor: props.valid ? VALID_BACKGROUND_COLOR : INVALID_BACKGROUND_COLOR,
         },
