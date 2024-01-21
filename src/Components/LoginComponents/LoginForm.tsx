@@ -28,7 +28,9 @@ export default function LoginForm() {
   const onSubmit = async (values: { email: string; password: string }) => {
     try {
       const loginRet = await Login.Post(values);
-      if (loginRet.ok) authenticate();
+      if (loginRet.ok) {
+        await authenticate();
+      }
     } catch (err) {
       console.log('Login Error', err);
     }

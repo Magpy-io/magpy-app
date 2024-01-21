@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import React, { ReactNode, createContext, useContext, useEffect, useState } from 'react';
 
 import { getAddressInfo, storeAddressInfo } from '~/Helpers/AsyncStorage';
 import { GetToken, SetPath } from '~/Helpers/ServerQueries';
@@ -30,7 +30,7 @@ async function TryServerAddress(ip: string, port: string, token: string) {
   }
 }
 
-const ServerProvider = ({ children }: { children: any }) => {
+const ServerProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { token } = useAuthContext();
   const [isServerReachable, setIsServerReachable] = useState(false);
   const [ipLocal, setIpLocal] = useState<string | null>(null);
@@ -42,20 +42,18 @@ const ServerProvider = ({ children }: { children: any }) => {
 
   useEffect(() => {
     async function core() {
-      try {
-        const res = await getAddressInfo();
-        if (res) {
-          setIpLocal(res.ipLocal);
-          setIpPublic(res.ipPublic);
-          setPort(res.port);
-        }
-      } catch (err) {}
+      const res = await getAddressInfo();
+      if (res) {
+        setIpLocal(res.ipLocal);
+        setIpPublic(res.ipPublic);
+        setPort(res.port);
+      }
     }
-    core();
+    core().catch(console.log);
   }, []);
 
   useEffect(() => {
-    async function FindServerAddressFromAsyncStorage() {
+    async function FindServerAddressFromAsyncStorage(token: string) {
       // I got ip/port from async storage, I try to connect
       if (ipLocal && port) {
         console.log('Trying Address from Async storage');
@@ -66,12 +64,12 @@ const ServerProvider = ({ children }: { children: any }) => {
       }
     }
     if (!isServerReachable && !!token) {
-      FindServerAddressFromAsyncStorage();
+      FindServerAddressFromAsyncStorage(token).catch(console.log);
     }
-  }, [isServerReachable, token]);
+  }, [isServerReachable, token, ipLocal, port]);
 
   useEffect(() => {
-    async function FindServerAddressFromBackend() {
+    async function FindServerAddressFromBackend(token: string) {
       // I try the local Ip given by backend
       if (server) {
         console.log('Trying address from server');
@@ -79,18 +77,18 @@ const ServerProvider = ({ children }: { children: any }) => {
         if (res) {
           setIpLocal(server.ipPrivate);
           setPort(server.port);
-          storeAddressInfo({ ipLocal: server.ipPrivate, port: server.port });
+          await storeAddressInfo({ ipLocal: server.ipPrivate, port: server.port });
           setIsServerReachable(true);
         }
       }
     }
     if (!isServerReachable && !!token) {
-      FindServerAddressFromBackend();
+      FindServerAddressFromBackend(token).catch(console.log);
     }
   }, [server, isServerReachable, token]);
 
   useEffect(() => {
-    async function FindServerAddressFromLocalServers() {
+    async function FindServerAddressFromLocalServers(token: string) {
       // I try local servers scanned
       console.log('Trying address from scanned local servers');
       const results: { result: string | undefined; server: Server }[] = [];
@@ -103,7 +101,7 @@ const ServerProvider = ({ children }: { children: any }) => {
       if (myPotentialServer) {
         setIpLocal(myPotentialServer.server.ip);
         setPort(myPotentialServer.server.port);
-        storeAddressInfo({
+        await storeAddressInfo({
           ipLocal: myPotentialServer.server.ip,
           port: myPotentialServer.server.port,
         });
@@ -112,9 +110,9 @@ const ServerProvider = ({ children }: { children: any }) => {
       }
     }
     if (!isServerReachable && !!token && !isScanning) {
-      FindServerAddressFromLocalServers();
+      FindServerAddressFromLocalServers(token).catch(console.log);
     }
-  }, [isServerReachable, token, isScanning]);
+  }, [isServerReachable, token, isScanning, localServers]);
 
   // TODO : make sure this only happens after we tried to find the local ip address
   // useEffect(() => {
@@ -160,7 +158,7 @@ const ServerProvider = ({ children }: { children: any }) => {
 
 function useServerContext() {
   const context = useContext(ServerContext);
-  if (!context) throw Error('useServerContext can only be used inside an AuthProvider');
+  if (!context) {throw Error('useServerContext can only be used inside an AuthProvider');}
   return context;
 }
 

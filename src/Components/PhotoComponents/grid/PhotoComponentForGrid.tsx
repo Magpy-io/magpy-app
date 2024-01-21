@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
 
 import { Icon } from '@rneui/themed';
@@ -33,7 +33,7 @@ function PhotoComponentForGrid(props: PropsType) {
     if (props.onPress) {
       return props.onPress;
     } else {
-      return (item: PhotoType) => {};
+      return () => {};
     }
   }, [props.onPress]);
 
@@ -41,7 +41,7 @@ function PhotoComponentForGrid(props: PropsType) {
     if (props.onLongPress) {
       return props.onLongPress;
     } else {
-      return (item: PhotoType) => {};
+      return () => {};
     }
   }, [props.onLongPress]);
 

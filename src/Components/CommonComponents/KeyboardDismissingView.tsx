@@ -1,3 +1,4 @@
+import React from 'react';
 import { Keyboard, TouchableWithoutFeedback, View } from 'react-native';
 
 /*

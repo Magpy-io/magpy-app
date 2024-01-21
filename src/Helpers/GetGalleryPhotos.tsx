@@ -23,7 +23,12 @@ async function getFirstPossibleFileName(imageName: string) {
   const path = (await MainModule.getRestoredMediaAbsolutePath()) + '/' + imageName;
 
   if (!(await RNFS.exists(path))) {
-    return path.split('/').pop();
+    const pathSplit = path.split('/');
+    if (pathSplit.length == 0) {
+      throw new Error('getFirstPossibleFileName: Unexpected image path, cannot get imageName');
+    }
+
+    return pathSplit.pop() as string;
   }
   const pathSplitted = path.split('.');
   const extension = pathSplitted.pop();
@@ -36,7 +41,14 @@ async function getFirstPossibleFileName(imageName: string) {
     currentPath = pathWithoutExtension + ` (${i++}).` + extension;
     exists = await RNFS.exists(currentPath);
   }
-  return currentPath.split('/').pop();
+
+  const currentPathSplit = currentPath.split('/');
+
+  if (currentPathSplit.length == 0) {
+    throw new Error('getFirstPossibleFileName: Unexpected image path, cannot get imageName');
+  }
+
+  return currentPathSplit.pop() as string;
 }
 
 async function addPhoto(photo: PhotoType, image64: string) {

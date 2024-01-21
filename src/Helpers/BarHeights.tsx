@@ -11,8 +11,8 @@ export function GetWindowHeight() {
   return Dimensions.get('window').height;
 }
 
-export function GetStatusBarHeight() {
-  const insets = MainModule.getWindowInsets();
+export async function GetStatusBarHeight() {
+  const insets = await MainModule.getWindowInsets();
   if (insets.valid) {
     return PixelRatio.roundToNearestPixel(insets.top / PixelRatio.get());
   } else {
@@ -20,17 +20,17 @@ export function GetStatusBarHeight() {
   }
 }
 
-export function GetNavigatorBarHeight() {
-  const insets = MainModule.getWindowInsets();
+export async function GetNavigatorBarHeight() {
+  const insets = await MainModule.getWindowInsets();
   if (insets.valid) {
     return PixelRatio.roundToNearestPixel(insets.bottom / PixelRatio.get());
   } else {
-    return GetScreenHeight() - GetWindowHeight() - GetStatusBarHeight();
+    return GetScreenHeight() - GetWindowHeight() - (await GetStatusBarHeight());
   }
 }
 
-export function GetIsFullScreen() {
-  const insets = MainModule.getWindowInsets();
+export async function GetIsFullScreen() {
+  const insets = await MainModule.getWindowInsets();
   if (insets.valid) {
     return insets.isFullScreen;
   } else {

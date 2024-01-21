@@ -1,9 +1,10 @@
+import React from 'react';
 import { View, ViewProps } from 'react-native';
 
 type ViewWithGapProps = { gap: number; children: JSX.Element[] } & ViewProps;
 
 export default function ViewWithGap({ gap, children, ...props }: ViewWithGapProps) {
-  let newChildren: JSX.Element[] = [];
+  const newChildren: JSX.Element[] = [];
   children?.map((c, index) => {
     newChildren.push(c);
     if (index < children?.length - 1) {

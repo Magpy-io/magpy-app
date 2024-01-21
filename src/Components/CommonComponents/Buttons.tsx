@@ -1,8 +1,9 @@
+import React from 'react';
 import { StyleSheet } from 'react-native';
 
-import { Button, ButtonProps, Text } from 'react-native-elements';
+import { Button, ButtonProps } from 'react-native-elements';
 
-import { appColors, colors } from '~/styles/colors';
+import { appColors } from '~/styles/colors';
 import { spacing } from '~/styles/spacing';
 
 export function PrimaryButton(props: ButtonProps) {

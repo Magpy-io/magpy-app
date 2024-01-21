@@ -1,12 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import {
-  ActivityIndicator,
-  FlatList,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import React, { useEffect } from 'react';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -18,8 +11,7 @@ import { spacing } from '~/styles/spacing';
 import { typography } from '~/styles/typography';
 
 export default function ServerSelectScreen() {
-  const { claimServer, localServers, isScanning, refreshData, hasServer } =
-    useServerClaimContext();
+  const { claimServer, localServers, isScanning, refreshData } = useServerClaimContext();
 
   const onSelectServer = async (server: Server) => {
     await claimServer('http://' + server.ip + ':' + server.port);
@@ -28,6 +20,7 @@ export default function ServerSelectScreen() {
   useEffect(() => {
     console.log('Refresh');
     refreshData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -36,7 +29,9 @@ export default function ServerSelectScreen() {
         servers={localServers}
         refreshData={refreshData}
         header={<Header isScanning={isScanning} />}
-        onSelectServer={onSelectServer}
+        onSelectServer={(server: Server) => {
+          onSelectServer(server).catch(e => console.log(e));
+        }}
       />
     </SafeAreaView>
   );

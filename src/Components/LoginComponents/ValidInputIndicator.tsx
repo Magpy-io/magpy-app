@@ -1,4 +1,4 @@
-import { StyleSheet, View } from 'react-native';
+import React, { StyleSheet, View } from 'react-native';
 
 import { Icon } from 'react-native-elements';
 

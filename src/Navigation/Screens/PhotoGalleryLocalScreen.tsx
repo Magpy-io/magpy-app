@@ -22,7 +22,7 @@ export default function PhotoGalleryLocalScreen() {
 
   const getPermissions = useCallback(async () => {
     const hasPerm = await AndroidPermissions.hasAndroidPermissionWriteExternalStorage();
-    if (!hasPerm) {
+    if (hasPerm) {
       setHasPermissions(hasPerm);
     }
   }, []);

@@ -78,7 +78,7 @@ async function GetMorePhotosLocal(
     ].exists;
   });
 
-  const photos = photosNotInServer.map((edge, index) => {
+  const photos = photosNotInServer.map(edge => {
     const photo = edge.node;
 
     photo.modificationTimestamp;
@@ -95,7 +95,7 @@ async function GetMorePhotosLocal(
         image64: '',
       },
       id: `local_${photo.image.uri}`,
-      album: photo.group_name,
+      album: photo.group_name.length ? photo.group_name[0] : '',
       created: new Date(photo.timestamp * 1000).toISOString(),
       modified: new Date(photo.modificationTimestamp * 1000).toISOString(),
       syncDate: '',

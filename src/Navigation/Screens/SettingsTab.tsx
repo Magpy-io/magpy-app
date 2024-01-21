@@ -6,12 +6,10 @@ import { Button, Text } from 'react-native-elements';
 
 import { useAuthContext } from '~/Context/AuthContext';
 import { useServerContext } from '~/Context/ServerContext';
-import { TokenManager } from '~/Helpers/BackendQueries';
 
 export default function App() {
   const { logout, user } = useAuthContext();
   const { isServerReachable } = useServerContext();
-  const token = TokenManager.GetUserToken();
   const navigation = useNavigation();
   return (
     <View style={styles.container}>

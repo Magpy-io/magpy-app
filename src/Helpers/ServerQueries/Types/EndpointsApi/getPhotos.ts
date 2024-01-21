@@ -1,5 +1,5 @@
 import { ErrorServerNotClaimed, ErrorsAuthorization } from '../ErrorTypes';
-import { APIPhoto, PhotoTypesArray, TokenAuthentification } from '../Types';
+import { APIPhoto, TokenAuthentification } from '../Types';
 
 export type ResponseData = {
   endReached: boolean;

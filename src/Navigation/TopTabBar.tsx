@@ -1,9 +1,9 @@
 import React from 'react';
-import { StyleSheet, Text, TouchableHighlight, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableHighlight, View } from 'react-native';
 
 import { MaterialTopTabBarProps } from '@react-navigation/material-top-tabs';
 
-import colors from '~/colors';
+import { colorsOld as colors } from '~/styles/colors';
 
 const TopTabBar = ({ navigation, state }: MaterialTopTabBarProps) => {
   function onSelect(index: number) {
@@ -21,7 +21,7 @@ const TopTabBar = ({ navigation, state }: MaterialTopTabBarProps) => {
 function TopBarTab(props: {
   title: string;
   index: number;
-  onSelect: (index: any) => void;
+  onSelect: (index: number) => void;
   selected: boolean;
 }) {
   return (

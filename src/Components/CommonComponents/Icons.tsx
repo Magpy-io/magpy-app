@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { Icon, IconProps } from 'react-native-elements';
 
 import { appColors } from '~/styles/colors';

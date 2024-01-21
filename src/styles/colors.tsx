@@ -59,3 +59,17 @@ export const appColors = {
   ACCENT: colors.ORANGE,
   FORM_BORDER: colors.LIGHT_GREEN,
 };
+
+export const colorNames = {
+  grey: '#59686b',
+  lightgrey: '#f2f2f2',
+};
+
+export const colorsOld = {
+  tabBarHighlight: '#2d82b5',
+  lightSuccess: '#d9f2e6',
+  success: '#2e855b',
+  darkSuccess: '#143927',
+  underlayColor: colorNames.lightgrey,
+  greyBackgroundColor: colorNames.lightgrey,
+};

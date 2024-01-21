@@ -1,7 +1,6 @@
-import React, { ReactNode, useCallback, useEffect, useRef, useState } from 'react';
-import { Modal, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
+import React from 'react';
+import { Modal, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 
-import { PhotoType } from '~/Helpers/types';
 
 type GenericModalProps = {
   modalVisible: boolean;

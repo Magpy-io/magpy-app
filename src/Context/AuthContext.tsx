@@ -1,6 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react';
-
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { ReactNode, createContext, useContext, useEffect, useState } from 'react';
 
 import { clearAll, getStoredToken, storeToken } from '~/Helpers/AsyncStorage';
 import { TokenManager, Types, WhoAmI } from '~/Helpers/BackendQueries';
@@ -15,7 +13,7 @@ type ContextType = {
 
 const AuthContext = createContext<ContextType | undefined>(undefined);
 
-const AuthProvider = ({ children }: { children: any }) => {
+const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<Types.UserType | null>();
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState<string | null>(null);
@@ -39,7 +37,7 @@ const AuthProvider = ({ children }: { children: any }) => {
       setLoading(false);
     }
 
-    retrieveToken();
+    retrieveToken().catch(console.log);
   }, []);
 
   const authenticate = async function () {
@@ -48,7 +46,7 @@ const AuthProvider = ({ children }: { children: any }) => {
     const ret = await WhoAmI.Post();
     console.log('Authenticate, whoAmI', ret);
     if (ret.ok) {
-      storeToken(token);
+      await storeToken(token);
       setToken(token);
       setUser(ret.data.user);
     }
@@ -73,7 +71,7 @@ const AuthProvider = ({ children }: { children: any }) => {
 
 function useAuthContext() {
   const context = useContext(AuthContext);
-  if (!context) throw Error('useAuthContext can only be used inside an AuthProvider');
+  if (!context) {throw Error('useAuthContext can only be used inside an AuthProvider');}
   return context;
 }
 
