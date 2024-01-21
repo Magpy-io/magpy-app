@@ -4,7 +4,7 @@ import { StyleSheet, Text, TouchableHighlight, View, ViewStyle } from 'react-nat
 import { Icon } from '@rneui/themed';
 
 import * as BarHeights from '~/Helpers/BarHeights';
-import colors from '~/colors';
+import { colorsOld as colors } from '~/styles/colors';
 
 const ICON_SIZE = 20;
 const TEXT_SIZE = 10;

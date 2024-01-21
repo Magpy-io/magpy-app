@@ -1,18 +1,11 @@
-import { ElementRef, useEffect, useRef, useState } from 'react';
-import {
-  Keyboard,
-  TextInput as RNTextInput,
-  TextInputProps as RNTextInputProps,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import React from 'react';
+import { StyleSheet, View } from 'react-native';
 
 import { Icon, Text } from 'react-native-elements';
 
-import { appColors, colors } from '~/styles/colors';
+import { colors } from '~/styles/colors';
 import { spacing } from '~/styles/spacing';
-import { textSize, typography } from '~/styles/typography';
+import { typography } from '~/styles/typography';
 
 export default function FormError({ error }: { error: string | undefined }) {
   if (error) {
@@ -22,7 +15,9 @@ export default function FormError({ error }: { error: string | undefined }) {
         <Text style={styles.textStyle}>{error}</Text>
       </View>
     );
-  } else return <></>;
+  } else {
+    return <></>;
+  }
 }
 
 const styles = StyleSheet.create({

@@ -13,6 +13,7 @@ module.exports = {
   rules: {
     'unused-imports/no-unused-imports': 'error',
     'unused-imports/no-unused-vars': 'off',
+    curly: ['error', 'all'],
   },
 
   overrides: [

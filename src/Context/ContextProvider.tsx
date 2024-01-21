@@ -1,4 +1,5 @@
 import React, {
+  ReactNode,
   createContext,
   useCallback,
   useContext,
@@ -123,7 +124,7 @@ const addSinglePhotoLocal = async (photo: PhotoType, dispatch: React.Dispatch<Ac
 const AppContext = createContext<contextType | undefined>(undefined);
 
 type PropsType = {
-  children: any;
+  children: ReactNode;
 };
 
 const ContextProvider = (props: PropsType) => {
@@ -139,10 +140,52 @@ const ContextProvider = (props: PropsType) => {
 
   const intervalIdForRefreshPhotosAddingServer = useRef<ReturnType<typeof setInterval>>();
 
-  const intervalFunction = () => {
+  const refreshPhotosAddingServer = useCallback(async () => {
+    try {
+      if (isrefreshPhotosAddingServerRunning.current) {
+        return;
+      }
+
+      isrefreshPhotosAddingServerRunning.current = true;
+
+      const serviceState = await MainModule.getServiceState();
+
+      //console.log("service is", serviceState);
+
+      if (serviceState == 'DESTROYED' || serviceState == 'STARTUP') {
+        return;
+      }
+
+      const ids = await MainModule.getIds();
+      const currentIndex = await MainModule.getCurrentIndex();
+
+      dispatch({
+        type: Actions.updatePhotosFromService,
+        payload: { ids, currentIndex },
+      });
+
+      if (serviceState == 'INACTIVE' || serviceState == 'FAILED') {
+        await MainModule.stopSendingMediaService();
+        dispatch({
+          type: Actions.clearAllLoadingLocal,
+          payload: {},
+        });
+
+        if (serviceState == 'FAILED') {
+          //TODO display toast message
+        }
+      }
+    } catch (err) {
+      console.log(err);
+    } finally {
+      isrefreshPhotosAddingServerRunning.current = false;
+    }
+  }, []);
+
+  const intervalFunction = useCallback(() => {
     //console.log("interval");
-    refreshPhotosAddingServer?.();
-  };
+    refreshPhotosAddingServer?.().catch(console.log);
+  }, [refreshPhotosAddingServer]);
 
   const intervalTimer = 5000;
 
@@ -155,13 +198,13 @@ const ContextProvider = (props: PropsType) => {
     return () => {
       clearInterval(intervalIdForRefreshPhotosAddingServer.current);
     };
-  }, []);
+  }, [intervalFunction]);
 
   useEffect(() => {
     const emitter = new NativeEventEmitter();
     const subscription = emitter.addListener('PhotoUploaded', () => {
       console.log('event');
-      refreshPhotosAddingServer?.();
+      refreshPhotosAddingServer?.().catch(console.log);
 
       if (intervalIdForRefreshPhotosAddingServer.current != null) {
         clearInterval(intervalIdForRefreshPhotosAddingServer.current);
@@ -175,7 +218,7 @@ const ContextProvider = (props: PropsType) => {
     return () => {
       subscription.remove();
     };
-  }, []);
+  }, [refreshPhotosAddingServer, intervalFunction]);
 
   const onRefreshLocal = useCallback(async () => {
     try {
@@ -349,7 +392,7 @@ const ContextProvider = (props: PropsType) => {
             id: p.id,
             name: p.image.fileName,
             date: new Date(p.created).toJSON(),
-            path: p.image.path,
+            path: p.image.path ?? '',
             width: p.image.width,
             height: p.image.height,
             size: p.image.fileSize,
@@ -408,9 +451,9 @@ const ContextProvider = (props: PropsType) => {
 
       try {
         await RemovePhotos(uris);
-      } catch (err: any) {
+      } catch (err) {
         photosRemoved = false;
-        const code: ErrorCodes = err.code;
+        const code: ErrorCodes = (err as { code: ErrorCodes }).code;
 
         if (code != 'ERROR_USER_REJECTED') {
           throw err;
@@ -445,48 +488,6 @@ const ContextProvider = (props: PropsType) => {
       }
     } catch (err) {
       console.log(err);
-    }
-  }, []);
-
-  const refreshPhotosAddingServer = useCallback(async () => {
-    try {
-      if (isrefreshPhotosAddingServerRunning.current) {
-        return;
-      }
-
-      isrefreshPhotosAddingServerRunning.current = true;
-
-      const serviceState = await MainModule.getServiceState();
-
-      //console.log("service is", serviceState);
-
-      if (serviceState == 'DESTROYED' || serviceState == 'STARTUP') {
-        return;
-      }
-
-      const ids = await MainModule.getIds();
-      const currentIndex = await MainModule.getCurrentIndex();
-
-      dispatch({
-        type: Actions.updatePhotosFromService,
-        payload: { ids, currentIndex },
-      });
-
-      if (serviceState == 'INACTIVE' || serviceState == 'FAILED') {
-        await MainModule.stopSendingMediaService();
-        dispatch({
-          type: Actions.clearAllLoadingLocal,
-          payload: {},
-        });
-
-        if (serviceState == 'FAILED') {
-          //TODO display toast message
-        }
-      }
-    } catch (err) {
-      console.log(err);
-    } finally {
-      isrefreshPhotosAddingServerRunning.current = false;
     }
   }, []);
 

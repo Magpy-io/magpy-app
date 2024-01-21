@@ -1,6 +1,5 @@
-import { ElementRef, useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
-  Keyboard,
   TextInput as RNTextInput,
   TextInputProps as RNTextInputProps,
   StyleSheet,
@@ -8,11 +7,10 @@ import {
   View,
 } from 'react-native';
 
-import { Icon, Text } from 'react-native-elements';
+import { Icon } from 'react-native-elements';
 
-import { appColors, colors } from '~/styles/colors';
+import { appColors } from '~/styles/colors';
 import { spacing } from '~/styles/spacing';
-import { textSize, typography } from '~/styles/typography';
 
 import FormError from './FormError';
 import PasswordRequirements from './PasswordRequirements';

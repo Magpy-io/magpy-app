@@ -15,7 +15,7 @@ import { spacing } from '~/styles/spacing';
 
 import { useAuthContext } from '../../Context/AuthContext';
 
-const specialChars = /(?=.*[!@#$%^&*()_\-+={}[\]\\|:;'<>,.?\/])/;
+const specialChars = /(?=.*[!@#$%^&*()_\-+={}[\]\\|:;'<>,.?/])/;
 
 const RegisterSchema = Yup.object().shape({
   name: Yup.string().required('No name provided').min(3, 'Should be at least 3 characters'),
@@ -33,7 +33,7 @@ const RegisterSchema = Yup.object().shape({
 });
 
 export default function RegisterForm() {
-  const [showErrors, setShowErrors] = useState(false);
+  const [, setShowErrors] = useState(false);
   const { authenticate } = useAuthContext();
 
   useEffect(() => {
@@ -60,7 +60,9 @@ export default function RegisterForm() {
             password: values.password,
           });
           console.log('login result', loginRet);
-          if (loginRet.ok) authenticate();
+          if (loginRet.ok) {
+            await authenticate();
+          }
         } catch (err) {
           console.log('login Err', err);
         }

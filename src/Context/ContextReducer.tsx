@@ -38,25 +38,31 @@ enum Actions {
 
 type Action = {
   type: Actions;
-  payload?: any;
+  payload?: unknown;
 };
 
 function GlobalReducer(prevState: stateType, action: Action) {
   switch (action.type) {
     case Actions.setNewPhotosLocal: {
+      const payload = action.payload as {
+        newPhotos: { photos: PhotoType[]; endReached: boolean; nextOffset: number };
+      };
       const newState = { ...prevState };
-      newState.nextOffsetLocal = action.payload.newPhotos.nextOffset;
-      newState.endReachedLocal = action.payload.newPhotos.endReached;
-      newState.photosLocal = action.payload.newPhotos.photos;
+      newState.nextOffsetLocal = payload.newPhotos.nextOffset;
+      newState.endReachedLocal = payload.newPhotos.endReached;
+      newState.photosLocal = payload.newPhotos.photos;
 
       return newState;
     }
 
     case Actions.setNewPhotosServer: {
       const newState = { ...prevState };
-      newState.nextOffsetServer = action.payload.newPhotos.nextOffset;
-      newState.endReachedServer = action.payload.newPhotos.endReached;
-      newState.photosServer = action.payload.newPhotos.photos;
+      const payload = action.payload as {
+        newPhotos: { photos: PhotoType[]; endReached: boolean; nextOffset: number };
+      };
+      newState.nextOffsetServer = payload.newPhotos.nextOffset;
+      newState.endReachedServer = payload.newPhotos.endReached;
+      newState.photosServer = payload.newPhotos.photos;
       return newState;
     }
 

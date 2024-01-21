@@ -1,12 +1,13 @@
-import { StyleSheet, View } from 'react-native';
+import React from 'react';
+import { StyleSheet, View, ViewStyle } from 'react-native';
 import { TouchableHighlight } from 'react-native';
 
 import { Icon } from '@rneui/themed';
 
-import colors from '~/colors';
+import { colorsOld as colors } from '~/styles/colors';
 
 type PropsType = {
-  style?: any;
+  style?: ViewStyle;
   onPress?: () => void;
 };
 

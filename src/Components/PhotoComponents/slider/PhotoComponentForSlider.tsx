@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Dimensions, StyleSheet, View } from 'react-native';
+import { Dimensions, StyleSheet } from 'react-native';
 
 import FastImage from 'react-native-fast-image';
 import {
@@ -7,12 +7,7 @@ import {
   GestureDetector,
   TouchableWithoutFeedback,
 } from 'react-native-gesture-handler';
-import Animated, {
-  runOnJS,
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from 'react-native-reanimated';
+import Animated, { runOnJS, useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 
 import { PhotoType } from '~/Helpers/types';
 
@@ -71,7 +66,7 @@ function PhotoComponentForSlider(props: PropsType) {
         position.value = newX;
       }
     })
-    .onEnd(e => {
+    .onEnd(() => {
       positionYLast.value = positionY.value;
       positionLast.value = position.value;
       console.log(positionLast.value, positionYLast.value);

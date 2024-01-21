@@ -1,7 +1,7 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import React, { ReactNode, createContext, useContext, useEffect, useState } from 'react';
 
 import { GetMyServerInfo, Types } from '~/Helpers/BackendQueries';
-import { ClaimServer, GetToken, SetPath } from '~/Helpers/ServerQueries';
+import { ClaimServer, SetPath } from '~/Helpers/ServerQueries';
 import useLocalServers, { Server } from '~/Hooks/useLocalServers';
 
 import { useAuthContext } from './AuthContext';
@@ -17,7 +17,7 @@ type ContextType = {
 
 const ServerClaimContext = createContext<ContextType | undefined>(undefined);
 
-const ServerClaimProvider = ({ children }: { children: any }) => {
+const ServerClaimProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { token } = useAuthContext();
   const [server, setServer] = useState<Types.ServerType>();
   const [hasServer, setHasServer] = useState<boolean>(false);
@@ -39,7 +39,7 @@ const ServerClaimProvider = ({ children }: { children: any }) => {
       }
     }
     if (token) {
-      GetServer();
+      GetServer().catch(console.log);
     }
   }, [token]);
 
@@ -78,7 +78,7 @@ const ServerClaimProvider = ({ children }: { children: any }) => {
 
 function useServerClaimContext() {
   const context = useContext(ServerClaimContext);
-  if (!context) throw Error('useServerClaimContext can only be used inside an ServerProvider');
+  if (!context) {throw Error('useServerClaimContext can only be used inside an ServerProvider');}
   return context;
 }
 

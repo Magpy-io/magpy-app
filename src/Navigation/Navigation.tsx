@@ -106,7 +106,10 @@ const AuthenticatedNavigator = () => {
 const Root = () => {
   const { token, loading } = useAuthContext();
 
-  if (loading) return <SplashScreen />;
+  if (loading) {
+    return <SplashScreen />;
+  }
+
   if (!token) {
     return <LoginStackNavigator />;
   } else {

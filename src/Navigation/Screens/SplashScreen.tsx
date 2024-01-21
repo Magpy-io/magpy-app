@@ -4,7 +4,7 @@ import { StyleSheet } from 'react-native';
 import { Text } from 'react-native-elements';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { appColors, colors } from '~/styles/colors';
+import { colors } from '~/styles/colors';
 import { spacing } from '~/styles/spacing';
 
 export default function SplashScreen() {

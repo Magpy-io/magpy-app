@@ -135,13 +135,11 @@ export default function PhotoSlider({
     });
   };
 
-  const onPressPhoto = () => {
+  const onPressPhoto = async () => {
     if (isFullScreen) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-      MainModule.disableFullScreen();
+      await MainModule.disableFullScreen();
     } else {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-      MainModule.enableFullScreen();
+      await MainModule.enableFullScreen();
     }
     setIsFullScreen(f => !f);
   };
@@ -153,7 +151,9 @@ export default function PhotoSlider({
         startIndex={props.startIndex}
         onIndexChanged={onCurrentIndexChanged}
         //onEndReached={}
-        onPhotoClick={onPressPhoto}
+        onPhotoClick={() => {
+          onPressPhoto().catch(console.log);
+        }}
       />
 
       {validFlatListCurrentIndex && !isFullScreen && (

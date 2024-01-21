@@ -5,15 +5,19 @@ import { Button, Text } from 'react-native-elements';
 
 import { useAuthContext } from '~/Context/AuthContext';
 import { useServerContext } from '~/Context/ServerContext';
-import { TokenManager } from '~/Helpers/BackendQueries';
 
 export default function App() {
   const { logout, user } = useAuthContext();
   const { isServerReachable } = useServerContext();
-  const token = TokenManager.GetUserToken();
+
   return (
     <View style={styles.container}>
-      <Button title="Log out" onPress={logout} />
+      <Button
+        title="Log out"
+        onPress={() => {
+          logout().catch(e => console.log(e));
+        }}
+      />
       <Text>{`User Id : ${user?._id}`}</Text>
       <Text>{user?.email}</Text>
       <Text>{isServerReachable ? 'Server reachable' : 'Unreachable'}</Text>

@@ -1,23 +1,34 @@
-import { PixelRatio, StyleSheet, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, View, ViewStyle } from 'react-native';
 import { TouchableHighlight } from 'react-native';
 
 import { useNavigation } from '@react-navigation/native';
 import { Icon } from '@rneui/themed';
 
 import * as BarHeights from '~/Helpers/BarHeights';
-import colors from '~/colors';
+import { colorsOld as colors } from '~/styles/colors';
 
 type PropsType = {
-  style?: any;
+  style?: ViewStyle;
   onPress?: () => void;
 };
 
 export default function BackButton(props: PropsType) {
+  const [barHeight, setBarHeight] = useState(0);
+
+  useEffect(() => {
+    async function getBarHeight() {
+      setBarHeight(await BarHeights.GetStatusBarHeight());
+    }
+
+    getBarHeight().catch(console.log);
+  });
+
   const navigation = useNavigation();
   return (
     <View
       style={{
-        marginTop: BarHeights.GetStatusBarHeight(),
+        marginTop: barHeight,
       }}>
       <TouchableHighlight
         style={[styles.backButtonStyle, props.style]}

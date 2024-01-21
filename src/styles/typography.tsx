@@ -1,4 +1,4 @@
-import { StyleProp, TextStyle } from 'react-native';
+import { TextStyle } from 'react-native/types';
 
 import { appColors, colors } from './colors';
 
@@ -20,7 +20,11 @@ export const textSize = {
   },
 };
 
-export const typography: any = {
+export const typography: {
+  screenTitle: TextStyle;
+  formError: TextStyle;
+  formInfo: TextStyle;
+} = {
   screenTitle: {
     ...textSize.extraLarge2,
     fontWeight: 'normal',

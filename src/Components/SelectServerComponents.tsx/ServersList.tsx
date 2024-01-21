@@ -3,7 +3,6 @@ import { FlatList, StyleSheet, View } from 'react-native';
 
 import ServerComponent from '~/Components/SelectServerComponents.tsx/ServerComponent';
 import { Server } from '~/Hooks/useLocalServers';
-import { appColors } from '~/styles/colors';
 import { spacing } from '~/styles/spacing';
 
 type ServersListProps = {
@@ -19,7 +18,7 @@ export default function ServersList({
   header,
   onSelectServer,
 }: ServersListProps) {
-  const renderRow = ({ item, index }: { item: Server; index: number }) => {
+  const renderRow = ({ item }: { item: Server; index: number }) => {
     return (
       <ServerComponent
         ip={item.ip}

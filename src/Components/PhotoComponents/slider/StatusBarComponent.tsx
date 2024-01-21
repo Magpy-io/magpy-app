@@ -6,7 +6,7 @@ import * as Progress from 'react-native-progress';
 
 import BackButton from '~/Components/CommonComponents/BackButton';
 import * as BarHeights from '~/Helpers/BarHeights';
-import colors from '~/colors';
+import { colorsOld as colors } from '~/styles/colors';
 
 type StatusBarComponentProps = {
   inDevice: boolean;

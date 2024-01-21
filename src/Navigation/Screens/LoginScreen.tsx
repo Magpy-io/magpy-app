@@ -37,7 +37,7 @@ function LoginFooter() {
           flexDirection: 'row',
           alignItems: 'center',
         }}>
-        <Text style={{ color: appColors.TEXT }}>Don't have an account ? </Text>
+        <Text style={{ color: appColors.TEXT }}>{"Don't have an account ? "}</Text>
         <TouchableOpacity
           onPress={() => {
             navigation.navigate('Register');
