@@ -1,5 +1,5 @@
-import React, { useCallback, useRef, useState } from 'react';
-import { StyleProp, ViewStyle } from 'react-native';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { BackHandler, StyleProp, ViewStyle } from 'react-native';
 
 import { useMainContext } from '~/Context/ContextProvider';
 import { useTabNavigationContext } from '~/Context/TabNavigationContext';
@@ -37,7 +37,21 @@ export default function PhotoGridController({
   const getPhotoIndexRef = useRef<(photo: PhotoType) => number>();
   const [isSelecting, setIsSelecting] = useState(false);
   const [seletedIds, setSelectedIds] = useState<Map<string, PhotoType>>(new Map());
-  const { hideTab } = useTabNavigationContext();
+  const { hideTab, showTab } = useTabNavigationContext();
+
+  useEffect(() => {
+    if (isSelecting) {
+      const backAction = () => {
+        setIsSelecting(false);
+        showTab();
+        return true;
+      };
+
+      const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+
+      return () => backHandler.remove();
+    }
+  }, [isSelecting, showTab]);
 
   getPhotoIndexRef.current = (item: PhotoType) => {
     let index = props.photos.findIndex(photo => photo.id == item.id);
@@ -72,16 +86,20 @@ export default function PhotoGridController({
   const onRenderItemLongPress = useCallback(
     (item: PhotoType) => {
       if (!isSelecting) {
+        hideTab();
         setIsSelecting(true);
         const map = new Map();
         map.set(item.id, item);
         setSelectedIds(map);
       }
     },
-    [isSelecting],
+    [hideTab, isSelecting],
   );
 
-  const onBackButton = useCallback(() => setIsSelecting(false), [setIsSelecting]);
+  const onBackButton = useCallback(() => {
+    setIsSelecting(false);
+    showTab();
+  }, [setIsSelecting, showTab]);
 
   const onSelectAll = useCallback(() => {
     setSelectedIds(ids => {
@@ -119,20 +137,23 @@ export default function PhotoGridController({
 
   const onAddLocal = useCallback(() => {
     setIsSelecting(false);
+    showTab();
     addPhotosLocal?.(Array.from(seletedIds.values())).catch(e =>
       console.log('Error : addPhotosLocal', e),
     );
-  }, [addPhotosLocal, seletedIds]);
+  }, [addPhotosLocal, seletedIds, showTab]);
 
   const onAddServer = useCallback(() => {
     setIsSelecting(false);
+    showTab();
     addPhotosServer?.(Array.from(seletedIds.values())).catch(e =>
       console.log('Error : addPhotosServer', e),
     );
-  }, [addPhotosServer, seletedIds]);
+  }, [addPhotosServer, seletedIds, showTab]);
 
   const onDeleteLocal = useCallback(() => {
     setIsSelecting(false);
+    showTab();
     const photosToDelete = Array.from(seletedIds.values());
     if (contextLocation == 'server') {
       RequestCroppedPhotosServer(photosToDelete).catch(e =>
@@ -142,14 +163,15 @@ export default function PhotoGridController({
     deletePhotosLocal?.(photosToDelete).catch(e =>
       console.log('Error : deletePhotosLocal', e),
     );
-  }, [RequestCroppedPhotosServer, contextLocation, deletePhotosLocal, seletedIds]);
+  }, [RequestCroppedPhotosServer, contextLocation, deletePhotosLocal, seletedIds, showTab]);
 
   const onDeleteServer = useCallback(() => {
     setIsSelecting(false);
+    showTab();
     deletePhotosServer?.(Array.from(seletedIds.values())).catch(e =>
       console.log('Error : deletePhotosServer', e),
     );
-  }, [deletePhotosServer, seletedIds]);
+  }, [deletePhotosServer, seletedIds, showTab]);
 
   return (
     <PhotoGridComponent

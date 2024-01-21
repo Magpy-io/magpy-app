@@ -1,11 +1,12 @@
 import React, { useMemo } from 'react';
-import { StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
 import { Icon } from '@rneui/themed';
 import FastImage from 'react-native-fast-image';
 import * as Progress from 'react-native-progress';
 
 import { PhotoType } from '~/Helpers/types';
+import { appColors } from '~/styles/colors';
 
 type PropsType = {
   photo: PhotoType;
@@ -46,7 +47,8 @@ function PhotoComponentForGrid(props: PropsType) {
   }, [props.onLongPress]);
 
   return (
-    <TouchableWithoutFeedback
+    <TouchableOpacity
+      style={{ flex: 1 }}
       onPress={() => onPress(props.photo)}
       onLongPress={() => onLongPress(props.photo)}>
       <View style={styles.itemStyle}>
@@ -71,7 +73,12 @@ function PhotoComponentForGrid(props: PropsType) {
         {props.isSelecting && (
           <View style={styles.iconViewStyle}>
             {props.isSelected ? (
-              <Icon style={styles.iconStyle} name="check-circle" size={35} color="#39a5f7" />
+              <Icon
+                style={styles.iconStyle}
+                name="check-circle"
+                size={35}
+                color={SELECT_COLOR}
+              />
             ) : (
               <Icon
                 style={styles.iconStyle}
@@ -83,16 +90,17 @@ function PhotoComponentForGrid(props: PropsType) {
           </View>
         )}
       </View>
-    </TouchableWithoutFeedback>
+    </TouchableOpacity>
   );
 }
+
+const SELECT_COLOR = appColors.BACKGROUND;
 
 const styles = StyleSheet.create({
   itemStyle: {
     padding: 1,
     flex: 1,
     aspectRatio: 1,
-    justifyContent: 'center',
   },
   imageStyle: {
     width: '100%',

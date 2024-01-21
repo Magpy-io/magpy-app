@@ -1,5 +1,4 @@
 import React from 'react';
-import { View } from 'react-native';
 
 import { PhotoType } from '~/Helpers/types';
 
@@ -30,7 +29,7 @@ export default function PhotoGridSelectView({
   contextLocation,
 }: PhotoGridSelectViewProps) {
   return (
-    <View>
+    <>
       {isSelecting && (
         <StatusBarGridComponent
           selectedNb={selectedIds.size}
@@ -47,6 +46,6 @@ export default function PhotoGridSelectView({
           onDeleteServer={onDeleteServer}
         />
       )}
-    </View>
+    </>
   );
 }

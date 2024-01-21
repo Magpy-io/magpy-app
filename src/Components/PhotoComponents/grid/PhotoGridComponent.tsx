@@ -81,7 +81,7 @@ export default function PhotoGridComponent({
   // This will also fix that when less than 3 photos are in a row, the 2 or 1 photo will stretch to fill all horizontal space.
 
   return (
-    <SafeAreaView style={[styles.mainViewStyle, style]}>
+    <SafeAreaView edges={['top']} style={[styles.mainViewStyle, style]}>
       <FlatList
         ref={flatlistRef}
         style={styles.flatListStyle}

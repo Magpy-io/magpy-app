@@ -1,9 +1,12 @@
 import React from 'react';
 import { StyleSheet, Text, View, ViewStyle } from 'react-native';
 
+import { SafeAreaView } from 'react-native-safe-area-context';
+
 import CancelButton from '~/Components/CommonComponents/CancelButton';
 import SelectAllButton from '~/Components/CommonComponents/SelectAllButton';
-import * as BarHeights from '~/Helpers/BarHeights';
+import { appColors } from '~/styles/colors';
+import { typography } from '~/styles/typography';
 
 type StatusBarComponentProps = {
   selectedNb: number;
@@ -26,7 +29,7 @@ function selectedElementsToString(n: number) {
 
 function StatusBarGridComponent(props: StatusBarComponentProps) {
   return (
-    <View style={[styles.StatusBarStyle, props.style]}>
+    <SafeAreaView edges={['top']} style={[styles.StatusBarStyle, props.style]}>
       <View style={styles.statusBarCancelButtonStyle}>
         <CancelButton onPress={props.onCancelButton} />
       </View>
@@ -38,28 +41,25 @@ function StatusBarGridComponent(props: StatusBarComponentProps) {
       <View style={styles.statusBarSelectAllButtonStyle}>
         <SelectAllButton onPress={props.onSelectAllButton} />
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   StatusBarStyle: {
-    padding: 5,
     width: '100%',
-    backgroundColor: 'white',
+    backgroundColor: appColors.BACKGROUND,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     position: 'absolute',
     top: 0,
-    marginTop: BarHeights.GetStatusBarHeight(),
+    padding: 10,
   },
   statusBarCancelButtonStyle: {},
   statusBarSelectAllButtonStyle: {},
   textElementsSelectedStyle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: 'black',
+    ...typography.largeText,
   },
 });
 
