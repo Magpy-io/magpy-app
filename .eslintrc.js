@@ -15,7 +15,6 @@ module.exports = {
     'unused-imports/no-unused-vars': 'off',
     curly: ['error', 'all'],
   },
-
   overrides: [
     {
       files: ['*.ts', '*.tsx'],

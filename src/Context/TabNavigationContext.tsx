@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useState } from 'react';
+import { ReactNode, createContext, useCallback, useContext, useState } from 'react';
 import React from 'react';
 
 import { CommonActions, useNavigation } from '@react-navigation/native';
@@ -19,7 +19,7 @@ type ContextType = {
 
 const TabNavigationContext = createContext<ContextType | undefined>(undefined);
 
-const TabNavigationProvider = ({ children }: { children: any }) => {
+const TabNavigationProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const navigation = useNavigation();
   const [focusedTab, setFocusedTab] = useState(TabName.Home);
   const [hidden, setHidden] = useState(false);
@@ -54,7 +54,9 @@ const TabNavigationProvider = ({ children }: { children: any }) => {
 
 function useTabNavigationContext() {
   const context = useContext(TabNavigationContext);
-  if (!context) throw Error('TabNavigationContext can only be used inside an ServerProvider');
+  if (!context) {
+    throw Error('TabNavigationContext can only be used inside an ServerProvider');
+  }
   return context;
 }
 

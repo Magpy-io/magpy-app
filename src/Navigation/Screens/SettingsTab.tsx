@@ -22,7 +22,12 @@ export default function App() {
       <Text>{`User Id : ${user?._id}`}</Text>
       <Text>{user?.email}</Text>
       <Text>{isServerReachable ? 'Server reachable' : 'Unreachable'}</Text>
-      <Button title="Log out" onPress={logout} />
+      <Button
+        title="Log out"
+        onPress={() => {
+          logout().catch(console.log);
+        }}
+      />
     </View>
   );
 }
