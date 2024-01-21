@@ -56,10 +56,10 @@ function GlobalReducer(prevState: stateType, action: Action) {
     }
 
     case Actions.setNewPhotosServer: {
-      const newState = { ...prevState };
       const payload = action.payload as {
         newPhotos: { photos: PhotoType[]; endReached: boolean; nextOffset: number };
       };
+      const newState = { ...prevState };
       newState.nextOffsetServer = payload.newPhotos.nextOffset;
       newState.endReachedServer = payload.newPhotos.endReached;
       newState.photosServer = payload.newPhotos.photos;
@@ -67,30 +67,39 @@ function GlobalReducer(prevState: stateType, action: Action) {
     }
 
     case Actions.addToPhotosLocal: {
+      const payload = action.payload as {
+        newPhotos: { photos: PhotoType[]; endReached: boolean; nextOffset: number };
+      };
       const newState = { ...prevState };
-      newState.nextOffsetLocal = action.payload.newPhotos.nextOffset;
-      newState.endReachedLocal = action.payload.newPhotos.endReached;
-      newState.photosLocal = [...prevState.photosLocal, ...action.payload.newPhotos.photos];
+      newState.nextOffsetLocal = payload.newPhotos.nextOffset;
+      newState.endReachedLocal = payload.newPhotos.endReached;
+      newState.photosLocal = [...prevState.photosLocal, ...payload.newPhotos.photos];
       return newState;
     }
 
     case Actions.addToPhotosServer: {
+      const payload = action.payload as {
+        newPhotos: { photos: PhotoType[]; endReached: boolean; nextOffset: number };
+      };
       const newState = { ...prevState };
-      newState.nextOffsetServer = action.payload.newPhotos.nextOffset;
-      newState.endReachedServer = action.payload.newPhotos.endReached;
-      newState.photosServer = [...prevState.photosServer, ...action.payload.newPhotos.photos];
+      newState.nextOffsetServer = payload.newPhotos.nextOffset;
+      newState.endReachedServer = payload.newPhotos.endReached;
+      newState.photosServer = [...prevState.photosServer, ...payload.newPhotos.photos];
       return newState;
     }
 
     case Actions.addFullPhotoById: {
+      const payload = action.payload as {
+        photo: PhotoType;
+      };
       const newState = { ...prevState };
       const newPhotosServer = [...newState.photosServer];
       const findCorrespondingPhotoIndex = newPhotosServer.findIndex(
-        photo => photo.id == action.payload.photo.id,
+        photo => photo.id == payload.photo.id,
       );
       if (findCorrespondingPhotoIndex >= 0) {
         const newPhoto = { ...newPhotosServer[findCorrespondingPhotoIndex] };
-        newPhoto.image.pathCache = action.payload.photo.image.pathCache;
+        newPhoto.image.pathCache = payload.photo.image.pathCache;
         newPhotosServer[findCorrespondingPhotoIndex] = newPhoto;
         newState.photosServer = newPhotosServer;
         return newState;
@@ -100,10 +109,13 @@ function GlobalReducer(prevState: stateType, action: Action) {
     }
 
     case Actions.addPhotoLocal: {
+      const payload = action.payload as {
+        photo: PhotoType;
+      };
       const newState = { ...prevState };
       const newPhotosServer = [...newState.photosServer];
       const findCorrespondingPhoto = newPhotosServer.find(
-        photo => photo.id == action.payload.photo.id,
+        photo => photo.id == payload.photo.id,
       );
       if (findCorrespondingPhoto) {
         findCorrespondingPhoto.inDevice = true;
@@ -115,10 +127,13 @@ function GlobalReducer(prevState: stateType, action: Action) {
     }
 
     case Actions.addPhotoServer: {
+      const payload = action.payload as {
+        photo: PhotoType;
+      };
       const newState = { ...prevState };
       const newPhotosLocal = [...newState.photosLocal];
       const findCorrespondingPhotoIndex = newPhotosLocal.findIndex(
-        photo => photo.id == action.payload.photo.id,
+        photo => photo.id == payload.photo.id,
       );
       if (findCorrespondingPhotoIndex >= 0) {
         newPhotosLocal.splice(findCorrespondingPhotoIndex, 1);
@@ -130,9 +145,11 @@ function GlobalReducer(prevState: stateType, action: Action) {
     }
 
     case Actions.deletePhotosLocalFromLocal: {
+      const payload = action.payload as {
+        photos: PhotoType[];
+      };
       const newState = { ...prevState };
-
-      const ids: string[] = action.payload.photos.map((photo: PhotoType) => photo.id);
+      const ids: string[] = payload.photos.map((photo: PhotoType) => photo.id);
 
       newState.photosLocal = newState.photosLocal.filter(photo => !ids.includes(photo.id));
 
@@ -140,11 +157,13 @@ function GlobalReducer(prevState: stateType, action: Action) {
     }
 
     case Actions.deletePhotosLocalFromServer: {
+      const payload = action.payload as {
+        photos: PhotoType[];
+      };
       const newState = { ...prevState };
-
       const newPhotosServer = [...newState.photosServer];
 
-      const ids: string[] = action.payload.photos.map((photo: PhotoType) => photo.id);
+      const ids: string[] = payload.photos.map((photo: PhotoType) => photo.id);
 
       ids.forEach(id => {
         const photo = newPhotosServer.find(v => v.id == id);
@@ -158,25 +177,32 @@ function GlobalReducer(prevState: stateType, action: Action) {
     }
 
     case Actions.deletePhotosServer: {
+      const payload = action.payload as {
+        ids: string[];
+      };
       const newState = { ...prevState };
-
       newState.photosServer = newState.photosServer.filter(
-        photo => !action.payload.ids.includes(photo.id),
+        photo => !payload.ids.includes(photo.id),
       );
 
       return newState;
     }
 
     case Actions.updatePhotoProgress: {
+      const payload = action.payload as {
+        photo: PhotoType;
+        isLoading: boolean;
+        p: number;
+      };
       const newState = { ...prevState };
       const newPhotosLocal = [...newState.photosLocal];
       const findCorrespondingPhotoIndex = newPhotosLocal.findIndex(
-        photo => photo.id == action.payload.photo.id,
+        photo => photo.id == payload.photo.id,
       );
       if (findCorrespondingPhotoIndex >= 0) {
         const newPhoto = { ...newPhotosLocal[findCorrespondingPhotoIndex] };
-        newPhoto.isLoading = action.payload.isLoading;
-        newPhoto.loadingPercentage = action.payload.p;
+        newPhoto.isLoading = payload.isLoading;
+        newPhoto.loadingPercentage = payload.p;
         newPhotosLocal[findCorrespondingPhotoIndex] = newPhoto;
         newState.photosLocal = newPhotosLocal;
         return newState;
@@ -186,10 +212,12 @@ function GlobalReducer(prevState: stateType, action: Action) {
     }
 
     case Actions.addCroppedPhotos: {
+      const payload = action.payload as {
+        images64: { id: string; image64: string }[];
+      };
       const newState = { ...prevState };
-
       const newPhotosServer = [...newState.photosServer];
-      action.payload.images64.forEach((requestPhoto: any) => {
+      payload.images64.forEach(requestPhoto => {
         const index = newPhotosServer.findIndex(v => v.id == requestPhoto.id);
 
         if (index >= 0) {
@@ -204,15 +232,20 @@ function GlobalReducer(prevState: stateType, action: Action) {
     }
 
     case Actions.updatePhotoProgressServer: {
+      const payload = action.payload as {
+        photo: PhotoType;
+        isLoading: boolean;
+        p: number;
+      };
       const newState = { ...prevState };
       const newPhotosServer = [...newState.photosServer];
       const findCorrespondingPhotoIndex = newPhotosServer.findIndex(
-        photo => photo.id == action.payload.photo.id,
+        photo => photo.id == payload.photo.id,
       );
       if (findCorrespondingPhotoIndex >= 0) {
         const newPhoto = { ...newPhotosServer[findCorrespondingPhotoIndex] };
-        newPhoto.isLoading = action.payload.isLoading;
-        newPhoto.loadingPercentage = action.payload.p;
+        newPhoto.isLoading = payload.isLoading;
+        newPhoto.loadingPercentage = payload.p;
         newPhotosServer[findCorrespondingPhotoIndex] = newPhoto;
         newState.photosServer = newPhotosServer;
         return newState;
@@ -222,10 +255,14 @@ function GlobalReducer(prevState: stateType, action: Action) {
     }
 
     case Actions.updatePhotosFromService: {
+      const payload = action.payload as {
+        ids: string[];
+        currentIndex: number;
+      };
       const newState = { ...prevState };
       const newPhotosLocal = [...newState.photosLocal];
-      const ids = action.payload.ids;
-      const currentIndex = action.payload.currentIndex;
+      const ids = payload.ids;
+      const currentIndex = payload.currentIndex;
       const idsSliced = ids.slice(0, currentIndex);
 
       const newPhotosLocalFiltered = newPhotosLocal.filter(photo => {
