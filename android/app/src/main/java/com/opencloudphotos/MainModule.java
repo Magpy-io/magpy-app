@@ -137,8 +137,11 @@ public class MainModule extends ReactContextBaseJavaModule{
                     datetime_original = date.getTime();
                 }
 
-            } catch (IOException | ParseException e) {
+            } catch (Exception e) {
                 Log.e("Tag", e.getMessage());
+                if(source.exists()) {
+                    datetime_original = source.lastModified();
+                }
             }
 
             mediaDetails.clear();
@@ -148,7 +151,7 @@ public class MainModule extends ReactContextBaseJavaModule{
             }
             resolver.update(mediaContentUri, mediaDetails, null, null);
             mPromise.resolve(getRestoredMediaAbsolutePathPrivate() + File.separator + name);
-        } catch (IOException e) {
+        } catch (Exception e) {
             mPromise.reject(e);
         } finally {
             if (input != null) {
