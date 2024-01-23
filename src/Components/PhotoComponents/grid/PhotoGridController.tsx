@@ -1,7 +1,7 @@
 import React, { useCallback, useRef, useState } from 'react';
 import { StyleProp, ViewStyle } from 'react-native';
 
-import { usePhotosFunctions } from '~/Context/PhotosContextHooks';
+import { usePhotosFunctions } from '~/Context/PhotosContext/usePhotos';
 import { useTabNavigationContext } from '~/Context/TabNavigationContext';
 import { useBackgroundService } from '~/Context/useBackgroundService';
 import { usePhotosDownloading } from '~/Context/usePhotosDownloading';

@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Text } from 'react-native';
 
 import PhotoGallery from '~/Components/PhotoGallery';
-import { useMainContext } from '~/Context/ContextProvider';
+import { useMainContext } from '~/Context/MainContextProvider';
 import * as AndroidPermissions from '~/Helpers/GetPermissionsAndroid';
 
 function photosNbToString(n: number) {
@@ -38,7 +38,7 @@ export default function PhotoGalleryLocalScreen() {
       {hasPermissions ? (
         <PhotoGallery
           style={{}}
-          photos={context.photosState.photosLocal}
+          photos={context.photosData.photosState.photosLocal}
           key={'gallery_local'}
           contextLocation={'local'}
           gridHeaderTextFunction={photosNbToString}

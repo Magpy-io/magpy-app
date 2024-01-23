@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useReducer } from 'react';
 
 import { ErrorCodes } from 'react-native-delete-media';
 
@@ -11,14 +11,32 @@ import { GetMorePhotosLocal, GetMorePhotosServer } from '~/Helpers/GetMorePhotos
 import { DeletePhotosById, GetPhotosById } from '~/Helpers/ServerQueries';
 import { PhotoType } from '~/Helpers/types';
 
-import { useMainContext } from './ContextProvider';
-import { Actions } from './ContextReducer';
+import { useMainContext } from '../MainContextProvider';
+import {
+  Action,
+  Actions,
+  GlobalReducer,
+  PhotosStateType,
+  initialState,
+} from './PhotosReducer';
 
 const ITEMS_TO_LOAD_PER_END_REACHED_LOCAL = 3000;
 const ITEMS_TO_LOAD_PER_END_REACHED_SERVER = 3000;
 
+export type PhotosDataType = {
+  photosState: PhotosStateType;
+  photosDispatch: React.Dispatch<Action>;
+};
+
+export function usePhotosData(): PhotosDataType {
+  const [photosState, photosDispatch] = useReducer(GlobalReducer, initialState);
+
+  return { photosState, photosDispatch };
+}
+
 export function usePhotosFunctions() {
-  const { photosDispatch, photosState } = useMainContext();
+  const { photosData } = useMainContext();
+  const { photosDispatch, photosState } = photosData;
 
   const RefreshPhotosLocal = useCallback(async () => {
     try {

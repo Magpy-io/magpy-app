@@ -1,18 +1,12 @@
-import React, { ReactNode, createContext, useContext, useReducer } from 'react';
+import React, { ReactNode, createContext, useContext } from 'react';
 
-import {
-  Action,
-  GlobalReducer,
-  PhotosStateType,
-  initialState,
-} from '~/Context/ContextReducer';
-
+import MainContextEffects from './MainContextEffects';
+import { PhotosDataType, usePhotosData } from './PhotosContext/usePhotos';
 import { BackgroundServiceDataType, useBackgroundServiceData } from './useBackgroundService';
 import { PhotosDownloadingDataType, usePhotosDownloadingData } from './usePhotosDownloading';
 
 export type PhotosContextType = {
-  photosState: PhotosStateType;
-  photosDispatch: React.Dispatch<Action>;
+  photosData: PhotosDataType;
   backgroundServiceData: BackgroundServiceDataType;
   photosDownloadingData: PhotosDownloadingDataType;
 };
@@ -23,22 +17,22 @@ type PropsType = {
   children: ReactNode;
 };
 
-const ContextProvider = (props: PropsType) => {
-  const [state, dispatch] = useReducer(GlobalReducer, initialState);
-
+const ContextProvider: React.FC<PropsType> = props => {
+  const photosData = usePhotosData();
   const backgroundServiceData = useBackgroundServiceData();
-  //useBackgroundServiceEffects();
-
   const photosDownloadingData = usePhotosDownloadingData();
 
   const value = {
-    photosState: state,
-    photosDispatch: dispatch,
+    photosData,
     backgroundServiceData,
     photosDownloadingData,
   };
 
-  return <AppContext.Provider value={value}>{props.children}</AppContext.Provider>;
+  return (
+    <AppContext.Provider value={value}>
+      <MainContextEffects>{props.children}</MainContextEffects>
+    </AppContext.Provider>
+  );
 };
 
 function useMainContext() {

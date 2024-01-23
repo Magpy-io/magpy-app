@@ -1,83 +1,38 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 import { NativeEventEmitter, NativeModules } from 'react-native';
 
-import { Actions } from '~/Context/ContextReducer';
 import { PhotoType } from '~/Helpers/types';
 
-import { useMainContext } from './ContextProvider';
+import { useMainContext } from './MainContextProvider';
+import { Actions } from './PhotosContext/PhotosReducer';
 
 const { MainModule } = NativeModules;
 
 const intervalTimer = 5000;
 
 export type BackgroundServiceDataType = {
-  isrefreshPhotosAddingServerRunning: React.MutableRefObject<boolean>;
-  intervalIdForRefreshPhotosAddingServer: React.MutableRefObject<
-    ReturnType<typeof setInterval> | undefined
-  >;
+  refreshPhotosAddingServerIsRunning: React.MutableRefObject<boolean>;
 };
 
 export function useBackgroundServiceData(): BackgroundServiceDataType {
-  const isrefreshPhotosAddingServerRunning = useRef(false);
-  const intervalIdForRefreshPhotosAddingServer = useRef<ReturnType<typeof setInterval>>();
+  const refreshPhotosAddingServerIsRunning = useRef(false);
 
-  return { isrefreshPhotosAddingServerRunning, intervalIdForRefreshPhotosAddingServer };
+  return { refreshPhotosAddingServerIsRunning };
 }
 
 export function useBackgroundServiceEffects() {
-  const { backgroundServiceData } = useMainContext();
-  const { intervalIdForRefreshPhotosAddingServer } = backgroundServiceData;
-
-  const { refreshPhotosAddingServer } = useBackgroundService();
-
-  const intervalFunction = useCallback(() => {
-    refreshPhotosAddingServer?.().catch(console.log);
-  }, [refreshPhotosAddingServer]);
-
-  useEffect(() => {
-    intervalIdForRefreshPhotosAddingServer.current = setInterval(
-      intervalFunction,
-      intervalTimer,
-    );
-
-    return () => {
-      clearInterval(intervalIdForRefreshPhotosAddingServer.current);
-    };
-  }, [intervalFunction, intervalIdForRefreshPhotosAddingServer]);
-
-  useEffect(() => {
-    const emitter = new NativeEventEmitter();
-    const subscription = emitter.addListener('PhotoUploaded', () => {
-      console.log('event');
-      refreshPhotosAddingServer?.().catch(console.log);
-
-      if (intervalIdForRefreshPhotosAddingServer.current != null) {
-        clearInterval(intervalIdForRefreshPhotosAddingServer.current);
-        intervalIdForRefreshPhotosAddingServer.current = setInterval(
-          intervalFunction,
-          intervalTimer,
-        );
-      }
-    });
-
-    return () => {
-      subscription.remove();
-    };
-  }, [intervalFunction, intervalIdForRefreshPhotosAddingServer, refreshPhotosAddingServer]);
-}
-
-export function useBackgroundService() {
-  const { backgroundServiceData, photosDispatch } = useMainContext();
-
-  const { isrefreshPhotosAddingServerRunning } = backgroundServiceData;
+  const { backgroundServiceData, photosData } = useMainContext();
+  const { photosDispatch } = photosData;
+  const { refreshPhotosAddingServerIsRunning } = backgroundServiceData;
 
   const refreshPhotosAddingServer = useCallback(async () => {
     try {
-      if (isrefreshPhotosAddingServerRunning.current) {
+      if (refreshPhotosAddingServerIsRunning.current) {
+        // already refreshing
         return;
       }
 
-      isrefreshPhotosAddingServerRunning.current = true;
+      refreshPhotosAddingServerIsRunning.current = true;
 
       const serviceState = await MainModule.getServiceState();
 
@@ -107,10 +62,33 @@ export function useBackgroundService() {
     } catch (err) {
       console.log(err);
     } finally {
-      isrefreshPhotosAddingServerRunning.current = false;
+      refreshPhotosAddingServerIsRunning.current = false;
     }
-  }, [isrefreshPhotosAddingServerRunning, photosDispatch]);
+  }, [refreshPhotosAddingServerIsRunning, photosDispatch]);
 
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      refreshPhotosAddingServer().catch(console.log);
+    }, intervalTimer);
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [refreshPhotosAddingServer]);
+
+  useEffect(() => {
+    const emitter = new NativeEventEmitter();
+    const subscription = emitter.addListener('PhotoUploaded', () => {
+      refreshPhotosAddingServer?.().catch(console.log);
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, [refreshPhotosAddingServer]);
+}
+
+export function useBackgroundService() {
   const SendPhotoToBackgroundServiceForUpload = useCallback(async (photos: PhotoType[]) => {
     try {
       await MainModule.startSendingMediaService(
@@ -131,5 +109,5 @@ export function useBackgroundService() {
     }
   }, []);
 
-  return { refreshPhotosAddingServer, SendPhotoToBackgroundServiceForUpload };
+  return { SendPhotoToBackgroundServiceForUpload };
 }

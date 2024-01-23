@@ -78,7 +78,9 @@ const ServerClaimProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
 function useServerClaimContext() {
   const context = useContext(ServerClaimContext);
-  if (!context) {throw Error('useServerClaimContext can only be used inside an ServerProvider');}
+  if (!context) {
+    throw Error('useServerClaimContext can only be used inside an ServerProvider');
+  }
   return context;
 }
 

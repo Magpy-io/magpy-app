@@ -158,7 +158,9 @@ const ServerProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
 function useServerContext() {
   const context = useContext(ServerContext);
-  if (!context) {throw Error('useServerContext can only be used inside an AuthProvider');}
+  if (!context) {
+    throw Error('useServerContext can only be used inside an AuthProvider');
+  }
   return context;
 }
 
