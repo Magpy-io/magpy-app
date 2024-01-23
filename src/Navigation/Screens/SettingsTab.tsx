@@ -1,26 +1,26 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
 
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
 import { Button, Text } from 'react-native-elements';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useAuthContext } from '~/Context/AuthContext';
 import { useServerContext } from '~/Context/ServerContext';
 
-import { ParentStackParamList } from '../NavigationParams';
+import { useMainNavigation } from '../Navigation';
 
 export default function App() {
   const { logout, user } = useAuthContext();
   const { isServerReachable } = useServerContext();
-  const navigation = useNavigation<StackNavigationProp<ParentStackParamList>>();
+  const navigation = useMainNavigation();
 
   return (
     <SafeAreaView style={styles.container}>
       <Button
         title="Account Settings"
-        onPress={() => navigation.navigate('SettingsStackNavigator', { screen: 'dsf' })}
+        onPress={() =>
+          navigation.navigate('SettingsStackNavigator', { screen: 'ServerSettings' })
+        }
       />
       <Text>{`User Id : ${user?._id}`}</Text>
       <Text>{user?.email}</Text>

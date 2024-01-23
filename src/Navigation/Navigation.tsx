@@ -1,9 +1,10 @@
 import React from 'react';
 import { View } from 'react-native';
 
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import type { NavigatorScreenParams } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 import { useAuthContext } from '~/Context/AuthContext';
 import { useServerClaimContext } from '~/Context/ServerClaimContext';
@@ -121,5 +122,9 @@ export type RootStackParamList = {
 export type LocalStackParamList = {
   LocalPage: undefined;
 };
+
+export function useMainNavigation() {
+  return useNavigation<StackNavigationProp<ParentStackParamList>>();
+}
 
 export default Navigation;

@@ -1,4 +1,4 @@
-import { StackNavigationProp } from '@react-navigation/stack';
+import { NavigatorScreenParams } from '@react-navigation/native';
 
 import { TabName } from '~/Context/TabNavigationContext';
 
@@ -20,6 +20,6 @@ export type TabStackParamList = {
 };
 
 export type ParentStackParamList = {
-  Tabs: StackNavigationProp<TabStackParamList>;
-  SettingsStackNavigator: StackNavigationProp<SettingsStackParamList>;
+  Tabs: NavigatorScreenParams<TabStackParamList>;
+  SettingsStackNavigator: NavigatorScreenParams<SettingsStackParamList>;
 };
