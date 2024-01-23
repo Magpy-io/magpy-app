@@ -14,7 +14,12 @@ import PhotoGalleryServerScreen from '~/Navigation/Screens/PhotoGalleryServerScr
 import ServerSelectScreen from '~/Navigation/Screens/ServerSelectScreen';
 import SettingsTab from '~/Navigation/Screens/SettingsTab';
 
-import { LoginStackParamList } from './NavigationParams';
+import {
+  LoginStackParamList,
+  ParentStackParamList,
+  SettingsStackParamList,
+  TabStackParamList,
+} from './NavigationParams';
 import AccountSettingsScreen from './Screens/AccountSettingsScreen';
 import RegisterScreen from './Screens/RegisterScreen';
 import SplashScreen from './Screens/SplashScreen';
@@ -33,7 +38,7 @@ function LoginStackNavigator() {
   );
 }
 
-const SettingsStack = createNativeStackNavigator();
+const SettingsStack = createNativeStackNavigator<SettingsStackParamList>();
 function SettingsStackNavigator() {
   return (
     <SettingsStack.Navigator
@@ -42,12 +47,11 @@ function SettingsStackNavigator() {
       }}>
       <SettingsStack.Screen name="AccountSettings" component={AccountSettingsScreen} />
       <SettingsStack.Screen name="ServerSettings" component={AccountSettingsScreen} />
-      <SettingsStack.Screen name="Preferences" component={AccountSettingsScreen} />
     </SettingsStack.Navigator>
   );
 }
 
-const TabStack = createNativeStackNavigator();
+const TabStack = createNativeStackNavigator<TabStackParamList>();
 function TabStackNavigator() {
   return (
     <View style={{ flex: 1 }}>
@@ -64,7 +68,7 @@ function TabStackNavigator() {
   );
 }
 
-const ParentStack = createNativeStackNavigator();
+const ParentStack = createNativeStackNavigator<ParentStackParamList>();
 function ParentStackNavigator() {
   return (
     <ParentStack.Navigator

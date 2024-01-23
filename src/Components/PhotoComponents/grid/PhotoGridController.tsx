@@ -143,7 +143,7 @@ export default function PhotoGridController({
     AddPhotosLocal?.(Array.from(seletedIds.values())).catch(e =>
       console.log('Error : addPhotosLocal', e),
     );
-  }, [addPhotosLocal, seletedIds, showTab]);
+  }, [AddPhotosLocal, seletedIds, showTab]);
 
   const onAddServer = useCallback(() => {
     setIsSelecting(false);
@@ -151,7 +151,7 @@ export default function PhotoGridController({
     SendPhotoToBackgroundServiceForUpload?.(Array.from(seletedIds.values())).catch(e =>
       console.log('Error : addPhotosServer', e),
     );
-  }, [addPhotosServer, seletedIds, showTab]);
+  }, [SendPhotoToBackgroundServiceForUpload, seletedIds, showTab]);
 
   const onDeleteLocal = useCallback(() => {
     setIsSelecting(false);
@@ -165,7 +165,7 @@ export default function PhotoGridController({
     DeletePhotosLocal?.(photosToDelete).catch(e =>
       console.log('Error : deletePhotosLocal', e),
     );
-  }, [RequestCroppedPhotosServer, contextLocation, deletePhotosLocal, seletedIds, showTab]);
+  }, [DeletePhotosLocal, RequestThumbnailPhotosServer, contextLocation, seletedIds, showTab]);
 
   const onDeleteServer = useCallback(() => {
     setIsSelecting(false);
@@ -173,7 +173,7 @@ export default function PhotoGridController({
     DeletePhotosServer?.(Array.from(seletedIds.values())).catch(e =>
       console.log('Error : deletePhotosServer', e),
     );
-  }, [deletePhotosServer, seletedIds, showTab]);
+  }, [DeletePhotosServer, seletedIds, showTab]);
 
   return (
     <PhotoGridComponent
