@@ -51,7 +51,7 @@ async function getFirstPossibleFileName(imageName: string) {
   return currentPathSplit.pop() as string;
 }
 
-async function addPhoto(photo: PhotoType, image64: string) {
+async function addPhotoToDevice(photo: PhotoType, image64: string) {
   const extention = photo.image.fileName.split('.').pop();
   const cachePhotoPath =
     RNFS.ExternalCachesDirectoryPath + `/temp_full_image_${photo.id}.${extention}`;
@@ -64,7 +64,7 @@ async function addPhoto(photo: PhotoType, image64: string) {
   return 'file://' + path;
 }
 
-async function RemovePhotos(uris: Array<string | undefined>) {
+async function DeletePhotosFromDevice(uris: Array<string | undefined>) {
   const urisThatExist = [];
   for (let i = 0; i < uris.length; i++) {
     const uri = uris[i];
@@ -97,4 +97,4 @@ async function clearCache() {
   }
 }
 
-export { GetPhotos, RemovePhotos, addPhoto, clearCache, addPhotoToCache };
+export { GetPhotos, DeletePhotosFromDevice, addPhotoToDevice, clearCache, addPhotoToCache };
