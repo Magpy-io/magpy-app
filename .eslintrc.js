@@ -36,4 +36,5 @@ module.exports = {
       version: 'detect',
     },
   },
+  parser: '@babel/eslint-parser',
 };
