@@ -1,22 +1,32 @@
-import React, { ReactNode, createContext, useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { clearAll, getStoredToken, storeToken } from '~/Helpers/AsyncStorage';
 import { TokenManager, Types, WhoAmI } from '~/Helpers/BackendQueries';
 
-type ContextType = {
-  authenticate: () => Promise<void>;
+import { useMainContext } from './MainContextProvider';
+
+type SetStateType<T> = React.Dispatch<React.SetStateAction<T>>;
+
+export type AuthDataType = {
+  user: Types.UserType | null;
+  setUser: SetStateType<Types.UserType | null>;
   loading: boolean;
+  setLoading: SetStateType<boolean>;
   token: string | null;
-  logout: () => Promise<void>;
-  user?: Types.UserType | null;
+  setToken: SetStateType<string | null>;
 };
 
-const AuthContext = createContext<ContextType | undefined>(undefined);
-
-const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<Types.UserType | null>();
+export function useAuthData(): AuthDataType {
+  const [user, setUser] = useState<Types.UserType | null>(null);
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState<string | null>(null);
+
+  return { user, setUser, loading, setLoading, token, setToken };
+}
+
+export function useAuthDataEffect() {
+  const { auth } = useMainContext();
+  const { setUser, setToken, setLoading } = auth;
 
   useEffect(() => {
     async function retrieveToken() {
@@ -38,7 +48,12 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     }
 
     retrieveToken().catch(console.log);
-  }, []);
+  }, [setLoading, setToken, setUser]);
+}
+
+export function useAuth() {
+  const { auth } = useMainContext();
+  const { setUser, setToken } = auth;
 
   const authenticate = async function () {
     const token = TokenManager.GetUserToken();
@@ -59,20 +74,5 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     TokenManager.SetUserToken('');
   };
 
-  const value = {
-    authenticate: authenticate,
-    user: user,
-    token: token,
-    loading: loading,
-    logout: logout,
-  };
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-};
-
-function useAuthContext() {
-  const context = useContext(AuthContext);
-  if (!context) {throw Error('useAuthContext can only be used inside an AuthProvider');}
-  return context;
+  return { authenticate, logout };
 }
-
-export { AuthProvider, useAuthContext };

@@ -4,13 +4,31 @@ import Zeroconf from 'react-native-zeroconf';
 
 import { serverMdnsPrefix } from '~/Config/config';
 
+import { useMainContext } from './MainContextProvider';
+
 const zeroconf = new Zeroconf();
+
+type SetStateType<T> = React.Dispatch<React.SetStateAction<T>>;
+
+export type LocalServersDataType = {
+  localServers: Server[];
+  setLocalServers: SetStateType<Server[]>;
+  isScanning: boolean;
+  setIsScanning: SetStateType<boolean>;
+};
 
 export type Server = { name: string; ip: string; port: string };
 
-export default function useLocalServers() {
+export function useLocalServersData(): LocalServersDataType {
   const [localServers, setLocalServers] = useState<Server[]>([]);
   const [isScanning, setIsScanning] = useState(false);
+
+  return { localServers, setLocalServers, isScanning, setIsScanning };
+}
+
+export function useLocalServersEffect() {
+  const { localServers } = useMainContext();
+  const { setIsScanning, setLocalServers } = localServers;
 
   useEffect(() => {
     zeroconf.on('start', () => {
@@ -40,7 +58,12 @@ export default function useLocalServers() {
     return () => {
       zeroconf.removeDeviceListeners();
     };
-  }, []);
+  }, [setIsScanning, setLocalServers]);
+}
+
+export function useLocalServers() {
+  const { localServers } = useMainContext();
+  const { isScanning, setLocalServers } = localServers;
 
   const refreshData = () => {
     if (isScanning) {
@@ -58,8 +81,6 @@ export default function useLocalServers() {
   };
 
   return {
-    localServers,
-    isScanning,
     refreshData,
     stopSearch,
   };

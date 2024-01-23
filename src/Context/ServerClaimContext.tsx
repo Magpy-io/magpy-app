@@ -1,28 +1,30 @@
-import React, { ReactNode, createContext, useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { GetMyServerInfo, Types } from '~/Helpers/BackendQueries';
 import { ClaimServer, SetPath } from '~/Helpers/ServerQueries';
-import useLocalServers, { Server } from '~/Hooks/useLocalServers';
 
-import { useAuthContext } from './AuthContext';
+import { useMainContext } from './MainContextProvider';
 
-type ContextType = {
-  server?: Types.ServerType;
+type SetStateType<T> = React.Dispatch<React.SetStateAction<T>>;
+
+export type ServerClaimDataType = {
+  server: Types.ServerType | null;
+  setServer: SetStateType<Types.ServerType | null>;
   hasServer: boolean;
-  claimServer: (path: string) => Promise<void>;
-  localServers: Server[];
-  isScanning: boolean;
-  refreshData: () => void;
+  setHasServer: SetStateType<boolean>;
 };
 
-const ServerClaimContext = createContext<ContextType | undefined>(undefined);
-
-const ServerClaimProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const { token } = useAuthContext();
-  const [server, setServer] = useState<Types.ServerType>();
+export function useServerClaimData(): ServerClaimDataType {
+  const [server, setServer] = useState<Types.ServerType | null>(null);
   const [hasServer, setHasServer] = useState<boolean>(false);
 
-  const { localServers, isScanning, refreshData } = useLocalServers();
+  return { server, setServer, hasServer, setHasServer };
+}
+
+export function useServerClaimEffects() {
+  const { serverClaim, auth } = useMainContext();
+  const { setServer, setHasServer } = serverClaim;
+  const { token } = auth;
 
   useEffect(() => {
     async function GetServer() {
@@ -41,9 +43,15 @@ const ServerClaimProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     if (token) {
       GetServer().catch(console.log);
     }
-  }, [token]);
+  }, [setHasServer, setServer, token]);
+}
 
-  async function claimServer(path: string) {
+export function useServerClaim() {
+  const { serverClaim, auth } = useMainContext();
+  const { setServer, setHasServer } = serverClaim;
+  const { token } = auth;
+
+  const claimServer = async (path: string) => {
     if (!token) {
       return;
     }
@@ -63,25 +71,7 @@ const ServerClaimProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     } catch (err) {
       console.log('Claim Server Error', err);
     }
-  }
-
-  const value = {
-    hasServer: hasServer,
-    server: server,
-    claimServer: claimServer,
-    localServers: localServers,
-    isScanning: isScanning,
-    refreshData: refreshData,
   };
-  return <ServerClaimContext.Provider value={value}>{children}</ServerClaimContext.Provider>;
-};
 
-function useServerClaimContext() {
-  const context = useContext(ServerClaimContext);
-  if (!context) {
-    throw Error('useServerClaimContext can only be used inside an ServerProvider');
-  }
-  return context;
+  return { claimServer };
 }
-
-export { ServerClaimProvider, useServerClaimContext };

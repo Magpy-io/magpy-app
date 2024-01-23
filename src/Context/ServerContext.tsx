@@ -1,56 +1,51 @@
-import React, { ReactNode, createContext, useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { getAddressInfo, storeAddressInfo } from '~/Helpers/AsyncStorage';
 import { GetToken, SetPath } from '~/Helpers/ServerQueries';
 import { Server } from '~/Hooks/useLocalServers';
 
-import { useAuthContext } from './AuthContext';
-import { useServerClaimContext } from './ServerClaimContext';
+import { useMainContext } from './MainContextProvider';
 
-type ContextType = {
+type SetStateType<T> = React.Dispatch<React.SetStateAction<T>>;
+
+export type ServerDataType = {
   isServerReachable: boolean;
+  setIsServerReachable: SetStateType<boolean>;
+  serverNetwork: ServerNetworkType;
+  setServerNetwork: SetStateType<ServerNetworkType>;
+};
+
+export type ServerNetworkType = {
   ipLocal: string | null;
   ipPublic: string | null;
   port: string | null;
 };
 
-const ServerContext = createContext<ContextType | undefined>(undefined);
-
-async function TryServerAddress(ip: string, port: string, token: string) {
-  console.log('Trying address :', ip, port);
-  try {
-    SetPath(`http://${ip}:${port}`);
-    const res = await GetToken.Post({ userToken: token });
-    if (res.ok) {
-      console.log("Bingo, it's: ", ip, port);
-      return res.data;
-    }
-  } catch (e) {
-    console.log('Error: TryServerAddress', e);
-  }
+export function useServerData(): ServerDataType {
+  const [isServerReachable, setIsServerReachable] = useState(false);
+  const [serverNetwork, setServerNetwork] = useState<ServerNetworkType>({
+    ipLocal: null,
+    ipPublic: null,
+    port: null,
+  });
+  return { isServerReachable, setIsServerReachable, serverNetwork, setServerNetwork };
 }
 
-const ServerProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const { token } = useAuthContext();
-  const [isServerReachable, setIsServerReachable] = useState(false);
-  const [ipLocal, setIpLocal] = useState<string | null>(null);
-  const [ipPublic, setIpPublic] = useState<string | null>(null);
-  const [port, setPort] = useState<string | null>(null);
-  const { server, localServers, isScanning } = useServerClaimContext();
-
-  console.log('ServerContext');
+export function useServerEffect() {
+  const { server, auth } = useMainContext();
+  const { setServerNetwork, serverNetwork, setIsServerReachable, isServerReachable } = server;
+  const { ipLocal, ipPublic, port } = serverNetwork;
+  const { token } = auth;
 
   useEffect(() => {
     async function core() {
       const res = await getAddressInfo();
       if (res) {
-        setIpLocal(res.ipLocal);
-        setIpPublic(res.ipPublic);
-        setPort(res.port);
+        setServerNetwork({ ipLocal: res.ipLocal, ipPublic: res.ipPublic, port: res.port });
       }
     }
     core().catch(console.log);
-  }, []);
+  }, [setServerNetwork]);
 
   useEffect(() => {
     async function FindServerAddressFromAsyncStorage(token: string) {
@@ -66,7 +61,7 @@ const ServerProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     if (!isServerReachable && !!token) {
       FindServerAddressFromAsyncStorage(token).catch(console.log);
     }
-  }, [isServerReachable, token, ipLocal, port]);
+  }, [isServerReachable, token, ipLocal, port, setIsServerReachable]);
 
   useEffect(() => {
     async function FindServerAddressFromBackend(token: string) {
@@ -75,8 +70,12 @@ const ServerProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         console.log('Trying address from server');
         const res = await TryServerAddress(server.ipPrivate, server.port, token);
         if (res) {
-          setIpLocal(server.ipPrivate);
-          setPort(server.port);
+          setServerNetwork({
+            ipLocal: server.ipPrivate,
+            ipPublic: ipPublic,
+            port: server.port,
+          });
+
           await storeAddressInfo({ ipLocal: server.ipPrivate, port: server.port });
           setIsServerReachable(true);
         }
@@ -85,7 +84,7 @@ const ServerProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     if (!isServerReachable && !!token) {
       FindServerAddressFromBackend(token).catch(console.log);
     }
-  }, [server, isServerReachable, token]);
+  }, [server, isServerReachable, token, setServerNetwork, ipPublic, setIsServerReachable]);
 
   useEffect(() => {
     async function FindServerAddressFromLocalServers(token: string) {
@@ -146,22 +145,18 @@ const ServerProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   //     FindServerPublicAddress();
   //   }
   // }, [isServerReachable, token, server]);
-
-  const value = {
-    ipLocal: ipLocal,
-    ipPublic: ipPublic,
-    isServerReachable: isServerReachable,
-    port: port,
-  };
-  return <ServerContext.Provider value={value}>{children}</ServerContext.Provider>;
-};
-
-function useServerContext() {
-  const context = useContext(ServerContext);
-  if (!context) {
-    throw Error('useServerContext can only be used inside an AuthProvider');
-  }
-  return context;
 }
 
-export { ServerProvider, useServerContext };
+async function TryServerAddress(ip: string, port: string, token: string) {
+  console.log('Trying address :', ip, port);
+  try {
+    SetPath(`http://${ip}:${port}`);
+    const res = await GetToken.Post({ userToken: token });
+    if (res.ok) {
+      console.log("Bingo, it's: ", ip, port);
+      return res.data;
+    }
+  } catch (e) {
+    console.log('Error: TryServerAddress', e);
+  }
+}
