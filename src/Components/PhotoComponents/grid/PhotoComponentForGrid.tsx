@@ -1,130 +1,57 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
-import { Icon } from '@rneui/themed';
-import FastImage from 'react-native-fast-image';
-import * as Progress from 'react-native-progress';
-
 import { PhotoType } from '~/Helpers/types';
-import { appColors } from '~/styles/colors';
+
+import ImageForGrid from './ImageForGrid';
+import SelectionIconForGrid from './SelectionIconForGrid';
 
 type PropsType = {
   photo: PhotoType;
   isSelecting: boolean;
   isSelected: boolean;
-  onPress?: (item: PhotoType) => void;
-  onLongPress?: (item: PhotoType) => void;
+  onPress: (item: PhotoType) => void;
+  onLongPress: (item: PhotoType) => void;
 };
 
 function PhotoComponentForGrid(props: PropsType) {
-  //console.log("render photo for grid", props.photo.id);
+  const { photo, isSelecting, isSelected, onPress, onLongPress } = props;
+  // console.log('Render PhotoComponentForGrid');
+
   const uriSource = useMemo(() => {
-    if (props.photo.inDevice) {
-      return props.photo.image.path;
+    if (photo.inDevice) {
+      return photo.image.path;
     } else {
-      if (props.photo.image.pathCache) {
-        return props.photo.image.pathCache;
+      if (photo.image.pathCache) {
+        return photo.image.pathCache;
       } else {
-        return props.photo.image.image64;
+        return photo.image.image64;
       }
     }
-  }, [props.photo]);
+  }, [photo]);
 
-  const onPress = useMemo(() => {
-    if (props.onPress) {
-      return props.onPress;
-    } else {
-      return () => {};
-    }
-  }, [props.onPress]);
-
-  const onLongPress = useMemo(() => {
-    if (props.onLongPress) {
-      return props.onLongPress;
-    } else {
-      return () => {};
-    }
-  }, [props.onLongPress]);
+  const onPressPhoto = useCallback(() => onPress(photo), [onPress, photo]);
+  const onLongPressPhoto = useCallback(() => onLongPress(photo), [onLongPress, photo]);
 
   return (
     <TouchableOpacity
       style={{ flex: 1 }}
-      onPress={() => onPress(props.photo)}
-      onLongPress={() => onLongPress(props.photo)}>
+      onPress={onPressPhoto}
+      onLongPress={onLongPressPhoto}>
       <View style={styles.itemStyle}>
-        <FastImage
-          source={{ uri: uriSource }}
-          resizeMode={FastImage.resizeMode.cover}
-          style={styles.imageStyle}
-        />
-        {props.photo.isLoading && (
-          <View style={styles.pieViewStyle}>
-            <Progress.Circle
-              style={styles.pieStyle}
-              progress={props.photo.loadingPercentage}
-              size={60}
-              borderColor={'#000000a0'}
-              color={'#000000a0'}
-              thickness={8}
-              indeterminate={props.photo.loadingPercentage == 0}
-            />
-          </View>
-        )}
-        {props.isSelecting && (
-          <View style={styles.iconViewStyle}>
-            {props.isSelected ? (
-              <Icon
-                style={styles.iconStyle}
-                name="check-circle"
-                size={35}
-                color={SELECT_COLOR}
-              />
-            ) : (
-              <Icon
-                style={styles.iconStyle}
-                name="radio-button-unchecked"
-                size={35}
-                color="white"
-              />
-            )}
-          </View>
-        )}
+        <ImageForGrid uri={uriSource} />
+        {isSelecting && <SelectionIconForGrid isSelected={isSelected} />}
       </View>
     </TouchableOpacity>
   );
 }
 
-const SELECT_COLOR = appColors.BACKGROUND;
-
 const styles = StyleSheet.create({
   itemStyle: {
     padding: 1,
-    flex: 1,
     aspectRatio: 1,
+    flex: 1,
   },
-  imageStyle: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 0,
-    position: 'absolute',
-  },
-  pieViewStyle: {
-    width: '100%',
-    height: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#ffffff50',
-    position: 'absolute',
-  },
-  pieStyle: {},
-  iconViewStyle: {
-    width: '100%',
-    height: '100%',
-    alignItems: 'flex-end',
-    justifyContent: 'flex-end',
-    position: 'absolute',
-  },
-  iconStyle: { margin: 5 },
 });
 
 export default React.memo(PhotoComponentForGrid);

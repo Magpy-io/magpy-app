@@ -59,6 +59,8 @@ export default function PhotoGridComponent({
 }: PhotoGridComponentProps) {
   const flatlistRef = useRef<FlatList>(null);
 
+  console.log('Render PhotoGridComponent');
+
   const renderItem = useCallback(
     ({ item }: { item: PhotoType }) => {
       return (
