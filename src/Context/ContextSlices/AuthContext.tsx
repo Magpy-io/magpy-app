@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 
-import { clearAll, getStoredToken, storeToken } from '~/Helpers/AsyncStorage';
+import { getStoredToken } from '~/Helpers/AsyncStorage';
 import { TokenManager, Types, WhoAmI } from '~/Helpers/BackendQueries';
 
-import { useMainContext } from './MainContextProvider';
+import { useMainContext } from '../MainContextProvider';
 
 type SetStateType<T> = React.Dispatch<React.SetStateAction<T>>;
 
@@ -25,8 +25,8 @@ export function useAuthData(): AuthDataType {
 }
 
 export function useAuthDataEffect() {
-  const { auth } = useMainContext();
-  const { setUser, setToken, setLoading } = auth;
+  const { authData } = useMainContext();
+  const { setUser, setToken, setLoading } = authData;
 
   useEffect(() => {
     async function retrieveToken() {
@@ -49,30 +49,4 @@ export function useAuthDataEffect() {
 
     retrieveToken().catch(console.log);
   }, [setLoading, setToken, setUser]);
-}
-
-export function useAuth() {
-  const { auth } = useMainContext();
-  const { setUser, setToken } = auth;
-
-  const authenticate = async function () {
-    const token = TokenManager.GetUserToken();
-    console.log('Authenticate, getToken', token);
-    const ret = await WhoAmI.Post();
-    console.log('Authenticate, whoAmI', ret);
-    if (ret.ok) {
-      await storeToken(token);
-      setToken(token);
-      setUser(ret.data.user);
-    }
-  };
-
-  const logout = async function () {
-    setUser(null);
-    setToken(null);
-    await clearAll();
-    TokenManager.SetUserToken('');
-  };
-
-  return { authenticate, logout };
 }

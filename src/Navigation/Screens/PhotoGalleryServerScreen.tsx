@@ -1,7 +1,7 @@
 import React from 'react';
 
 import PhotoGallery from '~/Components/PhotoGallery';
-import { useMainContext } from '~/Context/MainContextProvider';
+import { usePhotosContext } from '~/Context/UseContexts/usePhotosContext';
 
 function photosNbToString(n: number) {
   if (!n) {
@@ -15,11 +15,11 @@ function photosNbToString(n: number) {
 
 export default function PhotoGalleryScreen() {
   console.log('render screen server');
-  const context = useMainContext();
+  const { photosState } = usePhotosContext();
 
   return (
     <PhotoGallery
-      photos={context.photosData.photosState.photosServer}
+      photos={photosState.photosServer}
       key={'gallery_server'}
       contextLocation={'server'}
       gridHeaderTextFunction={photosNbToString}

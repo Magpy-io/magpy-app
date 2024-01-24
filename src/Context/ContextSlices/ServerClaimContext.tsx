@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
 
 import { GetMyServerInfo, Types } from '~/Helpers/BackendQueries';
-import { ClaimServer, SetPath } from '~/Helpers/ServerQueries';
 
-import { useMainContext } from './MainContextProvider';
+import { useMainContext } from '../MainContextProvider';
 
 type SetStateType<T> = React.Dispatch<React.SetStateAction<T>>;
 
@@ -22,9 +21,9 @@ export function useServerClaimData(): ServerClaimDataType {
 }
 
 export function useServerClaimEffects() {
-  const { serverClaim, auth } = useMainContext();
-  const { setServer, setHasServer } = serverClaim;
-  const { token } = auth;
+  const { serverClaimData, authData } = useMainContext();
+  const { setServer, setHasServer } = serverClaimData;
+  const { token } = authData;
 
   useEffect(() => {
     async function GetServer() {
@@ -44,34 +43,4 @@ export function useServerClaimEffects() {
       GetServer().catch(console.log);
     }
   }, [setHasServer, setServer, token]);
-}
-
-export function useServerClaim() {
-  const { serverClaim, auth } = useMainContext();
-  const { setServer, setHasServer } = serverClaim;
-  const { token } = auth;
-
-  const claimServer = async (path: string) => {
-    if (!token) {
-      return;
-    }
-
-    SetPath(path);
-    try {
-      const ret = await ClaimServer.Post({ userToken: token });
-      console.log('Claim Server ret with token', token, ret);
-      if (ret.ok) {
-        const serverInfo = await GetMyServerInfo.Post();
-        console.log('Server Info', serverInfo);
-        if (serverInfo.ok) {
-          setServer(serverInfo.data.server);
-          setHasServer(true);
-        }
-      }
-    } catch (err) {
-      console.log('Claim Server Error', err);
-    }
-  };
-
-  return { claimServer };
 }

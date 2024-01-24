@@ -9,11 +9,10 @@ import { PrimaryButtonExtraWide } from '~/Components/CommonComponents/Buttons';
 import ViewWithGap from '~/Components/CommonComponents/ViewWithGap';
 import { PasswordInput } from '~/Components/LoginComponents/PasswordInput';
 import TextInput from '~/Components/LoginComponents/TextInput';
+import { useAuthFunctions } from '~/Context/UseContexts/useAuthContext';
 import { Login, Register } from '~/Helpers/BackendQueries';
 import { ErrorBackendUnreachable } from '~/Helpers/BackendQueries/ExceptionsManager';
 import { spacing } from '~/styles/spacing';
-
-import { useAuthContext } from '../../Context/AuthContext';
 
 const specialChars = /(?=.*[!@#$%^&*()_\-+={}[\]\\|:;'<>,.?/])/;
 
@@ -34,7 +33,7 @@ const RegisterSchema = Yup.object().shape({
 
 export default function RegisterForm() {
   const [, setShowErrors] = useState(false);
-  const { authenticate } = useAuthContext();
+  const { authenticate } = useAuthFunctions();
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {

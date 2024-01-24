@@ -4,7 +4,7 @@ import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Icon, Text } from 'react-native-elements';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { TabName, useTabNavigationContext } from '~/Context/TabNavigationContext';
+import { TabName, useTabNavigationContext } from '~/Navigation/TabNavigationContext';
 import { appColors, colors } from '~/styles/colors';
 
 type IconType = { name: string; type: string };

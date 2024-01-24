@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { BackHandler, StyleProp, ViewStyle } from 'react-native';
 
-import { usePhotosFunctions } from '~/Context/PhotosContext/usePhotos';
-import { useTabNavigationContext } from '~/Context/TabNavigationContext';
-import { useBackgroundService } from '~/Context/useBackgroundService';
-import { usePhotosDownloading } from '~/Context/usePhotosDownloading';
+import { useBackgroundServiceFunctions } from '~/Context/UseContexts/useBackgroundServiceContext';
+import { usePhotosFunctions } from '~/Context/UseContexts/usePhotosContext';
+import { usePhotosDownloadingFunctions } from '~/Context/UseContexts/usePhotosDownloadingContext';
 import { PhotoType } from '~/Helpers/types';
+import { useTabNavigationContext } from '~/Navigation/TabNavigationContext';
 
 import PhotoGridComponent from './PhotoGridComponent';
 
@@ -33,8 +33,8 @@ export default function PhotoGridController({
     RequestThumbnailPhotosServer,
   } = usePhotosFunctions();
 
-  const { SendPhotoToBackgroundServiceForUpload } = useBackgroundService();
-  const { AddPhotosLocal } = usePhotosDownloading();
+  const { SendPhotoToBackgroundServiceForUpload } = useBackgroundServiceFunctions();
+  const { AddPhotosLocal } = usePhotosDownloadingFunctions();
 
   const getPhotoIndexRef = useRef<(photo: PhotoType) => number>();
   const [isSelecting, setIsSelecting] = useState(false);

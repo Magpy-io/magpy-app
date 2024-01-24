@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 
+import { Server } from '~/Context/ContextSlices/LocalServersContext';
 import { getAddressInfo, storeAddressInfo } from '~/Helpers/AsyncStorage';
 import { GetToken, SetPath } from '~/Helpers/ServerQueries';
-import { Server } from '~/Hooks/useLocalServers';
 
-import { useMainContext } from './MainContextProvider';
+import { useMainContext } from '../MainContextProvider';
 
 type SetStateType<T> = React.Dispatch<React.SetStateAction<T>>;
 
@@ -32,10 +32,15 @@ export function useServerData(): ServerDataType {
 }
 
 export function useServerEffect() {
-  const { server, auth } = useMainContext();
-  const { setServerNetwork, serverNetwork, setIsServerReachable, isServerReachable } = server;
+  const mainContext = useMainContext();
+
+  const { setServerNetwork, serverNetwork, setIsServerReachable, isServerReachable } =
+    mainContext.serverData;
+  const { token } = mainContext.authData;
+
   const { ipLocal, ipPublic, port } = serverNetwork;
-  const { token } = auth;
+  const claimedServer = mainContext.serverClaimData.server;
+  const { isScanning, localServers } = mainContext.localServersData;
 
   useEffect(() => {
     async function core() {
@@ -66,17 +71,20 @@ export function useServerEffect() {
   useEffect(() => {
     async function FindServerAddressFromBackend(token: string) {
       // I try the local Ip given by backend
-      if (server) {
+      if (claimedServer) {
         console.log('Trying address from server');
-        const res = await TryServerAddress(server.ipPrivate, server.port, token);
+        const res = await TryServerAddress(claimedServer.ipPrivate, claimedServer.port, token);
         if (res) {
           setServerNetwork({
-            ipLocal: server.ipPrivate,
+            ipLocal: claimedServer.ipPrivate,
             ipPublic: ipPublic,
-            port: server.port,
+            port: claimedServer.port,
           });
 
-          await storeAddressInfo({ ipLocal: server.ipPrivate, port: server.port });
+          await storeAddressInfo({
+            ipLocal: claimedServer.ipPrivate,
+            port: claimedServer.port,
+          });
           setIsServerReachable(true);
         }
       }
@@ -84,7 +92,14 @@ export function useServerEffect() {
     if (!isServerReachable && !!token) {
       FindServerAddressFromBackend(token).catch(console.log);
     }
-  }, [server, isServerReachable, token, setServerNetwork, ipPublic, setIsServerReachable]);
+  }, [
+    isServerReachable,
+    token,
+    setServerNetwork,
+    ipPublic,
+    setIsServerReachable,
+    claimedServer,
+  ]);
 
   useEffect(() => {
     async function FindServerAddressFromLocalServers(token: string) {
@@ -98,8 +113,11 @@ export function useServerEffect() {
       }
       const myPotentialServer = results.filter(r => !!r.result)?.[0];
       if (myPotentialServer) {
-        setIpLocal(myPotentialServer.server.ip);
-        setPort(myPotentialServer.server.port);
+        setServerNetwork({
+          ipLocal: myPotentialServer.server.ip,
+          ipPublic: ipPublic,
+          port: myPotentialServer.server.port,
+        });
         await storeAddressInfo({
           ipLocal: myPotentialServer.server.ip,
           port: myPotentialServer.server.port,
@@ -111,7 +129,15 @@ export function useServerEffect() {
     if (!isServerReachable && !!token && !isScanning) {
       FindServerAddressFromLocalServers(token).catch(console.log);
     }
-  }, [isServerReachable, token, isScanning, localServers]);
+  }, [
+    isServerReachable,
+    token,
+    isScanning,
+    localServers,
+    setServerNetwork,
+    ipPublic,
+    setIsServerReachable,
+  ]);
 
   // TODO : make sure this only happens after we tried to find the local ip address
   // useEffect(() => {

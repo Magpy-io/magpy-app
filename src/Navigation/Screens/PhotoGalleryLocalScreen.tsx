@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Text } from 'react-native';
 
 import PhotoGallery from '~/Components/PhotoGallery';
-import { useMainContext } from '~/Context/MainContextProvider';
+import { usePhotosContext } from '~/Context/UseContexts/usePhotosContext';
 import * as AndroidPermissions from '~/Helpers/GetPermissionsAndroid';
 
 function photosNbToString(n: number) {
@@ -18,7 +18,7 @@ function photosNbToString(n: number) {
 export default function PhotoGalleryLocalScreen() {
   console.log('render screen local');
   const [hasPermissions, setHasPermissions] = useState<boolean>(true);
-  const context = useMainContext();
+  const { photosState } = usePhotosContext();
 
   const getPermissions = useCallback(async () => {
     const hasPerm = await AndroidPermissions.hasAndroidPermissionWriteExternalStorage();
@@ -38,7 +38,7 @@ export default function PhotoGalleryLocalScreen() {
       {hasPermissions ? (
         <PhotoGallery
           style={{}}
-          photos={context.photosData.photosState.photosLocal}
+          photos={photosState.photosLocal}
           key={'gallery_local'}
           contextLocation={'local'}
           gridHeaderTextFunction={photosNbToString}

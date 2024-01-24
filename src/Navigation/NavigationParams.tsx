@@ -1,6 +1,6 @@
 import { NavigatorScreenParams } from '@react-navigation/native';
 
-import { TabName } from '~/Context/TabNavigationContext';
+import { TabName } from '~/Navigation/TabNavigationContext';
 
 export type LoginStackParamList = {
   Login: undefined;

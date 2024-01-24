@@ -4,9 +4,9 @@ import Zeroconf from 'react-native-zeroconf';
 
 import { serverMdnsPrefix } from '~/Config/config';
 
-import { useMainContext } from './MainContextProvider';
+import { useMainContext } from '../MainContextProvider';
 
-const zeroconf = new Zeroconf();
+export const zeroconf = new Zeroconf();
 
 type SetStateType<T> = React.Dispatch<React.SetStateAction<T>>;
 
@@ -27,8 +27,8 @@ export function useLocalServersData(): LocalServersDataType {
 }
 
 export function useLocalServersEffect() {
-  const { localServers } = useMainContext();
-  const { setIsScanning, setLocalServers } = localServers;
+  const { localServersData } = useMainContext();
+  const { setIsScanning, setLocalServers } = localServersData;
 
   useEffect(() => {
     zeroconf.on('start', () => {
@@ -59,29 +59,4 @@ export function useLocalServersEffect() {
       zeroconf.removeDeviceListeners();
     };
   }, [setIsScanning, setLocalServers]);
-}
-
-export function useLocalServers() {
-  const { localServers } = useMainContext();
-  const { isScanning, setLocalServers } = localServers;
-
-  const refreshData = () => {
-    if (isScanning) {
-      zeroconf.stop();
-    }
-    setLocalServers([]);
-    zeroconf.scan('http', 'tcp', 'local.');
-    setTimeout(() => {
-      zeroconf.stop();
-    }, 5000);
-  };
-
-  const stopSearch = () => {
-    zeroconf.stop();
-  };
-
-  return {
-    refreshData,
-    stopSearch,
-  };
 }

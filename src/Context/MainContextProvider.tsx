@@ -1,21 +1,30 @@
 import React, { ReactNode, createContext, useContext } from 'react';
 
-import { AuthDataType, useAuthData } from './AuthContext';
-import { LocalServersDataType, useLocalServersData } from './LocalServersContext';
-import { PhotosDataType, usePhotosData } from './PhotosContext/usePhotos';
-import { ServerClaimDataType, useServerClaimData } from './ServerClaimContext';
-import { ServerDataType, useServerData } from './ServerContext';
-import { BackgroundServiceDataType, useBackgroundServiceData } from './useBackgroundService';
-import { PhotosDownloadingDataType, usePhotosDownloadingData } from './usePhotosDownloading';
+import { AuthDataType, useAuthData } from './ContextSlices/AuthContext';
+import {
+  BackgroundServiceDataType,
+  useBackgroundServiceData,
+} from './ContextSlices/BackgroundServiceContext';
+import {
+  LocalServersDataType,
+  useLocalServersData,
+} from './ContextSlices/LocalServersContext';
+import { PhotosDataType, usePhotosData } from './ContextSlices/PhotosContext/PhotosContext';
+import {
+  PhotosDownloadingDataType,
+  usePhotosDownloadingData,
+} from './ContextSlices/PhotosDownloadingContext';
+import { ServerClaimDataType, useServerClaimData } from './ContextSlices/ServerClaimContext';
+import { ServerDataType, useServerData } from './ContextSlices/ServerContext';
 
 export type PhotosContextType = {
   photosData: PhotosDataType;
   backgroundServiceData: BackgroundServiceDataType;
   photosDownloadingData: PhotosDownloadingDataType;
-  serverClaim: ServerClaimDataType;
-  auth: AuthDataType;
-  server: ServerDataType;
-  localServers: LocalServersDataType;
+  serverClaimData: ServerClaimDataType;
+  authData: AuthDataType;
+  serverData: ServerDataType;
+  localServersData: LocalServersDataType;
 };
 
 const AppContext = createContext<PhotosContextType | undefined>(undefined);
@@ -28,19 +37,19 @@ const ContextProvider: React.FC<PropsType> = props => {
   const photosData = usePhotosData();
   const backgroundServiceData = useBackgroundServiceData();
   const photosDownloadingData = usePhotosDownloadingData();
-  const serverClaim = useServerClaimData();
-  const auth = useAuthData();
-  const server = useServerData();
-  const localServers = useLocalServersData();
+  const serverClaimData = useServerClaimData();
+  const authData = useAuthData();
+  const serverData = useServerData();
+  const localServersData = useLocalServersData();
 
   const value = {
     photosData,
     backgroundServiceData,
     photosDownloadingData,
-    serverClaim,
-    auth,
-    server,
-    localServers,
+    serverClaimData,
+    authData,
+    serverData,
+    localServersData,
   };
 
   return <AppContext.Provider value={value}>{props.children}</AppContext.Provider>;
