@@ -1,11 +1,12 @@
 import React from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { Button, Text } from 'react-native-elements';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useAuthContext, useAuthFunctions } from '~/Context/UseContexts/useAuthContext';
 import { useServerContext } from '~/Context/UseContexts/useServerContext';
+import { appColors } from '~/styles/colors';
 
 import { useMainNavigation } from '../../Navigation';
 
@@ -15,8 +16,9 @@ export default function SettingsScreenTab() {
   const { isServerReachable } = useServerContext();
   const navigation = useMainNavigation();
 
+  const insets = useSafeAreaInsets();
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
       <Button
         title="Account Settings"
         onPress={() =>
@@ -32,13 +34,13 @@ export default function SettingsScreenTab() {
           logout().catch(console.log);
         }}
       />
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    backgroundColor: appColors.BACKGROUND,
   },
 });

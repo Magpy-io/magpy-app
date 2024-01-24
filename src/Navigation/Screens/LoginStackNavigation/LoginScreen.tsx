@@ -4,7 +4,7 @@ import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Text } from 'react-native-elements';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import KeyboardDismissingView from '~/Components/CommonComponents/KeyboardDismissingView';
 import ScreenTitle from '~/Components/CommonComponents/ScreenTitle';
@@ -16,14 +16,16 @@ import { spacing } from '~/styles/spacing';
 import { LoginStackParamList } from '../../Navigators/LoginStackNavigator';
 
 export default function LoginScreen() {
+  const insets = useSafeAreaInsets();
+
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
       <KeyboardDismissingView>
         <ScreenTitle title="Login to your account" />
         <LoginForm />
       </KeyboardDismissingView>
       <LoginFooter />
-    </SafeAreaView>
+    </View>
   );
 }
 

@@ -3,7 +3,7 @@ import { StyleSheet, View, ViewStyle } from 'react-native';
 
 import { Icon } from '@rneui/themed';
 import { Text } from 'react-native-elements';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import BackButton from '~/Components/CommonComponents/BackButton';
 import { appColors } from '~/styles/colors';
@@ -25,9 +25,10 @@ function StatusBarComponent(props: StatusBarComponentProps) {
 
   const deviceStatusIcon = props.inDevice ? 'mobile-friendly' : 'phonelink-erase';
   const serverStatusIcon = props.inServer ? 'cloud-done-outline' : 'cloud-offline-outline';
+  const insets = useSafeAreaInsets();
 
   return (
-    <SafeAreaView edges={['top']} style={[styles.StatusBarStyle, props.style]}>
+    <View style={[styles.StatusBarStyle, props.style, { paddingTop: insets.top }]}>
       <View style={styles.BackButtonTitleView}>
         <BackButton onPress={props.onBackButton} />
         <Text style={styles.title}>{props.title}</Text>
@@ -45,7 +46,7 @@ function StatusBarComponent(props: StatusBarComponentProps) {
           valid={props.inDevice}
         />
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 

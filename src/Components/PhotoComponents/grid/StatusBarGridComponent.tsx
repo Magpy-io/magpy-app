@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View, ViewStyle } from 'react-native';
 
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import CancelButton from '~/Components/CommonComponents/CancelButton';
 import SelectAllButton from '~/Components/CommonComponents/SelectAllButton';
@@ -28,8 +28,9 @@ function selectedElementsToString(n: number) {
 }
 
 function StatusBarGridComponent(props: StatusBarComponentProps) {
+  const insets = useSafeAreaInsets();
   return (
-    <SafeAreaView edges={['top']} style={[styles.StatusBarStyle, props.style]}>
+    <View style={[styles.StatusBarStyle, props.style, { paddingTop: insets.top }]}>
       <View style={styles.statusBarCancelButtonStyle}>
         <CancelButton onPress={props.onCancelButton} />
       </View>
@@ -41,7 +42,7 @@ function StatusBarGridComponent(props: StatusBarComponentProps) {
       <View style={styles.statusBarSelectAllButtonStyle}>
         <SelectAllButton onPress={props.onSelectAllButton} />
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
