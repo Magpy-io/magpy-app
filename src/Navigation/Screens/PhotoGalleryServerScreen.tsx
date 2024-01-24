@@ -1,6 +1,6 @@
 import React from 'react';
 
-import PhotoGallery from '~/Components/PhotoGallery';
+import PhotoGallery from '~/Components/PhotoComponents/PhotoGallery';
 import { usePhotosContext } from '~/Context/UseContexts/usePhotosContext';
 
 function photosNbToString(n: number) {

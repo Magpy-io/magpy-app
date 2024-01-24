@@ -3,7 +3,7 @@ import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import ServersList from '~/Components/SelectServerComponents.tsx/ServersList';
+import ServersList from '~/Components/SelectServerComponents/ServersList';
 import { Server } from '~/Context/ContextSlices/LocalServersContext';
 import { useServerClaimFunctions } from '~/Context/UseContexts/useClaimServerContext';
 import {

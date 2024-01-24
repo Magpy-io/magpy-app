@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Text } from 'react-native';
 
-import PhotoGallery from '~/Components/PhotoGallery';
+import PhotoGallery from '~/Components/PhotoComponents/PhotoGallery';
 import { usePhotosContext } from '~/Context/UseContexts/usePhotosContext';
 import * as AndroidPermissions from '~/Helpers/GetPermissionsAndroid';
 

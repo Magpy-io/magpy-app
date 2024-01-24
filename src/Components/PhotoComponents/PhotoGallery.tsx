@@ -3,8 +3,8 @@ import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 
 import { PhotoType } from '~/Helpers/types';
 
-import PhotoGridController from './PhotoComponents/grid/PhotoGridController';
-import PhotoSlider from './PhotoComponents/slider/PhotoSliderController';
+import PhotoGridController from './grid/PhotoGridController';
+import PhotoSlider from './slider/PhotoSliderController';
 
 type PhotoGalleryPropsType = {
   style?: StyleProp<ViewStyle>;
