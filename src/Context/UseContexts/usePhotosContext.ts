@@ -18,7 +18,7 @@ const ITEMS_TO_LOAD_PER_END_REACHED_SERVER = 3000;
 
 export function usePhotosFunctions() {
   const { photosData } = useMainContext();
-  const { photosDispatch, photosState } = photosData;
+  const { photosDispatch } = photosData;
 
   const RefreshPhotosLocal = useCallback(async () => {
     try {
@@ -45,46 +45,6 @@ export function usePhotosFunctions() {
       console.log(err);
     }
   }, [photosDispatch]);
-
-  const FetchMoreLocal = useCallback(async () => {
-    try {
-      if (photosState.endReachedLocal) {
-        return;
-      }
-
-      const newPhotos = await GetMorePhotosLocal(
-        ITEMS_TO_LOAD_PER_END_REACHED_LOCAL,
-        photosState.nextOffsetLocal,
-      );
-
-      photosDispatch({
-        type: Actions.addToPhotosLocal,
-        payload: { newPhotos: newPhotos },
-      });
-    } catch (err) {
-      console.log(err);
-    }
-  }, [photosState.endReachedLocal, photosState.nextOffsetLocal, photosDispatch]);
-
-  const FetchMoreServer = useCallback(async () => {
-    try {
-      if (photosState.endReachedServer) {
-        return;
-      }
-
-      const newPhotos = await GetMorePhotosServer(
-        ITEMS_TO_LOAD_PER_END_REACHED_SERVER,
-        photosState.nextOffsetServer,
-      );
-
-      photosDispatch({
-        type: Actions.addToPhotosServer,
-        payload: { newPhotos: newPhotos },
-      });
-    } catch (err) {
-      console.log(err);
-    }
-  }, [photosState.endReachedServer, photosState.nextOffsetServer, photosDispatch]);
 
   const RequestCompressedPhotoServer = useCallback(
     async (photo: PhotoType) => {
@@ -218,8 +178,6 @@ export function usePhotosFunctions() {
   return {
     RefreshPhotosLocal,
     RefreshPhotosServer,
-    FetchMoreLocal,
-    FetchMoreServer,
     RequestCompressedPhotoServer,
     RequestThumbnailPhotosServer,
     DeletePhotosLocal,

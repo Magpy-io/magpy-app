@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useRef } from 'react';
 import { NativeEventEmitter, NativeModules } from 'react-native';
 
 import { useMainContext } from '../MainContextProvider';
-import { Actions } from './PhotosContext/PhotosReducer';
 
 const { MainModule } = NativeModules;
 
@@ -19,8 +18,8 @@ export function useBackgroundServiceData(): BackgroundServiceDataType {
 }
 
 export function useBackgroundServiceEffects() {
-  const { backgroundServiceData, photosData } = useMainContext();
-  const { photosDispatch } = photosData;
+  const { backgroundServiceData } = useMainContext();
+
   const { refreshPhotosAddingServerIsRunning } = backgroundServiceData;
 
   const refreshPhotosAddingServer = useCallback(async () => {
@@ -38,20 +37,11 @@ export function useBackgroundServiceEffects() {
         return;
       }
 
-      const ids = await MainModule.getIds();
-      const currentIndex = await MainModule.getCurrentIndex();
-
-      photosDispatch({
-        type: Actions.updatePhotosFromService,
-        payload: { ids, currentIndex },
-      });
+      //const ids = await MainModule.getIds();
+      //const currentIndex = await MainModule.getCurrentIndex();
 
       if (serviceState == 'INACTIVE' || serviceState == 'FAILED') {
         await MainModule.stopSendingMediaService();
-        photosDispatch({
-          type: Actions.clearAllLoadingLocal,
-          payload: {},
-        });
 
         if (serviceState == 'FAILED') {
           //TODO display toast message
@@ -62,7 +52,7 @@ export function useBackgroundServiceEffects() {
     } finally {
       refreshPhotosAddingServerIsRunning.current = false;
     }
-  }, [refreshPhotosAddingServerIsRunning, photosDispatch]);
+  }, [refreshPhotosAddingServerIsRunning]);
 
   useEffect(() => {
     const intervalId = setInterval(() => {

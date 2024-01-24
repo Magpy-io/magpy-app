@@ -15,12 +15,10 @@ export function usePhotosDownloadingFunctions() {
 
   const AddSinglePhotoLocal = useCallback(
     async (photo: PhotoType) => {
-      const result = await Queries.getPhotoWithProgress(photo.id, (p: number, t: number) => {
-        photosDispatch({
-          type: Actions.updatePhotoProgressServer,
-          payload: { photo: photo, isLoading: true, p: (p + 1) / t },
-        });
-      });
+      const result = await Queries.getPhotoWithProgress(
+        photo.id,
+        //(p: number, t: number) => {},
+      );
 
       if (!result.ok) {
         console.log(result.errorCode);
@@ -32,10 +30,6 @@ export function usePhotosDownloadingFunctions() {
 
       photo.image.path = newUri;
       photosDispatch({ type: Actions.addPhotoLocal, payload: { photo: photo } });
-      photosDispatch({
-        type: Actions.updatePhotoProgressServer,
-        payload: { photo: photo, isLoading: false, p: 0 },
-      });
 
       const result1 = await UpdatePhotoPath.Post({
         id: photo.id,
@@ -56,10 +50,6 @@ export function usePhotosDownloadingFunctions() {
       try {
         for (let i = 0; i < photos.length; i++) {
           if (!photos[i].isLoading && !photos[i].inDevice) {
-            photosDispatch({
-              type: Actions.updatePhotoProgressServer,
-              payload: { photo: photos[i], isLoading: true, p: 0 },
-            });
             photosDownloading.current.push(photos[i]);
           }
         }
@@ -83,7 +73,7 @@ export function usePhotosDownloadingFunctions() {
         console.log(err);
       }
     },
-    [AddSinglePhotoLocal, isPhotosDownloading, photosDispatch, photosDownloading],
+    [AddSinglePhotoLocal, isPhotosDownloading, photosDownloading],
   );
 
   return { AddSinglePhotoLocal, AddPhotosLocal };
