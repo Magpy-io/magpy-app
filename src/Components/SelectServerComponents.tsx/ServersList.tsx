@@ -2,7 +2,7 @@ import React from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
 
 import ServerComponent from '~/Components/SelectServerComponents.tsx/ServerComponent';
-import { Server } from '~/Hooks/useLocalServers';
+import { Server } from '~/Context/ContextSlices/LocalServersContext';
 import { spacing } from '~/styles/spacing';
 
 type ServersListProps = {

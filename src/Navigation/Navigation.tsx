@@ -6,14 +6,14 @@ import type { NavigatorScreenParams } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { useAuthContext } from '~/Context/AuthContext';
-import { useServerClaimContext } from '~/Context/ServerClaimContext';
-import { TabName, TabNavigationProvider } from '~/Context/TabNavigationContext';
+import { useAuthContext } from '~/Context/UseContexts/useAuthContext';
+import { useServerClaimContext } from '~/Context/UseContexts/useClaimServerContext';
 import LoginScreen from '~/Navigation/Screens/LoginScreen';
 import PhotoGalleryLocalScreen from '~/Navigation/Screens/PhotoGalleryLocalScreen';
 import PhotoGalleryServerScreen from '~/Navigation/Screens/PhotoGalleryServerScreen';
 import ServerSelectScreen from '~/Navigation/Screens/ServerSelectScreen';
 import SettingsTab from '~/Navigation/Screens/SettingsTab';
+import { TabName, TabNavigationProvider } from '~/Navigation/TabNavigationContext';
 
 import {
   LoginStackParamList,

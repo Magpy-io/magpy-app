@@ -1,9 +1,7 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 import { NativeEventEmitter, NativeModules } from 'react-native';
 
-import { PhotoType } from '~/Helpers/types';
-
-import { useMainContext } from './MainContextProvider';
+import { useMainContext } from '../MainContextProvider';
 import { Actions } from './PhotosContext/PhotosReducer';
 
 const { MainModule } = NativeModules;
@@ -86,28 +84,4 @@ export function useBackgroundServiceEffects() {
       subscription.remove();
     };
   }, [refreshPhotosAddingServer]);
-}
-
-export function useBackgroundService() {
-  const SendPhotoToBackgroundServiceForUpload = useCallback(async (photos: PhotoType[]) => {
-    try {
-      await MainModule.startSendingMediaService(
-        photos.map(p => {
-          return {
-            id: p.id,
-            name: p.image.fileName,
-            date: new Date(p.created).toJSON(),
-            path: p.image.path ?? '',
-            width: p.image.width,
-            height: p.image.height,
-            size: p.image.fileSize,
-          };
-        }),
-      );
-    } catch (err) {
-      console.log(err);
-    }
-  }, []);
-
-  return { SendPhotoToBackgroundServiceForUpload };
 }
