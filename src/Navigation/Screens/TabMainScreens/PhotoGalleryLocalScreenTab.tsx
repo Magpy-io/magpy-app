@@ -15,7 +15,7 @@ function photosNbToString(n: number) {
   return `${n} Photos ready for backup.`;
 }
 
-export default function PhotoGalleryLocalScreen() {
+export default function PhotoGalleryLocalScreenTab() {
   console.log('render screen local');
   const [hasPermissions, setHasPermissions] = useState<boolean>(true);
   const { photosState } = usePhotosContext();

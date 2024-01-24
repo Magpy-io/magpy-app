@@ -7,9 +7,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuthContext, useAuthFunctions } from '~/Context/UseContexts/useAuthContext';
 import { useServerContext } from '~/Context/UseContexts/useServerContext';
 
-import { useMainNavigation } from '../Navigation';
+import { useMainNavigation } from '../../Navigation';
 
-export default function App() {
+export default function SettingsScreenTab() {
   const { user } = useAuthContext();
   const { logout } = useAuthFunctions();
   const { isServerReachable } = useServerContext();

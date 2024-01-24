@@ -7,7 +7,7 @@ import { usePhotosFunctions } from '~/Context/UseContexts/usePhotosContext';
 import { usePhotosDownloadingFunctions } from '~/Context/UseContexts/usePhotosDownloadingContext';
 import { formatDate } from '~/Helpers/Date';
 import { PhotoType } from '~/Helpers/types';
-import { useTabNavigationContext } from '~/Navigation/TabNavigationContext';
+import { useTabNavigationContext } from '~/Navigation/TabNavigation/TabNavigationContext';
 
 import PhotoDetailsModal from './PhotoDetailsModal';
 import PhotoSliderComponent from './PhotoSliderComponent';

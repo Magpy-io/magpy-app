@@ -5,7 +5,7 @@ import { useBackgroundServiceFunctions } from '~/Context/UseContexts/useBackgrou
 import { usePhotosFunctions } from '~/Context/UseContexts/usePhotosContext';
 import { usePhotosDownloadingFunctions } from '~/Context/UseContexts/usePhotosDownloadingContext';
 import { PhotoType } from '~/Helpers/types';
-import { useTabNavigationContext } from '~/Navigation/TabNavigationContext';
+import { useTabNavigationContext } from '~/Navigation/TabNavigation/TabNavigationContext';
 
 import PhotoGridComponent from './PhotoGridComponent';
 

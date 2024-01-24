@@ -13,7 +13,7 @@ function photosNbToString(n: number) {
   return `${n} Photos in server`;
 }
 
-export default function PhotoGalleryScreen() {
+export default function PhotoGalleryScreenTab() {
   console.log('render screen server');
   const { photosState } = usePhotosContext();
 

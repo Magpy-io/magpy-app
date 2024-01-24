@@ -9,37 +9,41 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import KeyboardDismissingView from '~/Components/CommonComponents/KeyboardDismissingView';
 import ScreenTitle from '~/Components/CommonComponents/ScreenTitle';
 import GoogleSignIn from '~/Components/LoginComponents/GoogleSignIn';
-import RegisterForm from '~/Components/LoginComponents/RegisterForm';
+import LoginForm from '~/Components/LoginComponents/LoginForm';
 import { appColors } from '~/styles/colors';
 import { spacing } from '~/styles/spacing';
 
-import { LoginStackParamList } from '../NavigationParams';
+import { LoginStackParamList } from '../../Navigators/LoginStackNavigator';
 
-export default function RegisterScreen() {
+export default function LoginScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardDismissingView>
-        <ScreenTitle title="Create Account" />
-        <RegisterForm />
+        <ScreenTitle title="Login to your account" />
+        <LoginForm />
       </KeyboardDismissingView>
-      <RegisterFooter />
+      <LoginFooter />
     </SafeAreaView>
   );
 }
 
-function RegisterFooter() {
+function LoginFooter() {
   const navigation = useNavigation<StackNavigationProp<LoginStackParamList>>();
   return (
     <View style={styles.loginFooterStyle}>
       <GoogleSignIn />
-      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-        <Text style={{ color: appColors.TEXT }}>Already a client ? </Text>
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+        }}>
+        <Text style={{ color: appColors.TEXT }}>{"Don't have an account ? "}</Text>
         <TouchableOpacity
           onPress={() => {
-            navigation.navigate('Login');
+            navigation.navigate('Register');
           }}
           style={{ paddingVertical: spacing.spacing_s }}>
-          <Text style={{ color: appColors.ACCENT, fontWeight: 'bold' }}>Sign In !</Text>
+          <Text style={{ color: appColors.ACCENT, fontWeight: 'bold' }}>Register !</Text>
         </TouchableOpacity>
       </View>
     </View>

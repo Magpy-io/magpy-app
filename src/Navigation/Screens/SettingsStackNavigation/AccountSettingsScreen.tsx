@@ -3,7 +3,7 @@ import { StyleSheet, View } from 'react-native';
 
 import { Text } from 'react-native-elements';
 
-export default function App() {
+export default function AccountSettingsScreen() {
   return (
     <View style={styles.container}>
       <Text>Account settings</Text>

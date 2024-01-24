@@ -55,7 +55,7 @@ const TabNavigationProvider: React.FC<{ children: ReactNode }> = ({ children }) 
 function useTabNavigationContext() {
   const context = useContext(TabNavigationContext);
   if (!context) {
-    throw Error('TabNavigationContext can only be used inside an ServerProvider');
+    throw Error('TabNavigationContext can only be used inside TabNavigationContext');
   }
   return context;
 }
