@@ -2,12 +2,12 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { BackHandler, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import { NativeEventEmitter, NativeModules } from 'react-native';
 
-import { usePhotosFunctions } from '~/Context/PhotosContext/usePhotos';
-import { useTabNavigationContext } from '~/Context/TabNavigationContext';
+import { useBackgroundServiceFunctions } from '~/Context/UseContexts/useBackgroundServiceContext';
+import { usePhotosFunctions } from '~/Context/UseContexts/usePhotosContext';
+import { usePhotosDownloadingFunctions } from '~/Context/UseContexts/usePhotosDownloadingContext';
 import { formatDate } from '~/Helpers/Date';
-import { useBackgroundService } from '~/Context/useBackgroundService';
-import { usePhotosDownloading } from '~/Context/usePhotosDownloading';
 import { PhotoType } from '~/Helpers/types';
+import { useTabNavigationContext } from '~/Navigation/TabNavigationContext';
 
 import PhotoDetailsModal from './PhotoDetailsModal';
 import PhotoSliderComponent from './PhotoSliderComponent';
@@ -41,8 +41,8 @@ export default function PhotoSlider({
     RequestThumbnailPhotosServer,
   } = usePhotosFunctions();
 
-  const { SendPhotoToBackgroundServiceForUpload } = useBackgroundService();
-  const { AddPhotosLocal } = usePhotosDownloading();
+  const { SendPhotoToBackgroundServiceForUpload } = useBackgroundServiceFunctions();
+  const { AddPhotosLocal } = usePhotosDownloadingFunctions();
 
   const flatListCurrentIndexRef = useRef<number>(props.startIndex);
   const [flatListCurrentIndex, setFlatListCurrentIndex] = useState(props.startIndex);

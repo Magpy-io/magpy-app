@@ -1,27 +1,14 @@
-import React, { useCallback, useRef } from 'react';
+import { useCallback } from 'react';
 
 import { uniqueDeviceId } from '~/Config/config';
-import { Actions } from '~/Context/PhotosContext/PhotosReducer';
+import { Actions } from '~/Context/ContextSlices/PhotosContext/PhotosReducer';
+import { useMainContext } from '~/Context/MainContextProvider';
 import { addPhotoToDevice } from '~/Helpers/GetGalleryPhotos';
 import * as Queries from '~/Helpers/Queries';
 import { UpdatePhotoPath } from '~/Helpers/ServerQueries';
 import { PhotoType } from '~/Helpers/types';
 
-import { useMainContext } from './MainContextProvider';
-
-export type PhotosDownloadingDataType = {
-  photosDownloading: React.MutableRefObject<PhotoType[]>;
-  isPhotosDownloading: React.MutableRefObject<boolean>;
-};
-
-export function usePhotosDownloadingData(): PhotosDownloadingDataType {
-  const photosDownloading = useRef([] as PhotoType[]);
-  const isPhotosDownloading = useRef(false);
-
-  return { photosDownloading, isPhotosDownloading };
-}
-
-export function usePhotosDownloading() {
+export function usePhotosDownloadingFunctions() {
   const { photosDownloadingData, photosData } = useMainContext();
   const { photosDispatch } = photosData;
   const { photosDownloading, isPhotosDownloading } = photosDownloadingData;
@@ -100,4 +87,10 @@ export function usePhotosDownloading() {
   );
 
   return { AddSinglePhotoLocal, AddPhotosLocal };
+}
+
+export function usePhotosDownloadingContext() {
+  const { photosDownloadingData } = useMainContext();
+
+  return photosDownloadingData;
 }

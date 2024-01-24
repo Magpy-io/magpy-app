@@ -4,13 +4,14 @@ import { StyleSheet } from 'react-native';
 import { Button, Text } from 'react-native-elements';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { useAuthContext } from '~/Context/AuthContext';
-import { useServerContext } from '~/Context/ServerContext';
+import { useAuthContext, useAuthFunctions } from '~/Context/UseContexts/useAuthContext';
+import { useServerContext } from '~/Context/UseContexts/useServerContext';
 
 import { useMainNavigation } from '../Navigation';
 
 export default function App() {
-  const { logout, user } = useAuthContext();
+  const { user } = useAuthContext();
+  const { logout } = useAuthFunctions();
   const { isServerReachable } = useServerContext();
   const navigation = useMainNavigation();
 

@@ -1,7 +1,9 @@
-import { useCallback, useReducer } from 'react';
+import { useCallback } from 'react';
 
 import { ErrorCodes } from 'react-native-delete-media';
 
+import { Actions } from '~/Context/ContextSlices/PhotosContext/PhotosReducer';
+import { useMainContext } from '~/Context/MainContextProvider';
 import {
   DeletePhotosFromDevice,
   addPhotoToCache,
@@ -11,28 +13,8 @@ import { GetMorePhotosLocal, GetMorePhotosServer } from '~/Helpers/GetMorePhotos
 import { DeletePhotosById, GetPhotosById } from '~/Helpers/ServerQueries';
 import { PhotoType } from '~/Helpers/types';
 
-import { useMainContext } from '../MainContextProvider';
-import {
-  Action,
-  Actions,
-  GlobalReducer,
-  PhotosStateType,
-  initialState,
-} from './PhotosReducer';
-
 const ITEMS_TO_LOAD_PER_END_REACHED_LOCAL = 3000;
 const ITEMS_TO_LOAD_PER_END_REACHED_SERVER = 3000;
-
-export type PhotosDataType = {
-  photosState: PhotosStateType;
-  photosDispatch: React.Dispatch<Action>;
-};
-
-export function usePhotosData(): PhotosDataType {
-  const [photosState, photosDispatch] = useReducer(GlobalReducer, initialState);
-
-  return { photosState, photosDispatch };
-}
 
 export function usePhotosFunctions() {
   const { photosData } = useMainContext();
@@ -157,10 +139,15 @@ export function usePhotosFunctions() {
         const photosWithImage64Filtered = photosWithImage64.filter(image64 => image64.exists);
 
         const images64 = photosWithImage64Filtered.map(v => {
-          const vWithTypeAssertion = v as typeof v & { exists: true };
+          if (!v.exists) {
+            throw new Error(
+              'RequestThumbnailPhotosServer: photosWithImage64Filtered contains images whith exits=false, wich should not be possible',
+            );
+          }
+
           return {
-            id: vWithTypeAssertion.photo?.id,
-            image64: vWithTypeAssertion.photo?.image64,
+            id: v.photo?.id,
+            image64: v.photo?.image64,
           };
         });
 
@@ -238,4 +225,10 @@ export function usePhotosFunctions() {
     DeletePhotosLocal,
     DeletePhotosServer,
   };
+}
+
+export function usePhotosContext() {
+  const { photosData } = useMainContext();
+
+  return photosData;
 }

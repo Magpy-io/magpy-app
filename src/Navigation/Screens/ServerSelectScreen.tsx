@@ -4,14 +4,20 @@ import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import ServersList from '~/Components/SelectServerComponents.tsx/ServersList';
-import { useServerClaimContext } from '~/Context/ServerClaimContext';
-import { Server } from '~/Hooks/useLocalServers';
+import { Server } from '~/Context/ContextSlices/LocalServersContext';
+import { useServerClaimFunctions } from '~/Context/UseContexts/useClaimServerContext';
+import {
+  useLocalServersContext,
+  useLocalServersFunctions,
+} from '~/Context/UseContexts/useLocalServersContext';
 import { appColors } from '~/styles/colors';
 import { spacing } from '~/styles/spacing';
 import { typography } from '~/styles/typography';
 
 export default function ServerSelectScreen() {
-  const { claimServer, localServers, isScanning, refreshData } = useServerClaimContext();
+  const { localServers, isScanning } = useLocalServersContext();
+  const { claimServer } = useServerClaimFunctions();
+  const { refreshData } = useLocalServersFunctions();
 
   const onSelectServer = async (server: Server) => {
     await claimServer('http://' + server.ip + ':' + server.port);
