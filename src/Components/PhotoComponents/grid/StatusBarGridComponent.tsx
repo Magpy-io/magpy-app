@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
   statusBarCancelButtonStyle: {},
   statusBarSelectAllButtonStyle: {},
   textElementsSelectedStyle: {
-    ...typography.largeText,
+    ...typography.largeTextBold,
   },
 });
 

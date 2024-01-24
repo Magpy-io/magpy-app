@@ -22,14 +22,19 @@ export const textSize = {
 
 export const typography: {
   screenTitle: TextStyle;
-  formError: TextStyle;
-  formInfo: TextStyle;
-  mediumText: TextStyle;
-  lightMediumText: TextStyle;
-  largeText: TextStyle;
   sectionTitle: TextStyle;
-  tabBarLabel: TextStyle;
   smallText: TextStyle;
+  mediumText: TextStyle;
+  largeText: TextStyle;
+  smallTextBold: TextStyle;
+  mediumTextBold: TextStyle;
+  largeTextBold: TextStyle;
+  lightSmallText: TextStyle;
+  lightMediumText: TextStyle;
+  lightLargeText: TextStyle;
+  formInfo: TextStyle;
+  formError: TextStyle;
+  tabBarLabel: TextStyle;
 } = {
   // TITLES & HEADERS
   screenTitle: {
@@ -54,14 +59,43 @@ export const typography: {
     color: appColors.TEXT,
     fontFamily: 'Inter-Regular',
   },
+  largeText: {
+    ...textSize.large,
+    color: appColors.TEXT,
+    fontFamily: 'Inter-Regular',
+  },
+
+  // TEXTS in differents sizes but BOLD
+  smallTextBold: {
+    ...textSize.small,
+    color: appColors.TEXT,
+    fontFamily: 'Inter-Medium',
+  },
+  mediumTextBold: {
+    ...textSize.medium,
+    color: appColors.TEXT,
+    fontFamily: 'Inter-Medium',
+  },
+  largeTextBold: {
+    ...textSize.large,
+    color: appColors.TEXT,
+    fontFamily: 'Inter-Medium',
+  },
+
+  // TEXTS in differents sizes in Lighter color (grey)
+  lightSmallText: {
+    ...textSize.small,
+    color: appColors.TEXT_LIGHT,
+    fontFamily: 'Inter-Regular',
+  },
   lightMediumText: {
     ...textSize.medium,
     color: appColors.TEXT_LIGHT,
     fontFamily: 'Inter-Regular',
   },
-  largeText: {
+  lightLargeText: {
     ...textSize.large,
-    color: appColors.TEXT,
+    color: appColors.TEXT_LIGHT,
     fontFamily: 'Inter-Medium',
   },
 

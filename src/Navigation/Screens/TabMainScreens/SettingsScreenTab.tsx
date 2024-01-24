@@ -13,9 +13,10 @@ import {
   PreferencesIcon,
   UploadIcon,
 } from '~/Components/CommonComponents/Icons';
+import LogoutComponent from '~/Components/SettingsComponents/LogoutComponent';
 import ProfileHeader from '~/Components/SettingsComponents/ProfileHeader';
 import SettingComponent from '~/Components/SettingsComponents/SettingComponent';
-import { appColors } from '~/styles/colors';
+import { appColors, colors } from '~/styles/colors';
 import { spacing } from '~/styles/spacing';
 import { typography } from '~/styles/typography';
 
@@ -98,18 +99,22 @@ export default function SettingsScreenTab() {
         renderSectionHeader={renderSectionHeader}
         renderItem={renderItem}
         contentContainerStyle={{
-          paddingVertical: spacing.spacing_xxl,
-          gap: spacing.spacing_s,
+          paddingVertical: spacing.spacing_s,
         }}
+        ListFooterComponent={<LogoutComponent />}
       />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  logoutText: {
+    ...typography.mediumTextBold,
+    color: colors.COLOR_ERROR_500,
+  },
   title: {
     ...typography.sectionTitle,
-    paddingBottom: spacing.spacing_xs,
+    paddingVertical: spacing.spacing_l,
   },
   container: {
     flex: 1,

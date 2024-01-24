@@ -76,7 +76,7 @@ const INVALID_COLOR = appColors.TEXT_LIGHT;
 
 const styles = StyleSheet.create({
   title: {
-    ...typography.largeText,
+    ...typography.largeTextBold,
   },
   StatusBarStyle: {
     width: '100%',

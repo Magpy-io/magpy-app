@@ -38,7 +38,7 @@ const AVATAR_SIZE = 60;
 console.log('borderRadius', borderRadius);
 const styles = StyleSheet.create({
   name: {
-    ...typography.largeText,
+    ...typography.largeTextBold,
   },
   email: {
     ...typography.lightMediumText,
