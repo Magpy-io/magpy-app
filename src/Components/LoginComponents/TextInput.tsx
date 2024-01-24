@@ -9,7 +9,7 @@ import {
 import { Icon } from 'react-native-elements';
 
 import { appColors } from '~/styles/colors';
-import { spacing } from '~/styles/spacing';
+import { borderRadius, spacing } from '~/styles/spacing';
 
 import FormError from './FormError';
 import ValidInputIndicator from './ValidInputIndicator';
@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
     paddingLeft: spacing.spacing_xxl_2,
     borderColor: appColors.FORM_BORDER,
     borderWidth: 1,
-    borderRadius: spacing.spacing_s,
+    borderRadius: borderRadius.input,
     height: spacing.spacing_xxl_3,
   },
 });

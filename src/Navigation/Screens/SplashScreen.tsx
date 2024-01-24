@@ -20,9 +20,9 @@ export default function SplashScreen() {
 const styles = StyleSheet.create({
   textStyle: {
     fontSize: spacing.spacing_xxl,
-    fontWeight: 'bold',
     alignSelf: 'center',
     color: colors.SOFT_GREY,
+    fontFamily: 'Inter-Medium',
   },
   container: {
     flex: 1,

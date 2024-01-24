@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
     bottom: 0,
   },
   toolsView: {
-    height: 80,
+    height: 100,
     flexDirection: 'row',
     alignItems: 'center',
   },

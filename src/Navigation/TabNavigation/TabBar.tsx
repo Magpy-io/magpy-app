@@ -9,6 +9,7 @@ import {
   useTabNavigationContext,
 } from '~/Navigation/TabNavigation/TabNavigationContext';
 import { appColors, colors } from '~/styles/colors';
+import { typography } from '~/styles/typography';
 
 type IconType = { name: string; type: string };
 type RouteType = {
@@ -121,8 +122,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   label: {
-    fontSize: 10,
-    fontWeight: 'bold',
+    ...typography.tabBarLabel,
     paddingTop: 4,
   },
   tabView: {

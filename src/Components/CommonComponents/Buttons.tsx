@@ -4,7 +4,7 @@ import { StyleSheet } from 'react-native';
 import { Button, ButtonProps } from 'react-native-elements';
 
 import { appColors } from '~/styles/colors';
-import { spacing } from '~/styles/spacing';
+import { borderRadius, spacing } from '~/styles/spacing';
 
 export function PrimaryButton(props: ButtonProps) {
   return (
@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
   },
   buttonStyle: {
     backgroundColor: appColors.PRIMARY,
-    borderRadius: spacing.spacing_s,
+    borderRadius: borderRadius.button,
     paddingVertical: spacing.spacing_s,
     paddingHorizontal: spacing.spacing_xl,
   },

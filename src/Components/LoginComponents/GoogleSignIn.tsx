@@ -4,7 +4,7 @@ import { StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { Icon } from 'react-native-elements';
 
 import { appColors } from '~/styles/colors';
-import { spacing } from '~/styles/spacing';
+import { borderRadius, spacing } from '~/styles/spacing';
 
 import ViewWithGap from '../CommonComponents/ViewWithGap';
 
@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   buttonStyle: {
-    borderRadius: spacing.spacing_s,
+    borderRadius: borderRadius.button,
     borderColor: appColors.TEXT_LIGHT,
     borderWidth: 1,
     padding: spacing.spacing_s,

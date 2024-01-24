@@ -17,3 +17,11 @@ export const spacing = {
   spacing_xxl_8: 212,
   spacing_xxl_9: 276,
 };
+
+export const borderRadius = {
+  default: 12,
+  button: 12,
+  input: 12,
+  image: 4,
+  avatar: 12,
+};

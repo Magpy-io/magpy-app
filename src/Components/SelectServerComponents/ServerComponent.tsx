@@ -1,7 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-
 import { appColors } from '~/styles/colors';
 import { spacing } from '~/styles/spacing';
 import { textSize } from '~/styles/typography';
@@ -44,7 +43,7 @@ const styles = StyleSheet.create({
   },
   viewStyle: {
     marginHorizontal: spacing.spacing_l,
-    borderRadius: spacing.spacing_xs,
+    borderRadius: spacing.spacing_s,
     backgroundColor: appColors.BACKGROUND_LIGHT,
     padding: spacing.spacing_m,
     flexDirection: 'row',
