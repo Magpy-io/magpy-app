@@ -4,7 +4,7 @@ import { StyleSheet } from 'react-native';
 import FastImage from 'react-native-fast-image';
 
 const ImageForGrid = ({ uri }: { uri: string | undefined }) => {
-  console.log('ImageFOrGrid render', uri);
+  //console.log('ImageFOrGrid render', uri);
   return (
     <FastImage
       source={{ uri: uri }}
