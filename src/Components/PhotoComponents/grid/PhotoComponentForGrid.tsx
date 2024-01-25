@@ -1,34 +1,35 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
-import { PhotoType } from '~/Helpers/types';
+import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos';
 
 import ImageForGrid from './ImageForGrid';
 import SelectionIconForGrid from './SelectionIconForGrid';
 
 type PropsType = {
-  photo: PhotoType;
+  photo: PhotoGalleryType;
   isSelecting: boolean;
   isSelected: boolean;
-  onPress: (item: PhotoType) => void;
-  onLongPress: (item: PhotoType) => void;
+  onPress: (item: PhotoGalleryType) => void;
+  onLongPress: (item: PhotoGalleryType) => void;
 };
 
 function PhotoComponentForGrid(props: PropsType) {
   const { photo, isSelecting, isSelected, onPress, onLongPress } = props;
   // console.log('Render PhotoComponentForGrid');
 
-  const uriSource = useMemo(() => {
-    if (photo.inDevice) {
-      return photo.image.path;
-    } else {
-      if (photo.image.pathCache) {
-        return photo.image.pathCache;
-      } else {
-        return photo.image.image64;
-      }
-    }
-  }, [photo]);
+  // const uriSource = useMemo(() => {
+  //   if (photo.inDevice) {
+  //     return photo.image.path;
+  //   } else {
+  //     if (photo.image.pathCache) {
+  //       return photo.image.pathCache;
+  //     } else {
+  //       return photo.image.image64;
+  //     }
+  //   }
+  // }, [photo]);
+  const uriSource = photo.uri;
 
   const onPressPhoto = useCallback(() => onPress(photo), [onPress, photo]);
   const onLongPressPhoto = useCallback(() => onLongPress(photo), [onLongPress, photo]);

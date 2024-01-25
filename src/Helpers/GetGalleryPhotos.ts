@@ -8,7 +8,7 @@ import { PhotoType } from './types';
 
 const { MainModule } = NativeModules;
 
-function GetPhotos(n: number, offset: number = 0) {
+function GalleryGetPhotos(n: number, offset: number = 0) {
   return CameraRoll.getPhotos({
     first: n,
     after: String(offset),
@@ -97,4 +97,10 @@ async function clearCache() {
   }
 }
 
-export { GetPhotos, DeletePhotosFromDevice, addPhotoToDevice, clearCache, addPhotoToCache };
+export {
+  GalleryGetPhotos,
+  DeletePhotosFromDevice,
+  addPhotoToDevice,
+  clearCache,
+  addPhotoToCache,
+};

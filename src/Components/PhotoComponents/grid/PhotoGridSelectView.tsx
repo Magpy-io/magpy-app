@@ -1,32 +1,22 @@
 import React from 'react';
 
-import { PhotoType } from '~/Helpers/types';
+import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos';
 
 import StatusBarGridComponent from './StatusBarGridComponent';
 import ToolBarGrid from './ToolBarGrid';
 
 type PhotoGridSelectViewProps = {
   isSelecting: boolean;
-  selectedIds: Map<string, PhotoType>;
-  onAddLocal: () => void;
-  onAddServer: () => void;
-  onDeleteLocal: () => void;
-  onDeleteServer: () => void;
+  selectedIds: Map<string, PhotoGalleryType>;
   onSelectAll: () => void;
   onBackButton: () => void;
-  contextLocation: string;
 };
 
 export default function PhotoGridSelectView({
   isSelecting,
   selectedIds,
-  onAddServer,
-  onAddLocal,
-  onDeleteLocal,
-  onDeleteServer,
   onBackButton,
   onSelectAll,
-  contextLocation,
 }: PhotoGridSelectViewProps) {
   return (
     <>
@@ -37,15 +27,7 @@ export default function PhotoGridSelectView({
           onSelectAllButton={onSelectAll}
         />
       )}
-      {isSelecting && (
-        <ToolBarGrid
-          contextLocation={contextLocation}
-          onAddLocal={onAddLocal}
-          onAddServer={onAddServer}
-          onDeleteLocal={onDeleteLocal}
-          onDeleteServer={onDeleteServer}
-        />
-      )}
+      {isSelecting && <ToolBarGrid />}
     </>
   );
 }

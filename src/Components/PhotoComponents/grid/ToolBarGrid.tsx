@@ -11,7 +11,6 @@ const TOOLBAR_COLOR = appColors.BACKGROUND;
 
 type ToolBarProps = {
   style?: ViewStyle;
-  contextLocation: string;
   onDeleteLocal?: () => void;
   onAddLocal?: () => void;
   onDeleteServer?: () => void;
@@ -24,7 +23,7 @@ function ToolBarGrid(props: ToolBarProps) {
   return (
     <SafeAreaView edges={['bottom']} style={[styles.toolBarView, props.style]}>
       <View style={styles.toolsView}>
-        {props.contextLocation == 'local' ? (
+        {true ? (
           <ToolComponent
             icon="backup"
             type="material"
@@ -45,7 +44,7 @@ function ToolBarGrid(props: ToolBarProps) {
           text="Delete from device"
           onPress={() => props.onDeleteLocal?.()}
         />
-        {props.contextLocation == 'server' && (
+        {false && (
           <ToolComponent
             icon="delete"
             type="material"

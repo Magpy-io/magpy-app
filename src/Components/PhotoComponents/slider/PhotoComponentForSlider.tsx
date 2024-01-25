@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { Dimensions, StyleSheet } from 'react-native';
 
 import FastImage from 'react-native-fast-image';
@@ -9,32 +9,34 @@ import {
 } from 'react-native-gesture-handler';
 import Animated, { runOnJS, useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 
-import { PhotoType } from '~/Helpers/types';
+import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos';
 
 const H = Dimensions.get('screen').height;
 const W = Dimensions.get('screen').width;
 
 type PropsType = {
-  photo: PhotoType;
+  photo: PhotoGalleryType;
   isFullScreen: boolean;
-  onPress?: (item: PhotoType) => void;
-  onLongPress?: (item: PhotoType) => void;
+  onPress?: (item: PhotoGalleryType) => void;
+  onLongPress?: (item: PhotoGalleryType) => void;
 };
 
 function PhotoComponentForSlider(props: PropsType) {
   //console.log("render photo for slider", props.photo.id);
 
-  const uriSource = useMemo(() => {
-    if (props.photo.inDevice) {
-      return props.photo.image.path;
-    } else {
-      if (props.photo.image.pathCache) {
-        return props.photo.image.pathCache;
-      } else {
-        return props.photo.image.image64;
-      }
-    }
-  }, [props.photo]);
+  // const uriSource = useMemo(() => {
+  //   if (props.photo.inDevice) {
+  //     return props.photo.image.path;
+  //   } else {
+  //     if (props.photo.image.pathCache) {
+  //       return props.photo.image.pathCache;
+  //     } else {
+  //       return props.photo.image.image64;
+  //     }
+  //   }
+  // }, [props.photo]);
+
+  const uriSource = props.photo.uri;
 
   const position = useSharedValue(0);
   const positionLast = useSharedValue(0);

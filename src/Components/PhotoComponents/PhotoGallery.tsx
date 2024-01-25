@@ -1,21 +1,14 @@
 import React, { useCallback, useState } from 'react';
 import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 
-import { PhotoType } from '~/Helpers/types';
-
 import PhotoGridController from './grid/PhotoGridController';
 import PhotoSlider from './slider/PhotoSliderController';
 
 type PhotoGalleryPropsType = {
   style?: StyleProp<ViewStyle>;
-  photos: PhotoType[];
-  contextLocation: string;
-  gridHeaderTextFunction?: (photosNb: number) => string;
 };
 
 export default function PhotoGallery(props: PhotoGalleryPropsType) {
-  console.log('render gallery', props.contextLocation);
-
   const [switchingState, setSwitchingState] = useState({
     isPhotoSelected: false,
     startIndexWhenSwitching: 0,
@@ -39,45 +32,31 @@ export default function PhotoGallery(props: PhotoGalleryPropsType) {
       {switchingState.isPhotoSelected ? (
         <View style={styles.viewStyle}>
           <PhotoSlider
-            key={'photo_slider_' + props.contextLocation}
-            id={'photo_slider_' + props.contextLocation}
-            contextLocation={props.contextLocation}
+            key={'photo_slider'}
+            id={'photo_slider'}
             isSliding={switchingState.isPhotoSelected}
-            style={{}}
-            photos={props.photos}
             startIndex={switchingState.startIndexWhenSwitching}
             onSwitchMode={onSwitchMode}
           />
           <PhotoGridController
-            key={'photo_grid_' + props.contextLocation}
-            id={'photo_grid_' + props.contextLocation}
-            contextLocation={props.contextLocation}
-            style={{}}
-            photos={props.photos}
+            key={'photo_grid'}
+            id={'photo_grid'}
             startIndex={switchingState.startIndexWhenSwitching}
             onSwitchMode={onSwitchMode}
-            headerDisplayTextFunction={props.gridHeaderTextFunction}
           />
         </View>
       ) : (
         <View style={styles.viewStyle}>
           <PhotoGridController
-            key={'photo_grid_' + props.contextLocation}
-            id={'photo_grid_' + props.contextLocation}
-            contextLocation={props.contextLocation}
-            style={{}}
-            photos={props.photos}
+            key={'photo_grid'}
+            id={'photo_grid'}
             startIndex={switchingState.startIndexWhenSwitching}
             onSwitchMode={onSwitchMode}
-            headerDisplayTextFunction={props.gridHeaderTextFunction}
           />
           <PhotoSlider
-            key={'photo_slider_' + props.contextLocation}
-            id={'photo_slider_' + props.contextLocation}
-            contextLocation={props.contextLocation}
+            key={'photo_slider'}
+            id={'photo_slider'}
             isSliding={switchingState.isPhotoSelected}
-            style={{}}
-            photos={props.photos}
             startIndex={switchingState.startIndexWhenSwitching}
             onSwitchMode={onSwitchMode}
           />

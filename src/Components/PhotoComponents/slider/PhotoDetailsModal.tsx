@@ -3,16 +3,16 @@ import { Text, View } from 'react-native';
 
 import { Icon } from 'react-native-elements';
 
+import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos';
 import { formatDate } from '~/Helpers/Date';
 import { getReadableFileSizeString } from '~/Helpers/FileSizeFormat';
-import { PhotoType } from '~/Helpers/types';
 
 import GenericModal from '../../CommonComponents/GenericModal';
 
 type PhotoDetailsModalProps = {
   modalVisible: boolean;
   handleModal: () => void;
-  photo: PhotoType;
+  photo: PhotoGalleryType;
 };
 
 export default function PhotoDetailsModal({

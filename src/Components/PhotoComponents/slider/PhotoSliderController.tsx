@@ -2,14 +2,9 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { BackHandler, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import { NativeEventEmitter, NativeModules } from 'react-native';
 
-import { useBackgroundServiceFunctions } from '~/Context/UseContexts/useBackgroundServiceContext';
-import { usePhotosFunctions } from '~/Context/UseContexts/usePhotosContext';
-import { usePhotosDownloadingFunctions } from '~/Context/UseContexts/usePhotosDownloadingContext';
-import { formatDate } from '~/Helpers/Date';
-import { PhotoType } from '~/Helpers/types';
+import { useAppSelector } from '~/Context/ReduxStore/Store';
 import { useTabNavigationContext } from '~/Navigation/TabNavigation/TabNavigationContext';
 
-import PhotoDetailsModal from './PhotoDetailsModal';
 import PhotoSliderComponent from './PhotoSliderComponent';
 import StatusBarComponent from './StatusBarComponent';
 import ToolBar from './ToolBar';
@@ -17,32 +12,17 @@ import ToolBar from './ToolBar';
 const { MainModule } = NativeModules;
 
 type PropsType = {
-  photos: Array<PhotoType>;
   style?: StyleProp<ViewStyle>;
   startIndex: number;
-  contextLocation: string;
   id: string;
   isSliding: boolean;
   onSwitchMode: (isPhotoSelected: boolean, index: number) => void;
 };
 
-export default function PhotoSlider({
-  photos,
-  contextLocation,
-  onSwitchMode,
-  ...props
-}: PropsType) {
-  console.log('render slider', contextLocation);
+export default function PhotoSlider({ onSwitchMode, ...props }: PropsType) {
+  console.log('render slider');
 
-  const {
-    RequestCompressedPhotoServer,
-    DeletePhotosLocal,
-    DeletePhotosServer,
-    RequestThumbnailPhotosServer,
-  } = usePhotosFunctions();
-
-  const { SendPhotoToBackgroundServiceForUpload } = useBackgroundServiceFunctions();
-  const { AddPhotosLocal } = usePhotosDownloadingFunctions();
+  const photos = useAppSelector(state => state.photos.photosGallery);
 
   const flatListCurrentIndexRef = useRef<number>(props.startIndex);
   const [flatListCurrentIndex, setFlatListCurrentIndex] = useState(props.startIndex);
@@ -50,24 +30,6 @@ export default function PhotoSlider({
   const [isFullScreen, setIsFullScreen] = useState(false);
   const validFlatListCurrentIndex = photos.length != 0 && flatListCurrentIndex < photos.length;
   const { showTab } = useTabNavigationContext();
-
-  useEffect(() => {
-    if (
-      validFlatListCurrentIndex &&
-      !photos[flatListCurrentIndex].inDevice &&
-      contextLocation == 'server'
-    ) {
-      RequestCompressedPhotoServer(photos[flatListCurrentIndex]).catch(e =>
-        console.log('Error : RequestFullPhotoServer', e),
-      );
-    }
-  }, [
-    photos,
-    contextLocation,
-    flatListCurrentIndex,
-    validFlatListCurrentIndex,
-    RequestCompressedPhotoServer,
-  ]);
 
   const onCurrentIndexChanged = useCallback((index: number) => {
     flatListCurrentIndexRef.current = index;
@@ -113,35 +75,6 @@ export default function PhotoSlider({
     };
   }, []);
 
-  const onAddLocal = () => {
-    AddPhotosLocal?.([photos[flatListCurrentIndex]]).catch(e =>
-      console.log('Error : addPhotosLocal', e),
-    );
-  };
-
-  const onAddServer = () => {
-    SendPhotoToBackgroundServiceForUpload?.([photos[flatListCurrentIndex]]).catch(e =>
-      console.log('Error : addPhotosServer', e),
-    );
-  };
-
-  const onDeleteLocal = () => {
-    if (contextLocation == 'server') {
-      RequestThumbnailPhotosServer([photos[flatListCurrentIndex]]).catch(e =>
-        console.log('Error : RequestCroppedPhotosServer', e),
-      );
-    }
-    DeletePhotosLocal?.([photos[flatListCurrentIndex]]).catch(e =>
-      console.log('Error : deletePhotosLocal', e),
-    );
-  };
-
-  const onDeleteServer = () => {
-    DeletePhotosServer?.([photos[flatListCurrentIndex]]).catch(e => {
-      console.log('Error: deletePhotosServer', e);
-    });
-  };
-
   const onPressPhoto = async () => {
     if (isFullScreen) {
       await MainModule.disableFullScreen();
@@ -171,11 +104,11 @@ export default function PhotoSlider({
 
       {validFlatListCurrentIndex && !isFullScreen && (
         <StatusBarComponent
-          inDevice={photos[flatListCurrentIndex].inDevice}
-          inServer={photos[flatListCurrentIndex].inServer}
-          isLoading={photos[flatListCurrentIndex].isLoading}
-          loadingPercentage={photos[flatListCurrentIndex].loadingPercentage}
-          title={formatDate(photos[flatListCurrentIndex].created)}
+          inDevice={true}
+          inServer={false}
+          isLoading={false}
+          loadingPercentage={0}
+          title={'formatDate(photos[flatListCurrentIndex].created)'}
           onBackButton={onStatusBarBackButton}
         />
       )}
@@ -183,23 +116,19 @@ export default function PhotoSlider({
       {validFlatListCurrentIndex && !isFullScreen && (
         <>
           <ToolBar
-            inDevice={photos[flatListCurrentIndex].inDevice}
-            inServer={photos[flatListCurrentIndex].inServer}
-            onAddLocal={onAddLocal}
-            onAddServer={onAddServer}
-            onDeleteLocal={onDeleteLocal}
-            onDeleteServer={onDeleteServer}
+            inDevice={true}
+            inServer={false}
             onDetails={() => {
               setDetailsModalVisible(true);
               console.log('details');
             }}
           />
 
-          <PhotoDetailsModal
+          {/* <PhotoDetailsModal
             modalVisible={detailsModalVisible}
             handleModal={() => setDetailsModalVisible(!detailsModalVisible)}
             photo={photos[flatListCurrentIndex]}
-          />
+          /> */}
         </>
       )}
     </View>

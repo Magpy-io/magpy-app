@@ -1,17 +1,17 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 import { Dimensions, FlatList, StyleSheet, ViewToken } from 'react-native';
 
-import { PhotoType } from '~/Helpers/types';
+import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos';
 
 import PhotoComponentForSlider from './PhotoComponentForSlider';
 
 const ITEM_WIDTH = Dimensions.get('window').width;
 
-function keyExtractor(item: PhotoType, index: number) {
-  return `Photo_${item.image.fileName}_index_${index}`;
+function keyExtractor(item: PhotoGalleryType, index: number) {
+  return `Photo_${item.uri}_index_${index}`;
 }
 
-function getItemLayout(data: ArrayLike<PhotoType> | null | undefined, index: number) {
+function getItemLayout(data: ArrayLike<PhotoGalleryType> | null | undefined, index: number) {
   return {
     length: ITEM_WIDTH,
     offset: ITEM_WIDTH * index,
@@ -20,13 +20,13 @@ function getItemLayout(data: ArrayLike<PhotoType> | null | undefined, index: num
 }
 
 type PropsType = {
-  photos: PhotoType[];
+  photos: PhotoGalleryType[];
   startIndex: number;
   isFullScreen: boolean;
   onIndexChanged?: (index: number) => void;
   onEndReached?: () => void;
-  onPhotoClick?: (item: PhotoType) => void;
-  onPhotoLongClick?: (item: PhotoType) => void;
+  onPhotoClick?: (item: PhotoGalleryType) => void;
+  onPhotoLongClick?: (item: PhotoGalleryType) => void;
 };
 
 export default function PhotoSliderComponent({
@@ -42,7 +42,7 @@ export default function PhotoSliderComponent({
   const flatListCurrentIndexRef = useRef<number>(startIndex);
 
   const renderItem = useCallback(
-    ({ item }: { item: PhotoType; index: number }) => (
+    ({ item }: { item: PhotoGalleryType; index: number }) => (
       <PhotoComponentForSlider
         photo={item}
         onPress={onPhotoClick}

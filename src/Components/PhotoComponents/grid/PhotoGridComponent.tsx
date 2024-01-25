@@ -1,20 +1,20 @@
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { Dimensions, FlatList, StyleProp, StyleSheet, ViewStyle } from 'react-native';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { PhotoType } from '~/Helpers/types';
+import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos';
 
 import PhotoComponentForGrid from './PhotoComponentForGrid';
 import PhotoGridSelectView from './PhotoGridSelectView';
 
 const ITEM_HEIGHT = Dimensions.get('screen').width / 3;
 
-function keyExtractor(item: PhotoType) {
-  return `grid_${item.id}`;
+function keyExtractor(item: PhotoGalleryType) {
+  return `grid_${item.uri}`;
 }
 
-function getItemLayout(data: ArrayLike<PhotoType> | null | undefined, index: number) {
+function getItemLayout(data: ArrayLike<PhotoGalleryType> | null | undefined, index: number) {
   return {
     length: ITEM_HEIGHT,
     offset: ITEM_HEIGHT * index,
@@ -23,21 +23,16 @@ function getItemLayout(data: ArrayLike<PhotoType> | null | undefined, index: num
 }
 
 type PhotoGridComponentProps = {
-  photos: Array<PhotoType>;
+  photos: Array<PhotoGalleryType>;
   style?: StyleProp<ViewStyle>;
-  onPressPhoto: (item: PhotoType) => void;
-  onLongPressPhoto: (item: PhotoType) => void;
+  onPressPhoto: (item: PhotoGalleryType) => void;
+  onLongPressPhoto: (item: PhotoGalleryType) => void;
   initialScrollIndex: number;
   onRefresh: () => void;
   isSelecting: boolean;
-  selectedIds: Map<string, PhotoType>;
-  onAddLocal: () => void;
-  onAddServer: () => void;
-  onDeleteLocal: () => void;
-  onDeleteServer: () => void;
+  selectedIds: Map<string, PhotoGalleryType>;
   onSelectAll: () => void;
   onBackButton: () => void;
-  contextLocation: string;
 };
 
 export default function PhotoGridComponent({
@@ -49,26 +44,22 @@ export default function PhotoGridComponent({
   onRefresh,
   isSelecting,
   selectedIds,
-  onAddServer,
-  onAddLocal,
-  onDeleteLocal,
-  onDeleteServer,
   onBackButton,
   onSelectAll,
-  contextLocation,
 }: PhotoGridComponentProps) {
   const flatlistRef = useRef<FlatList>(null);
-
+  const photosLenRef = useRef<number>(photos.length);
+  photosLenRef.current = photos.length;
   console.log('Render PhotoGridComponent');
 
   const renderItem = useCallback(
-    ({ item }: { item: PhotoType }) => {
+    ({ item }: { item: PhotoGalleryType }) => {
       return (
         <PhotoComponentForGrid
-          key={`grid_${item.id}`}
+          key={`grid_${item.uri}`}
           photo={item}
           isSelecting={isSelecting}
-          isSelected={selectedIds.has(item.id)}
+          isSelected={selectedIds.has(item.uri)}
           onPress={onPressPhoto}
           onLongPress={onLongPressPhoto}
         />
@@ -76,6 +67,16 @@ export default function PhotoGridComponent({
     },
     [onLongPressPhoto, onPressPhoto, isSelecting, selectedIds],
   );
+
+  console.log('initialScrollIndex', initialScrollIndex);
+
+  useEffect(() => {
+    console.log('useEffect ', photosLenRef.current);
+    if (photosLenRef.current > 0) {
+      console.log('scrolling to ', initialScrollIndex);
+      flatlistRef.current?.scrollToIndex({ index: initialScrollIndex });
+    }
+  }, [flatlistRef, initialScrollIndex]);
 
   // TODO change the numColumns to 1 and create a renderItem containing 3 photos
   // This will fix a bug in flatlist which makes it recreate all items each time one is added or removed from the top (indexes change for the rest)
@@ -103,11 +104,6 @@ export default function PhotoGridComponent({
       />
 
       <PhotoGridSelectView
-        contextLocation={contextLocation}
-        onAddLocal={onAddLocal}
-        onAddServer={onAddServer}
-        onDeleteLocal={onDeleteLocal}
-        onDeleteServer={onDeleteServer}
         onBackButton={onBackButton}
         onSelectAll={onSelectAll}
         isSelecting={isSelecting}

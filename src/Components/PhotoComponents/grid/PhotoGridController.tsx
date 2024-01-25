@@ -1,45 +1,31 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { BackHandler, StyleProp, ViewStyle } from 'react-native';
 
-import { useBackgroundServiceFunctions } from '~/Context/UseContexts/useBackgroundServiceContext';
-import { usePhotosFunctions } from '~/Context/UseContexts/usePhotosContext';
-import { usePhotosDownloadingFunctions } from '~/Context/UseContexts/usePhotosDownloadingContext';
-import { PhotoType } from '~/Helpers/types';
+import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos';
+import { usePhotosFunctionsStore } from '~/Context/ReduxStore/Slices/PhotosFunctions';
+import { useAppSelector } from '~/Context/ReduxStore/Store';
 import { useTabNavigationContext } from '~/Navigation/TabNavigation/TabNavigationContext';
 
 import PhotoGridComponent from './PhotoGridComponent';
 
 type PropsType = {
-  photos: Array<PhotoType>;
   style?: StyleProp<ViewStyle>;
   startIndex: number;
-  contextLocation: string;
   id: string;
   onSwitchMode: (isPhotoSelected: boolean, index: number) => void;
-  headerDisplayTextFunction?: (photosNb: number) => string;
 };
 
-export default function PhotoGridController({
-  onSwitchMode,
-  contextLocation,
-  ...props
-}: PropsType) {
-  console.log('render grid', contextLocation);
-  const {
-    RefreshPhotosLocal,
-    RefreshPhotosServer,
-    DeletePhotosLocal,
-    DeletePhotosServer,
-    RequestThumbnailPhotosServer,
-  } = usePhotosFunctions();
+export default function PhotoGridController({ onSwitchMode, ...props }: PropsType) {
+  console.log('render grid');
 
-  const { SendPhotoToBackgroundServiceForUpload } = useBackgroundServiceFunctions();
-  const { AddPhotosLocal } = usePhotosDownloadingFunctions();
+  const photos = useAppSelector(state => state.photos.photosGallery);
 
-  const getPhotoIndexRef = useRef<(photo: PhotoType) => number>();
+  const getPhotoIndexRef = useRef<(photo: PhotoGalleryType) => number>();
   const [isSelecting, setIsSelecting] = useState(false);
-  const [seletedIds, setSelectedIds] = useState<Map<string, PhotoType>>(new Map());
+  const [seletedIds, setSelectedIds] = useState<Map<string, PhotoGalleryType>>(new Map());
   const { hideTab, showTab } = useTabNavigationContext();
+
+  const { RefreshLocalPhotos } = usePhotosFunctionsStore();
 
   useEffect(() => {
     if (isSelecting) {
@@ -55,8 +41,8 @@ export default function PhotoGridController({
     }
   }, [isSelecting, showTab]);
 
-  getPhotoIndexRef.current = (item: PhotoType) => {
-    let index = props.photos.findIndex(photo => photo.id == item.id);
+  getPhotoIndexRef.current = (item: PhotoGalleryType) => {
+    let index = photos.findIndex(photo => photo.uri == item.uri);
     if (index < 0) {
       index = 0;
     }
@@ -64,16 +50,16 @@ export default function PhotoGridController({
   };
 
   const onRenderItemPress = useCallback(
-    (item: PhotoType) => {
+    (item: PhotoGalleryType) => {
       if (isSelecting) {
         setSelectedIds(sIds => {
-          if (sIds.has(item.id)) {
+          if (sIds.has(item.uri)) {
             const newMap = new Map(sIds);
-            newMap.delete(item.id);
+            newMap.delete(item.uri);
             return newMap;
           } else {
             const newMap = new Map(sIds);
-            newMap.set(item.id, item);
+            newMap.set(item.uri, item);
             return newMap;
           }
         });
@@ -86,12 +72,12 @@ export default function PhotoGridController({
   );
 
   const onRenderItemLongPress = useCallback(
-    (item: PhotoType) => {
+    (item: PhotoGalleryType) => {
       if (!isSelecting) {
         hideTab();
         setIsSelecting(true);
         const map = new Map();
-        map.set(item.id, item);
+        map.set(item.uri, item);
         setSelectedIds(map);
       }
     },
@@ -107,22 +93,22 @@ export default function PhotoGridController({
     setSelectedIds(ids => {
       const newMap = new Map();
 
-      if (ids.size == props.photos.length) {
+      if (ids.size == photos.length) {
         return newMap;
       }
 
-      props.photos.forEach(photo => {
-        newMap.set(photo.id, photo);
+      photos.forEach(photo => {
+        newMap.set(photo.uri, photo);
       });
 
       return newMap;
     });
-  }, [props.photos]);
+  }, [photos]);
 
   let correctStartIndex = Math.floor(props.startIndex / 3);
 
-  if (props.startIndex >= props.photos.length) {
-    correctStartIndex = Math.floor((props.photos.length - 1) / 3);
+  if (props.startIndex >= photos.length) {
+    correctStartIndex = Math.floor((photos.length - 1) / 3);
   }
 
   if (correctStartIndex < 0) {
@@ -130,54 +116,12 @@ export default function PhotoGridController({
   }
 
   const onRefresh = useCallback(() => {
-    if (contextLocation == 'local') {
-      RefreshPhotosLocal().catch(e => console.log('Error : onRefreshLocal', e));
-    } else if (contextLocation == 'server') {
-      RefreshPhotosServer().catch(e => console.log('Error : onRefreshServer', e));
-    }
-  }, [RefreshPhotosLocal, RefreshPhotosServer, contextLocation]);
-
-  const onAddLocal = useCallback(() => {
-    setIsSelecting(false);
-    showTab();
-    AddPhotosLocal?.(Array.from(seletedIds.values())).catch(e =>
-      console.log('Error : addPhotosLocal', e),
-    );
-  }, [AddPhotosLocal, seletedIds, showTab]);
-
-  const onAddServer = useCallback(() => {
-    setIsSelecting(false);
-    showTab();
-    SendPhotoToBackgroundServiceForUpload?.(Array.from(seletedIds.values())).catch(e =>
-      console.log('Error : addPhotosServer', e),
-    );
-  }, [SendPhotoToBackgroundServiceForUpload, seletedIds, showTab]);
-
-  const onDeleteLocal = useCallback(() => {
-    setIsSelecting(false);
-    showTab();
-    const photosToDelete = Array.from(seletedIds.values());
-    if (contextLocation == 'server') {
-      RequestThumbnailPhotosServer(photosToDelete).catch(e =>
-        console.log('Error : RequestCroppedPhotosServer', e),
-      );
-    }
-    DeletePhotosLocal?.(photosToDelete).catch(e =>
-      console.log('Error : deletePhotosLocal', e),
-    );
-  }, [DeletePhotosLocal, RequestThumbnailPhotosServer, contextLocation, seletedIds, showTab]);
-
-  const onDeleteServer = useCallback(() => {
-    setIsSelecting(false);
-    showTab();
-    DeletePhotosServer?.(Array.from(seletedIds.values())).catch(e =>
-      console.log('Error : deletePhotosServer', e),
-    );
-  }, [DeletePhotosServer, seletedIds, showTab]);
+    RefreshLocalPhotos().catch(e => console.log('Error : onRefreshLocal', e));
+  }, [RefreshLocalPhotos]);
 
   return (
     <PhotoGridComponent
-      photos={props.photos}
+      photos={photos}
       style={props.style}
       onPressPhoto={onRenderItemPress}
       onLongPressPhoto={onRenderItemLongPress}
@@ -185,13 +129,8 @@ export default function PhotoGridController({
       onRefresh={onRefresh}
       isSelecting={isSelecting}
       selectedIds={seletedIds}
-      onAddLocal={onAddLocal}
-      onAddServer={onAddServer}
-      onDeleteLocal={onDeleteLocal}
-      onDeleteServer={onDeleteServer}
       onSelectAll={onSelectAll}
       onBackButton={onBackButton}
-      contextLocation={contextLocation}
     />
   );
 }
