@@ -10,37 +10,37 @@ type PhotoGalleryPropsType = {
 
 export default function PhotoGallery(props: PhotoGalleryPropsType) {
   const [switchingState, setSwitchingState] = useState({
-    isPhotoSelected: false,
-    startIndexWhenSwitching: 0,
+    isSlidingPhotos: false,
+    currentIndexScrolling: 0,
   });
 
-  const onSwitchMode = useCallback((isPhotoSelected: boolean, index: number) => {
-    setSwitchingState(s => {
-      if (s.isPhotoSelected != isPhotoSelected || s.startIndexWhenSwitching != index) {
-        return {
-          isPhotoSelected: isPhotoSelected,
-          startIndexWhenSwitching: index,
-        };
-      } else {
-        return s;
-      }
+  const { isSlidingPhotos, currentIndexScrolling } = switchingState;
+
+  const onSwitchMode = useCallback((isSlidingPhotos: boolean, index: number) => {
+    setSwitchingState({
+      isSlidingPhotos: isSlidingPhotos,
+      currentIndexScrolling: index,
     });
   }, []);
 
-  const displaySlider = switchingState.isPhotoSelected ? 'flex' : 'none';
-  const displayGrid = switchingState.isPhotoSelected ? 'none' : 'flex';
+  const displaySlider = isSlidingPhotos ? 'flex' : 'none';
+  const displayGrid = isSlidingPhotos ? 'none' : 'flex';
 
   return (
     <View style={[styles.viewStyle, props.style]}>
       <View style={[styles.viewStyle, { display: displaySlider }]}>
         <PhotoSlider
-          isSliding={switchingState.isPhotoSelected}
-          startIndex={switchingState.startIndexWhenSwitching}
+          isSlidingPhotos={isSlidingPhotos}
+          startIndex={currentIndexScrolling}
           onSwitchMode={onSwitchMode}
         />
       </View>
       <View style={[styles.viewStyle, { display: displayGrid }]}>
-        <PhotoGridController startIndex={0} onSwitchMode={onSwitchMode} />
+        <PhotoGridController
+          isSlidingPhotos={isSlidingPhotos}
+          startIndex={currentIndexScrolling}
+          onSwitchMode={onSwitchMode}
+        />
       </View>
     </View>
   );

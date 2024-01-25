@@ -9,7 +9,8 @@ import {
 } from 'react-native-gesture-handler';
 import Animated, { runOnJS, useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 
-import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos';
+import { PhotoGalleryType, photoLocalSelector } from '~/Context/ReduxStore/Slices/Photos';
+import { useAppSelector } from '~/Context/ReduxStore/Store';
 
 const H = Dimensions.get('screen').height;
 const W = Dimensions.get('screen').width;
@@ -24,6 +25,8 @@ type PropsType = {
 function PhotoComponentForSlider(props: PropsType) {
   console.log('render photo for slider');
 
+  const localPhoto = useAppSelector(photoLocalSelector(props.photo.mediaId));
+
   // const uriSource = useMemo(() => {
   //   if (props.photo.inDevice) {
   //     return props.photo.image.path;
@@ -36,7 +39,7 @@ function PhotoComponentForSlider(props: PropsType) {
   //   }
   // }, [props.photo]);
 
-  const uriSource = props.photo.uri;
+  const uriSource = localPhoto?.uri;
 
   const position = useSharedValue(0);
   const positionLast = useSharedValue(0);

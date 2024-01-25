@@ -1,7 +1,8 @@
 import React, { useCallback } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
-import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos';
+import { PhotoGalleryType, photoLocalSelector } from '~/Context/ReduxStore/Slices/Photos';
+import { useAppSelector } from '~/Context/ReduxStore/Store';
 
 import ImageForGrid from './ImageForGrid';
 import SelectionIconForGrid from './SelectionIconForGrid';
@@ -18,6 +19,8 @@ function PhotoComponentForGrid(props: PropsType) {
   const { photo, isSelecting, isSelected, onPress, onLongPress } = props;
   console.log('Render photo for grid');
 
+  const localPhoto = useAppSelector(photoLocalSelector(photo.mediaId));
+
   // const uriSource = useMemo(() => {
   //   if (photo.inDevice) {
   //     return photo.image.path;
@@ -29,7 +32,7 @@ function PhotoComponentForGrid(props: PropsType) {
   //     }
   //   }
   // }, [photo]);
-  const uriSource = photo.uri;
+  const uriSource = localPhoto?.uri;
 
   const onPressPhoto = useCallback(() => onPress(photo), [onPress, photo]);
   const onLongPressPhoto = useCallback(() => onLongPress(photo), [onLongPress, photo]);

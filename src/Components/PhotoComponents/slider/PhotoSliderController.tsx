@@ -14,11 +14,11 @@ const { MainModule } = NativeModules;
 type PropsType = {
   style?: StyleProp<ViewStyle>;
   startIndex: number;
-  isSliding: boolean;
+  isSlidingPhotos: boolean;
   onSwitchMode: (isPhotoSelected: boolean, index: number) => void;
 };
 
-function PhotoSlider({ onSwitchMode, ...props }: PropsType) {
+function PhotoSlider({ onSwitchMode, isSlidingPhotos, ...props }: PropsType) {
   console.log('render slider');
 
   const photos = useAppSelector(state => state.photos.photosGallery);
@@ -28,7 +28,7 @@ function PhotoSlider({ onSwitchMode, ...props }: PropsType) {
   const [detailsModalVisible, setDetailsModalVisible] = useState(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
   const validFlatListCurrentIndex = photos.length != 0 && flatListCurrentIndex < photos.length;
-  const { showTab } = useTabNavigationContext();
+  const { showTab, hideTab } = useTabNavigationContext();
 
   const onCurrentIndexChanged = useCallback((index: number) => {
     flatListCurrentIndexRef.current = index;
@@ -37,9 +37,8 @@ function PhotoSlider({ onSwitchMode, ...props }: PropsType) {
 
   useEffect(() => {
     const backAction = () => {
-      if (props.isSliding) {
+      if (isSlidingPhotos) {
         onSwitchMode(false, flatListCurrentIndexRef.current);
-        showTab();
         backHandler.remove();
         return true;
       } else {
@@ -51,7 +50,13 @@ function PhotoSlider({ onSwitchMode, ...props }: PropsType) {
     return () => {
       return backHandler.remove();
     };
-  }, [onSwitchMode, props.isSliding, showTab]);
+  }, [onSwitchMode, isSlidingPhotos, showTab]);
+
+  useEffect(() => {
+    if (isSlidingPhotos) {
+      hideTab();
+    }
+  }, [hideTab, isSlidingPhotos]);
 
   useEffect(() => {
     if (photos.length == 0) {
@@ -89,7 +94,6 @@ function PhotoSlider({ onSwitchMode, ...props }: PropsType) {
 
   const onStatusBarBackButton = () => {
     onSwitchMode(false, flatListCurrentIndex);
-    showTab();
   };
 
   return (

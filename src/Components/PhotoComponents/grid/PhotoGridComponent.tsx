@@ -11,7 +11,7 @@ import PhotoGridSelectView from './PhotoGridSelectView';
 const ITEM_HEIGHT = Dimensions.get('screen').width / 3;
 
 function keyExtractor(item: PhotoGalleryType) {
-  return `grid_${item.uri}`;
+  return `grid_${item.key}`;
 }
 
 function getItemLayout(data: ArrayLike<PhotoGalleryType> | null | undefined, index: number) {
@@ -49,16 +49,17 @@ export default function PhotoGridComponent({
 }: PhotoGridComponentProps) {
   const flatlistRef = useRef<FlatList>(null);
   const photosLenRef = useRef<number>(photos.length);
+  const insets = useSafeAreaInsets();
+
   photosLenRef.current = photos.length;
 
   const renderItem = useCallback(
     ({ item }: { item: PhotoGalleryType }) => {
       return (
         <PhotoComponentForGrid
-          key={`grid_${item.uri}`}
           photo={item}
           isSelecting={isSelecting}
-          isSelected={selectedIds.has(item.uri)}
+          isSelected={selectedIds.has(item.key)}
           onPress={onPressPhoto}
           onLongPress={onLongPressPhoto}
         />
@@ -77,7 +78,6 @@ export default function PhotoGridComponent({
   // This will fix a bug in flatlist which makes it recreate all items each time one is added or removed from the top (indexes change for the rest)
   // with numColumns set to 1, this problem is fixed and the items are able to rerender as needed
   // This will also fix that when less than 3 photos are in a row, the 2 or 1 photo will stretch to fill all horizontal space.
-  const insets = useSafeAreaInsets();
 
   return (
     <View style={[styles.mainViewStyle, style, { paddingTop: insets.top }]}>

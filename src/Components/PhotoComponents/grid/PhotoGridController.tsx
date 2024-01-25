@@ -11,19 +11,22 @@ import PhotoGridComponent from './PhotoGridComponent';
 type PropsType = {
   style?: StyleProp<ViewStyle>;
   startIndex: number;
+  isSlidingPhotos: boolean;
   onSwitchMode: (isPhotoSelected: boolean, index: number) => void;
 };
 
-function PhotoGridController({ onSwitchMode, ...props }: PropsType) {
+function PhotoGridController({ onSwitchMode, startIndex, style, isSlidingPhotos }: PropsType) {
   console.log('render grid');
 
   const photos = useAppSelector(state => state.photos.photosGallery);
+  const photosRef = useRef<PhotoGalleryType[]>(photos);
 
-  const getPhotoIndexRef = useRef<(photo: PhotoGalleryType) => number>();
+  photosRef.current = photos;
+
   const [isSelecting, setIsSelecting] = useState(false);
-  const [seletedIds, setSelectedIds] = useState<Map<string, PhotoGalleryType>>(new Map());
-  const { hideTab, showTab } = useTabNavigationContext();
+  const [seletedKeys, setSelectedKeys] = useState<Map<string, PhotoGalleryType>>(new Map());
 
+  const { hideTab, showTab } = useTabNavigationContext();
   const { RefreshLocalPhotos } = usePhotosFunctionsStore();
 
   useEffect(() => {
@@ -40,34 +43,39 @@ function PhotoGridController({ onSwitchMode, ...props }: PropsType) {
     }
   }, [isSelecting, showTab]);
 
-  getPhotoIndexRef.current = (item: PhotoGalleryType) => {
-    let index = photos.findIndex(photo => photo.uri == item.uri);
+  useEffect(() => {
+    if (!isSlidingPhotos) {
+      showTab();
+    }
+  }, [isSlidingPhotos, showTab]);
+
+  const findPhotoIndex = useCallback((item: PhotoGalleryType) => {
+    let index = photosRef.current.findIndex(photo => photo.key == item.key);
     if (index < 0) {
       index = 0;
     }
     return index;
-  };
+  }, []);
 
   const onRenderItemPress = useCallback(
     (item: PhotoGalleryType) => {
       if (isSelecting) {
-        setSelectedIds(sIds => {
-          if (sIds.has(item.uri)) {
-            const newMap = new Map(sIds);
-            newMap.delete(item.uri);
+        setSelectedKeys(sKeys => {
+          if (sKeys.has(item.key)) {
+            const newMap = new Map(sKeys);
+            newMap.delete(item.key);
             return newMap;
           } else {
-            const newMap = new Map(sIds);
-            newMap.set(item.uri, item);
+            const newMap = new Map(sKeys);
+            newMap.set(item.key, item);
             return newMap;
           }
         });
       } else {
-        hideTab();
-        onSwitchMode(true, getPhotoIndexRef.current?.(item) || 0);
+        onSwitchMode(true, findPhotoIndex(item) || 0);
       }
     },
-    [isSelecting, hideTab, onSwitchMode],
+    [isSelecting, onSwitchMode, findPhotoIndex],
   );
 
   const onRenderItemLongPress = useCallback(
@@ -76,8 +84,8 @@ function PhotoGridController({ onSwitchMode, ...props }: PropsType) {
         hideTab();
         setIsSelecting(true);
         const map = new Map();
-        map.set(item.uri, item);
-        setSelectedIds(map);
+        map.set(item.key, item);
+        setSelectedKeys(map);
       }
     },
     [hideTab, isSelecting],
@@ -89,7 +97,7 @@ function PhotoGridController({ onSwitchMode, ...props }: PropsType) {
   }, [setIsSelecting, showTab]);
 
   const onSelectAll = useCallback(() => {
-    setSelectedIds(ids => {
+    setSelectedKeys(ids => {
       const newMap = new Map();
 
       if (ids.size == photos.length) {
@@ -97,16 +105,16 @@ function PhotoGridController({ onSwitchMode, ...props }: PropsType) {
       }
 
       photos.forEach(photo => {
-        newMap.set(photo.uri, photo);
+        newMap.set(photo.key, photo);
       });
 
       return newMap;
     });
   }, [photos]);
 
-  let correctStartIndex = Math.floor(props.startIndex / 3);
+  let correctStartIndex = Math.floor(startIndex / 3);
 
-  if (props.startIndex >= photos.length) {
+  if (startIndex >= photos.length) {
     correctStartIndex = Math.floor((photos.length - 1) / 3);
   }
 
@@ -121,13 +129,13 @@ function PhotoGridController({ onSwitchMode, ...props }: PropsType) {
   return (
     <PhotoGridComponent
       photos={photos}
-      style={props.style}
+      style={style}
       onPressPhoto={onRenderItemPress}
       onLongPressPhoto={onRenderItemLongPress}
       initialScrollIndex={correctStartIndex}
       onRefresh={onRefresh}
       isSelecting={isSelecting}
-      selectedIds={seletedIds}
+      selectedIds={seletedKeys}
       onSelectAll={onSelectAll}
       onBackButton={onBackButton}
     />

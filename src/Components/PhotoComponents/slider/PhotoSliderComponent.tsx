@@ -7,8 +7,8 @@ import PhotoComponentForSlider from './PhotoComponentForSlider';
 
 const ITEM_WIDTH = Dimensions.get('window').width;
 
-function keyExtractor(item: PhotoGalleryType, index: number) {
-  return `Photo_${item.uri}_index_${index}`;
+function keyExtractor(item: PhotoGalleryType) {
+  return `Photo_${item.key}`;
 }
 
 function getItemLayout(data: ArrayLike<PhotoGalleryType> | null | undefined, index: number) {

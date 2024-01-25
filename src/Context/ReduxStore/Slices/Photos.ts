@@ -1,5 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
+import { RootState } from '../Store';
+
 export type PhotoServerType = {
   id: string;
   fileSize: number;
@@ -14,6 +16,7 @@ export type PhotoServerType = {
 };
 
 export type PhotoLocalType = {
+  id: string;
   uri: string;
   fileSize: number;
   fileName: string;
@@ -26,8 +29,9 @@ export type PhotoLocalType = {
 };
 
 export type PhotoGalleryType = {
-  //id: string | undefined;
-  uri: string;
+  key: string;
+  serverId: string | undefined;
+  mediaId: string | undefined;
 };
 
 export type PhotosState = {
@@ -61,8 +65,9 @@ const photosServerSlice = createSlice({
       state.photosServerIdsOrdered = action.payload.map(photo => photo.id);
       state.photosGallery = action.payload.map(photo => {
         return {
-          id: photo.id,
-          uri: 'undefined',
+          key: photo.id,
+          serverId: photo.id,
+          mediaId: undefined,
         };
       });
     },
@@ -70,7 +75,7 @@ const photosServerSlice = createSlice({
     setPhotosLocal: (state, action: { payload: PhotoLocalType[] }) => {
       state.photosLocal = action.payload.reduce(
         (accumulator: { [key: string]: PhotoLocalType }, photo) => {
-          accumulator[photo.uri] = photo;
+          accumulator[photo.id] = photo;
           return accumulator;
         },
         {},
@@ -78,8 +83,9 @@ const photosServerSlice = createSlice({
       state.photosLocalUriOrdered = action.payload.map(photo => photo.uri);
       state.photosGallery = action.payload.map(photo => {
         return {
-          id: 'id',
-          uri: photo.uri,
+          key: photo.uri,
+          serverId: undefined,
+          mediaId: photo.id,
         };
       });
     },
@@ -102,3 +108,7 @@ export const {
 } = photosServerSlice.actions;
 
 export default photosServerSlice.reducer;
+
+export function photoLocalSelector(id?: string) {
+  return (state: RootState) => (id ? state.photos.photosLocal[id] : undefined);
+}

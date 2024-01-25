@@ -13,6 +13,7 @@ export function usePhotosFunctionsStore() {
 
     const photos: PhotoLocalType[] = photosFromDevice.edges.map(edge => {
       return {
+        id: edge.node.id,
         uri: edge.node.image.uri,
         fileSize: edge.node.image.fileSize ?? 0,
         fileName: edge.node.image.filename ?? '',
