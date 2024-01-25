@@ -111,6 +111,12 @@ function TabElement({ routeName, icon, iconFocused }: TabElementProps) {
   );
 }
 
+export function TabBarPadding() {
+  const insets = useSafeAreaInsets();
+  return <View style={{ height: TAB_BAR_HEIGHT + insets.bottom }} />;
+}
+
+const TAB_BAR_HEIGHT = 80;
 const COLOR = colors.LIGHT_GREEN;
 const FOCUSED_COLOR = appColors.PRIMARY;
 const ICON_SIZE = 22;
@@ -126,7 +132,7 @@ const styles = StyleSheet.create({
     paddingTop: 4,
   },
   tabView: {
-    height: 80,
+    height: TAB_BAR_HEIGHT,
     backgroundColor: 'white',
     flexDirection: 'row',
     justifyContent: 'space-evenly',

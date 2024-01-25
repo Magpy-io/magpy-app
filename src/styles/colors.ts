@@ -36,7 +36,7 @@ export const colors = {
   LIGHT_GREY: '#F5F5F6',
   SOFT_GREY: '#E8E8E8',
   ORANGE: '#CE8C1E',
-
+  TRANSPARENT: `rgba(0,0,0,0)`,
   COLOR_SUCCESS_500: '#5aa97e',
   COLOR_SUCCESS_400: '#acd3be',
   COLOR_SUCCESS_300: '#d5e8de',

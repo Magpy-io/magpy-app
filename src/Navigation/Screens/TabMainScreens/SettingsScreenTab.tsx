@@ -13,9 +13,12 @@ import {
   PreferencesIcon,
   UploadIcon,
 } from '~/Components/CommonComponents/Icons';
+import AutoBackupCard from '~/Components/SettingsComponents/AutoBackupCard';
 import LogoutComponent from '~/Components/SettingsComponents/LogoutComponent';
 import ProfileHeader from '~/Components/SettingsComponents/ProfileHeader';
 import SettingComponent from '~/Components/SettingsComponents/SettingComponent';
+import { useMainNavigation } from '~/Navigation/Navigation';
+import { TabBarPadding } from '~/Navigation/TabNavigation/TabBar';
 import { appColors, colors } from '~/styles/colors';
 import { spacing } from '~/styles/spacing';
 import { typography } from '~/styles/typography';
@@ -28,6 +31,7 @@ type ItemType = {
 
 export default function SettingsScreenTab() {
   const insets = useSafeAreaInsets();
+  const navigation = useMainNavigation();
 
   const data = [
     {
@@ -50,7 +54,9 @@ export default function SettingsScreenTab() {
       data: [
         {
           title: 'Account settings',
-          onPress: () => {},
+          onPress: () => {
+            navigation.navigate('SettingsStackNavigator', { screen: 'AccountSettings' });
+          },
           icon: <AccountIcon />,
         },
         {
@@ -91,23 +97,34 @@ export default function SettingsScreenTab() {
   };
 
   return (
-    <View style={[styles.container, { marginTop: insets.top }]}>
-      <ProfileHeader />
-
+    <View style={[styles.container, { paddingTop: insets.top }]}>
       <SectionList
+        ListHeaderComponent={Header}
         sections={data}
         renderSectionHeader={renderSectionHeader}
         renderItem={renderItem}
-        contentContainerStyle={{
-          paddingVertical: spacing.spacing_s,
-        }}
+        contentContainerStyle={{ paddingHorizontal: spacing.spacing_l }}
         ListFooterComponent={<LogoutComponent />}
       />
+      <TabBarPadding />
+    </View>
+  );
+}
+
+function Header() {
+  return (
+    <View style={styles.header}>
+      <ProfileHeader />
+      <AutoBackupCard />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  header: {
+    paddingTop: spacing.spacing_xl,
+    gap: spacing.spacing_xl,
+  },
   logoutText: {
     ...typography.mediumTextBold,
     color: colors.COLOR_ERROR_500,
@@ -119,6 +136,5 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: appColors.BACKGROUND,
-    padding: spacing.spacing_l,
   },
 });

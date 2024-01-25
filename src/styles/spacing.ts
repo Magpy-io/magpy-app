@@ -21,6 +21,7 @@ export const spacing = {
 export const borderRadius = {
   default: 12,
   button: 12,
+  small: 8,
   input: 12,
   image: 4,
   avatar: 12,
