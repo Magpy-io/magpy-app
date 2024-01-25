@@ -14,12 +14,11 @@ const { MainModule } = NativeModules;
 type PropsType = {
   style?: StyleProp<ViewStyle>;
   startIndex: number;
-  id: string;
   isSliding: boolean;
   onSwitchMode: (isPhotoSelected: boolean, index: number) => void;
 };
 
-export default function PhotoSlider({ onSwitchMode, ...props }: PropsType) {
+function PhotoSlider({ onSwitchMode, ...props }: PropsType) {
   console.log('render slider');
 
   const photos = useAppSelector(state => state.photos.photosGallery);
@@ -75,14 +74,18 @@ export default function PhotoSlider({ onSwitchMode, ...props }: PropsType) {
     };
   }, []);
 
-  const onPressPhoto = async () => {
-    if (isFullScreen) {
-      await MainModule.disableFullScreen();
-    } else {
-      await MainModule.enableFullScreen();
-    }
-    setIsFullScreen(f => !f);
-  };
+  const onPressPhoto = useCallback(() => {
+    const onPressAsync = async () => {
+      if (isFullScreen) {
+        await MainModule.disableFullScreen();
+      } else {
+        await MainModule.enableFullScreen();
+      }
+      setIsFullScreen(f => !f);
+    };
+
+    onPressAsync().catch(console.log);
+  }, [isFullScreen]);
 
   const onStatusBarBackButton = () => {
     onSwitchMode(false, flatListCurrentIndex);
@@ -96,9 +99,7 @@ export default function PhotoSlider({ onSwitchMode, ...props }: PropsType) {
         startIndex={props.startIndex}
         onIndexChanged={onCurrentIndexChanged}
         //onEndReached={}
-        onPhotoClick={() => {
-          onPressPhoto().catch(console.log);
-        }}
+        onPhotoClick={onPressPhoto}
         isFullScreen={isFullScreen}
       />
 
@@ -141,3 +142,5 @@ const styles = StyleSheet.create({
     width: '100%',
   },
 });
+
+export default React.memo(PhotoSlider);

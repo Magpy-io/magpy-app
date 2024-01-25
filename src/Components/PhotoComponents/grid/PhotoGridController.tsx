@@ -11,11 +11,10 @@ import PhotoGridComponent from './PhotoGridComponent';
 type PropsType = {
   style?: StyleProp<ViewStyle>;
   startIndex: number;
-  id: string;
   onSwitchMode: (isPhotoSelected: boolean, index: number) => void;
 };
 
-export default function PhotoGridController({ onSwitchMode, ...props }: PropsType) {
+function PhotoGridController({ onSwitchMode, ...props }: PropsType) {
   console.log('render grid');
 
   const photos = useAppSelector(state => state.photos.photosGallery);
@@ -134,3 +133,5 @@ export default function PhotoGridController({ onSwitchMode, ...props }: PropsTyp
     />
   );
 }
+
+export default React.memo(PhotoGridController);

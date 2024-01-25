@@ -50,7 +50,6 @@ export default function PhotoGridComponent({
   const flatlistRef = useRef<FlatList>(null);
   const photosLenRef = useRef<number>(photos.length);
   photosLenRef.current = photos.length;
-  console.log('Render PhotoGridComponent');
 
   const renderItem = useCallback(
     ({ item }: { item: PhotoGalleryType }) => {
@@ -68,12 +67,8 @@ export default function PhotoGridComponent({
     [onLongPressPhoto, onPressPhoto, isSelecting, selectedIds],
   );
 
-  console.log('initialScrollIndex', initialScrollIndex);
-
   useEffect(() => {
-    console.log('useEffect ', photosLenRef.current);
     if (photosLenRef.current > 0) {
-      console.log('scrolling to ', initialScrollIndex);
       flatlistRef.current?.scrollToIndex({ index: initialScrollIndex });
     }
   }, [flatlistRef, initialScrollIndex]);

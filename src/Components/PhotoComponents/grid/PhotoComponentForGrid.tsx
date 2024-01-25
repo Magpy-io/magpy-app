@@ -16,7 +16,7 @@ type PropsType = {
 
 function PhotoComponentForGrid(props: PropsType) {
   const { photo, isSelecting, isSelected, onPress, onLongPress } = props;
-  // console.log('Render PhotoComponentForGrid');
+  console.log('Render photo for grid');
 
   // const uriSource = useMemo(() => {
   //   if (photo.inDevice) {
