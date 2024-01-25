@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef } from 'react';
-import { Dimensions, FlatList, StyleProp, StyleSheet, ViewStyle } from 'react-native';
+import { Dimensions, FlatList, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos';
 
@@ -77,9 +77,10 @@ export default function PhotoGridComponent({
   // This will fix a bug in flatlist which makes it recreate all items each time one is added or removed from the top (indexes change for the rest)
   // with numColumns set to 1, this problem is fixed and the items are able to rerender as needed
   // This will also fix that when less than 3 photos are in a row, the 2 or 1 photo will stretch to fill all horizontal space.
+  const insets = useSafeAreaInsets();
 
   return (
-    <SafeAreaView edges={['top']} style={[styles.mainViewStyle, style]}>
+    <View style={[styles.mainViewStyle, style, { paddingTop: insets.top }]}>
       <FlatList
         ref={flatlistRef}
         style={styles.flatListStyle}
@@ -104,7 +105,7 @@ export default function PhotoGridComponent({
         isSelecting={isSelecting}
         selectedIds={selectedIds}
       />
-    </SafeAreaView>
+    </View>
   );
 }
 

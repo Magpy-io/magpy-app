@@ -20,8 +20,6 @@ type ToolBarProps = {
 };
 
 function ToolBar(props: ToolBarProps) {
-  // Using insets here instead of SafeAreaView makes the toolBar not slide which I prefer, but not necessary
-  // Feel free to experiment
   const insets = useSafeAreaInsets();
   return (
     <View style={[styles.toolBarView, props.style, { paddingBottom: insets.bottom }]}>

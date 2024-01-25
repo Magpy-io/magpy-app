@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View, ViewStyle } from 'react-native';
 
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { appColors } from '~/styles/colors';
 
@@ -20,8 +20,10 @@ type ToolBarProps = {
 };
 
 function ToolBarGrid(props: ToolBarProps) {
+  const insets = useSafeAreaInsets();
+
   return (
-    <SafeAreaView edges={['bottom']} style={[styles.toolBarView, props.style]}>
+    <View style={[styles.toolBarView, props.style, { paddingBottom: insets.bottom }]}>
       <View style={styles.toolsView}>
         {true ? (
           <ToolComponent
@@ -59,7 +61,7 @@ function ToolBarGrid(props: ToolBarProps) {
           onPress={() => props.onShare?.()}
         />
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 

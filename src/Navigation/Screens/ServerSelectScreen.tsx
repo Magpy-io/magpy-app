@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import ServersList from '~/Components/SelectServerComponents/ServersList';
 import { Server } from '~/Context/ContextSlices/LocalServersContext';
@@ -29,8 +29,10 @@ export default function ServerSelectScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const insets = useSafeAreaInsets();
+
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
       <ServersList
         servers={localServers}
         refreshData={refreshData}
@@ -39,7 +41,7 @@ export default function ServerSelectScreen() {
           onSelectServer(server).catch(e => console.log(e));
         }}
       />
-    </SafeAreaView>
+    </View>
   );
 }
 
