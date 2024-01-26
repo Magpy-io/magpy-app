@@ -8,8 +8,8 @@ import { appColors } from '~/styles/colors';
 import ToolComponent from '../common/ToolComponent';
 
 type ToolBarProps = {
-  inDevice: boolean;
-  inServer: boolean;
+  inDevice?: boolean;
+  inServer?: boolean;
   style?: ViewStyle;
   onDeleteLocal?: () => void;
   onAddLocal?: () => void;

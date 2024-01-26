@@ -11,15 +11,15 @@ type PhotoGalleryPropsType = {
 export default function PhotoGallery(props: PhotoGalleryPropsType) {
   const [switchingState, setSwitchingState] = useState({
     isSlidingPhotos: false,
-    currentIndexScrolling: 0,
+    scrollPosition: 0,
   });
 
-  const { isSlidingPhotos, currentIndexScrolling } = switchingState;
+  const { isSlidingPhotos, scrollPosition } = switchingState;
 
   const onSwitchMode = useCallback((isSlidingPhotos: boolean, index: number) => {
     setSwitchingState({
       isSlidingPhotos: isSlidingPhotos,
-      currentIndexScrolling: index,
+      scrollPosition: index,
     });
   }, []);
 
@@ -31,14 +31,14 @@ export default function PhotoGallery(props: PhotoGalleryPropsType) {
       <View style={[styles.viewStyle, { display: displayGrid }]}>
         <PhotoGridController
           isSlidingPhotos={isSlidingPhotos}
-          startIndex={currentIndexScrolling}
+          scrollPosition={scrollPosition}
           onSwitchMode={onSwitchMode}
         />
       </View>
       <View style={[styles.viewStyle, { display: displaySlider }]}>
         <PhotoSlider
           isSlidingPhotos={isSlidingPhotos}
-          startIndex={currentIndexScrolling}
+          scrollPosition={scrollPosition}
           onSwitchMode={onSwitchMode}
         />
       </View>

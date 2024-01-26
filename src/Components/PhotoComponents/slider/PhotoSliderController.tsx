@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { BackHandler, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
+import { BackHandler, StyleSheet, View } from 'react-native';
 import { NativeEventEmitter, NativeModules } from 'react-native';
 
 import { useAppSelector } from '~/Context/ReduxStore/Store';
+import { NativeEventsNames } from '~/NativeModules/NativeModulesEventNames';
 import { useTabNavigationContext } from '~/Navigation/TabNavigation/TabNavigationContext';
 
 import PhotoSliderComponent from './PhotoSliderComponent';
@@ -12,28 +13,28 @@ import ToolBar from './ToolBar';
 const { MainModule } = NativeModules;
 
 type PropsType = {
-  style?: StyleProp<ViewStyle>;
-  startIndex: number;
+  scrollPosition: number;
   isSlidingPhotos: boolean;
   onSwitchMode: (isPhotoSelected: boolean, index: number) => void;
 };
 
-function PhotoSlider({ onSwitchMode, isSlidingPhotos, ...props }: PropsType) {
+function PhotoSlider({ onSwitchMode, isSlidingPhotos, scrollPosition }: PropsType) {
   console.log('render slider');
 
   const photos = useAppSelector(state => state.photos.photosGallery);
 
-  const flatListCurrentIndexRef = useRef<number>(props.startIndex);
-  const [flatListCurrentIndex, setFlatListCurrentIndex] = useState(props.startIndex);
-  const [detailsModalVisible, setDetailsModalVisible] = useState(false);
-  const [isFullScreen, setIsFullScreen] = useState(false);
-  const validFlatListCurrentIndex = photos.length != 0 && flatListCurrentIndex < photos.length;
-  const { showTab, hideTab } = useTabNavigationContext();
+  const [flatListCurrentIndex, setFlatListCurrentIndex] = useState(scrollPosition);
+  const flatListCurrentIndexRef = useRef<number>(flatListCurrentIndex);
 
-  const onCurrentIndexChanged = useCallback((index: number) => {
-    flatListCurrentIndexRef.current = index;
-    setFlatListCurrentIndex(index);
-  }, []);
+  const [isFullScreen, setIsFullScreen] = useState(false);
+
+  const { hideTab } = useTabNavigationContext();
+
+  useEffect(() => {
+    if (photos.length == 0) {
+      onSwitchMode(false, 0);
+    }
+  }, [photos.length, onSwitchMode]);
 
   useEffect(() => {
     const backAction = () => {
@@ -50,24 +51,12 @@ function PhotoSlider({ onSwitchMode, isSlidingPhotos, ...props }: PropsType) {
     return () => {
       return backHandler.remove();
     };
-  }, [onSwitchMode, isSlidingPhotos, showTab]);
-
-  useEffect(() => {
-    if (isSlidingPhotos) {
-      hideTab();
-    }
-  }, [hideTab, isSlidingPhotos]);
-
-  useEffect(() => {
-    if (photos.length == 0) {
-      onSwitchMode(false, 0);
-    }
-  }, [photos.length, onSwitchMode]);
+  }, [onSwitchMode, isSlidingPhotos]);
 
   useEffect(() => {
     const emitter = new NativeEventEmitter();
     const subscription = emitter.addListener(
-      'FullScreenChanged',
+      NativeEventsNames.FullScreenChanged,
       (param: { isFullScreen: boolean }) => {
         console.log('fullscreenChanged');
         setIsFullScreen(param.isFullScreen);
@@ -77,6 +66,17 @@ function PhotoSlider({ onSwitchMode, isSlidingPhotos, ...props }: PropsType) {
     return () => {
       subscription.remove();
     };
+  }, []);
+
+  useEffect(() => {
+    if (isSlidingPhotos) {
+      hideTab();
+    }
+  }, [hideTab, isSlidingPhotos]);
+
+  const onCurrentIndexChanged = useCallback((index: number) => {
+    flatListCurrentIndexRef.current = index;
+    setFlatListCurrentIndex(index);
   }, []);
 
   const onPressPhoto = useCallback(() => {
@@ -92,50 +92,23 @@ function PhotoSlider({ onSwitchMode, isSlidingPhotos, ...props }: PropsType) {
     onPressAsync().catch(console.log);
   }, [isFullScreen]);
 
-  const onStatusBarBackButton = () => {
-    onSwitchMode(false, flatListCurrentIndex);
-  };
+  const onStatusBarBackButton = useCallback(() => {
+    onSwitchMode(false, flatListCurrentIndexRef.current);
+  }, [onSwitchMode]);
 
   return (
-    <View style={[styles.mainViewStyle, props.style]}>
+    <View style={[styles.mainViewStyle]}>
       <PhotoSliderComponent
         photos={photos}
-        startIndex={props.startIndex}
+        scrollPosition={scrollPosition}
         onIndexChanged={onCurrentIndexChanged}
-        //onEndReached={}
         onPhotoClick={onPressPhoto}
         isFullScreen={isFullScreen}
       />
 
-      {validFlatListCurrentIndex && !isFullScreen && (
-        <StatusBarComponent
-          inDevice={true}
-          inServer={false}
-          isLoading={false}
-          loadingPercentage={0}
-          title={'formatDate(photos[flatListCurrentIndex].created)'}
-          onBackButton={onStatusBarBackButton}
-        />
-      )}
+      {!isFullScreen && <StatusBarComponent onBackButton={onStatusBarBackButton} />}
 
-      {validFlatListCurrentIndex && !isFullScreen && (
-        <>
-          <ToolBar
-            inDevice={true}
-            inServer={false}
-            onDetails={() => {
-              setDetailsModalVisible(true);
-              console.log('details');
-            }}
-          />
-
-          {/* <PhotoDetailsModal
-            modalVisible={detailsModalVisible}
-            handleModal={() => setDetailsModalVisible(!detailsModalVisible)}
-            photo={photos[flatListCurrentIndex]}
-          /> */}
-        </>
-      )}
+      {!isFullScreen && <ToolBar />}
     </View>
   );
 }

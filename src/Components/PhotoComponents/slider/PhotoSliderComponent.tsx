@@ -21,10 +21,9 @@ function getItemLayout(data: ArrayLike<PhotoGalleryType> | null | undefined, ind
 
 type PropsType = {
   photos: PhotoGalleryType[];
-  startIndex: number;
+  scrollPosition: number;
   isFullScreen: boolean;
   onIndexChanged?: (index: number) => void;
-  onEndReached?: () => void;
   onPhotoClick?: (item: PhotoGalleryType) => void;
   onPhotoLongClick?: (item: PhotoGalleryType) => void;
 };
@@ -33,59 +32,20 @@ export default function PhotoSliderComponent({
   onIndexChanged,
   onPhotoClick,
   onPhotoLongClick,
-  startIndex,
   photos,
+  scrollPosition,
   isFullScreen,
-  ...props
 }: PropsType) {
   const flatlistRef = useRef<FlatList>(null);
-  const flatListCurrentIndexRef = useRef<number>(startIndex);
 
-  const renderItem = useCallback(
-    ({ item }: { item: PhotoGalleryType; index: number }) => (
-      <PhotoComponentForSlider
-        photo={item}
-        onPress={onPhotoClick}
-        onLongPress={onPhotoLongClick}
-        isFullScreen={isFullScreen}
-      />
-    ),
-    [isFullScreen, onPhotoClick, onPhotoLongClick],
-  );
-
-  let correctStartIndex = startIndex;
-
-  if (startIndex >= photos.length) {
-    correctStartIndex = photos.length - 1;
-  }
-
-  if (correctStartIndex < 0) {
-    correctStartIndex = 0;
-  }
-
-  const onFlatListCurrentIndexChanged = useCallback(
-    (index: number) => {
-      onIndexChanged?.(index);
-    },
-    [onIndexChanged],
-  );
-
-  const onViewableItemsChangedCallBack = useCallback(
-    ({ viewableItems }: { viewableItems: ViewToken[]; changed: ViewToken[] }) => {
-      if (viewableItems.length == 1) {
-        const index = viewableItems[0].index ?? 0;
-        flatListCurrentIndexRef.current = index;
-        onFlatListCurrentIndexChanged(index);
-      }
-    },
-    [onFlatListCurrentIndexChanged],
-  );
+  const flatListCurrentIndexRef = useRef<number>(scrollPosition);
 
   useEffect(() => {
     if (photos.length == 0) {
       return;
     }
-    const indexOutOfRange = flatListCurrentIndexRef.current >= photos.length || startIndex < 0;
+    const indexOutOfRange =
+      flatListCurrentIndexRef.current >= photos.length || scrollPosition < 0;
 
     let indexToScroll = flatListCurrentIndexRef.current;
 
@@ -103,19 +63,30 @@ export default function PhotoSliderComponent({
         index: indexToScroll,
       });
     }
-  }, [photos.length, startIndex]);
+  }, [photos.length, scrollPosition]);
 
-  const startIndexOutOfRange = startIndex >= photos.length;
+  const renderItem = useCallback(
+    ({ item }: { item: PhotoGalleryType }) => (
+      <PhotoComponentForSlider
+        photo={item}
+        onPress={onPhotoClick}
+        onLongPress={onPhotoLongClick}
+        isFullScreen={isFullScreen}
+      />
+    ),
+    [isFullScreen, onPhotoClick, onPhotoLongClick],
+  );
 
-  useEffect(() => {
-    if (startIndexOutOfRange) {
-      return;
-    }
-    flatlistRef.current?.scrollToIndex({
-      animated: false,
-      index: startIndex,
-    });
-  }, [startIndexOutOfRange, startIndex]);
+  const onViewableItemsChangedCallBack = useCallback(
+    ({ viewableItems }: { viewableItems: ViewToken[]; changed: ViewToken[] }) => {
+      if (viewableItems.length == 1) {
+        const index = viewableItems[0].index ?? 0;
+        flatListCurrentIndexRef.current = index;
+        onIndexChanged?.(index);
+      }
+    },
+    [onIndexChanged],
+  );
 
   return (
     <FlatList
@@ -124,7 +95,6 @@ export default function PhotoSliderComponent({
       data={photos}
       renderItem={renderItem}
       initialNumToRender={10}
-      initialScrollIndex={correctStartIndex}
       onViewableItemsChanged={onViewableItemsChangedCallBack}
       viewabilityConfig={{
         itemVisiblePercentThreshold: 90,
@@ -137,7 +107,6 @@ export default function PhotoSliderComponent({
       snapToInterval={ITEM_WIDTH}
       keyExtractor={keyExtractor}
       onEndReachedThreshold={5}
-      onEndReached={props.onEndReached}
       getItemLayout={getItemLayout}
     />
   );

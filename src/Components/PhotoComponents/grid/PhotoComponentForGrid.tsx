@@ -21,17 +21,6 @@ function PhotoComponentForGrid(props: PropsType) {
 
   const localPhoto = useAppSelector(photoLocalSelector(photo.mediaId));
 
-  // const uriSource = useMemo(() => {
-  //   if (photo.inDevice) {
-  //     return photo.image.path;
-  //   } else {
-  //     if (photo.image.pathCache) {
-  //       return photo.image.pathCache;
-  //     } else {
-  //       return photo.image.image64;
-  //     }
-  //   }
-  // }, [photo]);
   const uriSource = localPhoto?.uri;
 
   const onPressPhoto = useCallback(() => onPress(photo), [onPress, photo]);

@@ -10,11 +10,11 @@ import { appColors } from '~/styles/colors';
 import { typography } from '~/styles/typography';
 
 type StatusBarComponentProps = {
-  inDevice: boolean;
-  inServer: boolean;
-  isLoading: boolean;
-  loadingPercentage: number;
-  title: string;
+  inDevice?: boolean;
+  inServer?: boolean;
+  isLoading?: boolean;
+  loadingPercentage?: number;
+  title?: string;
   style?: ViewStyle;
   onBackButton?: () => void;
 };
@@ -38,12 +38,12 @@ function StatusBarComponent(props: StatusBarComponentProps) {
           icon={serverStatusIcon}
           type="ionicon"
           text={serverStatusText}
-          valid={props.inServer}
+          valid={props.inServer ?? false}
         />
         <StatusComponent
           icon={deviceStatusIcon}
           text={deviceStatusText}
-          valid={props.inDevice}
+          valid={props.inDevice ?? false}
         />
       </View>
     </View>

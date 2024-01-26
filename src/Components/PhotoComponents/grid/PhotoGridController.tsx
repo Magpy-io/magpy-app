@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { BackHandler, StyleProp, ViewStyle } from 'react-native';
+import { BackHandler, View } from 'react-native';
 
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos';
 import { usePhotosFunctionsStore } from '~/Context/ReduxStore/Slices/PhotosFunctions';
@@ -7,15 +7,15 @@ import { useAppSelector } from '~/Context/ReduxStore/Store';
 import { useTabNavigationContext } from '~/Navigation/TabNavigation/TabNavigationContext';
 
 import PhotoGridComponent from './PhotoGridComponent';
+import PhotoGridSelectView from './PhotoGridSelectView';
 
 type PropsType = {
-  style?: StyleProp<ViewStyle>;
-  startIndex: number;
+  scrollPosition: number;
   isSlidingPhotos: boolean;
   onSwitchMode: (isPhotoSelected: boolean, index: number) => void;
 };
 
-function PhotoGridController({ onSwitchMode, startIndex, style, isSlidingPhotos }: PropsType) {
+function PhotoGridController({ onSwitchMode, scrollPosition, isSlidingPhotos }: PropsType) {
   console.log('render grid');
 
   const photos = useAppSelector(state => state.photos.photosGallery);
@@ -112,33 +112,28 @@ function PhotoGridController({ onSwitchMode, startIndex, style, isSlidingPhotos 
     });
   }, [photos]);
 
-  let correctStartIndex = Math.floor(startIndex / 3);
-
-  if (startIndex >= photos.length) {
-    correctStartIndex = Math.floor((photos.length - 1) / 3);
-  }
-
-  if (correctStartIndex < 0) {
-    correctStartIndex = 0;
-  }
-
   const onRefresh = useCallback(() => {
     RefreshLocalPhotos().catch(e => console.log('Error : onRefreshLocal', e));
   }, [RefreshLocalPhotos]);
 
   return (
-    <PhotoGridComponent
-      photos={photos}
-      style={style}
-      onPressPhoto={onRenderItemPress}
-      onLongPressPhoto={onRenderItemLongPress}
-      initialScrollIndex={correctStartIndex}
-      onRefresh={onRefresh}
-      isSelecting={isSelecting}
-      selectedIds={seletedKeys}
-      onSelectAll={onSelectAll}
-      onBackButton={onBackButton}
-    />
+    <View>
+      <PhotoGridComponent
+        photos={photos}
+        onPressPhoto={onRenderItemPress}
+        onLongPressPhoto={onRenderItemLongPress}
+        scrollPosition={scrollPosition}
+        onRefresh={onRefresh}
+        isSelecting={isSelecting}
+        selectedIds={seletedKeys}
+      />
+      <PhotoGridSelectView
+        onBackButton={onBackButton}
+        onSelectAll={onSelectAll}
+        isSelecting={isSelecting}
+        selectedIds={seletedKeys}
+      />
+    </View>
   );
 }
 
