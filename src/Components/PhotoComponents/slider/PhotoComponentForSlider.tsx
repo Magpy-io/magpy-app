@@ -27,18 +27,6 @@ function PhotoComponentForSlider(props: PropsType) {
 
   const localPhoto = useAppSelector(photoLocalSelector(props.photo.mediaId));
 
-  // const uriSource = useMemo(() => {
-  //   if (props.photo.inDevice) {
-  //     return props.photo.image.path;
-  //   } else {
-  //     if (props.photo.image.pathCache) {
-  //       return props.photo.image.pathCache;
-  //     } else {
-  //       return props.photo.image.image64;
-  //     }
-  //   }
-  // }, [props.photo]);
-
   const uriSource = localPhoto?.uri;
 
   const position = useSharedValue(0);

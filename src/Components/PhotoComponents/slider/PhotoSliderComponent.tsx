@@ -39,30 +39,29 @@ export default function PhotoSliderComponent({
   const flatlistRef = useRef<FlatList>(null);
 
   const flatListCurrentIndexRef = useRef<number>(scrollPosition);
+  flatListCurrentIndexRef.current = scrollPosition;
 
   useEffect(() => {
     if (photos.length == 0) {
       return;
     }
-    const indexOutOfRange =
-      flatListCurrentIndexRef.current >= photos.length || scrollPosition < 0;
 
     let indexToScroll = flatListCurrentIndexRef.current;
 
-    if (flatListCurrentIndexRef.current < 0) {
+    if (indexToScroll < 0) {
       indexToScroll = 0;
     }
 
-    if (flatListCurrentIndexRef.current >= photos.length) {
+    if (indexToScroll >= photos.length) {
       indexToScroll = photos.length - 1;
     }
 
-    if (indexOutOfRange) {
-      flatlistRef.current?.scrollToIndex({
-        animated: false,
-        index: indexToScroll,
-      });
-    }
+    flatListCurrentIndexRef.current = indexToScroll;
+
+    flatlistRef.current?.scrollToIndex({
+      index: indexToScroll,
+      animated: false,
+    });
   }, [photos.length, scrollPosition]);
 
   const renderItem = useCallback(

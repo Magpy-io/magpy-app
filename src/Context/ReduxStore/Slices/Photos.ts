@@ -38,7 +38,7 @@ export type PhotosState = {
   photosServer: { [key: string]: PhotoServerType };
   photosServerIdsOrdered: string[];
   photosLocal: { [key: string]: PhotoLocalType };
-  photosLocalUriOrdered: string[];
+  photosLocalIdsOrdered: string[];
   photosGallery: PhotoGalleryType[];
 };
 
@@ -46,7 +46,7 @@ const initialState: PhotosState = {
   photosServer: {},
   photosServerIdsOrdered: [],
   photosLocal: {},
-  photosLocalUriOrdered: [],
+  photosLocalIdsOrdered: [],
   photosGallery: [],
 };
 
@@ -80,7 +80,7 @@ const photosServerSlice = createSlice({
         },
         {},
       );
-      state.photosLocalUriOrdered = action.payload.map(photo => photo.uri);
+      state.photosLocalIdsOrdered = action.payload.map(photo => photo.id);
       state.photosGallery = action.payload.map(photo => {
         return {
           key: photo.uri,

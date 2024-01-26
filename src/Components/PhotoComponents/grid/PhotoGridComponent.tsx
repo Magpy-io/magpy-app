@@ -95,7 +95,6 @@ export default function PhotoGridComponent({
         initialNumToRender={1}
         keyExtractor={keyExtractor}
         onEndReachedThreshold={1}
-        //onEndReached={}
         onRefresh={onRefresh}
         refreshing={false}
         numColumns={3}
