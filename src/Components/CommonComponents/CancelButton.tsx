@@ -11,7 +11,7 @@ type PropsType = {
   onPress?: () => void;
 };
 
-export default function BackButton(props: PropsType) {
+export default function CancelButton(props: PropsType) {
   return (
     <View>
       <TouchableHighlight

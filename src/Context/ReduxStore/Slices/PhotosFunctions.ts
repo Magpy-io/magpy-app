@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 
 import { GalleryGetPhotos } from '~/Helpers/GetGalleryPhotos';
 
@@ -8,7 +8,7 @@ import { PhotoLocalType, setPhotosLocal } from './Photos';
 export function usePhotosFunctionsStore() {
   const dispatch = useAppDispatch();
 
-  const RefreshLocalPhotos = async () => {
+  const RefreshLocalPhotos = useCallback(async () => {
     const photosFromDevice = await GalleryGetPhotos(3000);
 
     const photos: PhotoLocalType[] = photosFromDevice.edges.map(edge => {
@@ -27,14 +27,13 @@ export function usePhotosFunctionsStore() {
     });
 
     dispatch(setPhotosLocal(photos));
-  };
+  }, [dispatch]);
 
   return { RefreshLocalPhotos };
 }
 
 export function usePhotosStoreEffect() {
   const { RefreshLocalPhotos } = usePhotosFunctionsStore();
-
   useEffect(() => {
     RefreshLocalPhotos().catch(console.log);
   }, [RefreshLocalPhotos]);

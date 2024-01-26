@@ -28,15 +28,15 @@ export default function PhotoGallery(props: PhotoGalleryPropsType) {
 
   return (
     <View style={[styles.viewStyle, props.style]}>
-      <View style={[styles.viewStyle, { display: displaySlider }]}>
-        <PhotoSlider
+      <View style={[styles.viewStyle, { display: displayGrid }]}>
+        <PhotoGridController
           isSlidingPhotos={isSlidingPhotos}
           startIndex={currentIndexScrolling}
           onSwitchMode={onSwitchMode}
         />
       </View>
-      <View style={[styles.viewStyle, { display: displayGrid }]}>
-        <PhotoGridController
+      <View style={[styles.viewStyle, { display: displaySlider }]}>
+        <PhotoSlider
           isSlidingPhotos={isSlidingPhotos}
           startIndex={currentIndexScrolling}
           onSwitchMode={onSwitchMode}
