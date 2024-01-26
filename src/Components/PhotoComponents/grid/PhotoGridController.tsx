@@ -19,8 +19,8 @@ function PhotoGridController({ onSwitchMode, startIndex, style, isSlidingPhotos 
   console.log('render grid');
 
   const photos = useAppSelector(state => state.photos.photosGallery);
-  const photosRef = useRef<PhotoGalleryType[]>(photos);
 
+  const photosRef = useRef<PhotoGalleryType[]>(photos);
   photosRef.current = photos;
 
   const [isSelecting, setIsSelecting] = useState(false);
