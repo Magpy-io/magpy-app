@@ -1,7 +1,12 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
-import { PhotoGalleryType, photoLocalSelector } from '~/Context/ReduxStore/Slices/Photos';
+import {
+  PhotoGalleryType,
+  photoLocalSelector,
+  photoServerSelector,
+} from '~/Context/ReduxStore/Slices/Photos';
+import { usePhotosFunctionsStore } from '~/Context/ReduxStore/Slices/PhotosFunctions';
 import { useAppSelector } from '~/Context/ReduxStore/Store';
 
 import ImageForGrid from './ImageForGrid';
@@ -20,11 +25,26 @@ function PhotoComponentForGrid(props: PropsType) {
   console.log('Render photo for grid');
 
   const localPhoto = useAppSelector(photoLocalSelector(photo.mediaId));
+  const serverPhoto = useAppSelector(photoServerSelector(photo.serverId));
 
-  const uriSource = localPhoto?.uri;
+  const { AddPhotoThumbnailIfMissing } = usePhotosFunctionsStore();
+
+  useEffect(() => {
+    if (serverPhoto && !localPhoto && !serverPhoto.uriThumbnail) {
+      AddPhotoThumbnailIfMissing(serverPhoto).catch(console.log);
+    }
+  }, [AddPhotoThumbnailIfMissing, localPhoto, serverPhoto]);
 
   const onPressPhoto = useCallback(() => onPress(photo), [onPress, photo]);
   const onLongPressPhoto = useCallback(() => onLongPress(photo), [onLongPress, photo]);
+
+  let uriSource = '';
+
+  if (localPhoto) {
+    uriSource = localPhoto.uri;
+  } else if (serverPhoto?.uriThumbnail) {
+    uriSource = serverPhoto.uriThumbnail;
+  }
 
   return (
     <TouchableOpacity

@@ -25,21 +25,14 @@ function ToolBarGrid(props: ToolBarProps) {
   return (
     <View style={[styles.toolBarView, props.style, { paddingBottom: insets.bottom }]}>
       <View style={styles.toolsView}>
-        {true ? (
+        {
           <ToolComponent
             icon="backup"
             type="material"
             text="Back up"
             onPress={() => props.onAddServer?.()}
           />
-        ) : (
-          <ToolComponent
-            icon="system-update"
-            type="material"
-            text="Save to device"
-            onPress={() => props.onAddLocal?.()}
-          />
-        )}
+        }
         <ToolComponent
           icon="mobile-off"
           type="material"

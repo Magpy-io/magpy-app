@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Dimensions, StyleSheet } from 'react-native';
 
 import FastImage from 'react-native-fast-image';
@@ -9,7 +9,12 @@ import {
 } from 'react-native-gesture-handler';
 import Animated, { runOnJS, useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 
-import { PhotoGalleryType, photoLocalSelector } from '~/Context/ReduxStore/Slices/Photos';
+import {
+  PhotoGalleryType,
+  photoLocalSelector,
+  photoServerSelector,
+} from '~/Context/ReduxStore/Slices/Photos';
+import { usePhotosFunctionsStore } from '~/Context/ReduxStore/Slices/PhotosFunctions';
 import { useAppSelector } from '~/Context/ReduxStore/Store';
 
 const H = Dimensions.get('screen').height;
@@ -26,8 +31,25 @@ function PhotoComponentForSlider(props: PropsType) {
   console.log('render photo for slider');
 
   const localPhoto = useAppSelector(photoLocalSelector(props.photo.mediaId));
+  const serverPhoto = useAppSelector(photoServerSelector(props.photo.serverId));
 
-  const uriSource = localPhoto?.uri;
+  const { AddPhotoCompressedIfMissing } = usePhotosFunctionsStore();
+
+  useEffect(() => {
+    if (serverPhoto && !localPhoto && !serverPhoto.uriCompressed) {
+      AddPhotoCompressedIfMissing(serverPhoto).catch(console.log);
+    }
+  }, [AddPhotoCompressedIfMissing, localPhoto, serverPhoto]);
+
+  let uriSource = '';
+
+  if (localPhoto) {
+    uriSource = localPhoto.uri;
+  } else if (serverPhoto?.uriCompressed) {
+    uriSource = serverPhoto.uriCompressed;
+  } else if (serverPhoto?.uriThumbnail) {
+    uriSource = serverPhoto.uriThumbnail;
+  }
 
   const position = useSharedValue(0);
   const positionLast = useSharedValue(0);

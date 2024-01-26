@@ -10,7 +10,7 @@ export type PhotoServerType = {
   width: number;
   created: string;
   syncDate: string;
-  clientPaths: Array<{ deviceUniquedId: string; path: string }>;
+  clientPaths: Array<{ deviceUniqueId: string; path: string }>;
   uriThumbnail: string | undefined;
   uriCompressed: string | undefined;
 };
@@ -83,7 +83,7 @@ const photosServerSlice = createSlice({
       state.photosLocalIdsOrdered = action.payload.map(photo => photo.id);
       state.photosGallery = action.payload.map(photo => {
         return {
-          key: photo.uri,
+          key: photo.id,
           serverId: undefined,
           mediaId: photo.id,
         };
@@ -111,4 +111,8 @@ export default photosServerSlice.reducer;
 
 export function photoLocalSelector(id?: string) {
   return (state: RootState) => (id ? state.photos.photosLocal[id] : undefined);
+}
+
+export function photoServerSelector(id?: string) {
+  return (state: RootState) => (id ? state.photos.photosServer[id] : undefined);
 }

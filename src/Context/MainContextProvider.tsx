@@ -9,7 +9,6 @@ import {
   LocalServersDataType,
   useLocalServersData,
 } from './ContextSlices/LocalServersContext';
-import { PhotosDataType, usePhotosData } from './ContextSlices/PhotosContext/PhotosContext';
 import {
   PhotosDownloadingDataType,
   usePhotosDownloadingData,
@@ -18,7 +17,6 @@ import { ServerClaimDataType, useServerClaimData } from './ContextSlices/ServerC
 import { ServerDataType, useServerData } from './ContextSlices/ServerContext';
 
 export type PhotosContextType = {
-  photosData: PhotosDataType;
   backgroundServiceData: BackgroundServiceDataType;
   photosDownloadingData: PhotosDownloadingDataType;
   serverClaimData: ServerClaimDataType;
@@ -34,7 +32,6 @@ type PropsType = {
 };
 
 const ContextProvider: React.FC<PropsType> = props => {
-  const photosData = usePhotosData();
   const backgroundServiceData = useBackgroundServiceData();
   const photosDownloadingData = usePhotosDownloadingData();
   const serverClaimData = useServerClaimData();
@@ -43,7 +40,6 @@ const ContextProvider: React.FC<PropsType> = props => {
   const localServersData = useLocalServersData();
 
   const value = {
-    photosData,
     backgroundServiceData,
     photosDownloadingData,
     serverClaimData,

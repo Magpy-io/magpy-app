@@ -27,7 +27,7 @@ function PhotoGridController({ onSwitchMode, scrollPosition, isSlidingPhotos }: 
   const [seletedKeys, setSelectedKeys] = useState<Map<string, PhotoGalleryType>>(new Map());
 
   const { hideTab, showTab } = useTabNavigationContext();
-  const { RefreshLocalPhotos } = usePhotosFunctionsStore();
+  const { RefreshServerPhotos } = usePhotosFunctionsStore();
 
   useEffect(() => {
     if (isSelecting) {
@@ -113,8 +113,8 @@ function PhotoGridController({ onSwitchMode, scrollPosition, isSlidingPhotos }: 
   }, [photos]);
 
   const onRefresh = useCallback(() => {
-    RefreshLocalPhotos().catch(e => console.log('Error : onRefreshLocal', e));
-  }, [RefreshLocalPhotos]);
+    RefreshServerPhotos().catch(e => console.log('Error : onRefreshLocal', e));
+  }, [RefreshServerPhotos]);
 
   return (
     <View>
