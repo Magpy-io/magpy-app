@@ -39,7 +39,7 @@ export function useLocalServersFunctions() {
       setTimeout(() => {
         zeroconf.stop();
         resolve(localServersRef.current);
-      }, 5000);
+      }, 3000);
     });
   }, [setLocalServers, localServersRef]);
 
