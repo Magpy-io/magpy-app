@@ -30,8 +30,6 @@ export default function ServerSelectScreen() {
 
   const insets = useSafeAreaInsets();
 
-  const insets = useSafeAreaInsets();
-
   return (
     <View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
       <ServersList

@@ -42,7 +42,6 @@ export default function PhotoGridComponent({
 }: PhotoGridComponentProps) {
   const flatlistRef = useRef<FlatList>(null);
   const photosLenRef = useRef<number>(photos.length);
-  const insets = useSafeAreaInsets();
 
   photosLenRef.current = photos.length;
 
