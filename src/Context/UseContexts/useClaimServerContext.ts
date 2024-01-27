@@ -1,6 +1,6 @@
 import { useMainContext } from '~/Context/MainContextProvider';
 import { GetMyServerInfo } from '~/Helpers/BackendQueries';
-import { ClaimServer, SetPath } from '~/Helpers/ServerQueries';
+import { ClaimServer } from '~/Helpers/ServerQueries';
 
 export function useServerClaimFunctions() {
   const { serverClaimData, authData } = useMainContext();
@@ -12,9 +12,8 @@ export function useServerClaimFunctions() {
       return;
     }
 
-    SetPath(path);
     try {
-      const ret = await ClaimServer.Post({ userToken: token });
+      const ret = await ClaimServer.Post({ userToken: token }, { path: path });
       console.log('Claim Server ret with token', token, ret);
       if (ret.ok) {
         const serverInfo = await GetMyServerInfo.Post();
