@@ -2,6 +2,7 @@ import { useCallback, useEffect } from 'react';
 
 import { Promise as BluebirdPromise } from 'bluebird';
 
+import { useServerContext } from '~/Context/UseContexts/useServerContext';
 import {
   GalleryGetPhotos,
   addPhotoCompressedToCache,
@@ -160,7 +161,11 @@ export function usePhotosFunctionsStore() {
 
 export function usePhotosStoreEffect() {
   const { RefreshServerPhotos } = usePhotosFunctionsStore();
+  const { isServerReachable } = useServerContext();
+
   useEffect(() => {
-    RefreshServerPhotos().catch(console.log);
-  }, [RefreshServerPhotos]);
+    if (isServerReachable) {
+      RefreshServerPhotos().catch(console.log);
+    }
+  }, [RefreshServerPhotos, isServerReachable]);
 }
