@@ -26,8 +26,7 @@ export default function ServerSelectScreen() {
   useEffect(() => {
     console.log('Refresh');
     refreshData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [refreshData]);
 
   const insets = useSafeAreaInsets();
 
