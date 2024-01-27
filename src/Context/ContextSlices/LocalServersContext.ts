@@ -38,7 +38,6 @@ export function useLocalServersEffect() {
       setIsScanning(false);
     });
     zeroconf.on('resolved', service => {
-      console.log('resolved', service);
       if (service.name.startsWith(serverMdnsPrefix)) {
         setLocalServers(oldServers => {
           return [
@@ -53,6 +52,7 @@ export function useLocalServersEffect() {
       }
     });
     zeroconf.on('error', err => {
+      setIsScanning(false);
       console.log('[Error]', err);
     });
     return () => {

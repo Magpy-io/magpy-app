@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 
-import { Server } from '~/Context/ContextSlices/LocalServersContext';
-import { getAddressInfo, storeAddressInfo } from '~/Helpers/AsyncStorage';
+import * as AsyncStorageFunctions from '~/Helpers/AsyncStorage';
 import { GetToken, SetPath } from '~/Helpers/ServerQueries';
+import { ErrorServerUnreachable } from '~/Helpers/ServerQueries/ExceptionsManager';
 
 import { useMainContext } from '../MainContextProvider';
+import { useLocalServersFunctions } from '../UseContexts/useLocalServersContext';
 
 type SetStateType<T> = React.Dispatch<React.SetStateAction<T>>;
 
@@ -34,110 +35,115 @@ export function useServerData(): ServerDataType {
 export function useServerEffect() {
   const mainContext = useMainContext();
 
-  const { setServerNetwork, serverNetwork, setIsServerReachable, isServerReachable } =
-    mainContext.serverData;
+  const { searchAsync } = useLocalServersFunctions();
+
+  const { setServerNetwork, setIsServerReachable, isServerReachable } = mainContext.serverData;
   const { token } = mainContext.authData;
 
-  const { ipLocal, ipPublic, port } = serverNetwork;
   const claimedServer = mainContext.serverClaimData.server;
   const { isScanning, localServers } = mainContext.localServersData;
 
   useEffect(() => {
-    async function core() {
-      const res = await getAddressInfo();
-      if (res) {
-        setServerNetwork({ ipLocal: res.ipLocal, ipPublic: res.ipPublic, port: res.port });
-      }
-    }
-    core().catch(console.log);
-  }, [setServerNetwork]);
-
-  useEffect(() => {
-    async function FindServerAddressFromAsyncStorage(token: string) {
-      // I got ip/port from async storage, I try to connect
+    async function FindServer(backendToken: string) {
+      let serverFound = false;
+      const { ipLocal, port } = await AsyncStorageFunctions.getAddressInfo();
       if (ipLocal && port) {
-        console.log('Trying Address from Async storage');
-        const res = await TryServerAddress(ipLocal, port, token);
-        if (res) {
-          setIsServerReachable(true);
-        }
-      }
-    }
-    if (!isServerReachable && !!token) {
-      FindServerAddressFromAsyncStorage(token).catch(console.log);
-    }
-  }, [isServerReachable, token, ipLocal, port, setIsServerReachable]);
-
-  useEffect(() => {
-    async function FindServerAddressFromBackend(token: string) {
-      // I try the local Ip given by backend
-      if (claimedServer) {
-        console.log('Trying address from server');
-        const res = await TryServerAddress(claimedServer.ipPrivate, claimedServer.port, token);
-        if (res) {
-          setServerNetwork({
-            ipLocal: claimedServer.ipPrivate,
-            ipPublic: ipPublic,
-            port: claimedServer.port,
-          });
-
-          await storeAddressInfo({
-            ipLocal: claimedServer.ipPrivate,
-            port: claimedServer.port,
+        const serverResponded = await TryServerAddress(ipLocal, port, backendToken);
+        if (serverResponded) {
+          serverFound = true;
+          setServerNetwork(s => {
+            return { ipLocal: ipLocal, ipPublic: s.ipPublic, port: port };
           });
           setIsServerReachable(true);
+        } else {
+          await AsyncStorageFunctions.storeAddressInfo({ ipLocal: '', port: '' });
         }
       }
-    }
-    if (!isServerReachable && !!token) {
-      FindServerAddressFromBackend(token).catch(console.log);
-    }
-  }, [
-    isServerReachable,
-    token,
-    setServerNetwork,
-    ipPublic,
-    setIsServerReachable,
-    claimedServer,
-  ]);
 
-  useEffect(() => {
-    async function FindServerAddressFromLocalServers(token: string) {
-      // I try local servers scanned
-      console.log('Trying address from scanned local servers');
-      const results: { result: string | undefined; server: Server }[] = [];
-      for (const s of localServers) {
-        console.log('Loop', s.ip);
-        const r = await TryServerAddress(s.ip, s.port, token);
-        results.push({ result: r, server: s });
+      if (serverFound) {
+        return;
       }
-      const myPotentialServer = results.filter(r => !!r.result)?.[0];
-      if (myPotentialServer) {
-        setServerNetwork({
-          ipLocal: myPotentialServer.server.ip,
-          ipPublic: ipPublic,
-          port: myPotentialServer.server.port,
-        });
-        await storeAddressInfo({
-          ipLocal: myPotentialServer.server.ip,
-          port: myPotentialServer.server.port,
-        });
-        setIsServerReachable(true);
-        SetPath(`http://${myPotentialServer.server.ip}:${myPotentialServer.server.port}`);
-      }
+
+      const servers = await searchAsync();
+
+      console.log(servers);
     }
-    if (!isServerReachable && !!token && !isScanning) {
-      FindServerAddressFromLocalServers(token).catch(console.log);
+
+    if (token) {
+      FindServer(token).catch(console.log);
     }
-  }, [
-    isServerReachable,
-    token,
-    isScanning,
-    localServers,
-    setServerNetwork,
-    ipPublic,
-    setIsServerReachable,
-  ]);
+  }, [searchAsync, setIsServerReachable, setServerNetwork, token]);
+
+  // useEffect(() => {
+  //   async function FindServerAddressFromBackend(token: string) {
+  //     // I try the local Ip given by backend
+  //     if (claimedServer) {
+  //       console.log('Trying address from server');
+  //       const res = await TryServerAddress(claimedServer.ipPrivate, claimedServer.port, token);
+  //       if (res) {
+  //         setServerNetwork({
+  //           ipLocal: claimedServer.ipPrivate,
+  //           ipPublic: ipPublic,
+  //           port: claimedServer.port,
+  //         });
+
+  //         await storeAddressInfo({
+  //           ipLocal: claimedServer.ipPrivate,
+  //           port: claimedServer.port,
+  //         });
+  //         setIsServerReachable(true);
+  //       }
+  //     }
+  //   }
+  //   if (!isServerReachable && !!token) {
+  //     FindServerAddressFromBackend(token).catch(console.log);
+  //   }
+  // }, [
+  //   isServerReachable,
+  //   token,
+  //   setServerNetwork,
+  //   ipPublic,
+  //   setIsServerReachable,
+  //   claimedServer,
+  // ]);
+
+  // useEffect(() => {
+  //   async function FindServerAddressFromLocalServers(token: string) {
+  //     // I try local servers scanned
+  //     console.log('Trying address from scanned local servers');
+  //     const results: { result: string | undefined; server: Server }[] = [];
+  //     for (const s of localServers) {
+  //       console.log('Loop', s.ip);
+  //       const r = await TryServerAddress(s.ip, s.port, token);
+  //       results.push({ result: r, server: s });
+  //     }
+  //     const myPotentialServer = results.filter(r => !!r.result)?.[0];
+  //     if (myPotentialServer) {
+  //       setServerNetwork({
+  //         ipLocal: myPotentialServer.server.ip,
+  //         ipPublic: ipPublic,
+  //         port: myPotentialServer.server.port,
+  //       });
+  //       await storeAddressInfo({
+  //         ipLocal: myPotentialServer.server.ip,
+  //         port: myPotentialServer.server.port,
+  //       });
+  //       setIsServerReachable(true);
+  //       SetPath(`http://${myPotentialServer.server.ip}:${myPotentialServer.server.port}`);
+  //     }
+  //   }
+  //   if (!isServerReachable && !!token && !isScanning) {
+  //     FindServerAddressFromLocalServers(token).catch(console.log);
+  //   }
+  // }, [
+  //   isServerReachable,
+  //   token,
+  //   isScanning,
+  //   localServers,
+  //   setServerNetwork,
+  //   ipPublic,
+  //   setIsServerReachable,
+  // ]);
 
   // TODO : make sure this only happens after we tried to find the local ip address
   // useEffect(() => {
@@ -180,9 +186,14 @@ async function TryServerAddress(ip: string, port: string, token: string) {
     const res = await GetToken.Post({ userToken: token });
     if (res.ok) {
       console.log("Bingo, it's: ", ip, port);
-      return res.data;
+      return true;
     }
+    return false;
   } catch (e) {
+    if (e instanceof ErrorServerUnreachable) {
+      return false;
+    }
     console.log('Error: TryServerAddress', e);
+    throw e;
   }
 }
