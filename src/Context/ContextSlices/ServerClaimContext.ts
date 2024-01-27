@@ -15,7 +15,7 @@ export type ServerClaimDataType = {
 
 export function useServerClaimData(): ServerClaimDataType {
   const [server, setServer] = useState<Types.ServerType | null>(null);
-  const [hasServer, setHasServer] = useState<boolean>(false);
+  const [hasServer, setHasServer] = useState<boolean>(true);
 
   return { server, setServer, hasServer, setHasServer };
 }
