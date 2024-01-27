@@ -2,7 +2,7 @@ import { PhotoIdentifier } from '@react-native-camera-roll/camera-roll';
 import RNFS from 'react-native-fs';
 
 import { uniqueDeviceId } from '~/Config/config';
-import { GetPhotos as GalleryGetPhotos } from '~/Helpers/GetGalleryPhotos';
+import { GalleryGetPhotos } from '~/Helpers/GetGalleryPhotos';
 import { PhotoType } from '~/Helpers/types';
 
 import {

@@ -1,3 +1,5 @@
+import { useCallback, useRef } from 'react';
+
 import { zeroconf } from '~/Context/ContextSlices/LocalServersContext';
 import { useMainContext } from '~/Context/MainContextProvider';
 
@@ -5,8 +7,11 @@ export function useLocalServersFunctions() {
   const { localServersData } = useMainContext();
   const { isScanning, setLocalServers } = localServersData;
 
-  const refreshData = () => {
-    if (isScanning) {
+  const isScanningRef = useRef(isScanning);
+  isScanningRef.current = isScanning;
+
+  const refreshData = useCallback(() => {
+    if (isScanningRef.current) {
       zeroconf.stop();
     }
     setLocalServers([]);
@@ -14,7 +19,7 @@ export function useLocalServersFunctions() {
     setTimeout(() => {
       zeroconf.stop();
     }, 5000);
-  };
+  }, [isScanningRef, setLocalServers]);
 
   const stopSearch = () => {
     zeroconf.stop();

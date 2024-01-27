@@ -1,20 +1,19 @@
-import React, { useCallback, useRef } from 'react';
-import { Dimensions, FlatList, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
+import React, { useCallback, useEffect, useRef } from 'react';
+import { Dimensions, FlatList, StyleSheet, View } from 'react-native';
 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { PhotoType } from '~/Helpers/types';
+import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos';
 
 import PhotoComponentForGrid from './PhotoComponentForGrid';
-import PhotoGridSelectView from './PhotoGridSelectView';
 
 const ITEM_HEIGHT = Dimensions.get('screen').width / 3;
 
-function keyExtractor(item: PhotoType) {
-  return `grid_${item.id}`;
+function keyExtractor(item: PhotoGalleryType) {
+  return `grid_${item.key}`;
 }
 
-function getItemLayout(data: ArrayLike<PhotoType> | null | undefined, index: number) {
+function getItemLayout(data: ArrayLike<PhotoGalleryType> | null | undefined, index: number) {
   return {
     length: ITEM_HEIGHT,
     offset: ITEM_HEIGHT * index,
@@ -23,52 +22,37 @@ function getItemLayout(data: ArrayLike<PhotoType> | null | undefined, index: num
 }
 
 type PhotoGridComponentProps = {
-  photos: Array<PhotoType>;
-  style?: StyleProp<ViewStyle>;
-  onPressPhoto: (item: PhotoType) => void;
-  onLongPressPhoto: (item: PhotoType) => void;
-  initialScrollIndex: number;
+  photos: Array<PhotoGalleryType>;
+  onPressPhoto: (item: PhotoGalleryType) => void;
+  onLongPressPhoto: (item: PhotoGalleryType) => void;
+  scrollPosition: number;
   onRefresh: () => void;
   isSelecting: boolean;
-  selectedIds: Map<string, PhotoType>;
-  onAddLocal: () => void;
-  onAddServer: () => void;
-  onDeleteLocal: () => void;
-  onDeleteServer: () => void;
-  onSelectAll: () => void;
-  onBackButton: () => void;
-  contextLocation: string;
+  selectedIds: Map<string, PhotoGalleryType>;
 };
 
 export default function PhotoGridComponent({
   photos,
-  style,
   onLongPressPhoto,
   onPressPhoto,
-  initialScrollIndex,
+  scrollPosition,
   onRefresh,
   isSelecting,
   selectedIds,
-  onAddServer,
-  onAddLocal,
-  onDeleteLocal,
-  onDeleteServer,
-  onBackButton,
-  onSelectAll,
-  contextLocation,
 }: PhotoGridComponentProps) {
   const flatlistRef = useRef<FlatList>(null);
+  const photosLenRef = useRef<number>(photos.length);
+  const insets = useSafeAreaInsets();
 
-  console.log('Render PhotoGridComponent');
+  photosLenRef.current = photos.length;
 
   const renderItem = useCallback(
-    ({ item }: { item: PhotoType }) => {
+    ({ item }: { item: PhotoGalleryType }) => {
       return (
         <PhotoComponentForGrid
-          key={`grid_${item.id}`}
           photo={item}
           isSelecting={isSelecting}
-          isSelected={selectedIds.has(item.id)}
+          isSelected={selectedIds.has(item.key)}
           onPress={onPressPhoto}
           onLongPress={onLongPressPhoto}
         />
@@ -77,6 +61,23 @@ export default function PhotoGridComponent({
     [onLongPressPhoto, onPressPhoto, isSelecting, selectedIds],
   );
 
+  let correctStartIndex = Math.floor(scrollPosition / 3);
+
+  if (scrollPosition >= photos.length) {
+    correctStartIndex = Math.floor((photos.length - 1) / 3);
+  }
+
+  if (correctStartIndex < 0) {
+    correctStartIndex = 0;
+  }
+
+  useEffect(() => {
+    // don't scroll if no photos yet
+    if (photosLenRef.current > 0) {
+      flatlistRef.current?.scrollToIndex({ index: correctStartIndex });
+    }
+  }, [flatlistRef, correctStartIndex]);
+
   // TODO change the numColumns to 1 and create a renderItem containing 3 photos
   // This will fix a bug in flatlist which makes it recreate all items each time one is added or removed from the top (indexes change for the rest)
   // with numColumns set to 1, this problem is fixed and the items are able to rerender as needed
@@ -84,7 +85,7 @@ export default function PhotoGridComponent({
   const insets = useSafeAreaInsets();
 
   return (
-    <View style={[styles.mainViewStyle, style, { paddingTop: insets.top }]}>
+    <View style={[styles.mainViewStyle, { paddingTop: insets.top }]}>
       <FlatList
         ref={flatlistRef}
         style={styles.flatListStyle}
@@ -93,26 +94,12 @@ export default function PhotoGridComponent({
         windowSize={3}
         maxToRenderPerBatch={1}
         initialNumToRender={1}
-        initialScrollIndex={initialScrollIndex}
         keyExtractor={keyExtractor}
         onEndReachedThreshold={1}
-        //onEndReached={}
         onRefresh={onRefresh}
         refreshing={false}
         numColumns={3}
         getItemLayout={getItemLayout}
-      />
-
-      <PhotoGridSelectView
-        contextLocation={contextLocation}
-        onAddLocal={onAddLocal}
-        onAddServer={onAddServer}
-        onDeleteLocal={onDeleteLocal}
-        onDeleteServer={onDeleteServer}
-        onBackButton={onBackButton}
-        onSelectAll={onSelectAll}
-        isSelecting={isSelecting}
-        selectedIds={selectedIds}
       />
     </View>
   );

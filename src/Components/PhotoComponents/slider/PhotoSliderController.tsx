@@ -1,15 +1,11 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { BackHandler, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
+import { BackHandler, StyleSheet, View } from 'react-native';
 import { NativeEventEmitter, NativeModules } from 'react-native';
 
-import { useBackgroundServiceFunctions } from '~/Context/UseContexts/useBackgroundServiceContext';
-import { usePhotosFunctions } from '~/Context/UseContexts/usePhotosContext';
-import { usePhotosDownloadingFunctions } from '~/Context/UseContexts/usePhotosDownloadingContext';
-import { formatDate } from '~/Helpers/Date';
-import { PhotoType } from '~/Helpers/types';
+import { useAppSelector } from '~/Context/ReduxStore/Store';
+import { NativeEventsNames } from '~/NativeModules/NativeModulesEventNames';
 import { useTabNavigationContext } from '~/Navigation/TabNavigation/TabNavigationContext';
 
-import PhotoDetailsModal from './PhotoDetailsModal';
 import PhotoSliderComponent from './PhotoSliderComponent';
 import StatusBarComponent from './StatusBarComponent';
 import ToolBar from './ToolBar';
@@ -17,68 +13,33 @@ import ToolBar from './ToolBar';
 const { MainModule } = NativeModules;
 
 type PropsType = {
-  photos: Array<PhotoType>;
-  style?: StyleProp<ViewStyle>;
-  startIndex: number;
-  contextLocation: string;
-  id: string;
-  isSliding: boolean;
+  scrollPosition: number;
+  isSlidingPhotos: boolean;
   onSwitchMode: (isPhotoSelected: boolean, index: number) => void;
 };
 
-export default function PhotoSlider({
-  photos,
-  contextLocation,
-  onSwitchMode,
-  ...props
-}: PropsType) {
-  console.log('render slider', contextLocation);
+function PhotoSlider({ onSwitchMode, isSlidingPhotos, scrollPosition }: PropsType) {
+  console.log('render slider');
 
-  const {
-    RequestCompressedPhotoServer,
-    DeletePhotosLocal,
-    DeletePhotosServer,
-    RequestThumbnailPhotosServer,
-  } = usePhotosFunctions();
+  const photos = useAppSelector(state => state.photos.photosGallery);
 
-  const { SendPhotoToBackgroundServiceForUpload } = useBackgroundServiceFunctions();
-  const { AddPhotosLocal } = usePhotosDownloadingFunctions();
+  const [flatListCurrentIndex, setFlatListCurrentIndex] = useState(scrollPosition);
+  const flatListCurrentIndexRef = useRef<number>(flatListCurrentIndex);
 
-  const flatListCurrentIndexRef = useRef<number>(props.startIndex);
-  const [flatListCurrentIndex, setFlatListCurrentIndex] = useState(props.startIndex);
-  const [detailsModalVisible, setDetailsModalVisible] = useState(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
-  const validFlatListCurrentIndex = photos.length != 0 && flatListCurrentIndex < photos.length;
-  const { showTab } = useTabNavigationContext();
+
+  const { hideTab } = useTabNavigationContext();
 
   useEffect(() => {
-    if (
-      validFlatListCurrentIndex &&
-      !photos[flatListCurrentIndex].inDevice &&
-      contextLocation == 'server'
-    ) {
-      RequestCompressedPhotoServer(photos[flatListCurrentIndex]).catch(e =>
-        console.log('Error : RequestFullPhotoServer', e),
-      );
+    if (photos.length == 0) {
+      onSwitchMode(false, 0);
     }
-  }, [
-    photos,
-    contextLocation,
-    flatListCurrentIndex,
-    validFlatListCurrentIndex,
-    RequestCompressedPhotoServer,
-  ]);
-
-  const onCurrentIndexChanged = useCallback((index: number) => {
-    flatListCurrentIndexRef.current = index;
-    setFlatListCurrentIndex(index);
-  }, []);
+  }, [photos.length, onSwitchMode]);
 
   useEffect(() => {
     const backAction = () => {
-      if (props.isSliding) {
+      if (isSlidingPhotos) {
         onSwitchMode(false, flatListCurrentIndexRef.current);
-        showTab();
         backHandler.remove();
         return true;
       } else {
@@ -90,18 +51,12 @@ export default function PhotoSlider({
     return () => {
       return backHandler.remove();
     };
-  }, [onSwitchMode, props.isSliding, showTab]);
-
-  useEffect(() => {
-    if (photos.length == 0) {
-      onSwitchMode(false, 0);
-    }
-  }, [photos.length, onSwitchMode]);
+  }, [onSwitchMode, isSlidingPhotos]);
 
   useEffect(() => {
     const emitter = new NativeEventEmitter();
     const subscription = emitter.addListener(
-      'FullScreenChanged',
+      NativeEventsNames.FullScreenChanged,
       (param: { isFullScreen: boolean }) => {
         console.log('fullscreenChanged');
         setIsFullScreen(param.isFullScreen);
@@ -113,95 +68,47 @@ export default function PhotoSlider({
     };
   }, []);
 
-  const onAddLocal = () => {
-    AddPhotosLocal?.([photos[flatListCurrentIndex]]).catch(e =>
-      console.log('Error : addPhotosLocal', e),
-    );
-  };
-
-  const onAddServer = () => {
-    SendPhotoToBackgroundServiceForUpload?.([photos[flatListCurrentIndex]]).catch(e =>
-      console.log('Error : addPhotosServer', e),
-    );
-  };
-
-  const onDeleteLocal = () => {
-    if (contextLocation == 'server') {
-      RequestThumbnailPhotosServer([photos[flatListCurrentIndex]]).catch(e =>
-        console.log('Error : RequestCroppedPhotosServer', e),
-      );
+  useEffect(() => {
+    if (isSlidingPhotos) {
+      hideTab();
     }
-    DeletePhotosLocal?.([photos[flatListCurrentIndex]]).catch(e =>
-      console.log('Error : deletePhotosLocal', e),
-    );
-  };
+  }, [hideTab, isSlidingPhotos]);
 
-  const onDeleteServer = () => {
-    DeletePhotosServer?.([photos[flatListCurrentIndex]]).catch(e => {
-      console.log('Error: deletePhotosServer', e);
-    });
-  };
+  const onCurrentIndexChanged = useCallback((index: number) => {
+    flatListCurrentIndexRef.current = index;
+    setFlatListCurrentIndex(index);
+  }, []);
 
-  const onPressPhoto = async () => {
-    if (isFullScreen) {
-      await MainModule.disableFullScreen();
-    } else {
-      await MainModule.enableFullScreen();
-    }
-    setIsFullScreen(f => !f);
-  };
+  const onPressPhoto = useCallback(() => {
+    const onPressAsync = async () => {
+      if (isFullScreen) {
+        await MainModule.disableFullScreen();
+      } else {
+        await MainModule.enableFullScreen();
+      }
+      setIsFullScreen(f => !f);
+    };
 
-  const onStatusBarBackButton = () => {
-    onSwitchMode(false, flatListCurrentIndex);
-    showTab();
-  };
+    onPressAsync().catch(console.log);
+  }, [isFullScreen]);
+
+  const onStatusBarBackButton = useCallback(() => {
+    onSwitchMode(false, flatListCurrentIndexRef.current);
+  }, [onSwitchMode]);
 
   return (
-    <View style={[styles.mainViewStyle, props.style]}>
+    <View style={[styles.mainViewStyle]}>
       <PhotoSliderComponent
         photos={photos}
-        startIndex={props.startIndex}
+        scrollPosition={scrollPosition}
         onIndexChanged={onCurrentIndexChanged}
-        //onEndReached={}
-        onPhotoClick={() => {
-          onPressPhoto().catch(console.log);
-        }}
+        onPhotoClick={onPressPhoto}
         isFullScreen={isFullScreen}
       />
 
-      {validFlatListCurrentIndex && !isFullScreen && (
-        <StatusBarComponent
-          inDevice={photos[flatListCurrentIndex].inDevice}
-          inServer={photos[flatListCurrentIndex].inServer}
-          isLoading={photos[flatListCurrentIndex].isLoading}
-          loadingPercentage={photos[flatListCurrentIndex].loadingPercentage}
-          title={formatDate(photos[flatListCurrentIndex].created)}
-          onBackButton={onStatusBarBackButton}
-        />
-      )}
+      {!isFullScreen && <StatusBarComponent onBackButton={onStatusBarBackButton} />}
 
-      {validFlatListCurrentIndex && !isFullScreen && (
-        <>
-          <ToolBar
-            inDevice={photos[flatListCurrentIndex].inDevice}
-            inServer={photos[flatListCurrentIndex].inServer}
-            onAddLocal={onAddLocal}
-            onAddServer={onAddServer}
-            onDeleteLocal={onDeleteLocal}
-            onDeleteServer={onDeleteServer}
-            onDetails={() => {
-              setDetailsModalVisible(true);
-              console.log('details');
-            }}
-          />
-
-          <PhotoDetailsModal
-            modalVisible={detailsModalVisible}
-            handleModal={() => setDetailsModalVisible(!detailsModalVisible)}
-            photo={photos[flatListCurrentIndex]}
-          />
-        </>
-      )}
+      {!isFullScreen && <ToolBar />}
     </View>
   );
 }
@@ -212,3 +119,5 @@ const styles = StyleSheet.create({
     width: '100%',
   },
 });
+
+export default React.memo(PhotoSlider);

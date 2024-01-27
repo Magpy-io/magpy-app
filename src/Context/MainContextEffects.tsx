@@ -5,6 +5,7 @@ import { useBackgroundServiceEffects } from './ContextSlices/BackgroundServiceCo
 import { useLocalServersEffect } from './ContextSlices/LocalServersContext';
 import { useServerClaimEffects } from './ContextSlices/ServerClaimContext';
 import { useServerEffect } from './ContextSlices/ServerContext';
+import { usePhotosStoreEffect } from './ReduxStore/Slices/PhotosFunctions';
 
 type PropsType = {
   children: ReactNode;
@@ -16,6 +17,7 @@ const MainContextEffects: React.FC<PropsType> = props => {
   useBackgroundServiceEffects();
   useServerClaimEffects();
   useServerEffect();
+  usePhotosStoreEffect();
 
   return <>{props.children}</>;
 };

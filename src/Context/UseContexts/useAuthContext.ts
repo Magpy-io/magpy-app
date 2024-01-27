@@ -1,5 +1,5 @@
 import { useMainContext } from '~/Context/MainContextProvider';
-import { clearAll, storeToken } from '~/Helpers/AsyncStorage';
+import { removeStoredToken, storeToken } from '~/Helpers/AsyncStorage';
 import { TokenManager, WhoAmI } from '~/Helpers/BackendQueries';
 
 export function useAuthFunctions() {
@@ -21,7 +21,7 @@ export function useAuthFunctions() {
   const logout = async function () {
     setUser(null);
     setToken(null);
-    await clearAll();
+    await removeStoredToken();
     TokenManager.SetUserToken('');
   };
 

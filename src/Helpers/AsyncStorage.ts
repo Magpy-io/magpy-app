@@ -21,15 +21,6 @@ export const getStoredToken = async () => {
   }
 };
 
-export const clearAll = async () => {
-  try {
-    await AsyncStorage.clear();
-    console.log('Clearing Auth token from AsyncStorage');
-  } catch (e) {
-    console.log('Error clearing Auth Token from AsyncStorage', e);
-  }
-};
-
 export const removeStoredToken = async () => {
   try {
     await AsyncStorage.removeItem('authToken');
