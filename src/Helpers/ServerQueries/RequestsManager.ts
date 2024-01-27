@@ -16,11 +16,12 @@ function GeneratePostWithAuth<RequestData, ResponseData, ResponseErrorTypes>(
 ) {
   const PostFunction = async <RequestData, ResponseData, ResponseErrorTypes>(
     data: RequestData,
+    options?: { path?: string },
   ): Promise<ResponseTypeFrom<ResponseData, ResponseErrorTypes>> => {
     verifyHasUserToken();
     try {
       const response = await axios.post(
-        getPathWithEndpoint(endpointPath),
+        getPathWithEndpoint(endpointPath, options?.path),
         data,
         userAuthorizationObject(),
       );
@@ -37,9 +38,13 @@ function GeneratePostWithNoAuth<RequestData, ResponseData, ResponseErrorTypes>(
 ) {
   const PostFunction = async <RequestData, ResponseData, ResponseErrorTypes>(
     data: RequestData,
+    options?: { path?: string },
   ): Promise<ResponseTypeFrom<ResponseData, ResponseErrorTypes>> => {
     try {
-      const response = await axios.post(getPathWithEndpoint(endpointPath), data);
+      const response = await axios.post(
+        getPathWithEndpoint(endpointPath, options?.path),
+        data,
+      );
       return response.data;
     } catch (err: any) {
       return handleAxiosError(err);
@@ -53,9 +58,13 @@ function GeneratePostSetAuth<RequestData, ResponseData, ResponseErrorTypes>(
 ) {
   const PostFunction = async <RequestData, ResponseData, ResponseErrorTypes>(
     data: RequestData,
+    options?: { path?: string },
   ): Promise<ResponseTypeFrom<ResponseData, ResponseErrorTypes>> => {
     try {
-      const response = await axios.post(getPathWithEndpoint(endpointPath), data);
+      const response = await axios.post(
+        getPathWithEndpoint(endpointPath, options?.path),
+        data,
+      );
       const token = extractToken(response);
       SetUserToken(token);
       return response.data;
@@ -67,8 +76,14 @@ function GeneratePostSetAuth<RequestData, ResponseData, ResponseErrorTypes>(
 }
 
 type FunctionType<RequestData, ResponseData, ResponseErrorTypes> = {} extends RequestData
-  ? (data?: RequestData) => Promise<ResponseTypeFrom<ResponseData, ResponseErrorTypes>>
-  : (data: RequestData) => Promise<ResponseTypeFrom<ResponseData, ResponseErrorTypes>>;
+  ? (
+      data?: RequestData,
+      options?: { path?: string },
+    ) => Promise<ResponseTypeFrom<ResponseData, ResponseErrorTypes>>
+  : (
+      data: RequestData,
+      options?: { path?: string },
+    ) => Promise<ResponseTypeFrom<ResponseData, ResponseErrorTypes>>;
 
 export function GeneratePostRequest<RequestData, ResponseData, ResponseErrorTypes>(
   endpointPath: string,

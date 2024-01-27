@@ -1,6 +1,6 @@
 import { useCallback, useRef } from 'react';
 
-import { zeroconf } from '~/Context/ContextSlices/LocalServersContext';
+import { Server, zeroconf } from '~/Context/ContextSlices/LocalServersContext';
 import { useMainContext } from '~/Context/MainContextProvider';
 
 export function useLocalServersFunctions() {
@@ -35,11 +35,11 @@ export function useLocalServersFunctions() {
     setLocalServers([]);
     zeroconf.scan('http', 'tcp', 'local.');
 
-    return new Promise(resolve => {
+    return new Promise((resolve: (value: Server[]) => void) => {
       setTimeout(() => {
         zeroconf.stop();
         resolve(localServersRef.current);
-      }, 3000);
+      }, 1000);
     });
   }, [setLocalServers, localServersRef]);
 

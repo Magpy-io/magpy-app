@@ -1,11 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import * as AsyncStorageFunctions from '~/Helpers/AsyncStorage';
+import { ServerType } from '~/Helpers/BackendQueries/Types';
 import { GetToken, SetPath } from '~/Helpers/ServerQueries';
 import { ErrorServerUnreachable } from '~/Helpers/ServerQueries/ExceptionsManager';
 
 import { useMainContext } from '../MainContextProvider';
 import { useLocalServersFunctions } from '../UseContexts/useLocalServersContext';
+import { Server } from './LocalServersContext';
 
 type SetStateType<T> = React.Dispatch<React.SetStateAction<T>>;
 
@@ -14,6 +16,8 @@ export type ServerDataType = {
   setIsServerReachable: SetStateType<boolean>;
   serverNetwork: ServerNetworkType;
   setServerNetwork: SetStateType<ServerNetworkType>;
+  serverSearchFailed: boolean;
+  setServerSearchFailed: SetStateType<boolean>;
 };
 
 export type ServerNetworkType = {
@@ -24,12 +28,20 @@ export type ServerNetworkType = {
 
 export function useServerData(): ServerDataType {
   const [isServerReachable, setIsServerReachable] = useState(false);
+  const [serverSearchFailed, setServerSearchFailed] = useState(false);
   const [serverNetwork, setServerNetwork] = useState<ServerNetworkType>({
     ipLocal: null,
     ipPublic: null,
     port: null,
   });
-  return { isServerReachable, setIsServerReachable, serverNetwork, setServerNetwork };
+  return {
+    isServerReachable,
+    setIsServerReachable,
+    serverNetwork,
+    setServerNetwork,
+    serverSearchFailed,
+    setServerSearchFailed,
+  };
 }
 
 export function useServerEffect() {
@@ -37,155 +49,173 @@ export function useServerEffect() {
 
   const { searchAsync } = useLocalServersFunctions();
 
-  const { setServerNetwork, setIsServerReachable, isServerReachable } = mainContext.serverData;
+  const { setServerNetwork, setIsServerReachable, setServerSearchFailed } =
+    mainContext.serverData;
   const { token } = mainContext.authData;
 
   const claimedServer = mainContext.serverClaimData.server;
-  const { isScanning, localServers } = mainContext.localServersData;
+
+  const setReachableServer = useCallback(
+    async (server: { ipLocal?: string; ipPublic?: string; port: string }) => {
+      setServerNetwork(s => {
+        return {
+          ipLocal: server.ipLocal ?? s.ipLocal,
+          ipPublic: server.ipPublic ?? s.ipPublic,
+          port: server.port,
+        };
+      });
+      setIsServerReachable(true);
+      setAddressForServerApi(server.ipLocal ?? server.ipPublic ?? '', server.port);
+      await AsyncStorageFunctions.storeAddressInfo({
+        ipLocal: server.ipLocal,
+        ipPublic: server.ipPublic,
+        port: server.port,
+      });
+    },
+    [setIsServerReachable, setServerNetwork],
+  );
 
   useEffect(() => {
-    async function FindServer(backendToken: string) {
-      let serverFound = false;
-      const { ipLocal, port } = await AsyncStorageFunctions.getAddressInfo();
-      if (ipLocal && port) {
-        const serverResponded = await TryServerAddress(ipLocal, port, backendToken);
+    async function FindServer(backendToken: string, claimedServer: ServerType) {
+      let serverResponded = false;
+
+      // Start search for local mdns servers
+      const serversPromise = searchAsync();
+
+      // Try async storage local address
+      const AsyncStorageNetwork = await AsyncStorageFunctions.getAddressInfo();
+      if (AsyncStorageNetwork.ipLocal && AsyncStorageNetwork.port) {
+        serverResponded = await TryServer(
+          AsyncStorageNetwork.ipLocal,
+          AsyncStorageNetwork.port,
+          backendToken,
+        );
         if (serverResponded) {
-          serverFound = true;
-          setServerNetwork(s => {
-            return { ipLocal: ipLocal, ipPublic: s.ipPublic, port: port };
+          await setReachableServer({
+            ipLocal: AsyncStorageNetwork.ipLocal,
+            port: AsyncStorageNetwork.port,
           });
-          setIsServerReachable(true);
+          return;
         } else {
-          await AsyncStorageFunctions.storeAddressInfo({ ipLocal: '', port: '' });
+          await AsyncStorageFunctions.storeAddressInfo({ ipLocal: '' });
         }
       }
 
-      if (serverFound) {
+      // Try backend server local address
+      serverResponded = await TryServer(
+        claimedServer.ipPrivate,
+        claimedServer.port,
+        backendToken,
+      );
+
+      if (serverResponded) {
+        await setReachableServer({
+          ipLocal: claimedServer.ipPrivate,
+          port: claimedServer.port,
+        });
         return;
       }
 
-      const servers = await searchAsync();
+      // Try discovered servers
+      const servers = await serversPromise;
 
-      console.log(servers);
+      const serversTriedPromises = servers.map(server => {
+        return TryServer(server.ip, server.port, backendToken).then(responded => {
+          if (responded) {
+            return server;
+          } else {
+            throw 'NO_RESPONSE';
+          }
+        });
+      });
+
+      let anyServerResponded: Server | undefined;
+
+      try {
+        anyServerResponded = await Promise.any(serversTriedPromises);
+      } catch (error) {
+        if (error instanceof AggregateError) {
+          const allErrorsNoResponse = error.errors.reduce((p: boolean, c) => {
+            return p && c === 'NO_RESPONSE';
+          }, true);
+
+          if (!allErrorsNoResponse) {
+            console.log(error);
+          }
+        } else {
+          console.log(error);
+        }
+      }
+
+      if (anyServerResponded) {
+        await setReachableServer({
+          ipLocal: anyServerResponded.ip,
+          port: anyServerResponded.port,
+        });
+
+        return;
+      }
+
+      // Try async storage public address
+      if (AsyncStorageNetwork.ipPublic && AsyncStorageNetwork.port) {
+        serverResponded = await TryServer(
+          AsyncStorageNetwork.ipPublic,
+          AsyncStorageNetwork.port,
+          backendToken,
+        );
+        if (serverResponded) {
+          await setReachableServer({
+            ipPublic: AsyncStorageNetwork.ipPublic,
+            port: AsyncStorageNetwork.port,
+          });
+          return;
+        } else {
+          await AsyncStorageFunctions.storeAddressInfo({ ipPublic: '' });
+        }
+      }
+
+      // Try backend server public address
+      serverResponded = await TryServer(
+        claimedServer.ipPublic,
+        claimedServer.port,
+        backendToken,
+      );
+
+      if (serverResponded) {
+        await setReachableServer({
+          ipPublic: claimedServer.ipPublic,
+          port: claimedServer.port,
+        });
+        return;
+      }
+
+      setServerSearchFailed(true);
     }
 
-    if (token) {
-      FindServer(token).catch(console.log);
+    if (token && claimedServer) {
+      FindServer(token, claimedServer).catch(console.log);
     }
-  }, [searchAsync, setIsServerReachable, setServerNetwork, token]);
-
-  // useEffect(() => {
-  //   async function FindServerAddressFromBackend(token: string) {
-  //     // I try the local Ip given by backend
-  //     if (claimedServer) {
-  //       console.log('Trying address from server');
-  //       const res = await TryServerAddress(claimedServer.ipPrivate, claimedServer.port, token);
-  //       if (res) {
-  //         setServerNetwork({
-  //           ipLocal: claimedServer.ipPrivate,
-  //           ipPublic: ipPublic,
-  //           port: claimedServer.port,
-  //         });
-
-  //         await storeAddressInfo({
-  //           ipLocal: claimedServer.ipPrivate,
-  //           port: claimedServer.port,
-  //         });
-  //         setIsServerReachable(true);
-  //       }
-  //     }
-  //   }
-  //   if (!isServerReachable && !!token) {
-  //     FindServerAddressFromBackend(token).catch(console.log);
-  //   }
-  // }, [
-  //   isServerReachable,
-  //   token,
-  //   setServerNetwork,
-  //   ipPublic,
-  //   setIsServerReachable,
-  //   claimedServer,
-  // ]);
-
-  // useEffect(() => {
-  //   async function FindServerAddressFromLocalServers(token: string) {
-  //     // I try local servers scanned
-  //     console.log('Trying address from scanned local servers');
-  //     const results: { result: string | undefined; server: Server }[] = [];
-  //     for (const s of localServers) {
-  //       console.log('Loop', s.ip);
-  //       const r = await TryServerAddress(s.ip, s.port, token);
-  //       results.push({ result: r, server: s });
-  //     }
-  //     const myPotentialServer = results.filter(r => !!r.result)?.[0];
-  //     if (myPotentialServer) {
-  //       setServerNetwork({
-  //         ipLocal: myPotentialServer.server.ip,
-  //         ipPublic: ipPublic,
-  //         port: myPotentialServer.server.port,
-  //       });
-  //       await storeAddressInfo({
-  //         ipLocal: myPotentialServer.server.ip,
-  //         port: myPotentialServer.server.port,
-  //       });
-  //       setIsServerReachable(true);
-  //       SetPath(`http://${myPotentialServer.server.ip}:${myPotentialServer.server.port}`);
-  //     }
-  //   }
-  //   if (!isServerReachable && !!token && !isScanning) {
-  //     FindServerAddressFromLocalServers(token).catch(console.log);
-  //   }
-  // }, [
-  //   isServerReachable,
-  //   token,
-  //   isScanning,
-  //   localServers,
-  //   setServerNetwork,
-  //   ipPublic,
-  //   setIsServerReachable,
-  // ]);
-
-  // TODO : make sure this only happens after we tried to find the local ip address
-  // useEffect(() => {
-  //   async function FindServerPublicAddress() {
-  //     // Try public Ip from async storage
-  //     if (ipPublic) {
-  //       console.log('Trying public ip from async storage');
-  //       const res = await TryServerAddress(ipPublic, port, token);
-  //       if (res) {
-  //         setIsServerReachable(true);
-  //         return;
-  //       }
-  //     }
-  //     // Try public Ip from backend
-  //     if (server) {
-  //       console.log('Trying public ip from backend');
-  //       const res = await TryServerAddress(server.ipPublic, server.port, token);
-  //       if (res) {
-  //         // TODO uncomment this when done
-  //         // setIsServerReachable(true);
-  //         setIpPublic(server.ipPublic);
-  //         setPort(server.port);
-  //         storeAddressInfo({
-  //           ipPublic: server.ipPublic,
-  //           port: server.port,
-  //         });
-  //       }
-  //     }
-  //   }
-  //   if (!isServerReachable && !!token) {
-  //     FindServerPublicAddress();
-  //   }
-  // }, [isServerReachable, token, server]);
+  }, [
+    searchAsync,
+    setIsServerReachable,
+    setServerNetwork,
+    token,
+    claimedServer,
+    setReachableServer,
+    setServerSearchFailed,
+  ]);
 }
 
-async function TryServerAddress(ip: string, port: string, token: string) {
-  console.log('Trying address :', ip, port);
+function setAddressForServerApi(ip: string, port: string) {
+  SetPath(`http://${ip}:${port}`);
+}
+
+async function TryServer(ip: string, port: string, token: string) {
   try {
-    SetPath(`http://${ip}:${port}`);
-    const res = await GetToken.Post({ userToken: token });
+    console.log('trying ', ip);
+    const res = await GetToken.Post({ userToken: token }, { path: `http://${ip}:${port}` });
     if (res.ok) {
-      console.log("Bingo, it's: ", ip, port);
+      console.log('Server found');
       return true;
     }
     return false;
@@ -193,7 +223,7 @@ async function TryServerAddress(ip: string, port: string, token: string) {
     if (e instanceof ErrorServerUnreachable) {
       return false;
     }
-    console.log('Error: TryServerAddress', e);
+    console.log('Error: TryServer', e);
     throw e;
   }
 }

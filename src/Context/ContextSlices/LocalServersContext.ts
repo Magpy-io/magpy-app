@@ -38,13 +38,13 @@ export function useLocalServersEffect() {
       setIsScanning(false);
     });
     zeroconf.on('resolved', service => {
-      if (service.name.startsWith(serverMdnsPrefix)) {
+      if (service.name.startsWith(serverMdnsPrefix) && service.addresses[0]) {
         setLocalServers(oldServers => {
           return [
             ...oldServers,
             {
               name: service.name.replace(serverMdnsPrefix, ''),
-              ip: service.host,
+              ip: service.addresses[0],
               port: service.port.toString(),
             },
           ];

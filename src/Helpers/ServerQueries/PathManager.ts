@@ -17,8 +17,16 @@ export function GetPath() {
   return path;
 }
 
-export function getPathWithEndpoint(endpoint: string) {
-  return GetPath() + endpoint + '/';
+export function getPathWithEndpoint(endpoint: string, path?: string) {
+  let pathFormatted = path;
+
+  if (pathFormatted) {
+    if (pathFormatted[pathFormatted.length - 1] != '/') {
+      pathFormatted += '/';
+    }
+  }
+
+  return (pathFormatted ?? GetPath()) + endpoint + '/';
 }
 
 function checkPathExists() {

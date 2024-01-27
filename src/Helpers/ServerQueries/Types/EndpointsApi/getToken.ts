@@ -1,3 +1,5 @@
+
+
 import {
   ErrorAuthorizationBackendExpired,
   ErrorAuthorizationBackendFailed,
@@ -8,6 +10,8 @@ import {
 import { TokenAuthentification } from '../Types';
 
 export type ResponseData = string;
+
+
 
 export type ResponseErrorTypes =
   | ErrorBackendServerUnreachable
