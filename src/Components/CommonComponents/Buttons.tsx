@@ -58,6 +58,7 @@ export function PrimaryButtonWide(props: ButtonProps) {
 export function PrimaryButtonExtraWide(props: ButtonProps) {
   return (
     <Button
+      testID={props.testID}
       {...props}
       containerStyle={[styles.containerStyle, props.containerStyle]}
       buttonStyle={[

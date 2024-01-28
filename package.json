@@ -34,7 +34,7 @@
     "luxon": "^3.4.4",
     "react": "18.2.0",
     "react-native": "0.73.2",
-    "react-native-delete-media": "^1.0.6",
+    "react-native-delete-media": "^1.0.7",
     "react-native-elements": "^3.4.3",
     "react-native-fast-image": "^8.6.3",
     "react-native-fs": "^2.20.0",
@@ -80,8 +80,10 @@
     "@typescript-eslint/parser": "^6.19.0",
     "babel-jest": "^29.6.3",
     "babel-plugin-module-resolver": "^5.0.0",
+    "detox": "^20.17.0",
     "eslint": "^8.56.0",
     "eslint-config-standard-with-typescript": "^43.0.1",
+    "eslint-plugin-detox": "^1.0.0",
     "eslint-plugin-n": "^15.0.0 || ^16.0.0 ",
     "eslint-plugin-promise": "^6.0.0",
     "eslint-plugin-react": "^7.33.2",
@@ -94,6 +96,11 @@
   },
   "engines": {
     "node": ">=18"
+  },
+  "jest": {
+    "modulePathIgnorePatterns": [
+      "e2e"
+    ]
   },
   "packageManager": "yarn@4.0.2"
 }
