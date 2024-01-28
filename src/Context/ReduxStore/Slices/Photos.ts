@@ -10,7 +10,7 @@ export type PhotoServerType = {
   width: number;
   created: string;
   syncDate: string;
-  clientPaths: Array<{ deviceUniqueId: string; path: string }>;
+  uri: string | undefined;
   uriThumbnail: string | undefined;
   uriCompressed: string | undefined;
 };
@@ -63,13 +63,7 @@ const photosServerSlice = createSlice({
         {},
       );
       state.photosServerIdsOrdered = action.payload.map(photo => photo.id);
-      state.photosGallery = action.payload.map(photo => {
-        return {
-          key: photo.id,
-          serverId: photo.id,
-          mediaId: undefined,
-        };
-      });
+      state.photosGallery = mergePhotos(state);
     },
 
     setPhotosLocal: (state, action: { payload: PhotoLocalType[] }) => {
@@ -81,13 +75,7 @@ const photosServerSlice = createSlice({
         {},
       );
       state.photosLocalIdsOrdered = action.payload.map(photo => photo.id);
-      state.photosGallery = action.payload.map(photo => {
-        return {
-          key: photo.id,
-          serverId: undefined,
-          mediaId: photo.id,
-        };
-      });
+      state.photosGallery = mergePhotos(state);
     },
 
     addCompressedPhotoById: (state, action: { payload: { id: string; uri: string } }) => {
@@ -115,4 +103,78 @@ export function photoLocalSelector(id?: string) {
 
 export function photoServerSelector(id?: string) {
   return (state: RootState) => (id ? state.photos.photosServer[id] : undefined);
+}
+
+function mergePhotos(photosState: PhotosState): PhotoGalleryType[] {
+  let localIndex = 0;
+  let serverIndex = 0;
+
+  const { photosLocal, photosLocalIdsOrdered, photosServer, photosServerIdsOrdered } =
+    photosState;
+
+  const galleryPhotos: PhotoGalleryType[] = [];
+
+  while (
+    localIndex < photosLocalIdsOrdered.length ||
+    serverIndex < photosServerIdsOrdered.length
+  ) {
+    const photoLocal = photosLocal[photosLocalIdsOrdered[localIndex]];
+    const photoServer = photosServer[photosServerIdsOrdered[serverIndex]];
+
+    const diff = compareDates(photoLocal?.created, photoServer?.created);
+
+    if (
+      diff == 0 &&
+      photoLocal.fileSize == photoServer.fileSize &&
+      photoLocal.uri == photoServer.uri
+    ) {
+      galleryPhotos.push({
+        key: photoServer.id,
+        serverId: photoServer.id,
+        mediaId: photoLocal.id,
+      });
+      localIndex += 1;
+      serverIndex += 1;
+      continue;
+    }
+
+    if (diff >= 0) {
+      galleryPhotos.push({
+        key: photoLocal.id,
+        serverId: undefined,
+        mediaId: photoLocal.id,
+      });
+      localIndex += 1;
+    } else {
+      galleryPhotos.push({
+        key: photoServer.id,
+        serverId: photoServer.id,
+        mediaId: undefined,
+      });
+      serverIndex += 1;
+    }
+  }
+
+  return galleryPhotos;
+}
+
+function compareDates(date1: string, date2: string) {
+  if (!date2) {
+    return 1;
+  }
+
+  if (!date1) {
+    return -1;
+  }
+
+  const d1 = Date.parse(date1);
+  const d2 = Date.parse(date2);
+
+  if (d1 > d2) {
+    return 1;
+  } else if (d1 < d2) {
+    return -1;
+  } else {
+    return 0;
+  }
 }

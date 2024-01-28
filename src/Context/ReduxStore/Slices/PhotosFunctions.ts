@@ -2,6 +2,7 @@ import { useCallback, useEffect } from 'react';
 
 import { Promise as BluebirdPromise } from 'bluebird';
 
+import { uniqueDeviceId } from '~/Config/config';
 import { useServerContext } from '~/Context/UseContexts/useServerContext';
 import {
   GalleryGetPhotos,
@@ -88,7 +89,9 @@ export function usePhotosFunctionsStore() {
         width: photo.meta.width,
         created: photo.meta.date,
         syncDate: photo.meta.syncDate,
-        clientPaths: photo.meta.clientPaths,
+        uri: photo.meta.clientPaths.find(
+          clientPath => clientPath.deviceUniqueId == uniqueDeviceId,
+        )?.path,
         uriThumbnail: photoThumbnailExistsInCache.exists
           ? photoThumbnailExistsInCache.uri
           : undefined,
@@ -160,12 +163,13 @@ export function usePhotosFunctionsStore() {
 }
 
 export function usePhotosStoreEffect() {
-  const { RefreshServerPhotos } = usePhotosFunctionsStore();
+  const { RefreshServerPhotos, RefreshLocalPhotos } = usePhotosFunctionsStore();
   const { isServerReachable } = useServerContext();
 
   useEffect(() => {
+    RefreshLocalPhotos().catch(console.log);
     if (isServerReachable) {
       RefreshServerPhotos().catch(console.log);
     }
-  }, [RefreshServerPhotos, isServerReachable]);
+  }, [RefreshServerPhotos, RefreshLocalPhotos, isServerReachable]);
 }
