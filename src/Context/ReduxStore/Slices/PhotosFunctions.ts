@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
 import { Promise as BluebirdPromise } from 'bluebird';
 
@@ -24,6 +24,10 @@ import {
 
 export function usePhotosFunctionsStore() {
   const dispatch = useAppDispatch();
+
+  const { isServerReachable } = useServerContext();
+  const isServerReachableRef = useRef(false);
+  isServerReachableRef.current = isServerReachable;
 
   const RefreshLocalPhotos = useCallback(async () => {
     const photosFromDevice = await GalleryGetPhotos(3000);
@@ -154,22 +158,26 @@ export function usePhotosFunctionsStore() {
     [dispatch],
   );
 
+  const RefreshAllPhotos = useCallback(async () => {
+    await RefreshLocalPhotos();
+    if (isServerReachableRef.current) {
+      await RefreshServerPhotos();
+    }
+  }, [RefreshLocalPhotos, RefreshServerPhotos]);
+
   return {
     RefreshLocalPhotos,
     RefreshServerPhotos,
+    RefreshAllPhotos,
     AddPhotoThumbnailIfMissing,
     AddPhotoCompressedIfMissing,
   };
 }
 
 export function usePhotosStoreEffect() {
-  const { RefreshServerPhotos, RefreshLocalPhotos } = usePhotosFunctionsStore();
-  const { isServerReachable } = useServerContext();
+  const { RefreshAllPhotos } = usePhotosFunctionsStore();
 
   useEffect(() => {
-    RefreshLocalPhotos().catch(console.log);
-    if (isServerReachable) {
-      RefreshServerPhotos().catch(console.log);
-    }
-  }, [RefreshServerPhotos, RefreshLocalPhotos, isServerReachable]);
+    RefreshAllPhotos().catch(console.log);
+  }, [RefreshAllPhotos]);
 }

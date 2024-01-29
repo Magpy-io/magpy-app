@@ -45,6 +45,7 @@ module.exports = {
     '@typescript-eslint',
     'unused-imports',
     'detox',
+    'jest',
     'prettier',
   ],
   settings: {
