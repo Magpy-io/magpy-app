@@ -23,8 +23,8 @@ export default function LoginScreen() {
       <KeyboardDismissingView>
         <ScreenTitle title="Login to your account" />
         <LoginForm />
+        <LoginFooter />
       </KeyboardDismissingView>
-      <LoginFooter />
     </View>
   );
 }

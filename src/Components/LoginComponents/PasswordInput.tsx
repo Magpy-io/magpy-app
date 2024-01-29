@@ -34,6 +34,7 @@ export function PasswordInput(props: PasswordInputProps) {
     <View>
       <View style={styles.viewStyle}>
         <RNTextInput
+          testID={props.testID}
           placeholder="Password"
           placeholderTextColor={appColors.TEXT_LIGHT}
           secureTextEntry={!passwordVisible}

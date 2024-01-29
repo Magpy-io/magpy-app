@@ -44,6 +44,7 @@ export default function LoginForm() {
         <View>
           <ViewWithGap gap={spacing.spacing_m} style={styles.formView}>
             <TextInput
+              testID="emailEntry"
               placeholder="Email"
               onChangeText={handleChange('email')}
               onBlur={handleBlur('email')}
@@ -53,6 +54,7 @@ export default function LoginForm() {
             />
             <>
               <PasswordInput
+                testID="passwordEntry"
                 onChangeText={handleChange('password')}
                 onBlur={handleBlur('password')}
                 value={values.password}
@@ -62,6 +64,7 @@ export default function LoginForm() {
             </>
           </ViewWithGap>
           <PrimaryButtonExtraWide
+            testID="loginButton"
             title="Sign In"
             onPress={() => {
               handleSubmit();

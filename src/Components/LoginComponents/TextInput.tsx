@@ -27,6 +27,7 @@ export default function TextInput(props: TextInputProps) {
     <View>
       <View style={styles.viewStyle}>
         <RNTextInput
+          testID={props.testID}
           style={styles.textInputStyle}
           placeholderTextColor={appColors.TEXT_LIGHT}
           ref={inputRef}

@@ -29,8 +29,24 @@ module.exports = {
         project: ['./tsconfig.json'],
       },
     },
+
+    {
+      files: ['e2e/**/*.test.js'],
+      env: {
+        'detox/detox': true,
+        jest: true,
+        'jest/globals': true,
+      },
+    },
   ],
-  plugins: ['react', 'react-hooks', '@typescript-eslint', 'unused-imports', 'prettier'],
+  plugins: [
+    'react',
+    'react-hooks',
+    '@typescript-eslint',
+    'unused-imports',
+    'detox',
+    'prettier',
+  ],
   settings: {
     react: {
       version: 'detect',
