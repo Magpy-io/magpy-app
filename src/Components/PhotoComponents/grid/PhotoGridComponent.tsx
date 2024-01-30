@@ -1,26 +1,19 @@
 import React, { useCallback, useEffect, useRef } from 'react';
-import { Dimensions, FlatList, FlatListProps, StyleSheet, View } from 'react-native';
+import { FlatList, StyleSheet, View } from 'react-native';
 
-import { Text } from 'react-native-elements';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos';
 import { TabBarPadding } from '~/Navigation/TabNavigation/TabBar';
+import { appColors } from '~/styles/colors';
 
+import FlatListWithColumns from './FlatListWithColumns';
 import PhotoComponentForGrid from './PhotoComponentForGrid';
 
-const ITEM_HEIGHT = Dimensions.get('screen').width / 3;
+const NUM_COLUMNS = 3;
 
 function keyExtractor(item: PhotoGalleryType) {
   return `grid_${item.key}`;
-}
-
-function getItemLayout(data: ArrayLike<PhotoGalleryType> | null | undefined, index: number) {
-  return {
-    length: ITEM_HEIGHT,
-    offset: ITEM_HEIGHT * index,
-    index,
-  };
 }
 
 type PhotoGridComponentProps = {
@@ -47,10 +40,10 @@ export default function PhotoGridComponent({
 
   photosLenRef.current = photos.length;
 
-  let correctStartIndex = Math.floor(scrollPosition / 3);
+  let correctStartIndex = Math.floor(scrollPosition / NUM_COLUMNS);
 
   if (scrollPosition >= photos.length) {
-    correctStartIndex = Math.floor((photos.length - 1) / 3);
+    correctStartIndex = Math.floor((photos.length - 1) / NUM_COLUMNS);
   }
 
   if (correctStartIndex < 0) {
@@ -85,19 +78,9 @@ export default function PhotoGridComponent({
     [onLongPressPhoto, onPressPhoto, isSelecting, selectedIds],
   );
 
-  const data = ['one', 'two', 'three', 'four', 'five'];
-
-  const renderTest = ({ item }) => {
-    return (
-      <View>
-        <Text>{item}</Text>
-      </View>
-    );
-  };
-
   return (
     <View style={[styles.mainViewStyle, { paddingTop: insets.top }]}>
-      <FlatList
+      <FlatListWithColumns
         ref={flatlistRef}
         style={styles.flatListStyle}
         data={photos}
@@ -109,73 +92,10 @@ export default function PhotoGridComponent({
         onEndReachedThreshold={1}
         onRefresh={onRefresh}
         refreshing={false}
-        numColumns={3}
-        // columns={3}
-        getItemLayout={getItemLayout}
+        columns={NUM_COLUMNS}
       />
-      {/* <FlatListWithColumns data={data} renderItem={renderTest} columns={3} /> */}
       <TabBarPadding />
     </View>
-  );
-}
-
-type FlatListWithColumnsType<T> = {
-  columns: number;
-  renderItem: ({ item, index }: { item: T; index?: number }) => React.ReactElement | null;
-  keyExtractor: (item: T, index: number) => string;
-} & Omit<FlatListProps<T>, 'numColumns' | 'renderItem' | 'keyExtractor' | 'getItemLayout'>;
-
-function FlatListWithColumns<T>({
-  data,
-  columns,
-  renderItem,
-  keyExtractor,
-  ...props
-}: FlatListWithColumnsType<T>) {
-  if (!data) {
-    return <View />;
-  }
-
-  const newArray: T[][] = [];
-  const newArrayLength = Math.ceil(data.length / columns);
-  for (let i = 0; i < newArrayLength; i++) {
-    newArray.push(data.slice(i * columns, i * columns + columns));
-  }
-
-  console.log('newArray', newArray);
-
-  const renderRow = ({ item, index }: { item: T[]; index: number }) => {
-    console.log('render row item', item);
-    return (
-      <View style={{ flexDirection: 'row' }}>
-        {Array(columns)
-          .fill(0)
-          .map((u, i) => i)
-          .map(i => {
-            if (item[i]) {
-              return (
-                <View style={{ flex: 1 }} key={keyExtractor(item[i], index)}>
-                  {renderItem({ item: item[i] })}
-                </View>
-              );
-            }
-          })}
-      </View>
-    );
-  };
-
-  function rowKeyExtractor(item: T[], index: number) {
-    return keyExtractor(item[0], index);
-  }
-
-  return (
-    <FlatList
-      data={newArray}
-      renderItem={renderRow}
-      keyExtractor={rowKeyExtractor}
-      {...props}
-      // getItemLayout={getItemLayout}
-    />
   );
 }
 
@@ -183,6 +103,7 @@ const styles = StyleSheet.create({
   mainViewStyle: {
     height: '100%',
     width: '100%',
+    backgroundColor: appColors.BACKGROUND,
   },
   flatListStyle: {},
 });

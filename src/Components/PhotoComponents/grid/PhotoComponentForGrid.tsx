@@ -47,10 +47,7 @@ function PhotoComponentForGrid(props: PropsType) {
   }
 
   return (
-    <TouchableOpacity
-      style={{ flex: 1 }}
-      onPress={onPressPhoto}
-      onLongPress={onLongPressPhoto}>
+    <TouchableOpacity onPress={onPressPhoto} onLongPress={onLongPressPhoto}>
       <View style={styles.itemStyle}>
         <ImageForGrid uri={uriSource} />
         {isSelecting && <SelectionIconForGrid isSelected={isSelected} />}
@@ -63,7 +60,6 @@ const styles = StyleSheet.create({
   itemStyle: {
     padding: 1,
     aspectRatio: 1,
-    flex: 1,
   },
 });
 
