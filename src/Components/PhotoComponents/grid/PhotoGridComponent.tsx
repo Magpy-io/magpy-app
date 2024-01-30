@@ -26,6 +26,18 @@ type PhotoGridComponentProps = {
   selectedIds: Map<string, PhotoGalleryType>;
 };
 
+function correctIndexFromScrollPosition(scrollPosition: number, len: number) {
+  let tmp = Math.floor(scrollPosition / NUM_COLUMNS);
+  if (scrollPosition >= len) {
+    tmp = Math.floor((len - 1) / NUM_COLUMNS);
+  }
+
+  if (tmp < 0) {
+    tmp = 0;
+  }
+  return tmp;
+}
+
 export default function PhotoGridComponent({
   photos,
   onLongPressPhoto,
@@ -37,18 +49,9 @@ export default function PhotoGridComponent({
 }: PhotoGridComponentProps) {
   const flatlistRef = useRef<FlatList>(null);
   const photosLenRef = useRef<number>(photos.length);
-
   photosLenRef.current = photos.length;
-
-  let correctStartIndex = Math.floor(scrollPosition / NUM_COLUMNS);
-
-  if (scrollPosition >= photos.length) {
-    correctStartIndex = Math.floor((photos.length - 1) / NUM_COLUMNS);
-  }
-
-  if (correctStartIndex < 0) {
-    correctStartIndex = 0;
-  }
+  const correctStartIndex = correctIndexFromScrollPosition(scrollPosition, photos.length);
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     // don't scroll if no photos yet
@@ -56,12 +59,6 @@ export default function PhotoGridComponent({
       flatlistRef.current?.scrollToIndex({ index: correctStartIndex });
     }
   }, [flatlistRef, correctStartIndex]);
-
-  // TODO change the numColumns to 1 and create a renderItem containing 3 photos
-  // This will fix a bug in flatlist which makes it recreate all items each time one is added or removed from the top (indexes change for the rest)
-  // with numColumns set to 1, this problem is fixed and the items are able to rerender as needed
-  // This will also fix that when less than 3 photos are in a row, the 2 or 1 photo will stretch to fill all horizontal space.
-  const insets = useSafeAreaInsets();
 
   const renderItem = useCallback(
     ({ item }: { item: PhotoGalleryType }) => {
