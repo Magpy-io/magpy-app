@@ -113,7 +113,7 @@ function PhotoGridController({ onSwitchMode, scrollPosition, isSlidingPhotos }: 
   }, [photos]);
 
   const onRefresh = useCallback(() => {
-    RefreshAllPhotos().catch(console.log);
+    RefreshAllPhotos(3000, 3000).catch(console.log);
   }, [RefreshAllPhotos]);
 
   return (

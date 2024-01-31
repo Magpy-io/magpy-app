@@ -29,84 +29,90 @@ export function usePhotosFunctionsStore() {
   const isServerReachableRef = useRef(false);
   isServerReachableRef.current = isServerReachable;
 
-  const RefreshLocalPhotos = useCallback(async () => {
-    const photosFromDevice = await GalleryGetPhotos(3000);
+  const RefreshLocalPhotos = useCallback(
+    async (n: number) => {
+      const photosFromDevice = await GalleryGetPhotos(n);
 
-    const photos: PhotoLocalType[] = photosFromDevice.edges.map(edge => {
-      return {
-        id: edge.node.id,
-        uri: edge.node.image.uri,
-        fileSize: edge.node.image.fileSize ?? 0,
-        fileName: edge.node.image.filename ?? '',
-        height: edge.node.image.height,
-        width: edge.node.image.width,
-        group_name: edge.node.group_name,
-        created: new Date(edge.node.timestamp * 1000).toISOString(),
-        modified: new Date(edge.node.modificationTimestamp * 1000).toISOString(),
-        type: edge.node.type,
-      };
-    });
+      const photos: PhotoLocalType[] = photosFromDevice.edges.map(edge => {
+        return {
+          id: edge.node.id,
+          uri: edge.node.image.uri,
+          fileSize: edge.node.image.fileSize ?? 0,
+          fileName: edge.node.image.filename ?? '',
+          height: edge.node.image.height,
+          width: edge.node.image.width,
+          group_name: edge.node.group_name,
+          created: new Date(edge.node.timestamp * 1000).toISOString(),
+          modified: new Date(edge.node.modificationTimestamp * 1000).toISOString(),
+          type: edge.node.type,
+        };
+      });
 
-    dispatch(setPhotosLocal(photos));
-  }, [dispatch]);
+      dispatch(setPhotosLocal(photos));
+    },
+    [dispatch],
+  );
 
-  const RefreshServerPhotos = useCallback(async () => {
-    const photosFromServer = await GetPhotos.Post({
-      number: 3000,
-      offset: 0,
-      photoType: 'data',
-    });
+  const RefreshServerPhotos = useCallback(
+    async (n: number) => {
+      const photosFromServer = await GetPhotos.Post({
+        number: n,
+        offset: 0,
+        photoType: 'data',
+      });
 
-    if (!photosFromServer.ok) {
-      console.log('failed to get photos from server');
-      return;
-    }
+      if (!photosFromServer.ok) {
+        console.log('failed to get photos from server');
+        return;
+      }
 
-    // BluebirdPromise is used because Promise.all gives a warning when too many promises are created simultaneously
-    // Excessive number of pending callbacks: 501. Some pending callbacks that might have leaked by never being called from native code
-    // BluebirdPromise allows to set a limit on how many concurrent promises are created
+      // BluebirdPromise is used because Promise.all gives a warning when too many promises are created simultaneously
+      // Excessive number of pending callbacks: 501. Some pending callbacks that might have leaked by never being called from native code
+      // BluebirdPromise allows to set a limit on how many concurrent promises are created
 
-    const photosThumbnailExistsInCache = await BluebirdPromise.map(
-      photosFromServer.data.photos,
-      photo => {
-        return photoCompressedExistsInCache(photo.id);
-      },
-      { concurrency: 100 },
-    );
-    const photosCompressedExistsInCache = await BluebirdPromise.map(
-      photosFromServer.data.photos,
-      photo => {
-        return photoCompressedExistsInCache(photo.id);
-      },
-      { concurrency: 100 },
-    );
+      const photosThumbnailExistsInCache = await BluebirdPromise.map(
+        photosFromServer.data.photos,
+        photo => {
+          return photoCompressedExistsInCache(photo.id);
+        },
+        { concurrency: 100 },
+      );
+      const photosCompressedExistsInCache = await BluebirdPromise.map(
+        photosFromServer.data.photos,
+        photo => {
+          return photoCompressedExistsInCache(photo.id);
+        },
+        { concurrency: 100 },
+      );
 
-    const photos: PhotoServerType[] = photosFromServer.data.photos.map((photo, index) => {
-      const photoThumbnailExistsInCache = photosThumbnailExistsInCache[index];
-      const photoCompressedExistsInCache = photosCompressedExistsInCache[index];
+      const photos: PhotoServerType[] = photosFromServer.data.photos.map((photo, index) => {
+        const photoThumbnailExistsInCache = photosThumbnailExistsInCache[index];
+        const photoCompressedExistsInCache = photosCompressedExistsInCache[index];
 
-      return {
-        id: photo.id,
-        fileSize: photo.meta.fileSize,
-        fileName: photo.meta.name,
-        height: photo.meta.height,
-        width: photo.meta.width,
-        created: photo.meta.date,
-        syncDate: photo.meta.syncDate,
-        uri: photo.meta.clientPaths.find(
-          clientPath => clientPath.deviceUniqueId == uniqueDeviceId,
-        )?.path,
-        uriThumbnail: photoThumbnailExistsInCache.exists
-          ? photoThumbnailExistsInCache.uri
-          : undefined,
-        uriCompressed: photoCompressedExistsInCache.exists
-          ? photoCompressedExistsInCache.uri
-          : undefined,
-      };
-    });
+        return {
+          id: photo.id,
+          fileSize: photo.meta.fileSize,
+          fileName: photo.meta.name,
+          height: photo.meta.height,
+          width: photo.meta.width,
+          created: photo.meta.date,
+          syncDate: photo.meta.syncDate,
+          uri: photo.meta.clientPaths.find(
+            clientPath => clientPath.deviceUniqueId == uniqueDeviceId,
+          )?.path,
+          uriThumbnail: photoThumbnailExistsInCache.exists
+            ? photoThumbnailExistsInCache.uri
+            : undefined,
+          uriCompressed: photoCompressedExistsInCache.exists
+            ? photoCompressedExistsInCache.uri
+            : undefined,
+        };
+      });
 
-    dispatch(setPhotosServer(photos));
-  }, [dispatch]);
+      dispatch(setPhotosServer(photos));
+    },
+    [dispatch],
+  );
 
   const AddPhotoThumbnailIfMissing = useCallback(
     async (serverPhoto: PhotoServerType) => {
@@ -158,12 +164,15 @@ export function usePhotosFunctionsStore() {
     [dispatch],
   );
 
-  const RefreshAllPhotos = useCallback(async () => {
-    await RefreshLocalPhotos();
-    if (isServerReachableRef.current) {
-      await RefreshServerPhotos();
-    }
-  }, [RefreshLocalPhotos, RefreshServerPhotos]);
+  const RefreshAllPhotos = useCallback(
+    async (nLocal: number, nServer: number) => {
+      await RefreshLocalPhotos(nLocal);
+      if (isServerReachableRef.current) {
+        await RefreshServerPhotos(nServer);
+      }
+    },
+    [RefreshLocalPhotos, RefreshServerPhotos],
+  );
 
   return {
     RefreshLocalPhotos,
@@ -178,6 +187,13 @@ export function usePhotosStoreEffect() {
   const { RefreshAllPhotos } = usePhotosFunctionsStore();
 
   useEffect(() => {
-    RefreshAllPhotos().catch(console.log);
+    RefreshAllPhotos(30, 30)
+      .then(() => {
+        return RefreshAllPhotos(300, 300);
+      })
+      .then(() => {
+        return RefreshAllPhotos(3000, 3000);
+      })
+      .catch(console.log);
   }, [RefreshAllPhotos]);
 }
