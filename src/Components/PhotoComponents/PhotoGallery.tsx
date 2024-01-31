@@ -1,11 +1,13 @@
 import React, { useCallback, useState } from 'react';
-import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+
+import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos';
 
 import PhotoGridController from './grid/PhotoGridController';
 import PhotoSlider from './slider/PhotoSliderController';
 
 type PhotoGalleryPropsType = {
-  style?: StyleProp<ViewStyle>;
+  photos: Array<PhotoGalleryType>;
 };
 
 export default function PhotoGallery(props: PhotoGalleryPropsType) {
@@ -27,9 +29,10 @@ export default function PhotoGallery(props: PhotoGalleryPropsType) {
   const displayGrid = isSlidingPhotos ? 'none' : 'flex';
 
   return (
-    <View style={[styles.viewStyle, props.style]}>
+    <View style={styles.viewStyle}>
       <View style={[styles.viewStyle, { display: displayGrid }]}>
         <PhotoGridController
+          photos={props.photos}
           isSlidingPhotos={isSlidingPhotos}
           scrollPosition={scrollPosition}
           onSwitchMode={onSwitchMode}
@@ -37,6 +40,7 @@ export default function PhotoGallery(props: PhotoGalleryPropsType) {
       </View>
       <View style={[styles.viewStyle, { display: displaySlider }]}>
         <PhotoSlider
+          photos={props.photos}
           isSlidingPhotos={isSlidingPhotos}
           scrollPosition={scrollPosition}
           onSwitchMode={onSwitchMode}

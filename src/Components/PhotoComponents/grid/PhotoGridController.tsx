@@ -3,28 +3,32 @@ import { BackHandler, View } from 'react-native';
 
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos';
 import { usePhotosFunctionsStore } from '~/Context/ReduxStore/Slices/PhotosFunctions';
-import { useAppSelector } from '~/Context/ReduxStore/Store';
 import { useTabNavigationContext } from '~/Navigation/TabNavigation/TabNavigationContext';
 
 import PhotoGridComponent from './PhotoGridComponent';
-import PhotoGridSelectView from './PhotoGridSelectView';
+import SelectionBar from './SelectionBar';
+import ToolBarGrid from './ToolBarGrid';
 
 type PropsType = {
+  photos: Array<PhotoGalleryType>;
   scrollPosition: number;
   isSlidingPhotos: boolean;
   onSwitchMode: (isPhotoSelected: boolean, index: number) => void;
 };
 
-function PhotoGridController({ onSwitchMode, scrollPosition, isSlidingPhotos }: PropsType) {
+function PhotoGridController({
+  photos,
+  onSwitchMode,
+  scrollPosition,
+  isSlidingPhotos,
+}: PropsType) {
   console.log('render grid');
-
-  const photos = useAppSelector(state => state.photos.photosGallery);
 
   const photosRef = useRef<PhotoGalleryType[]>(photos);
   photosRef.current = photos;
 
   const [isSelecting, setIsSelecting] = useState(false);
-  const [seletedKeys, setSelectedKeys] = useState<Map<string, PhotoGalleryType>>(new Map());
+  const [selectedKeys, setSelectedKeys] = useState<Map<string, PhotoGalleryType>>(new Map());
 
   const { hideTab, showTab } = useTabNavigationContext();
   const { RefreshAllPhotos } = usePhotosFunctionsStore();
@@ -125,14 +129,18 @@ function PhotoGridController({ onSwitchMode, scrollPosition, isSlidingPhotos }: 
         scrollPosition={scrollPosition}
         onRefresh={onRefresh}
         isSelecting={isSelecting}
-        selectedIds={seletedKeys}
+        selectedKeys={selectedKeys}
       />
-      <PhotoGridSelectView
-        onBackButton={onBackButton}
-        onSelectAll={onSelectAll}
-        isSelecting={isSelecting}
-        selectedIds={seletedKeys}
-      />
+
+      {isSelecting && (
+        <SelectionBar
+          selectedNb={selectedKeys.size}
+          onCancelButton={onBackButton}
+          onSelectAllButton={onSelectAll}
+        />
+      )}
+
+      {isSelecting && <ToolBarGrid selectedKeys={selectedKeys} />}
     </View>
   );
 }

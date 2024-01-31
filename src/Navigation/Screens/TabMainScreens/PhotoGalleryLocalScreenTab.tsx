@@ -2,11 +2,14 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Text } from 'react-native';
 
 import PhotoGallery from '~/Components/PhotoComponents/PhotoGallery';
+import { useAppSelector } from '~/Context/ReduxStore/Store';
 import * as AndroidPermissions from '~/Helpers/GetPermissionsAndroid';
 
 export default function PhotoGalleryLocalScreenTab() {
   console.log('render screen local');
   const [hasPermissions, setHasPermissions] = useState<boolean>(true);
+
+  const photos = useAppSelector(state => state.photos.photosGallery);
 
   const getPermissions = useCallback(async () => {
     const hasPerm = await AndroidPermissions.hasAndroidPermissionWriteExternalStorage();
@@ -21,5 +24,7 @@ export default function PhotoGalleryLocalScreenTab() {
     });
   }, [getPermissions]);
 
-  return <>{hasPermissions ? <PhotoGallery /> : <Text>Permissions needed</Text>}</>;
+  return (
+    <>{hasPermissions ? <PhotoGallery photos={photos} /> : <Text>Permissions needed</Text>}</>
+  );
 }

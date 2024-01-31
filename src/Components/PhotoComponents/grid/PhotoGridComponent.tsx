@@ -28,7 +28,7 @@ type PhotoGridComponentProps = {
   scrollPosition: number;
   onRefresh: () => void;
   isSelecting: boolean;
-  selectedIds: Map<string, PhotoGalleryType>;
+  selectedKeys: Map<string, PhotoGalleryType>;
 };
 
 export default function PhotoGridComponent({
@@ -38,7 +38,7 @@ export default function PhotoGridComponent({
   scrollPosition,
   onRefresh,
   isSelecting,
-  selectedIds,
+  selectedKeys,
 }: PhotoGridComponentProps) {
   const flatlistRef = useRef<FlatList>(null);
   const photosLenRef = useRef<number>(photos.length);
@@ -51,13 +51,13 @@ export default function PhotoGridComponent({
         <PhotoComponentForGrid
           photo={item}
           isSelecting={isSelecting}
-          isSelected={selectedIds.has(item.key)}
+          isSelected={selectedKeys.has(item.key)}
           onPress={onPressPhoto}
           onLongPress={onLongPressPhoto}
         />
       );
     },
-    [onLongPressPhoto, onPressPhoto, isSelecting, selectedIds],
+    [onLongPressPhoto, onPressPhoto, isSelecting, selectedKeys],
   );
 
   let correctStartIndex = Math.floor(scrollPosition / 3);

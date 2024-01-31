@@ -27,7 +27,7 @@ function selectedElementsToString(n: number) {
   return `${n} Elements Selected`;
 }
 
-function StatusBarGridComponent(props: StatusBarComponentProps) {
+function SelectionBar(props: StatusBarComponentProps) {
   const insets = useSafeAreaInsets();
   return (
     <View style={[styles.StatusBarStyle, props.style, { paddingTop: insets.top }]}>
@@ -64,4 +64,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default React.memo(StatusBarGridComponent);
+export default React.memo(SelectionBar);

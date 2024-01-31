@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { BackHandler, StyleSheet, View } from 'react-native';
 import { NativeEventEmitter, NativeModules } from 'react-native';
 
-import { useAppSelector } from '~/Context/ReduxStore/Store';
+import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos';
 import { NativeEventsNames } from '~/NativeModules/NativeModulesEventNames';
 import { useTabNavigationContext } from '~/Navigation/TabNavigation/TabNavigationContext';
 
@@ -13,15 +13,14 @@ import ToolBar from './ToolBar';
 const { MainModule } = NativeModules;
 
 type PropsType = {
+  photos: Array<PhotoGalleryType>;
   scrollPosition: number;
   isSlidingPhotos: boolean;
   onSwitchMode: (isPhotoSelected: boolean, index: number) => void;
 };
 
-function PhotoSlider({ onSwitchMode, isSlidingPhotos, scrollPosition }: PropsType) {
+function PhotoSlider({ photos, onSwitchMode, isSlidingPhotos, scrollPosition }: PropsType) {
   console.log('render slider');
-
-  const photos = useAppSelector(state => state.photos.photosGallery);
 
   const [flatListCurrentIndex, setFlatListCurrentIndex] = useState(scrollPosition);
   const flatListCurrentIndexRef = useRef<number>(flatListCurrentIndex);
