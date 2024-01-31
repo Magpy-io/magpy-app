@@ -35,7 +35,7 @@ function Details({ name, email }: { name: string; email: string }) {
 }
 
 const AVATAR_SIZE = 60;
-console.log('borderRadius', borderRadius);
+
 const styles = StyleSheet.create({
   name: {
     ...typography.largeTextBold,

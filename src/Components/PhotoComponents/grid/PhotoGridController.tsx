@@ -22,7 +22,7 @@ function PhotoGridController({
   scrollPosition,
   isSlidingPhotos,
 }: PropsType) {
-  console.log('render grid');
+  //console.log('render grid');
 
   const photosRef = useRef<PhotoGalleryType[]>(photos);
   photosRef.current = photos;

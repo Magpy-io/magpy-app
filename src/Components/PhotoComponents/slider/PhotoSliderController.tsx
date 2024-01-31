@@ -20,7 +20,7 @@ type PropsType = {
 };
 
 function PhotoSlider({ photos, onSwitchMode, isSlidingPhotos, scrollPosition }: PropsType) {
-  console.log('render slider');
+  //console.log('render slider');
 
   const [flatListCurrentIndex, setFlatListCurrentIndex] = useState(scrollPosition);
   const flatListCurrentIndexRef = useRef<number>(flatListCurrentIndex);

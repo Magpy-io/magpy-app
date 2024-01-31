@@ -22,7 +22,7 @@ type PropsType = {
 
 function PhotoComponentForGrid(props: PropsType) {
   const { photo, isSelecting, isSelected, onPress, onLongPress } = props;
-  console.log('Render photo for grid');
+  //console.log('Render photo for grid');
 
   const localPhoto = useAppSelector(photoLocalSelector(photo.mediaId));
   const serverPhoto = useAppSelector(photoServerSelector(photo.serverId));
