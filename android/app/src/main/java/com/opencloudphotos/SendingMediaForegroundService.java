@@ -178,7 +178,7 @@ public class SendingMediaForegroundService extends HeadlessJsTaskService {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
-    public void onTaskFinished(String code){
+    public void onTaskFinished(String code, String id){
 
         handler.removeCallbacks(timeoutRunnable);
 
@@ -195,13 +195,14 @@ public class SendingMediaForegroundService extends HeadlessJsTaskService {
             state = "FAILED";
             return;
         }
-        index++;
 
         WritableMap params = new WritableNativeMap();
         params.putString("state", state);
-
+        params.putString("serverId", id);
+        params.putString("mediaId", ids[index]);
         sendEvent("PhotoUploaded", params);
 
+        index++;
 
         notificationBuilder
                 .setProgress(ids.length, index, false)

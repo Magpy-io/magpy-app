@@ -2,7 +2,7 @@ import 'react-native';
 
 export interface MainModuleType {
   getRestoredMediaAbsolutePath: () => Promise<string>;
-  onJsTaskFinished: (param: { code: string }) => void;
+  onJsTaskFinished: (param: { code: string; id: string }) => void;
   disableFullScreen: () => Promise<void>;
   enableFullScreen: () => Promise<void>;
   startSendingMediaService: (
@@ -17,7 +17,7 @@ export interface MainModuleType {
     }[],
   ) => Promise<void>;
   stopSendingMediaService: () => Promise<void>;
-  getServiceState: () => Promise<string>;
+  getServiceState: () => Promise<'STARTUP' | 'DESTROYED' | 'INACTIVE' | 'FAILED'>;
   getIds: () => Promise<string[]>;
   getCurrentIndex: () => Promise<number>;
   getWindowInsets: () => Promise<{

@@ -7,7 +7,7 @@ import { useTabNavigationContext } from '~/Navigation/TabNavigation/TabNavigatio
 
 import PhotoGridComponent from './PhotoGridComponent';
 import SelectionBar from './SelectionBar';
-import ToolBarGrid from './ToolBarGrid';
+import ToolBarPhotos from './ToolBarPhotos';
 
 type PropsType = {
   photos: Array<PhotoGalleryType>;
@@ -140,7 +140,7 @@ function PhotoGridController({
         />
       )}
 
-      {isSelecting && <ToolBarGrid selectedKeys={selectedKeys} />}
+      {isSelecting && <ToolBarPhotos selectedKeys={selectedKeys.values()} />}
     </View>
   );
 }

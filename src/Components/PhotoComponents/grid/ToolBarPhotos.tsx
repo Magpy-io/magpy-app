@@ -13,10 +13,10 @@ import ToolComponent from '../common/ToolComponent';
 const TOOLBAR_COLOR = appColors.BACKGROUND;
 
 type ToolBarProps = {
-  selectedKeys: Map<string, PhotoGalleryType>;
+  selectedKeys: IterableIterator<PhotoGalleryType>;
 };
 
-function ToolBarGrid(props: ToolBarProps) {
+function ToolBarPhotos(props: ToolBarProps) {
   const insets = useSafeAreaInsets();
 
   const localPhotos = useAppSelector(state => state.photos.photosLocal);
@@ -25,7 +25,10 @@ function ToolBarGrid(props: ToolBarProps) {
 
   const selectedPhotos: PhotoLocalType[] = [];
 
-  for (const photo of props.selectedKeys.values()) {
+  for (const photo of props.selectedKeys) {
+    if (photo.serverId) {
+      continue;
+    }
     const localPhoto = photo.mediaId ? localPhotos[photo.mediaId] : undefined;
     if (localPhoto) {
       selectedPhotos.push(localPhoto);
@@ -97,4 +100,4 @@ const styles = StyleSheet.create({
   iconContainerStyle: {},
 });
 
-export default React.memo(ToolBarGrid);
+export default React.memo(ToolBarPhotos);

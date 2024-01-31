@@ -85,6 +85,18 @@ const photosServerSlice = createSlice({
     addThumbnailPhotoById: (state, action: { payload: { id: string; uri: string } }) => {
       state.photosServer[action.payload.id].uriThumbnail = action.payload.uri;
     },
+
+    addPhotoFromLocalToServer: (
+      state,
+      action: { payload: { photoServer: PhotoServerType; mediaId: string } },
+    ) => {
+      state.photosServer[action.payload.photoServer.id] = action.payload.photoServer;
+
+      const galleryPhoto = state.photosGallery.find(p => p.mediaId == action.payload.mediaId);
+      if (galleryPhoto) {
+        galleryPhoto.serverId = action.payload.photoServer.id;
+      }
+    },
   },
 });
 
@@ -93,6 +105,7 @@ export const {
   setPhotosLocal,
   addCompressedPhotoById,
   addThumbnailPhotoById,
+  addPhotoFromLocalToServer,
 } = photosServerSlice.actions;
 
 export default photosServerSlice.reducer;

@@ -1,50 +1,36 @@
 import React from 'react';
-import { StyleSheet, View, ViewStyle } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { Icon } from '@rneui/themed';
 import { Text } from 'react-native-elements';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import BackButton from '~/Components/CommonComponents/BackButton';
+import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos';
 import { appColors } from '~/styles/colors';
 import { typography } from '~/styles/typography';
 
 type StatusBarComponentProps = {
-  inDevice?: boolean;
-  inServer?: boolean;
-  isLoading?: boolean;
-  loadingPercentage?: number;
-  title?: string;
-  style?: ViewStyle;
+  photo: PhotoGalleryType;
   onBackButton?: () => void;
 };
 
-function StatusBarComponent(props: StatusBarComponentProps) {
-  const deviceStatusText = props.inDevice ? 'On device' : 'Not on device';
-  const serverStatusText = props.inServer ? 'Backed up' : 'Not backed up';
-
-  const deviceStatusIcon = props.inDevice ? 'mobile-friendly' : 'phonelink-erase';
-  const serverStatusIcon = props.inServer ? 'cloud-done-outline' : 'cloud-offline-outline';
+function StatusBarComponent({ photo, onBackButton }: StatusBarComponentProps) {
+  const photoInDevice = !!photo.mediaId;
+  const photoInServer = !!photo.serverId;
+  const deviceStatusIcon = photoInDevice ? 'mobile-friendly' : 'phonelink-erase';
+  const serverStatusIcon = photoInServer ? 'cloud-done-outline' : 'cloud-offline-outline';
   const insets = useSafeAreaInsets();
 
   return (
-    <View style={[styles.StatusBarStyle, props.style, { paddingTop: insets.top }]}>
+    <View style={[styles.StatusBarStyle, { paddingTop: insets.top }]}>
       <View style={styles.BackButtonTitleView}>
-        <BackButton onPress={props.onBackButton} />
-        <Text style={styles.title}>{props.title}</Text>
+        <BackButton onPress={onBackButton} />
+        <Text style={styles.title}>{'title'}</Text>
       </View>
       <View style={styles.statusBarComponentStyle}>
-        <StatusComponent
-          icon={serverStatusIcon}
-          type="ionicon"
-          text={serverStatusText}
-          valid={props.inServer ?? false}
-        />
-        <StatusComponent
-          icon={deviceStatusIcon}
-          text={deviceStatusText}
-          valid={props.inDevice ?? false}
-        />
+        <StatusComponent icon={serverStatusIcon} type="ionicon" valid={photoInServer} />
+        <StatusComponent icon={deviceStatusIcon} valid={photoInDevice} />
       </View>
     </View>
   );
@@ -52,7 +38,6 @@ function StatusBarComponent(props: StatusBarComponentProps) {
 
 type StatusComponentProps = {
   icon: string;
-  text: string;
   valid: boolean;
   type?: string;
 };

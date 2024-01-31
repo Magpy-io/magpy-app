@@ -2,10 +2,6 @@ import React, { ReactNode, createContext, useContext } from 'react';
 
 import { AuthDataType, useAuthData } from './ContextSlices/AuthContext';
 import {
-  BackgroundServiceDataType,
-  useBackgroundServiceData,
-} from './ContextSlices/BackgroundServiceContext';
-import {
   LocalServersDataType,
   useLocalServersData,
 } from './ContextSlices/LocalServersContext';
@@ -17,7 +13,6 @@ import { ServerClaimDataType, useServerClaimData } from './ContextSlices/ServerC
 import { ServerDataType, useServerData } from './ContextSlices/ServerContext';
 
 export type PhotosContextType = {
-  backgroundServiceData: BackgroundServiceDataType;
   photosDownloadingData: PhotosDownloadingDataType;
   serverClaimData: ServerClaimDataType;
   authData: AuthDataType;
@@ -32,7 +27,6 @@ type PropsType = {
 };
 
 const ContextProvider: React.FC<PropsType> = props => {
-  const backgroundServiceData = useBackgroundServiceData();
   const photosDownloadingData = usePhotosDownloadingData();
   const serverClaimData = useServerClaimData();
   const authData = useAuthData();
@@ -40,7 +34,6 @@ const ContextProvider: React.FC<PropsType> = props => {
   const localServersData = useLocalServersData();
 
   const value = {
-    backgroundServiceData,
     photosDownloadingData,
     serverClaimData,
     authData,

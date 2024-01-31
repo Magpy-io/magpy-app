@@ -26,12 +26,12 @@ export async function UploadPhotoTask(photo: {
     image64: res,
   });
 
-  if (result.ok) {
-    MainModule.onJsTaskFinished({ code: 'SUCCESS' });
+  if (result.ok && result.data.done) {
+    MainModule.onJsTaskFinished({ code: 'SUCCESS', id: result.data.photo.id });
     console.log('photo uploaded');
   } else {
-    MainModule.onJsTaskFinished({ code: 'ERROR' });
+    MainModule.onJsTaskFinished({ code: 'ERROR', id: '' });
     console.log('photo upload error');
-    console.log(result.errorCode);
+    console.log((result as typeof result & { ok: false }).errorCode);
   }
 }

@@ -6,9 +6,9 @@ import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos';
 import { NativeEventsNames } from '~/NativeModules/NativeModulesEventNames';
 import { useTabNavigationContext } from '~/Navigation/TabNavigation/TabNavigationContext';
 
+import ToolBarPhotos from '../grid/ToolBarPhotos';
 import PhotoSliderComponent from './PhotoSliderComponent';
 import StatusBarComponent from './StatusBarComponent';
-import ToolBar from './ToolBar';
 
 const { MainModule } = NativeModules;
 
@@ -28,6 +28,8 @@ function PhotoSlider({ photos, onSwitchMode, isSlidingPhotos, scrollPosition }: 
   const [isFullScreen, setIsFullScreen] = useState(false);
 
   const { hideTab } = useTabNavigationContext();
+
+  const currentPhoto = photos[flatListCurrentIndex];
 
   useEffect(() => {
     if (photos.length == 0) {
@@ -105,9 +107,11 @@ function PhotoSlider({ photos, onSwitchMode, isSlidingPhotos, scrollPosition }: 
         isFullScreen={isFullScreen}
       />
 
-      {!isFullScreen && <StatusBarComponent onBackButton={onStatusBarBackButton} />}
+      {!isFullScreen && (
+        <StatusBarComponent photo={currentPhoto} onBackButton={onStatusBarBackButton} />
+      )}
 
-      {!isFullScreen && <ToolBar />}
+      {!isFullScreen && <ToolBarPhotos selectedKeys={[currentPhoto].values()} />}
     </View>
   );
 }

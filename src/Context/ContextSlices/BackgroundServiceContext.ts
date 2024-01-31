@@ -1,77 +1,76 @@
-import React, { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect } from 'react';
 import { NativeEventEmitter, NativeModules } from 'react-native';
 
-import { useMainContext } from '../MainContextProvider';
+import { GetPhotosById } from '~/Helpers/ServerQueries';
+import { NativeEventsNames } from '~/NativeModules/NativeModulesEventNames';
+
+import { ParseApiPhoto } from '../ReduxStore/Slices/Functions';
+import { addPhotoFromLocalToServer } from '../ReduxStore/Slices/Photos';
+import { useAppDispatch } from '../ReduxStore/Store';
 
 const { MainModule } = NativeModules;
 
-const intervalTimer = 5000;
-
-export type BackgroundServiceDataType = {
-  refreshPhotosAddingServerIsRunning: React.MutableRefObject<boolean>;
-};
-
-export function useBackgroundServiceData(): BackgroundServiceDataType {
-  const refreshPhotosAddingServerIsRunning = useRef(false);
-
-  return { refreshPhotosAddingServerIsRunning };
-}
+const intervalTimer = 500;
 
 export function useBackgroundServiceEffects() {
-  const { backgroundServiceData } = useMainContext();
+  const dispatch = useAppDispatch();
 
-  const { refreshPhotosAddingServerIsRunning } = backgroundServiceData;
+  const manageBackgroundService = useCallback(async () => {
+    const serviceState = await MainModule.getServiceState();
 
-  const refreshPhotosAddingServer = useCallback(async () => {
-    try {
-      if (refreshPhotosAddingServerIsRunning.current) {
-        // already refreshing
-        return;
-      }
-
-      refreshPhotosAddingServerIsRunning.current = true;
-
-      const serviceState = await MainModule.getServiceState();
-
-      if (serviceState == 'DESTROYED' || serviceState == 'STARTUP') {
-        return;
-      }
-
-      //const ids = await MainModule.getIds();
-      //const currentIndex = await MainModule.getCurrentIndex();
-
-      if (serviceState == 'INACTIVE' || serviceState == 'FAILED') {
-        await MainModule.stopSendingMediaService();
-
-        if (serviceState == 'FAILED') {
-          //TODO display toast message
-        }
-      }
-    } catch (err) {
-      console.log(err);
-    } finally {
-      refreshPhotosAddingServerIsRunning.current = false;
+    if (serviceState == 'DESTROYED' || serviceState == 'STARTUP') {
+      return;
     }
-  }, [refreshPhotosAddingServerIsRunning]);
+
+    if (serviceState == 'INACTIVE' || serviceState == 'FAILED') {
+      if (serviceState == 'FAILED') {
+        //TODO display toast message
+      }
+
+      await MainModule.stopSendingMediaService();
+    }
+  }, []);
 
   useEffect(() => {
     const intervalId = setInterval(() => {
-      refreshPhotosAddingServer().catch(console.log);
+      manageBackgroundService().catch(console.log);
     }, intervalTimer);
 
     return () => {
       clearInterval(intervalId);
     };
-  }, [refreshPhotosAddingServer]);
+  }, [manageBackgroundService]);
 
   useEffect(() => {
     const emitter = new NativeEventEmitter();
-    const subscription = emitter.addListener('PhotoUploaded', () => {
-      refreshPhotosAddingServer?.().catch(console.log);
-    });
+    const subscription = emitter.addListener(
+      NativeEventsNames.PhotoUploaded,
+      ({ serverId, mediaId }: { serverId: string; mediaId: string; state: string }) => {
+        async function core() {
+          const ret = await GetPhotosById.Post({
+            ids: [serverId],
+            photoType: 'data',
+          });
+
+          if (!ret.ok || !ret.data.photos[0].exists) {
+            console.log('photo just added but not found on server,', serverId);
+            return;
+          }
+
+          dispatch(
+            addPhotoFromLocalToServer({
+              photoServer: ParseApiPhoto(ret.data.photos[0].photo),
+              mediaId,
+            }),
+          );
+        }
+
+        core().catch(console.log);
+      },
+    );
 
     return () => {
       subscription.remove();
     };
-  }, [refreshPhotosAddingServer]);
+  }, [dispatch]);
 }

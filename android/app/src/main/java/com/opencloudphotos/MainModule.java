@@ -303,10 +303,11 @@ public class MainModule extends ReactContextBaseJavaModule{
     @ReactMethod
     public void onJsTaskFinished(ReadableMap data){
         String returnCode = data.getString("code");
+        String serverId = data.getString("id");
         if(isServiceRunningInner()){
             if(SendingMediaForegroundService.getInstance() != null){
                 if(SendingMediaForegroundService.getInstance().state.equals("ACTIVE")){
-                    SendingMediaForegroundService.getInstance().onTaskFinished(returnCode);
+                    SendingMediaForegroundService.getInstance().onTaskFinished(returnCode, serverId);
                 }
             }else{
                 Log.e("Service", "onJsTaskFinished: Service not Destroyed but instance is null");

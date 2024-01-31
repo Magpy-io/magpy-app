@@ -2,7 +2,6 @@ import { useCallback, useEffect, useRef } from 'react';
 
 import { Promise as BluebirdPromise } from 'bluebird';
 
-import { uniqueDeviceId } from '~/Config/config';
 import { useBackgroundServiceFunctions } from '~/Context/UseContexts/useBackgroundServiceContext';
 import { useServerContext } from '~/Context/UseContexts/useServerContext';
 import {
@@ -14,6 +13,7 @@ import {
 import { GetPhotos, GetPhotosById } from '~/Helpers/ServerQueries';
 
 import { useAppDispatch } from '../Store';
+import { ParseApiPhoto } from './Functions';
 import {
   PhotoLocalType,
   PhotoServerType,
@@ -92,24 +92,15 @@ export function usePhotosFunctionsStore() {
         const photoThumbnailExistsInCache = photosThumbnailExistsInCache[index];
         const photoCompressedExistsInCache = photosCompressedExistsInCache[index];
 
-        return {
-          id: photo.id,
-          fileSize: photo.meta.fileSize,
-          fileName: photo.meta.name,
-          height: photo.meta.height,
-          width: photo.meta.width,
-          created: photo.meta.date,
-          syncDate: photo.meta.syncDate,
-          uri: photo.meta.clientPaths.find(
-            clientPath => clientPath.deviceUniqueId == uniqueDeviceId,
-          )?.path,
-          uriThumbnail: photoThumbnailExistsInCache.exists
-            ? photoThumbnailExistsInCache.uri
-            : undefined,
-          uriCompressed: photoCompressedExistsInCache.exists
-            ? photoCompressedExistsInCache.uri
-            : undefined,
-        };
+        const parsedPhoto = ParseApiPhoto(photo);
+        parsedPhoto.uriThumbnail = photoThumbnailExistsInCache.exists
+          ? photoThumbnailExistsInCache.uri
+          : undefined;
+        parsedPhoto.uriCompressed = photoCompressedExistsInCache.exists
+          ? photoCompressedExistsInCache.uri
+          : undefined;
+
+        return parsedPhoto;
       });
 
       dispatch(setPhotosServer(photos));
@@ -179,6 +170,9 @@ export function usePhotosFunctionsStore() {
 
   const UploadPhotos = useCallback(
     async (photos: PhotoLocalType[]) => {
+      if (photos.length == 0) {
+        return;
+      }
       await SendPhotoToBackgroundServiceForUpload(photos);
     },
     [SendPhotoToBackgroundServiceForUpload],
