@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef } from 'react';
 import { Promise as BluebirdPromise } from 'bluebird';
 
 import { uniqueDeviceId } from '~/Config/config';
+import { useBackgroundServiceFunctions } from '~/Context/UseContexts/useBackgroundServiceContext';
 import { useServerContext } from '~/Context/UseContexts/useServerContext';
 import {
   GalleryGetPhotos,
@@ -24,6 +25,8 @@ import {
 
 export function usePhotosFunctionsStore() {
   const dispatch = useAppDispatch();
+
+  const { SendPhotoToBackgroundServiceForUpload } = useBackgroundServiceFunctions();
 
   const { isServerReachable } = useServerContext();
   const isServerReachableRef = useRef(false);
@@ -174,12 +177,20 @@ export function usePhotosFunctionsStore() {
     [RefreshLocalPhotos, RefreshServerPhotos],
   );
 
+  const UploadPhotos = useCallback(
+    async (photos: PhotoLocalType[]) => {
+      await SendPhotoToBackgroundServiceForUpload(photos);
+    },
+    [SendPhotoToBackgroundServiceForUpload],
+  );
+
   return {
     RefreshLocalPhotos,
     RefreshServerPhotos,
     RefreshAllPhotos,
     AddPhotoThumbnailIfMissing,
     AddPhotoCompressedIfMissing,
+    UploadPhotos,
   };
 }
 

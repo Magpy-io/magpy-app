@@ -212,8 +212,9 @@ function setAddressForServerApi(ip: string, port: string) {
 
 async function TryServer(ip: string, port: string, token: string) {
   try {
-    console.log('trying ', ip);
+    console.log('trying ', ip, port);
     const res = await GetToken.Post({ userToken: token }, { path: `http://${ip}:${port}` });
+    console.log(res);
     if (res.ok) {
       console.log('Server found');
       return true;

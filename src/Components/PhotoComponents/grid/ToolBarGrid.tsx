@@ -3,7 +3,9 @@ import { StyleSheet, View } from 'react-native';
 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos';
+import { PhotoGalleryType, PhotoLocalType } from '~/Context/ReduxStore/Slices/Photos';
+import { usePhotosFunctionsStore } from '~/Context/ReduxStore/Slices/PhotosFunctions';
+import { useAppSelector } from '~/Context/ReduxStore/Store';
 import { appColors } from '~/styles/colors';
 
 import ToolComponent from '../common/ToolComponent';
@@ -17,6 +19,19 @@ type ToolBarProps = {
 function ToolBarGrid(props: ToolBarProps) {
   const insets = useSafeAreaInsets();
 
+  const localPhotos = useAppSelector(state => state.photos.photosLocal);
+
+  const { UploadPhotos } = usePhotosFunctionsStore();
+
+  const selectedPhotos: PhotoLocalType[] = [];
+
+  for (const photo of props.selectedKeys.values()) {
+    const localPhoto = photo.mediaId ? localPhotos[photo.mediaId] : undefined;
+    if (localPhoto) {
+      selectedPhotos.push(localPhoto);
+    }
+  }
+
   return (
     <View style={[styles.toolBarView, { paddingBottom: insets.bottom }]}>
       <View style={styles.toolsView}>
@@ -24,7 +39,9 @@ function ToolBarGrid(props: ToolBarProps) {
           icon="backup"
           type="material"
           text="Back up"
-          onPress={() => props.onAddServer?.()}
+          onPress={() => {
+            UploadPhotos(selectedPhotos).catch(console.log);
+          }}
         />
 
         <ToolComponent
