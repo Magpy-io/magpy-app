@@ -4,7 +4,7 @@ module.exports = {
   tabWidth: 2,
   singleQuote: true,
   bracketSpacing: true,
-  importOrder: ['^react$|^react-native$', '^[A-Za-z].*|^@.*', '^[~].*', '^[./]'],
+  importOrder: ['^react$|^react-native$', '^.*mock.*', '^[A-Za-z].*|^@.*', '^[~].*', '^[./]'],
   importOrderSeparation: true,
   importOrderSortSpecifiers: true,
   arrowParens: 'avoid',
