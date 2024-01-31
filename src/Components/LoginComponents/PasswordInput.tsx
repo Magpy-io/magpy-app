@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import {
-  TextInput as RNTextInput,
-  TextInputProps as RNTextInputProps,
+  TextInput,
+  TextInputProps,
   StyleSheet,
   TouchableOpacity,
   View,
@@ -20,20 +20,20 @@ type PasswordInputProps = {
   error: string | undefined;
   showPasswordRequirements?: boolean;
   showValidation?: boolean;
-} & RNTextInputProps;
+} & TextInputProps;
 
 export function PasswordInput(props: PasswordInputProps) {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const togglePasswordVisibility = () => {
     setPasswordVisible(!passwordVisible);
   };
-  const inputRef = useRef<RNTextInput>(null);
+  const inputRef = useRef<TextInput>(null);
   const showError = !inputRef.current?.isFocused() && props.value !== '';
 
   return (
     <View>
       <View style={styles.viewStyle}>
-        <RNTextInput
+        <TextInput
           testID={props.testID}
           placeholder="Password"
           placeholderTextColor={appColors.TEXT_LIGHT}

@@ -9,7 +9,7 @@ import * as Yup from 'yup';
 import { PrimaryButtonExtraWide } from '~/Components/CommonComponents/Buttons';
 import ViewWithGap from '~/Components/CommonComponents/ViewWithGap';
 import { PasswordInput } from '~/Components/LoginComponents/PasswordInput';
-import TextInput from '~/Components/LoginComponents/TextInput';
+import LoginTextInput from '~/Components/LoginComponents/LoginTextInput';
 import { useAuthFunctions } from '~/Context/UseContexts/useAuthContext';
 import { Login } from '~/Helpers/BackendQueries';
 import { appColors } from '~/styles/colors';
@@ -43,7 +43,7 @@ export default function LoginForm() {
       {({ handleChange, handleBlur, handleSubmit, values, errors }) => (
         <View>
           <ViewWithGap gap={spacing.spacing_m} style={styles.formView}>
-            <TextInput
+            <LoginTextInput
               testID="emailEntry"
               placeholder="Email"
               onChangeText={handleChange('email')}

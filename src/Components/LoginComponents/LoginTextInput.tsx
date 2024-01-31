@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import {
-  TextInput as RNTextInput,
-  TextInputProps as RNTextInputProps,
+  TextInput,
+  TextInputProps,
   StyleSheet,
   View,
 } from 'react-native';
@@ -14,19 +14,19 @@ import { borderRadius, spacing } from '~/styles/spacing';
 import FormError from './FormError';
 import ValidInputIndicator from './ValidInputIndicator';
 
-type TextInputProps = {
+type LoginTextInputProps = {
   error: string | undefined;
   icon: string;
   showValidation?: boolean;
-} & RNTextInputProps;
+} & TextInputProps;
 
-export default function TextInput(props: TextInputProps) {
-  const inputRef = useRef<RNTextInput>(null);
+export default function LoginTextInput(props: LoginTextInputProps) {
+  const inputRef = useRef<TextInput>(null);
   const showError = !inputRef?.current?.isFocused() && props.value !== '';
   return (
     <View>
       <View style={styles.viewStyle}>
-        <RNTextInput
+        <TextInput
           testID={props.testID}
           style={styles.textInputStyle}
           placeholderTextColor={appColors.TEXT_LIGHT}

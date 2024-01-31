@@ -8,7 +8,7 @@ import * as Yup from 'yup';
 import { PrimaryButtonExtraWide } from '~/Components/CommonComponents/Buttons';
 import ViewWithGap from '~/Components/CommonComponents/ViewWithGap';
 import { PasswordInput } from '~/Components/LoginComponents/PasswordInput';
-import TextInput from '~/Components/LoginComponents/TextInput';
+import LoginTextInput from '~/Components/LoginComponents/LoginTextInput';
 import { useAuthFunctions } from '~/Context/UseContexts/useAuthContext';
 import { Login, Register } from '~/Helpers/BackendQueries';
 import { ErrorBackendUnreachable } from '~/Helpers/BackendQueries/ExceptionsManager';
@@ -85,7 +85,7 @@ export default function RegisterForm() {
       {({ handleChange, handleBlur, handleSubmit, values, errors }) => (
         <View>
           <ViewWithGap gap={spacing.spacing_m} style={styles.viewStyle}>
-            <TextInput
+            <LoginTextInput
               placeholder="Name"
               onChangeText={handleChange('name')}
               onBlur={handleBlur('name')}
@@ -94,7 +94,7 @@ export default function RegisterForm() {
               icon="person"
               showValidation
             />
-            <TextInput
+            <LoginTextInput
               placeholder="Email"
               onChangeText={handleChange('email')}
               onBlur={handleBlur('email')}
