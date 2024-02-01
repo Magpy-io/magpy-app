@@ -1,8 +1,6 @@
 import { useCallback } from 'react';
 import { NativeModules } from 'react-native';
 
-import { useMainContext } from '~/Context/MainContextProvider';
-
 import { PhotoLocalType } from '../ReduxStore/Slices/Photos';
 
 const { MainModule } = NativeModules;
@@ -34,8 +32,4 @@ export function useBackgroundServiceFunctions() {
   return { SendPhotoToBackgroundServiceForUpload };
 }
 
-export function useBackgroundServiceContext() {
-  const { backgroundServiceData } = useMainContext();
-
-  return backgroundServiceData;
-}
+export function useBackgroundServiceContext() {}
