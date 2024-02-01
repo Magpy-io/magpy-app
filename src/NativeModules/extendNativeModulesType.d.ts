@@ -5,17 +5,7 @@ export interface MainModuleType {
   onJsTaskFinished: (param: { code: string; id: string }) => void;
   disableFullScreen: () => Promise<void>;
   enableFullScreen: () => Promise<void>;
-  startSendingMediaService: (
-    photos: {
-      id: string;
-      name: string;
-      date: string;
-      path: string;
-      width: number;
-      height: number;
-      size: number;
-    }[],
-  ) => Promise<void>;
+  startSendingMediaService: (photoMediaIds: string[]) => Promise<void>;
   stopSendingMediaService: () => Promise<void>;
   getServiceState: () => Promise<'STARTUP' | 'DESTROYED' | 'INACTIVE' | 'FAILED'>;
   getIds: () => Promise<string[]>;

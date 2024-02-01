@@ -234,7 +234,7 @@ public class MainModule extends ReactContextBaseJavaModule{
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
     @ReactMethod
-    public void startSendingMediaService(ReadableArray photos, Promise promise){
+    public void startSendingMediaService(ReadableArray photoMediaIds, Promise promise){
         Log.d("Service", "startSendingMediaService: started");
         if(isServiceRunningInner()){
             Log.d("Service", "startSendingMediaService: error server running");
@@ -249,33 +249,14 @@ public class MainModule extends ReactContextBaseJavaModule{
         Log.d("Service", "startSendingMediaService: Start foreground service");
         context.startForegroundService(serviceIntent);
 
-        String[] ids = new String[photos.size()];
-        String[] names = new String[photos.size()];
-        String[] dates = new String[photos.size()];
-        String[] paths = new String[photos.size()];
-        int[] widths = new int[photos.size()];
-        int[] heights = new int[photos.size()];
-        int[] sizes = new int[photos.size()];
+        String[] ids = new String[photoMediaIds.size()];
 
-        for(int i=0; i<photos.size(); i++){
-            ids[i] = photos.getMap(i).getString("id");
-            names[i] = photos.getMap(i).getString("name");
-            dates[i] = photos.getMap(i).getString("date");
-            paths[i] = photos.getMap(i).getString("path");
-            widths[i] = photos.getMap(i).getInt("width");
-            heights[i] = photos.getMap(i).getInt("height");
-            sizes[i] = photos.getMap(i).getInt("size");
+        for(int i=0; i<photoMediaIds.size(); i++){
+            ids[i] = photoMediaIds.getString(i);
         }
 
         Bundle b = new Bundle();
         b.putStringArray("ids", ids);
-        b.putStringArray("names", names);
-        b.putStringArray("dates", dates);
-        b.putStringArray("paths", paths);
-        b.putIntArray("widths", widths);
-        b.putIntArray("heights", heights);
-        b.putIntArray("sizes", sizes);
-
 
         Log.d("Service", "startSendingMediaService: waiting for instance creation");
         int waitCounter = 0;

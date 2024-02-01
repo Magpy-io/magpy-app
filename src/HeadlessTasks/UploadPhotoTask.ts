@@ -6,14 +6,7 @@ import * as Queries from '~/Helpers/Queries';
 
 const { MainModule } = NativeModules;
 
-export async function UploadPhotoTask(photo: {
-  path: string;
-  name: string;
-  date: string;
-  height: number;
-  width: number;
-  size: number;
-}) {
+export async function UploadPhotoTask(photo: { id: string }) {
   const res = await RNFS.readFile(photo.path, 'base64');
 
   const result = await Queries.addPhotoWithProgress({
