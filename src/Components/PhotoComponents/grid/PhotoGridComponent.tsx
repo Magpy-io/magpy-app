@@ -28,7 +28,7 @@ type PhotoGridComponentProps = {
   scrollPosition: number;
   onRefresh: () => void;
   isSelecting: boolean;
-  selectedKeys: Map<string, PhotoGalleryType>;
+  selectedKeys: Set<string>;
 };
 
 export default function PhotoGridComponent({

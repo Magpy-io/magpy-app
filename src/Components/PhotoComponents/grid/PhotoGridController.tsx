@@ -28,7 +28,7 @@ function PhotoGridController({
   photosRef.current = photos;
 
   const [isSelecting, setIsSelecting] = useState(false);
-  const [selectedKeys, setSelectedKeys] = useState<Map<string, PhotoGalleryType>>(new Map());
+  const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
 
   const { hideTab, showTab } = useTabNavigationContext();
   const { RefreshAllPhotos } = usePhotosFunctionsStore();
@@ -66,13 +66,13 @@ function PhotoGridController({
       if (isSelecting) {
         setSelectedKeys(sKeys => {
           if (sKeys.has(item.key)) {
-            const newMap = new Map(sKeys);
-            newMap.delete(item.key);
-            return newMap;
+            const newSet = new Set(sKeys);
+            newSet.delete(item.key);
+            return newSet;
           } else {
-            const newMap = new Map(sKeys);
-            newMap.set(item.key, item);
-            return newMap;
+            const newSet = new Set(sKeys);
+            newSet.add(item.key);
+            return newSet;
           }
         });
       } else {
@@ -87,9 +87,9 @@ function PhotoGridController({
       if (!isSelecting) {
         hideTab();
         setIsSelecting(true);
-        const map = new Map();
-        map.set(item.key, item);
-        setSelectedKeys(map);
+        const set = new Set<string>();
+        set.add(item.key);
+        setSelectedKeys(set);
       }
     },
     [hideTab, isSelecting],
@@ -101,18 +101,12 @@ function PhotoGridController({
   }, [setIsSelecting, showTab]);
 
   const onSelectAll = useCallback(() => {
-    setSelectedKeys(ids => {
-      const newMap = new Map();
-
-      if (ids.size == photos.length) {
-        return newMap;
+    setSelectedKeys(sKeys => {
+      if (sKeys.size == photos.length) {
+        return new Set<string>();
       }
 
-      photos.forEach(photo => {
-        newMap.set(photo.key, photo);
-      });
-
-      return newMap;
+      return new Set(photos.map(photo => photo.key));
     });
   }, [photos]);
 
@@ -140,7 +134,7 @@ function PhotoGridController({
         />
       )}
 
-      {isSelecting && <ToolBarPhotos selectedKeys={selectedKeys.values()} />}
+      {isSelecting && <ToolBarPhotos selectedKeys={selectedKeys} />}
     </View>
   );
 }

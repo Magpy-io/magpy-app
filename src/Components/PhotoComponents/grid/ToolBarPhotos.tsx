@@ -13,25 +13,34 @@ import ToolComponent from '../common/ToolComponent';
 const TOOLBAR_COLOR = appColors.BACKGROUND;
 
 type ToolBarProps = {
-  selectedKeys: IterableIterator<PhotoGalleryType>;
+  selectedKeys: Set<string>;
 };
 
 function ToolBarPhotos(props: ToolBarProps) {
   const insets = useSafeAreaInsets();
 
   const localPhotos = useAppSelector(state => state.photos.photosLocal);
+  const galleryPhotos = useAppSelector(state => state.photos.photosGallery);
 
   const { UploadPhotos } = usePhotosFunctionsStore();
 
-  const selectedPhotos: PhotoLocalType[] = [];
+  const seletedGalleryPhotos: PhotoGalleryType[] = [];
 
-  for (const photo of props.selectedKeys) {
+  for (const galleryPhoto of galleryPhotos) {
+    if (props.selectedKeys.has(galleryPhoto.key)) {
+      seletedGalleryPhotos.push(galleryPhoto);
+    }
+  }
+
+  const selectedLocalPhotos: PhotoLocalType[] = [];
+
+  for (const photo of seletedGalleryPhotos) {
     if (photo.serverId) {
       continue;
     }
     const localPhoto = photo.mediaId ? localPhotos[photo.mediaId] : undefined;
     if (localPhoto) {
-      selectedPhotos.push(localPhoto);
+      selectedLocalPhotos.push(localPhoto);
     }
   }
 
@@ -43,7 +52,7 @@ function ToolBarPhotos(props: ToolBarProps) {
           type="material"
           text="Back up"
           onPress={() => {
-            UploadPhotos(selectedPhotos).catch(console.log);
+            UploadPhotos(selectedLocalPhotos).catch(console.log);
           }}
         />
 
