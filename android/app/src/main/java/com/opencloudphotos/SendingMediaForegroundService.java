@@ -38,6 +38,7 @@ public class SendingMediaForegroundService extends HeadlessJsTaskService {
 
         @Override
         public void run() {
+            Log.d("Service", "runnable: stopping service");
             // Stop the foreground service and remove its notification
             service.stopForeground(true);
 
@@ -58,7 +59,7 @@ public class SendingMediaForegroundService extends HeadlessJsTaskService {
     public int[] sizes;
     public int index;
 
-    public String state;
+    public String state = "DESTROYED";
 
     public Notification notification;
     public NotificationCompat.Builder notificationBuilder;
@@ -68,6 +69,7 @@ public class SendingMediaForegroundService extends HeadlessJsTaskService {
 
     @Override
     public void onCreate() {
+        Log.d("Service", "SendingMediaForegroundService: onCreate");
         instance = this;
         handler = new Handler();
         timeoutRunnable = new MyRunnable(this);
@@ -76,6 +78,7 @@ public class SendingMediaForegroundService extends HeadlessJsTaskService {
 
     @Override
     public void onDestroy() {
+        Log.d("Service", "SendingMediaForegroundService: onDestroy");
         instance = null;
         if(handler != null && timeoutRunnable != null){
             handler.removeCallbacks(timeoutRunnable);
@@ -95,7 +98,7 @@ public class SendingMediaForegroundService extends HeadlessJsTaskService {
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-
+        Log.d("Service", "onStartCommand: started");
         state = "STARTUP";
 
         final String CHANNEL_ID = "Foreground Service ID";
@@ -117,11 +120,15 @@ public class SendingMediaForegroundService extends HeadlessJsTaskService {
         notification = notificationBuilder.build();
         startForeground(1001, notification);
 
+        state = "INACTIVE";
+        Log.d("Service", "onStartCommand: finished");
         return super.onStartCommand(intent, flags, startId);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     public void sendPhotos(Bundle b){
+        Log.d("Service", "service sendPhotos: started");
+
         ids = b.getStringArray("ids");
         names = b.getStringArray("names");
         dates = b.getStringArray("dates");
@@ -132,18 +139,22 @@ public class SendingMediaForegroundService extends HeadlessJsTaskService {
 
         state = "ACTIVE";
 
+        Log.d("Service", "service sendPhotos: startNextTask");
         startNextTask();
 
+        Log.d("Service", "service sendPhotos: creating notification");
         notificationBuilder
                 .setProgress(ids.length, 0, false)
                 .setContentText("Uploading photos ( " + Integer.toString(0) + " out of " + Integer.toString(ids.length) + " )");
 
         getSystemService(NotificationManager.class).notify(1001, notificationBuilder.build());
+
+        Log.d("Service", "service sendPhotos: finished");
     }
 
     public void startNextTask(){
         //TODO add timer
-
+        Log.d("Service", "service startNextTask: started");
         handler.postDelayed(timeoutRunnable, 10000);
 
         Bundle b = new Bundle();
@@ -155,16 +166,17 @@ public class SendingMediaForegroundService extends HeadlessJsTaskService {
         b.putInt("width", widths[index]);
         b.putInt("size", sizes[index]);
 
+        Log.d("Service", "service startNextTask: start js task");
         try{
             startTask(new HeadlessJsTaskConfig("MyTask", Arguments.fromBundle(b), 9000, true));
         }catch (Exception e){
             Log.e("Service", e.getMessage());
         }
-
+        Log.d("Service", "service startNextTask: finished");
     }
 
     private void sendEvent(String eventName, @Nullable WritableMap params){
-
+        Log.d("Service", "service sendEvent: started with "+ eventName);
         ReactContext reactContext;
         try{
             ReactInstanceManager reactInstanceManager = getReactNativeHost().getReactInstanceManager();
@@ -175,18 +187,23 @@ public class SendingMediaForegroundService extends HeadlessJsTaskService {
         }
 
         MainModule.sendEvent(reactContext, eventName, params);
+        Log.d("Service", "service sendEvent: finished");
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     public void onTaskFinished(String code, String id){
-
+        Log.d("Service", "service onTaskFinished: started");
         handler.removeCallbacks(timeoutRunnable);
 
         if(!Objects.equals(state, "ACTIVE")){
+            Log.d("Service", "service onTaskFinished, not active, do nothing");
             return;
         }
 
         if(!Objects.equals(code, "SUCCESS")){
+
+            Log.d("Service", "service onTaskFinished, not success, set state to failed");
+
             // Stop the foreground service and remove its notification
             stopForeground(true);
 
@@ -195,6 +212,8 @@ public class SendingMediaForegroundService extends HeadlessJsTaskService {
             state = "FAILED";
             return;
         }
+
+        Log.d("Service", "service onTaskFinished, send event photoUploaded");
 
         WritableMap params = new WritableNativeMap();
         params.putString("state", state);
@@ -210,19 +229,25 @@ public class SendingMediaForegroundService extends HeadlessJsTaskService {
 
         getSystemService(NotificationManager.class).notify(1001, notificationBuilder.build());
 
+
         if(index < ids.length){
+            Log.d("Service", "service onTaskFinished, more photos pending, start next");
             startNextTask();
         }else{
+            Log.d("Service", "service onTaskFinished, no more photos, set state to inactive");
             // Stop the foreground service and remove its notification
             stopForeground(true);
             state = "INACTIVE";
             //TODO Send event
+
+            this.stopService();
         }
+        Log.d("Service", "service onTaskFinished: finished");
     }
 
     public void stopService(){
         state = "DESTROYED";
-        Log.d("Service", "Killing service");
+        Log.d("Service", "service stopService");
         stopSelf();
     }
 

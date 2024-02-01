@@ -194,7 +194,7 @@ public class MainModule extends ReactContextBaseJavaModule{
                 promise.resolve(SendingMediaForegroundService.getInstance().state);
             }else{
                 promise.resolve("DESTROYED");
-                Log.e("Service", "getServiceState: Service not Destroyed but instance is null");
+                Log.e("Service", "getServiceState: isServiceRunningInner true but instance is null");
             }
         }
     }
@@ -235,8 +235,9 @@ public class MainModule extends ReactContextBaseJavaModule{
     @RequiresApi(api = Build.VERSION_CODES.Q)
     @ReactMethod
     public void startSendingMediaService(ReadableArray photos, Promise promise){
-
+        Log.d("Service", "startSendingMediaService: started");
         if(isServiceRunningInner()){
+            Log.d("Service", "startSendingMediaService: error server running");
             promise.reject("SERVICE_RUNNING", "Service running");
             return;
         }
@@ -245,6 +246,7 @@ public class MainModule extends ReactContextBaseJavaModule{
         Intent serviceIntent = new Intent(context,
                 SendingMediaForegroundService.class);
 
+        Log.d("Service", "startSendingMediaService: Start foreground service");
         context.startForegroundService(serviceIntent);
 
         String[] ids = new String[photos.size()];
@@ -274,56 +276,71 @@ public class MainModule extends ReactContextBaseJavaModule{
         b.putIntArray("heights", heights);
         b.putIntArray("sizes", sizes);
 
-        Log.d("Service", "Waiting for instance creation");
+
+        Log.d("Service", "startSendingMediaService: waiting for instance creation");
         int waitCounter = 0;
-        while(SendingMediaForegroundService.getInstance() == null && waitCounter < 15){
+        while((SendingMediaForegroundService.getInstance() == null || SendingMediaForegroundService.getInstance().state != "INACTIVE") && waitCounter < 10){
             waitCounter++;
-            Log.d("Service", Integer.toString(waitCounter));
+            Log.d("Service", "startSendingMediaService: waitCounter : " + Integer.toString(waitCounter));
             try {
-                Thread.sleep(100);
+                Thread.sleep(10);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
 
-        if(waitCounter >= 15){
+        if(waitCounter >= 10){
             promise.reject("ERROR_INIT_SERVICE_IN_TIME","Exception in startSendingMediaService. SendingMediaForegroundService not initialized before trying to send data to thread (sendDataToThread)");
             Log.e("Service", "Exception in startSendingMediaService. SendingMediaForegroundService not initialized before trying to send data to thread (sendDataToThread)");
             context.stopService(serviceIntent);
             return;
         }else{
-            Log.d("Service", "service instance created");
+            Log.d("Service", "startSendingMediaService: service instance created");
         }
-
+        Log.d("Service", "startSendingMediaService: sending photos to foreground service");
         SendingMediaForegroundService.getInstance().sendPhotos(b);
         promise.resolve(null);
+        Log.d("Service", "startSendingMediaService: finished");
     }
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
     @ReactMethod
     public void onJsTaskFinished(ReadableMap data){
+        Log.d("Service", "onJsTaskFinished: started");
         String returnCode = data.getString("code");
         String serverId = data.getString("id");
         if(isServiceRunningInner()){
+            Log.d("Service", "onJsTaskFinished: isServiceRunningInner true");
             if(SendingMediaForegroundService.getInstance() != null){
                 if(SendingMediaForegroundService.getInstance().state.equals("ACTIVE")){
+                    Log.d("Service", "onJsTaskFinished: calling sendingMediaServiceOnTaskFinished");
                     SendingMediaForegroundService.getInstance().onTaskFinished(returnCode, serverId);
+                }else{
+                    Log.d("Service", "onJsTaskFinished: service isServiceRunningInner but not active");
                 }
             }else{
-                Log.e("Service", "onJsTaskFinished: Service not Destroyed but instance is null");
+                Log.e("Service", "onJsTaskFinished: Service isServiceRunningInner but instance is null");
             }
+        }else{
+            Log.d("Service", "onJsTaskFinished: isServiceRunningInner false");
         }
+
+        Log.d("Service", "onJsTaskFinished: finished");
     }
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
     @ReactMethod
     public void stopSendingMediaService(Promise promise){
+        Log.d("Service", "stopSendingMediaService: started");
         if(!isServiceRunningInner()){
+            Log.d("Service", "stopSendingMediaService: cannot stop, already stopped");
             promise.reject("SERVICE_NOT_RUNNING", "Service not running");
             return;
         }
+        Log.d("Service", "stopSendingMediaService: stopping service");
         SendingMediaForegroundService.getInstance().stopService();
         promise.resolve(null);
+        Log.d("Service", "stopSendingMediaService: finished");
     }
 
     @ReactMethod
