@@ -57,9 +57,9 @@ function ToolBarPhotos(props: ToolBarProps) {
         />
 
         <ToolComponent
-          icon="backup"
+          icon="file-download"
           type="material"
-          text="Back up"
+          text="Download"
           onPress={() => props.onAddServer?.()}
         />
 

@@ -8,7 +8,7 @@ import SelectAllButton from '~/Components/CommonComponents/SelectAllButton';
 import { appColors } from '~/styles/colors';
 import { typography } from '~/styles/typography';
 
-type StatusBarComponentProps = {
+type SelectionBarProps = {
   selectedNb: number;
   style?: ViewStyle;
   onCancelButton?: () => void;
@@ -27,7 +27,7 @@ function selectedElementsToString(n: number) {
   return `${n} Elements Selected`;
 }
 
-function SelectionBar(props: StatusBarComponentProps) {
+function SelectionBar(props: SelectionBarProps) {
   const insets = useSafeAreaInsets();
   return (
     <View style={[styles.StatusBarStyle, props.style, { paddingTop: insets.top }]}>
