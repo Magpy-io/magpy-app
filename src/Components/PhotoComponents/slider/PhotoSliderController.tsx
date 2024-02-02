@@ -29,16 +29,18 @@ function PhotoSlider({ photos, onSwitchMode, isSlidingPhotos, scrollPosition }: 
 
   const { hideTab } = useTabNavigationContext();
 
-  const currentPhoto = photos[flatListCurrentIndex];
+  const currentPhoto = photos[flatListCurrentIndex] as PhotoGalleryType | undefined;
 
   const selectedKeys = new Set<string>();
-  selectedKeys.add(currentPhoto.key);
+  if (currentPhoto) {
+    selectedKeys.add(currentPhoto.key);
+  }
 
   useEffect(() => {
-    if (photos.length == 0) {
+    if (isSlidingPhotos && photos.length == 0) {
       onSwitchMode(false, 0);
     }
-  }, [photos.length, onSwitchMode]);
+  }, [isSlidingPhotos, photos.length, onSwitchMode]);
 
   useEffect(() => {
     const backAction = () => {
@@ -110,7 +112,7 @@ function PhotoSlider({ photos, onSwitchMode, isSlidingPhotos, scrollPosition }: 
         isFullScreen={isFullScreen}
       />
 
-      {!isFullScreen && (
+      {!isFullScreen && currentPhoto && (
         <StatusBarComponent photo={currentPhoto} onBackButton={onStatusBarBackButton} />
       )}
 
