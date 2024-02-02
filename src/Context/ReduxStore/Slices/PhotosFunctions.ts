@@ -26,7 +26,7 @@ export function usePhotosFunctionsStore() {
   const dispatch = useAppDispatch();
 
   const RefreshLocalPhotos = useCallback(async () => {
-    const photosFromDevice = await GalleryGetPhotos(20);
+    const photosFromDevice = await GalleryGetPhotos(3000);
 
     const photos: PhotoLocalType[] = photosFromDevice.edges.map(edge => {
       return {
