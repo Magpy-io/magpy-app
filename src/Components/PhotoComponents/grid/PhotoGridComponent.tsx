@@ -1,24 +1,19 @@
 import React, { useCallback, useEffect, useRef } from 'react';
-import { Dimensions, FlatList, StyleSheet, View } from 'react-native';
+import { FlatList, StyleSheet, View } from 'react-native';
 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos';
+import { TabBarPadding } from '~/Navigation/TabNavigation/TabBar';
+import { appColors } from '~/styles/colors';
 
+import FlatListWithColumns from './FlatListWithColumns';
 import PhotoComponentForGrid from './PhotoComponentForGrid';
 
-const ITEM_HEIGHT = Dimensions.get('screen').width / 3;
+const NUM_COLUMNS = 3;
 
 function keyExtractor(item: PhotoGalleryType) {
   return `grid_${item.key}`;
-}
-
-function getItemLayout(data: ArrayLike<PhotoGalleryType> | null | undefined, index: number) {
-  return {
-    length: ITEM_HEIGHT,
-    offset: ITEM_HEIGHT * index,
-    index,
-  };
 }
 
 type PhotoGridComponentProps = {
@@ -31,6 +26,18 @@ type PhotoGridComponentProps = {
   selectedKeys: Set<string>;
 };
 
+function correctIndexFromScrollPosition(scrollPosition: number, len: number) {
+  let tmp = Math.floor(scrollPosition / NUM_COLUMNS);
+  if (scrollPosition >= len) {
+    tmp = Math.floor((len - 1) / NUM_COLUMNS);
+  }
+
+  if (tmp < 0) {
+    tmp = 0;
+  }
+  return tmp;
+}
+
 export default function PhotoGridComponent({
   photos,
   onLongPressPhoto,
@@ -42,8 +49,16 @@ export default function PhotoGridComponent({
 }: PhotoGridComponentProps) {
   const flatlistRef = useRef<FlatList>(null);
   const photosLenRef = useRef<number>(photos.length);
-
   photosLenRef.current = photos.length;
+  const correctStartIndex = correctIndexFromScrollPosition(scrollPosition, photos.length);
+  const insets = useSafeAreaInsets();
+
+  useEffect(() => {
+    // don't scroll if no photos yet
+    if (photosLenRef.current > 0) {
+      flatlistRef.current?.scrollToIndex({ index: correctStartIndex });
+    }
+  }, [flatlistRef, correctStartIndex]);
 
   const renderItem = useCallback(
     ({ item }: { item: PhotoGalleryType }) => {
@@ -60,32 +75,9 @@ export default function PhotoGridComponent({
     [onLongPressPhoto, onPressPhoto, isSelecting, selectedKeys],
   );
 
-  let correctStartIndex = Math.floor(scrollPosition / 3);
-
-  if (scrollPosition >= photos.length) {
-    correctStartIndex = Math.floor((photos.length - 1) / 3);
-  }
-
-  if (correctStartIndex < 0) {
-    correctStartIndex = 0;
-  }
-
-  useEffect(() => {
-    // don't scroll if no photos yet
-    if (photosLenRef.current > 0) {
-      flatlistRef.current?.scrollToIndex({ index: correctStartIndex });
-    }
-  }, [flatlistRef, correctStartIndex]);
-
-  // TODO change the numColumns to 1 and create a renderItem containing 3 photos
-  // This will fix a bug in flatlist which makes it recreate all items each time one is added or removed from the top (indexes change for the rest)
-  // with numColumns set to 1, this problem is fixed and the items are able to rerender as needed
-  // This will also fix that when less than 3 photos are in a row, the 2 or 1 photo will stretch to fill all horizontal space.
-  const insets = useSafeAreaInsets();
-
   return (
     <View style={[styles.mainViewStyle, { paddingTop: insets.top }]}>
-      <FlatList
+      <FlatListWithColumns
         ref={flatlistRef}
         style={styles.flatListStyle}
         data={photos}
@@ -97,9 +89,9 @@ export default function PhotoGridComponent({
         onEndReachedThreshold={1}
         onRefresh={onRefresh}
         refreshing={false}
-        numColumns={3}
-        getItemLayout={getItemLayout}
+        columns={NUM_COLUMNS}
       />
+      <TabBarPadding />
     </View>
   );
 }
@@ -108,6 +100,7 @@ const styles = StyleSheet.create({
   mainViewStyle: {
     height: '100%',
     width: '100%',
+    backgroundColor: appColors.BACKGROUND,
   },
   flatListStyle: {},
 });
