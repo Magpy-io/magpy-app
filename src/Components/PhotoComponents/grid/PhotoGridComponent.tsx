@@ -1,9 +1,17 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
 
+import { DateTime } from 'luxon';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos';
+import {
+  PhotoGalleryType,
+  PhotoLocalType,
+  PhotoServerType,
+  photoSelector,
+} from '~/Context/ReduxStore/Slices/Photos';
+import { useAppSelector } from '~/Context/ReduxStore/Store';
+import { areDatesEqual } from '~/Helpers/Date';
 import { TabBarPadding } from '~/Navigation/TabNavigation/TabBar';
 import { appColors } from '~/styles/colors';
 
@@ -14,6 +22,18 @@ const NUM_COLUMNS = 3;
 
 function keyExtractor(item: PhotoGalleryType) {
   return `grid_${item.key}`;
+}
+
+export function getPhotoServerOrLocal(
+  localPhotos: {
+    [key: string]: PhotoLocalType;
+  },
+  serverPhotos: {
+    [key: string]: PhotoServerType;
+  },
+  photo?: PhotoGalleryType,
+) {
+  return photo?.mediaId ? localPhotos[photo?.mediaId] : serverPhotos[photo?.serverId ?? ''];
 }
 
 type PhotoGridComponentProps = {
@@ -74,6 +94,40 @@ export default function PhotoGridComponent({
     },
     [onLongPressPhoto, onPressPhoto, isSelecting, selectedKeys],
   );
+
+  const localPhotos = useAppSelector(state => state.photos.photosLocal);
+  const serverPhotos = useAppSelector(state => state.photos.photosServer);
+
+  type DayType = {
+    title: string;
+    data: PhotoGalleryType[];
+  };
+
+  const firstPhoto = getPhotoServerOrLocal(localPhotos, serverPhotos, photos[0]);
+  let currentDate = firstPhoto?.created;
+  const photosPerDay: DayType[] = [];
+  let currentBasket: DayType = {
+    title: currentDate,
+    data: [],
+  };
+
+  photos.forEach(photo => {
+    const photoData = getPhotoServerOrLocal(localPhotos, serverPhotos, photo);
+    const photoDate = photoData.created;
+
+    if (areDatesEqual(photoDate, currentDate)) {
+      currentBasket.data.push(photo);
+    } else {
+      photosPerDay.push(currentBasket);
+      currentDate = photoDate;
+      currentBasket = {
+        title: photoDate,
+        data: [photo],
+      };
+    }
+  });
+
+  console.log('photosPerDay', photosPerDay.length);
 
   return (
     <View style={[styles.mainViewStyle, { paddingTop: insets.top }]}>

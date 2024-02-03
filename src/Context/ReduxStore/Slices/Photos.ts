@@ -30,16 +30,18 @@ export type PhotoLocalType = {
 
 export type PhotoGalleryType = {
   key: string;
-  serverId: string | undefined;
-  mediaId: string | undefined;
-};
+} & (
+  | { serverId: string; mediaId: undefined }
+  | { serverId: undefined; mediaId: string }
+  | { serverId: string; mediaId: string }
+);
 
 export type PhotosState = {
   photosServer: { [key: string]: PhotoServerType };
   photosServerIdsOrdered: string[];
   photosLocal: { [key: string]: PhotoLocalType };
   photosLocalIdsOrdered: string[];
-  photosGallery: PhotoGalleryType[];
+  photosGallery: PhotoGalleryType[]; // First elemnt is the most recent photo
 };
 
 const initialState: PhotosState = {
@@ -109,6 +111,18 @@ export const {
 } = photosServerSlice.actions;
 
 export default photosServerSlice.reducer;
+
+export function photoSelector(photo?: PhotoGalleryType) {
+  return (state: RootState) => {
+    if (photo?.mediaId) {
+      return photoLocalSelector(photo.mediaId)(state);
+    }
+    if (photo?.serverId) {
+      return photoServerSelector(photo.serverId)(state);
+    }
+    return undefined;
+  };
+}
 
 export function photoLocalSelector(id?: string) {
   return (state: RootState) => (id ? state.photos.photosLocal[id] : undefined);
