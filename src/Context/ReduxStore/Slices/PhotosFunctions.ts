@@ -192,13 +192,13 @@ export function usePhotosStoreEffect() {
   const { RefreshAllPhotos } = usePhotosFunctionsStore();
 
   useEffect(() => {
-    RefreshAllPhotos(30, 30)
-      .then(() => {
-        return RefreshAllPhotos(300, 300);
-      })
-      .then(() => {
-        return RefreshAllPhotos(3000, 3000);
-      })
+    RefreshAllPhotos(3000, 3000)
+      // .then(() => {
+      //   return RefreshAllPhotos(300, 300);
+      // })
+      // .then(() => {
+      //   return RefreshAllPhotos(3000, 3000);
+      // })
       .catch(console.log);
   }, [RefreshAllPhotos]);
 }

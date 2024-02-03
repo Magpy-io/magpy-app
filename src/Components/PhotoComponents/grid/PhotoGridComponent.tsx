@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
-import { FlatList, StyleSheet, View } from 'react-native';
+import { FlatList, SectionList, StyleSheet, View } from 'react-native';
 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -66,6 +66,8 @@ export default function PhotoGridComponent({
   selectedKeys,
 }: PhotoGridComponentProps) {
   const flatlistRef = useRef<FlatList>(null);
+  const sectionlistRef = useRef<SectionList>(null);
+
   const photosLenRef = useRef<number>(photos.length);
   photosLenRef.current = photos.length;
   const correctStartIndex = correctIndexFromScrollPosition(scrollPosition, photos.length);
@@ -77,6 +79,13 @@ export default function PhotoGridComponent({
       flatlistRef.current?.scrollToIndex({ index: correctStartIndex });
     }
   }, [flatlistRef, correctStartIndex]);
+
+  // useEffect(() => {
+  //   if (photosLenRef.current > 0) {
+  //     console.log('should be 2023-06-17');
+  //     sectionlistRef.current?.scrollToLocation({ sectionIndex: 150, itemIndex: 0 });
+  //   }
+  // }, [sectionlistRef]);
 
   const renderItem = useCallback(
     ({ item }: { item: PhotoGalleryType }) => {
@@ -128,7 +137,7 @@ export default function PhotoGridComponent({
     return photosPerDay;
   }, [localPhotos, photos, serverPhotos]);
 
-  console.log('photosPerDay', photosPerDayMemo.length);
+  console.log('photosPerDay', photosPerDayMemo[150]);
 
   return (
     <View style={[styles.mainViewStyle, { paddingTop: insets.top }]}>
@@ -146,6 +155,18 @@ export default function PhotoGridComponent({
         refreshing={false}
         columns={NUM_COLUMNS}
       />
+      {/* <SectionListWithColumns
+        ref={sectionlistRef}
+        sections={photosPerDayMemo}
+        renderItem={renderItem}
+        renderSectionHeader={({ section: { title } }) => (
+          <View style={{ height: 30 }}>
+            <Text>{title}</Text>
+          </View>
+        )}
+        keyExtractor={keyExtractor}
+        columns={NUM_COLUMNS}
+      /> */}
       <TabBarPadding />
     </View>
   );
