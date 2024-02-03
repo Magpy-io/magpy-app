@@ -5,4 +5,5 @@ module.exports = {
   transformIgnorePatterns: [
     'node_modules/(?!((jest-)?react-native(-.*)?|react-redux|@react-native(-community)?|@rneui)/)',
   ],
+  testRegex: '((\\.|/)(test|spec))\\.[jt]sx?$',
 };
