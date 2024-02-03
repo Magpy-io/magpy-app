@@ -111,3 +111,7 @@ export const photosServer = {
 };
 
 export const photosServerIdsOrdered = [serverId1, serverId2, serverId3];
+
+export function DeepCopy(o: object) {
+  return JSON.parse(JSON.stringify(o)) as object;
+}

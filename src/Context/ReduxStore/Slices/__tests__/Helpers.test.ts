@@ -40,10 +40,54 @@ describe('Tests for compareDates function', () => {
 describe('Tests for insertPhotoKeyWithOrder function', () => {
   it('Should insert photo key in between an older photo and a more recent photo', () => {
     const photosLocalIdsOrdered = [MockValues.mediaId1, MockValues.mediaId3];
-    const photosLocal = MockValues.photosLocal;
 
-    insertPhotoKeyWithOrder(photosLocal, photosLocalIdsOrdered, MockValues.photoLocal2);
+    insertPhotoKeyWithOrder(
+      MockValues.photosLocal,
+      photosLocalIdsOrdered,
+      MockValues.photoLocal2,
+    );
 
     expect(photosLocalIdsOrdered).toEqual(MockValues.photosLocalIdsOrdered);
+  });
+
+  it('Should insert photo key in the begining if it is more recent', () => {
+    const photosLocalIdsOrdered = [MockValues.mediaId2, MockValues.mediaId3];
+
+    insertPhotoKeyWithOrder(
+      MockValues.photosLocal,
+      photosLocalIdsOrdered,
+      MockValues.photoLocal1,
+    );
+
+    expect(photosLocalIdsOrdered).toEqual(MockValues.photosLocalIdsOrdered);
+  });
+
+  it('Should insert photo key at the end if it is older', () => {
+    const photosLocalIdsOrdered = [MockValues.mediaId1, MockValues.mediaId2];
+
+    insertPhotoKeyWithOrder(
+      MockValues.photosLocal,
+      photosLocalIdsOrdered,
+      MockValues.photoLocal3,
+    );
+    console.log(photosLocalIdsOrdered);
+    expect(photosLocalIdsOrdered).toEqual(MockValues.photosLocalIdsOrdered);
+  });
+
+  it('Should insert photo key just before last if same date as last one', () => {
+    const photosLocalIdsOrdered = [MockValues.mediaId1, MockValues.mediaId2];
+
+    const photosLocal = MockValues.DeepCopy(
+      MockValues.photosLocal,
+    ) as typeof MockValues.photosLocal;
+
+    photosLocal['mediaId3'].created = MockValues.photoLocal2.created;
+
+    insertPhotoKeyWithOrder(photosLocal, photosLocalIdsOrdered, photosLocal['mediaId3']);
+    expect(photosLocalIdsOrdered).toEqual([
+      MockValues.mediaId1,
+      MockValues.mediaId3,
+      MockValues.mediaId2,
+    ]);
   });
 });

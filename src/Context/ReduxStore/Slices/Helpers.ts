@@ -82,6 +82,9 @@ export function insertPhotoKeyWithOrder<T extends { id: string; created: string 
   const insertIndex = photosIdsOrdered.findIndex(
     p => compareDates(photos[p].created, photo.created) <= 0,
   );
-
-  photosIdsOrdered.splice(insertIndex, 0, photo.id);
+  if (insertIndex == -1) {
+    photosIdsOrdered.push(photo.id);
+  } else {
+    photosIdsOrdered.splice(insertIndex, 0, photo.id);
+  }
 }
