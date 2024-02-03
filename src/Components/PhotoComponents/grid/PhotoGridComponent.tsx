@@ -8,7 +8,6 @@ import {
   PhotoLocalType,
   PhotoServerType,
 } from '~/Context/ReduxStore/Slices/Photos';
-import { useAppSelector } from '~/Context/ReduxStore/Store';
 import { areDatesEqual } from '~/Helpers/Date';
 import { TabBarPadding } from '~/Navigation/TabNavigation/TabBar';
 import { appColors } from '~/styles/colors';
@@ -36,6 +35,12 @@ export function getPhotoServerOrLocal(
 
 type PhotoGridComponentProps = {
   photos: Array<PhotoGalleryType>;
+  localPhotos: {
+    [key: string]: PhotoLocalType;
+  };
+  serverPhotos: {
+    [key: string]: PhotoServerType;
+  };
   onPressPhoto: (item: PhotoGalleryType) => void;
   onLongPressPhoto: (item: PhotoGalleryType) => void;
   scrollPosition: number;
@@ -58,6 +63,8 @@ function correctIndexFromScrollPosition(scrollPosition: number, len: number) {
 
 export default function PhotoGridComponent({
   photos,
+  localPhotos,
+  serverPhotos,
   onLongPressPhoto,
   onPressPhoto,
   scrollPosition,
@@ -92,9 +99,6 @@ export default function PhotoGridComponent({
     },
     [onLongPressPhoto, onPressPhoto, isSelecting, selectedKeys],
   );
-
-  const localPhotos = useAppSelector(state => state.photos.photosLocal);
-  const serverPhotos = useAppSelector(state => state.photos.photosServer);
 
   type DayType = {
     title: string;

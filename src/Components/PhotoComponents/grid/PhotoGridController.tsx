@@ -1,7 +1,11 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { BackHandler, View } from 'react-native';
 
-import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos';
+import {
+  PhotoGalleryType,
+  PhotoLocalType,
+  PhotoServerType,
+} from '~/Context/ReduxStore/Slices/Photos';
 import { usePhotosFunctionsStore } from '~/Context/ReduxStore/Slices/PhotosFunctions';
 import { useTabNavigationContext } from '~/Navigation/TabNavigation/TabNavigationContext';
 
@@ -11,6 +15,12 @@ import ToolBarPhotos from './ToolBarPhotos';
 
 type PropsType = {
   photos: Array<PhotoGalleryType>;
+  localPhotos: {
+    [key: string]: PhotoLocalType;
+  };
+  serverPhotos: {
+    [key: string]: PhotoServerType;
+  };
   scrollPosition: number;
   isSlidingPhotos: boolean;
   onSwitchMode: (isPhotoSelected: boolean, index: number) => void;
@@ -21,6 +31,8 @@ function PhotoGridController({
   onSwitchMode,
   scrollPosition,
   isSlidingPhotos,
+  localPhotos,
+  serverPhotos,
 }: PropsType) {
   //console.log('render grid');
 
@@ -118,6 +130,8 @@ function PhotoGridController({
     <View>
       <PhotoGridComponent
         photos={photos}
+        localPhotos={localPhotos}
+        serverPhotos={serverPhotos}
         onPressPhoto={onRenderItemPress}
         onLongPressPhoto={onRenderItemLongPress}
         scrollPosition={scrollPosition}

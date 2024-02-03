@@ -1,13 +1,23 @@
 import React, { useCallback, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos';
+import {
+  PhotoGalleryType,
+  PhotoLocalType,
+  PhotoServerType,
+} from '~/Context/ReduxStore/Slices/Photos';
 
 import PhotoGridController from './grid/PhotoGridController';
 import PhotoSlider from './slider/PhotoSliderController';
 
 type PhotoGalleryPropsType = {
   photos: Array<PhotoGalleryType>;
+  localPhotos: {
+    [key: string]: PhotoLocalType;
+  };
+  serverPhotos: {
+    [key: string]: PhotoServerType;
+  };
 };
 
 export default function PhotoGallery(props: PhotoGalleryPropsType) {
@@ -33,6 +43,8 @@ export default function PhotoGallery(props: PhotoGalleryPropsType) {
       <View style={[styles.viewStyle, { display: displayGrid }]}>
         <PhotoGridController
           photos={props.photos}
+          localPhotos={props.localPhotos}
+          serverPhotos={props.serverPhotos}
           isSlidingPhotos={isSlidingPhotos}
           scrollPosition={scrollPosition}
           onSwitchMode={onSwitchMode}

@@ -10,6 +10,8 @@ export default function PhotoGalleryLocalScreenTab() {
   const [hasPermissions, setHasPermissions] = useState<boolean>(true);
 
   const photos = useAppSelector(state => state.photos.photosGallery);
+  const photosLocal = useAppSelector(state => state.photos.photosLocal);
+  const photosServer = useAppSelector(state => state.photos.photosServer);
 
   const getPermissions = useCallback(async () => {
     const hasPerm = await AndroidPermissions.hasAndroidPermissionWriteExternalStorage();
@@ -25,6 +27,12 @@ export default function PhotoGalleryLocalScreenTab() {
   }, [getPermissions]);
 
   return (
-    <>{hasPermissions ? <PhotoGallery photos={photos} /> : <Text>Permissions needed</Text>}</>
+    <>
+      {hasPermissions ? (
+        <PhotoGallery photos={photos} serverPhotos={photosServer} localPhotos={photosLocal} />
+      ) : (
+        <Text>Permissions needed</Text>
+      )}
+    </>
   );
 }
