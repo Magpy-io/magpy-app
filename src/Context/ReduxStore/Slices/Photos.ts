@@ -185,11 +185,11 @@ function mergePhotos(photosState: PhotosState): PhotoGalleryType[] {
   return galleryPhotos;
 }
 
-function insertPhotoKeyWithOrder<T extends { created: string }>(photos: T[], photo: T) {
-  const insertIndex = photos.findIndex(p => compareDates(p.created, photo.created) <= 0);
-}
+// function insertPhotoKeyWithOrder<T extends { created: string }>(photos: T[], photo: T) {
+//   const insertIndex = photos.findIndex(p => compareDates(p.created, photo.created) <= 0);
+// }
 
-function compareDates(date1: string, date2: string) {
+export function compareDates(date1: string, date2: string) {
   if (!date2) {
     return 1;
   }
