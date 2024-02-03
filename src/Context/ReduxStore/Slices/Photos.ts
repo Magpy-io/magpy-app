@@ -190,16 +190,16 @@ function mergePhotos(photosState: PhotosState): PhotoGalleryType[] {
 // }
 
 export function compareDates(date1: string, date2: string) {
-  if (!date2) {
+  const d1 = Date.parse(date1);
+  const d2 = Date.parse(date2);
+
+  if (!d2) {
     return 1;
   }
 
-  if (!date1) {
+  if (!d1) {
     return -1;
   }
-
-  const d1 = Date.parse(date1);
-  const d2 = Date.parse(date2);
 
   if (d1 > d2) {
     return 1;
