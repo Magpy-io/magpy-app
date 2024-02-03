@@ -111,7 +111,7 @@ function PhotoGridController({
   }, [photos]);
 
   const onRefresh = useCallback(() => {
-    RefreshAllPhotos(3000, 3000).catch(console.log);
+    RefreshAllPhotos(30, 30).catch(console.log);
   }, [RefreshAllPhotos]);
 
   return (

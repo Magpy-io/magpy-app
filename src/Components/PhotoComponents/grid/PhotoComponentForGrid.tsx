@@ -1,12 +1,12 @@
 import React, { useCallback, useEffect } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
+import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos';
+import { usePhotosFunctionsStore } from '~/Context/ReduxStore/Slices/PhotosFunctions';
 import {
-  PhotoGalleryType,
   photoLocalSelector,
   photoServerSelector,
-} from '~/Context/ReduxStore/Slices/Photos';
-import { usePhotosFunctionsStore } from '~/Context/ReduxStore/Slices/PhotosFunctions';
+} from '~/Context/ReduxStore/Slices/Selectors';
 import { useAppSelector } from '~/Context/ReduxStore/Store';
 
 import ImageForGrid from './ImageForGrid';

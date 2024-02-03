@@ -197,7 +197,7 @@ export function usePhotosStoreEffect() {
         return RefreshAllPhotos(300, 300);
       })
       .then(() => {
-        return RefreshAllPhotos(3000, 3000);
+        //return RefreshAllPhotos(3000, 3000);
       })
       .catch(console.log);
   }, [RefreshAllPhotos]);
