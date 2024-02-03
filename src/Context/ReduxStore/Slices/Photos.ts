@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-import { mergePhotos } from './Helpers';
+import { insertPhotoKeyWithOrder, mergePhotos } from './Helpers';
 
 export type PhotoServerType = {
   id: string;
@@ -99,6 +99,12 @@ const photosServerSlice = createSlice({
       action: { payload: { photoServer: PhotoServerType; mediaId: string } },
     ) => {
       state.photosServer[action.payload.photoServer.id] = action.payload.photoServer;
+
+      insertPhotoKeyWithOrder(
+        state.photosServer,
+        state.photosServerIdsOrdered,
+        action.payload.photoServer,
+      );
 
       const galleryPhoto = state.photosGallery.find(p => p.mediaId == action.payload.mediaId);
       if (galleryPhoto) {
