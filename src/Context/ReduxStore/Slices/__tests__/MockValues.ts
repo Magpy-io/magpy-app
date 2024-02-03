@@ -18,6 +18,12 @@ const fileSize = 3415968;
 const height = 3840;
 const width = 2160;
 
+export const photo1 = {
+  key: serverId1,
+  mediaId: mediaId1,
+  serverId: serverId1,
+};
+
 export const photoServer1 = {
   id: serverId1,
   fileName: 'photo1.jpg',

@@ -36,10 +36,16 @@ export type PhotoGalleryType = {
   | { serverId: string; mediaId: string }
 );
 
+export type PhotosLocalType = {
+  [key: string]: PhotoLocalType;
+};
+
+export type PhotosServerType = { [key: string]: PhotoServerType };
+
 export type PhotosState = {
-  photosServer: { [key: string]: PhotoServerType };
+  photosServer: PhotosServerType;
   photosServerIdsOrdered: string[];
-  photosLocal: { [key: string]: PhotoLocalType };
+  photosLocal: PhotosLocalType;
   photosLocalIdsOrdered: string[];
   photosGallery: PhotoGalleryType[]; // First elemnt is the most recent photo
 };

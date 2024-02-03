@@ -38,3 +38,9 @@ export function setTimeToZero(date: DateTime) {
   });
   return newDate;
 }
+
+// Converts a string (2023-06-22T14:43:51.880Z) to a date string without time (2023-06-23T00:00:00.000Z)
+export function withoutTime(date: string) {
+  const dateObject = setTimeToZero(DateTime.fromISO(date).toUTC());
+  return dateObject.toISO();
+}
