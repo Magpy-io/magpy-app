@@ -1,4 +1,5 @@
-import { compareDates } from '../Helpers';
+import { compareDates, insertPhotoKeyWithOrder } from '../Helpers';
+import * as MockValues from './MockValues';
 
 const dateRecent = '2024-02-03T11:30:40.000Z';
 const dateOld = '2024-02-03T11:30:30.000Z';
@@ -36,12 +37,13 @@ describe('Tests for compareDates function', () => {
   );
 });
 
-describe('test another function', () => {
-  it.each([{ date: 'invalidDate' }, { date: null }, { date: undefined }])(
-    'Should return negative if date1 is an invalid',
-    testData => {
-      const r = compareDates(testData.date as string, dateOld);
-      expect(r).toBeLessThan(0);
-    },
-  );
+describe('Tests for insertPhotoKeyWithOrder function', () => {
+  it('Should insert photo key in between an older photo and a more recent photo', () => {
+    const photosLocalIdsOrdered = [MockValues.mediaId1, MockValues.mediaId3];
+    const photosLocal = MockValues.photosLocal;
+
+    insertPhotoKeyWithOrder(photosLocal, photosLocalIdsOrdered, MockValues.photoLocal2);
+
+    expect(photosLocalIdsOrdered).toEqual(MockValues.photosLocalIdsOrdered);
+  });
 });

@@ -66,12 +66,6 @@ const photosServerSlice = createSlice({
       );
       state.photosServerIdsOrdered = action.payload.map(photo => photo.id);
       state.photosGallery = mergePhotos(state);
-
-      // console.log(state.photosServer);
-      // console.log(state.photosServerIdsOrdered);
-      // console.log(state.photosLocal);
-      // console.log(state.photosLocalIdsOrdered);
-      // console.log(state.photosGallery);
     },
 
     setPhotosLocal: (state, action: { payload: PhotoLocalType[] }) => {

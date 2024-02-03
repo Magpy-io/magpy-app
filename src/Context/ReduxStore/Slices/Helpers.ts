@@ -74,6 +74,14 @@ export function compareDates(date1: string, date2: string) {
   }
 }
 
-export function insertPhotoKeyWithOrder<T extends { created: string }>(photos: T[], photo: T) {
-  const insertIndex = photos.findIndex(p => compareDates(p.created, photo.created) <= 0);
+export function insertPhotoKeyWithOrder<T extends { id: string; created: string }>(
+  photos: { [key: string]: T },
+  photosIdsOrdered: string[],
+  photo: T,
+) {
+  const insertIndex = photosIdsOrdered.findIndex(
+    p => compareDates(photos[p].created, photo.created) <= 0,
+  );
+
+  photosIdsOrdered.splice(insertIndex, 0, photo.id);
 }
