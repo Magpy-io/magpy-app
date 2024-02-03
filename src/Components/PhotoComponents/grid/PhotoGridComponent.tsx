@@ -1,14 +1,12 @@
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
 
-import { DateTime } from 'luxon';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import {
   PhotoGalleryType,
   PhotoLocalType,
   PhotoServerType,
-  photoSelector,
 } from '~/Context/ReduxStore/Slices/Photos';
 import { useAppSelector } from '~/Context/ReduxStore/Store';
 import { areDatesEqual } from '~/Helpers/Date';
@@ -103,31 +101,34 @@ export default function PhotoGridComponent({
     data: PhotoGalleryType[];
   };
 
-  const firstPhoto = getPhotoServerOrLocal(localPhotos, serverPhotos, photos[0]);
-  let currentDate = firstPhoto?.created;
-  const photosPerDay: DayType[] = [];
-  let currentBasket: DayType = {
-    title: currentDate,
-    data: [],
-  };
+  const photosPerDayMemo: DayType[] = useMemo(() => {
+    const photosPerDay: DayType[] = [];
+    const firstPhoto = getPhotoServerOrLocal(localPhotos, serverPhotos, photos[0]);
+    let currentDate = firstPhoto?.created;
+    let currentBasket: DayType = {
+      title: currentDate,
+      data: [],
+    };
 
-  photos.forEach(photo => {
-    const photoData = getPhotoServerOrLocal(localPhotos, serverPhotos, photo);
-    const photoDate = photoData.created;
+    photos.forEach(photo => {
+      const photoData = getPhotoServerOrLocal(localPhotos, serverPhotos, photo);
+      const photoDate = photoData.created;
 
-    if (areDatesEqual(photoDate, currentDate)) {
-      currentBasket.data.push(photo);
-    } else {
-      photosPerDay.push(currentBasket);
-      currentDate = photoDate;
-      currentBasket = {
-        title: photoDate,
-        data: [photo],
-      };
-    }
-  });
+      if (areDatesEqual(photoDate, currentDate)) {
+        currentBasket.data.push(photo);
+      } else {
+        photosPerDay.push(currentBasket);
+        currentDate = photoDate;
+        currentBasket = {
+          title: photoDate,
+          data: [photo],
+        };
+      }
+    });
+    return photosPerDay;
+  }, [localPhotos, photos, serverPhotos]);
 
-  console.log('photosPerDay', photosPerDay.length);
+  console.log('photosPerDay', photosPerDayMemo.length);
 
   return (
     <View style={[styles.mainViewStyle, { paddingTop: insets.top }]}>
