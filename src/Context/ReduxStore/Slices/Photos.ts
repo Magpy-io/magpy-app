@@ -171,7 +171,7 @@ function mergePhotos(photosState: PhotosState): PhotoGalleryType[] {
   return galleryPhotos;
 }
 
-function compareDates(date1: string, date2: string) {
+export function compareDates(date1: string, date2: string) {
   if (!date2) {
     return 1;
   }
