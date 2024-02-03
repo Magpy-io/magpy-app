@@ -1,9 +1,5 @@
 module.exports = {
-  presets: [
-    'module:@react-native/babel-preset',
-    // '@babel/preset-typescript',
-    // '@babel/preset-env',
-  ],
+  presets: ['module:@react-native/babel-preset'],
   plugins: [
     [
       require.resolve('babel-plugin-module-resolver'),

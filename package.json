@@ -60,8 +60,6 @@
     "@babel/core": "^7.23.9",
     "@babel/eslint-parser": "^7.23.3",
     "@babel/plugin-transform-export-namespace-from": "^7.23.4",
-    "@babel/preset-env": "^7.23.9",
-    "@babel/preset-typescript": "^7.23.3",
     "@babel/runtime": "^7.20.0",
     "@jest/globals": "^29.7.0",
     "@react-native/babel-preset": "^0.73.19",

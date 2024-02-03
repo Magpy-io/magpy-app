@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 
-//import { ErrorCodes } from 'react-native-delete-media';
+import { ErrorCodes } from 'react-native-delete-media';
 
 import { Actions } from '~/Context/ContextSlices/PhotosContext/PhotosReducer';
 import { useMainContext } from '~/Context/MainContextProvider';

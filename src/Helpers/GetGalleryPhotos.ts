@@ -1,7 +1,7 @@
 import { NativeModules } from 'react-native';
 
 import { CameraRoll } from '@react-native-camera-roll/camera-roll';
-//import { DeleteMedia } from 'react-native-delete-media';
+import { DeleteMedia } from 'react-native-delete-media';
 import RNFS from 'react-native-fs';
 
 import { PhotoType } from './types';
