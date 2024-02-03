@@ -14,15 +14,15 @@ const { MainModule } = NativeModules;
 
 type PropsType = {
   photos: Array<PhotoGalleryType>;
-  scrollPosition: number;
+  currentPhotoIndex: number;
   isSlidingPhotos: boolean;
   onSwitchMode: (isPhotoSelected: boolean, index: number) => void;
 };
 
-function PhotoSlider({ photos, onSwitchMode, isSlidingPhotos, scrollPosition }: PropsType) {
+function PhotoSlider({ photos, onSwitchMode, isSlidingPhotos, currentPhotoIndex }: PropsType) {
   //console.log('render slider');
 
-  const [flatListCurrentIndex, setFlatListCurrentIndex] = useState(scrollPosition);
+  const [flatListCurrentIndex, setFlatListCurrentIndex] = useState(currentPhotoIndex);
   const flatListCurrentIndexRef = useRef<number>(flatListCurrentIndex);
 
   const [isFullScreen, setIsFullScreen] = useState(false);
@@ -106,7 +106,7 @@ function PhotoSlider({ photos, onSwitchMode, isSlidingPhotos, scrollPosition }: 
     <View style={[styles.mainViewStyle]}>
       <PhotoSliderComponent
         photos={photos}
-        scrollPosition={scrollPosition}
+        currentPhotoIndex={currentPhotoIndex}
         onIndexChanged={onCurrentIndexChanged}
         onPhotoClick={onPressPhoto}
         isFullScreen={isFullScreen}

@@ -21,7 +21,7 @@ type PropsType = {
   serverPhotos: {
     [key: string]: PhotoServerType;
   };
-  scrollPosition: number;
+  currentPhotoIndex: number;
   isSlidingPhotos: boolean;
   onSwitchMode: (isPhotoSelected: boolean, index: number) => void;
 };
@@ -29,7 +29,7 @@ type PropsType = {
 function PhotoGridController({
   photos,
   onSwitchMode,
-  scrollPosition,
+  currentPhotoIndex,
   isSlidingPhotos,
   localPhotos,
   serverPhotos,
@@ -134,7 +134,7 @@ function PhotoGridController({
         serverPhotos={serverPhotos}
         onPressPhoto={onRenderItemPress}
         onLongPressPhoto={onRenderItemLongPress}
-        scrollPosition={scrollPosition}
+        currentPhotoIndex={currentPhotoIndex}
         onRefresh={onRefresh}
         isSelecting={isSelecting}
         selectedKeys={selectedKeys}

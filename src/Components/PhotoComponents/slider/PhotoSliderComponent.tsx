@@ -21,7 +21,7 @@ function getItemLayout(data: ArrayLike<PhotoGalleryType> | null | undefined, ind
 
 type PropsType = {
   photos: PhotoGalleryType[];
-  scrollPosition: number;
+  currentPhotoIndex: number;
   isFullScreen: boolean;
   onIndexChanged?: (index: number) => void;
   onPhotoClick?: (item: PhotoGalleryType) => void;
@@ -33,13 +33,13 @@ export default function PhotoSliderComponent({
   onPhotoClick,
   onPhotoLongClick,
   photos,
-  scrollPosition,
+  currentPhotoIndex,
   isFullScreen,
 }: PropsType) {
   const flatlistRef = useRef<FlatList>(null);
 
-  const flatListCurrentIndexRef = useRef<number>(scrollPosition);
-  flatListCurrentIndexRef.current = scrollPosition;
+  const flatListCurrentIndexRef = useRef<number>(currentPhotoIndex);
+  flatListCurrentIndexRef.current = currentPhotoIndex;
 
   useEffect(() => {
     if (photos.length == 0) {
@@ -62,7 +62,7 @@ export default function PhotoSliderComponent({
       index: indexToScroll,
       animated: false,
     });
-  }, [photos.length, scrollPosition]);
+  }, [photos.length, currentPhotoIndex]);
 
   const renderItem = useCallback(
     ({ item }: { item: PhotoGalleryType }) => (

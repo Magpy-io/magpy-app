@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { FlatList, SectionList, StyleSheet, View } from 'react-native';
 
+import { Text } from 'react-native-elements';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import {
@@ -12,8 +13,8 @@ import { areDatesEqual } from '~/Helpers/Date';
 import { TabBarPadding } from '~/Navigation/TabNavigation/TabBar';
 import { appColors } from '~/styles/colors';
 
-import FlatListWithColumns from './FlatListWithColumns';
 import PhotoComponentForGrid from './PhotoComponentForGrid';
+import SectionListWithColumns from './SectionListWithColumns';
 
 const NUM_COLUMNS = 3;
 
@@ -43,15 +44,15 @@ type PhotoGridComponentProps = {
   };
   onPressPhoto: (item: PhotoGalleryType) => void;
   onLongPressPhoto: (item: PhotoGalleryType) => void;
-  scrollPosition: number;
+  currentPhotoIndex: number;
   onRefresh: () => void;
   isSelecting: boolean;
   selectedKeys: Set<string>;
 };
 
-function correctIndexFromScrollPosition(scrollPosition: number, len: number) {
-  let tmp = Math.floor(scrollPosition / NUM_COLUMNS);
-  if (scrollPosition >= len) {
+function correctIndexFromScrollPosition(currentPhotoIndex: number, len: number) {
+  let tmp = Math.floor(currentPhotoIndex / NUM_COLUMNS);
+  if (currentPhotoIndex >= len) {
     tmp = Math.floor((len - 1) / NUM_COLUMNS);
   }
 
@@ -61,13 +62,19 @@ function correctIndexFromScrollPosition(scrollPosition: number, len: number) {
   return tmp;
 }
 
+const renderSectionHeader = ({ section: { title } }: { section: { title: string } }) => (
+  <View style={{ height: 30 }}>
+    <Text>{title}</Text>
+  </View>
+);
+
 export default function PhotoGridComponent({
   photos,
   localPhotos,
   serverPhotos,
   onLongPressPhoto,
   onPressPhoto,
-  scrollPosition,
+  currentPhotoIndex,
   onRefresh,
   isSelecting,
   selectedKeys,
@@ -77,7 +84,7 @@ export default function PhotoGridComponent({
 
   const photosLenRef = useRef<number>(photos.length);
   photosLenRef.current = photos.length;
-  const correctStartIndex = correctIndexFromScrollPosition(scrollPosition, photos.length);
+  const correctStartIndex = correctIndexFromScrollPosition(currentPhotoIndex, photos.length);
   const insets = useSafeAreaInsets();
 
   useEffect(() => {
@@ -145,7 +152,7 @@ export default function PhotoGridComponent({
 
   return (
     <View style={[styles.mainViewStyle, { paddingTop: insets.top }]}>
-      <FlatListWithColumns
+      {/* <FlatListWithColumns
         ref={flatlistRef}
         style={styles.flatListStyle}
         data={photos}
@@ -158,19 +165,15 @@ export default function PhotoGridComponent({
         onRefresh={onRefresh}
         refreshing={false}
         columns={NUM_COLUMNS}
-      />
-      {/* <SectionListWithColumns
+      /> */}
+      <SectionListWithColumns
         ref={sectionlistRef}
         sections={photosPerDayMemo}
         renderItem={renderItem}
-        renderSectionHeader={({ section: { title } }) => (
-          <View style={{ height: 30 }}>
-            <Text>{title}</Text>
-          </View>
-        )}
+        renderSectionHeader={renderSectionHeader}
         keyExtractor={keyExtractor}
         columns={NUM_COLUMNS}
-      /> */}
+      />
       <TabBarPadding />
     </View>
   );
