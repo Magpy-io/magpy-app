@@ -171,7 +171,11 @@ function mergePhotos(photosState: PhotosState): PhotoGalleryType[] {
   return galleryPhotos;
 }
 
-export function compareDates(date1: string, date2: string) {
+function insertPhotoKeyWithOrder<T extends { created: string }>(photos: T[], photo: T) {
+  const insertIndex = photos.findIndex(p => compareDates(p.created, photo.created) <= 0);
+}
+
+function compareDates(date1: string, date2: string) {
   if (!date2) {
     return 1;
   }
