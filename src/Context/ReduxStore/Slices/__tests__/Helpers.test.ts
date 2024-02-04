@@ -70,7 +70,6 @@ describe('Tests for insertPhotoKeyWithOrder function', () => {
       photosLocalIdsOrdered,
       MockValues.photoLocal3,
     );
-    console.log(photosLocalIdsOrdered);
     expect(photosLocalIdsOrdered).toEqual(MockValues.photosLocalIdsOrdered);
   });
 

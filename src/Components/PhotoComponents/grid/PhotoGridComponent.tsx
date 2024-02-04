@@ -8,24 +8,15 @@ import {
   PhotoGalleryType,
   PhotoLocalType,
   PhotoServerType,
-  PhotosLocalType,
-  PhotosServerType,
 } from '~/Context/ReduxStore/Slices/Photos';
-import { areDatesEqual, withoutTime } from '~/Helpers/Date';
 import { TabBarPadding } from '~/Navigation/TabNavigation/TabBar';
 import { appColors } from '~/styles/colors';
 
-import { getPhotoServerOrLocal } from './Helpers';
+import { DayType, getIndexInSectionList, getPhotosPerDay } from './Helpers';
 import PhotoComponentForGrid from './PhotoComponentForGrid';
 import SectionListWithColumns from './SectionListWithColumns';
 
 const NUM_COLUMNS = 3;
-
-type DayType = {
-  title: string;
-  day: string;
-  data: PhotoGalleryType[];
-};
 
 function keyExtractor(item: PhotoGalleryType) {
   return `grid_${item.key}`;
@@ -53,36 +44,6 @@ const renderSectionHeader = ({ section: { title } }: { section: { title: string 
   </View>
 );
 
-function getClosestPhotoToIndex(currentPhotoIndex: number, photos: PhotoGalleryType[]) {
-  const len = photos.length;
-  if (currentPhotoIndex >= len) {
-    return photos[len - 1];
-  }
-  return photos[currentPhotoIndex];
-}
-
-function getIndexInSectionList(
-  currentPhotoIndex: number,
-  photosPerDayMemo: DayType[],
-  localPhotos: PhotosLocalType,
-  serverPhotos: PhotosServerType,
-  photos: PhotoGalleryType[],
-) {
-  const currentPhoto = getClosestPhotoToIndex(currentPhotoIndex, photos);
-  const currentPhotoData = getPhotoServerOrLocal(localPhotos, serverPhotos, currentPhoto);
-  const currentPhotoDate = withoutTime(currentPhotoData.created);
-  const sectionIndex = photosPerDayMemo.findIndex(e => e.day === currentPhotoDate);
-  const itemIndex = photosPerDayMemo[sectionIndex]?.data.findIndex(
-    e => e.key === currentPhoto.key,
-  );
-  const rowIndex = Math.floor(itemIndex / NUM_COLUMNS);
-  console.log('getIndexInSectionList', sectionIndex, itemIndex, rowIndex);
-  return {
-    sectionIndex: sectionIndex,
-    rowIndex: rowIndex,
-  };
-}
-
 export default function PhotoGridComponent({
   photos,
   localPhotos,
@@ -99,7 +60,6 @@ export default function PhotoGridComponent({
   const insets = useSafeAreaInsets();
 
   photosLenRef.current = photos.length;
-  console.log('currentPhotoIndex', currentPhotoIndex);
   const renderItem = useCallback(
     ({ item }: { item: PhotoGalleryType }) => {
       return (
@@ -116,36 +76,7 @@ export default function PhotoGridComponent({
   );
 
   const photosPerDayMemo: DayType[] = useMemo(() => {
-    if (photos && photos.length > 0) {
-      const photosPerDay: DayType[] = [];
-      const firstPhoto = getPhotoServerOrLocal(localPhotos, serverPhotos, photos[0]);
-      let currentDate = withoutTime(firstPhoto?.created) ?? '';
-      let currentBasket: DayType = {
-        title: currentDate,
-        day: currentDate,
-        data: [],
-      };
-
-      photos.forEach(photo => {
-        const photoData = getPhotoServerOrLocal(localPhotos, serverPhotos, photo);
-        const photoDate = withoutTime(photoData.created) ?? '';
-
-        if (areDatesEqual(photoDate, currentDate)) {
-          currentBasket.data.push(photo);
-        } else {
-          photosPerDay.push(currentBasket);
-          currentDate = photoDate;
-          currentBasket = {
-            title: photoDate,
-            day: photoDate,
-            data: [photo],
-          };
-        }
-      });
-      return photosPerDay;
-    } else {
-      return [];
-    }
+    return getPhotosPerDay(photos, localPhotos, serverPhotos);
   }, [localPhotos, photos, serverPhotos]);
 
   const indexInSectionList = useMemo(() => {
@@ -156,6 +87,7 @@ export default function PhotoGridComponent({
         localPhotos,
         serverPhotos,
         photos,
+        NUM_COLUMNS,
       );
     }
     return { sectionIndex: 0, rowIndex: 0 };
@@ -163,6 +95,8 @@ export default function PhotoGridComponent({
 
   useEffect(() => {
     if (
+      photosPerDayMemo &&
+      photosPerDayMemo.length > 0 &&
       indexInSectionList &&
       indexInSectionList.sectionIndex >= 0 &&
       indexInSectionList.rowIndex >= 0
@@ -173,24 +107,10 @@ export default function PhotoGridComponent({
         itemIndex: indexInSectionList.rowIndex,
       });
     }
-  }, [sectionlistRef, indexInSectionList]);
+  }, [sectionlistRef, indexInSectionList, photosPerDayMemo]);
 
   return (
     <View style={[styles.mainViewStyle, { paddingTop: insets.top }]}>
-      {/* <FlatListWithColumns
-        ref={flatlistRef}
-        style={styles.flatListStyle}
-        data={photos}
-        renderItem={renderItem}
-        windowSize={3}
-        maxToRenderPerBatch={1}
-        initialNumToRender={1}
-        keyExtractor={keyExtractor}
-        onEndReachedThreshold={1}
-        onRefresh={onRefresh}
-        refreshing={false}
-        columns={NUM_COLUMNS}
-      /> */}
       <SectionListWithColumns
         ref={sectionlistRef}
         sections={photosPerDayMemo}

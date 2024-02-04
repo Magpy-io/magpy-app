@@ -2508,13 +2508,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/luxon@npm:^3.4.1":
-  version: 3.4.2
-  resolution: "@types/luxon@npm:3.4.2"
-  checksum: d835467de3daf7e17ba78b50bb5a14efd94272439ca067990d71332a54b311544459c69623eddd243b511b28d70194c9591a9ee8cf9c038962c965f991affd7e
-  languageName: node
-  linkType: hard
-
 "@types/node@npm:*":
   version: 20.11.10
   resolution: "@types/node@npm:20.11.10"
@@ -2955,7 +2948,6 @@ __metadata:
     "@types/axios": "npm:^0.14.0"
     "@types/bluebird": "npm:^3"
     "@types/jest": "npm:^29.5.11"
-    "@types/luxon": "npm:^3.4.1"
     "@types/react": "npm:^18.2.6"
     "@types/react-native": "npm:^0.73.0"
     "@types/react-native-zeroconf": "npm:^0.12.3"
@@ -2983,7 +2975,6 @@ __metadata:
     eslint-plugin-unused-imports: "npm:^3.0.0"
     formik: "npm:^2.4.5"
     jest: "npm:^29.7.0"
-    luxon: "npm:^3.4.4"
     prettier: "npm:^3.2.4"
     react: "npm:18.2.0"
     react-native: "npm:0.73.2"
@@ -7546,13 +7537,6 @@ __metadata:
   dependencies:
     yallist: "npm:^4.0.0"
   checksum: cb53e582785c48187d7a188d3379c181b5ca2a9c78d2bce3e7dee36f32761d1c42983da3fe12b55cb74e1779fa94cdc2e5367c028a9b35317184ede0c07a30a9
-  languageName: node
-  linkType: hard
-
-"luxon@npm:^3.4.4":
-  version: 3.4.4
-  resolution: "luxon@npm:3.4.4"
-  checksum: 02e26a0b039c11fd5b75e1d734c8f0332c95510f6a514a9a0991023e43fb233884da02d7f966823ffb230632a733fc86d4a4b1e63c3fbe00058b8ee0f8c728af
   languageName: node
   linkType: hard
 
