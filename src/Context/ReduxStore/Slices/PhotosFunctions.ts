@@ -190,6 +190,7 @@ export function usePhotosFunctionsStore() {
 
 export function usePhotosStoreEffect() {
   const { RefreshAllPhotos } = usePhotosFunctionsStore();
+  const { isServerReachable } = useServerContext();
 
   useEffect(() => {
     RefreshAllPhotos(3000, 3000)
@@ -200,5 +201,5 @@ export function usePhotosStoreEffect() {
       //   return RefreshAllPhotos(3000, 3000);
       // })
       .catch(console.log);
-  }, [RefreshAllPhotos]);
+  }, [RefreshAllPhotos, isServerReachable]);
 }

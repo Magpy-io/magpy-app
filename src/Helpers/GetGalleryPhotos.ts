@@ -4,8 +4,6 @@ import { CameraRoll } from '@react-native-camera-roll/camera-roll';
 import { DeleteMedia } from 'react-native-delete-media';
 import RNFS from 'react-native-fs';
 
-import { PhotoType } from './types';
-
 const { MainModule } = NativeModules;
 
 export function GalleryGetPhotos(n: number, offset: number = 0) {
@@ -51,12 +49,14 @@ export async function getFirstPossibleFileName(imageName: string) {
   return currentPathSplit.pop() as string;
 }
 
-export async function addPhotoToDevice(photo: PhotoType, image64: string) {
-  const extention = photo.image.fileName.split('.').pop();
+export async function addPhotoToDevice<
+  T extends { fileName: string; id: string; image64: string },
+>(photo: T) {
+  const extention = photo.fileName.split('.').pop();
   const cachePhotoPath =
     RNFS.ExternalCachesDirectoryPath + `/temp_full_image_${photo.id}.${extention}`;
-  await RNFS.writeFile(cachePhotoPath, image64, 'base64');
-  const imageName = await getFirstPossibleFileName(photo.image.fileName);
+  await RNFS.writeFile(cachePhotoPath, photo.image64, 'base64');
+  const imageName = await getFirstPossibleFileName(photo.fileName);
   const path = await MainModule.saveToRestored(cachePhotoPath, {
     name: imageName,
   });

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import React, { useCallback, useMemo, useRef } from 'react';
 import { SectionList, StyleSheet, View } from 'react-native';
 
 import { Text } from 'react-native-elements';
@@ -161,19 +161,19 @@ export default function PhotoGridComponent({
     return { sectionIndex: 0, rowIndex: 0 };
   }, [currentPhotoIndex, localPhotos, photos, photosPerDayMemo, serverPhotos]);
 
-  useEffect(() => {
-    if (
-      indexInSectionList &&
-      indexInSectionList.sectionIndex >= 0 &&
-      indexInSectionList.rowIndex >= 0
-    ) {
-      console.log('indexInSectionList', indexInSectionList);
-      sectionlistRef.current?.scrollToLocation({
-        sectionIndex: indexInSectionList.sectionIndex,
-        itemIndex: indexInSectionList.rowIndex,
-      });
-    }
-  }, [sectionlistRef, indexInSectionList]);
+  // useEffect(() => {
+  //   if (
+  //     indexInSectionList &&
+  //     indexInSectionList.sectionIndex >= 0 &&
+  //     indexInSectionList.rowIndex >= 0
+  //   ) {
+  //     console.log('indexInSectionList', indexInSectionList);
+  //     sectionlistRef.current?.scrollToLocation({
+  //       sectionIndex: indexInSectionList.sectionIndex,
+  //       itemIndex: indexInSectionList.rowIndex,
+  //     });
+  //   }
+  // }, [sectionlistRef, indexInSectionList]);
 
   return (
     <View style={[styles.mainViewStyle, { paddingTop: insets.top }]}>

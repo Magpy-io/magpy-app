@@ -5,15 +5,11 @@ import {
   LocalServersDataType,
   useLocalServersData,
 } from './ContextSlices/LocalServersContext';
-import {
-  PhotosDownloadingDataType,
-  usePhotosDownloadingData,
-} from './ContextSlices/PhotosDownloadingContext';
+import PhotosDownloadingProvider from './ContextSlices/PhotosDownloadingContext/PhotosDownloadingContext';
 import { ServerClaimDataType, useServerClaimData } from './ContextSlices/ServerClaimContext';
 import { ServerDataType, useServerData } from './ContextSlices/ServerContext';
 
 export type PhotosContextType = {
-  photosDownloadingData: PhotosDownloadingDataType;
   serverClaimData: ServerClaimDataType;
   authData: AuthDataType;
   serverData: ServerDataType;
@@ -27,21 +23,23 @@ type PropsType = {
 };
 
 const ContextProvider: React.FC<PropsType> = props => {
-  const photosDownloadingData = usePhotosDownloadingData();
   const serverClaimData = useServerClaimData();
   const authData = useAuthData();
   const serverData = useServerData();
   const localServersData = useLocalServersData();
 
   const value = {
-    photosDownloadingData,
     serverClaimData,
     authData,
     serverData,
     localServersData,
   };
 
-  return <AppContext.Provider value={value}>{props.children}</AppContext.Provider>;
+  return (
+    <AppContext.Provider value={value}>
+      <PhotosDownloadingProvider>{props.children}</PhotosDownloadingProvider>
+    </AppContext.Provider>
+  );
 };
 
 function useMainContext(): PhotosContextType {

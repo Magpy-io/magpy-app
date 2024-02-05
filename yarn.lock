@@ -2982,6 +2982,7 @@ __metadata:
     eslint-plugin-react-hooks: "npm:^4.6.0"
     eslint-plugin-unused-imports: "npm:^3.0.0"
     formik: "npm:^2.4.5"
+    immer: "npm:^10.0.3"
     jest: "npm:^29.7.0"
     luxon: "npm:^3.4.4"
     prettier: "npm:^3.2.4"
