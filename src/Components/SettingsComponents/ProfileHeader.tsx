@@ -4,6 +4,7 @@ import { Image, StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-elements';
 
 import { useAuthContext } from '~/Context/UseContexts/useAuthContext';
+import { appColors } from '~/styles/colors';
 import { borderRadius, spacing } from '~/styles/spacing';
 import { typography } from '~/styles/typography';
 
@@ -15,7 +16,7 @@ export default function ProfileHeader() {
   }
 
   const name = user.name;
-  const uri = `https://ui-avatars.com/api/?name=${name}&format=png&background=364D56&color=fff&length=1`;
+  const uri = `https://ui-avatars.com/api/?name=${name}&format=png&background=${appColors.SECONDARY.slice(1, -1)}&color=fff&length=1`;
 
   return (
     <View style={styles.container}>

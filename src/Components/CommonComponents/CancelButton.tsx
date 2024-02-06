@@ -4,7 +4,7 @@ import { TouchableHighlight } from 'react-native';
 
 import { Icon } from '@rneui/themed';
 
-import { colorsOld as colors } from '~/styles/colors';
+import { appColors } from '~/styles/colors';
 
 type PropsType = {
   style?: ViewStyle;
@@ -17,7 +17,7 @@ export default function CancelButton(props: PropsType) {
       <TouchableHighlight
         style={[styles.backButtonStyle, props.style]}
         onPress={props.onPress}
-        underlayColor={colors.underlayColor}>
+        underlayColor={appColors.UNDERLAY}>
         <Icon name="close" color={'black'} size={26} style={styles.backIconStyle} />
       </TouchableHighlight>
     </View>

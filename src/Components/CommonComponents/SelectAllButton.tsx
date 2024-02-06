@@ -3,7 +3,7 @@ import { StyleSheet, TouchableHighlight, View, ViewStyle } from 'react-native';
 
 import { Icon } from '@rneui/themed';
 
-import { colorsOld as colors } from '~/styles/colors';
+import { appColors } from '~/styles/colors';
 
 type PropsType = {
   style?: ViewStyle;
@@ -16,7 +16,7 @@ export default function SelectAllButton(props: PropsType) {
       <TouchableHighlight
         style={[styles.backButtonStyle, props.style]}
         onPress={props.onPress}
-        underlayColor={colors.underlayColor}>
+        underlayColor={appColors.UNDERLAY}>
         <Icon name="select-all" color={'black'} size={26} style={styles.backIconStyle} />
       </TouchableHighlight>
     </View>
