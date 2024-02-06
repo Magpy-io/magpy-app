@@ -11,12 +11,16 @@ import {
 } from '~/Context/ReduxStore/Slices/Photos';
 import { TabBarPadding } from '~/Navigation/TabNavigation/TabBar';
 import { appColors } from '~/styles/colors';
+import { spacing } from '~/styles/spacing';
+import { typography } from '~/styles/typography';
 
 import { DayType, getIndexInSectionList, getPhotosPerDay } from './Helpers';
 import PhotoComponentForGrid from './PhotoComponentForGrid';
 import SectionListWithColumns from './SectionListWithColumns';
 
 const NUM_COLUMNS = 3;
+const SECTION_HEADER_HEIGHT = 60;
+const SPACE_BETWEEN_PHOTOS = 1;
 
 function keyExtractor(item: PhotoGalleryType) {
   return `grid_${item.key}`;
@@ -39,8 +43,8 @@ type PhotoGridComponentProps = {
 };
 
 const renderSectionHeader = ({ section: { title } }: { section: { title: string } }) => (
-  <View style={{ height: 30 }}>
-    <Text>{title}</Text>
+  <View style={styles.sectionHeaderStyle}>
+    <Text style={styles.headerTitleStyle}>{title}</Text>
   </View>
 );
 
@@ -117,7 +121,8 @@ export default function PhotoGridComponent({
         renderSectionHeader={renderSectionHeader}
         keyExtractor={keyExtractor}
         columns={NUM_COLUMNS}
-        separatorSpace={1}
+        separatorSpace={SPACE_BETWEEN_PHOTOS}
+        sectionHeaderHeight={SECTION_HEADER_HEIGHT}
         onRefresh={onRefresh}
         refreshing={false}
       />
@@ -127,6 +132,15 @@ export default function PhotoGridComponent({
 }
 
 const styles = StyleSheet.create({
+  sectionHeaderStyle: {
+    height: SECTION_HEADER_HEIGHT,
+    justifyContent: 'center',
+  },
+  headerTitleStyle: {
+    paddingTop: spacing.spacing_s,
+    paddingLeft: spacing.spacing_m,
+    ...typography.largeText,
+  },
   mainViewStyle: {
     height: '100%',
     width: '100%',

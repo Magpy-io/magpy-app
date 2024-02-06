@@ -21,6 +21,7 @@ type SectionListWithColumnsType = {
     | undefined;
   onRefresh?: (() => void) | null | undefined;
   refreshing?: boolean | null | undefined;
+  sectionHeaderHeight: number;
 };
 
 // converts any array like to an array of columns elements
@@ -44,6 +45,7 @@ const SectionListWithColumns = React.forwardRef(function SectionListWithColumns(
     separatorSpace = 0,
     onRefresh,
     refreshing,
+    sectionHeaderHeight,
   }: SectionListWithColumnsType,
   ref: React.LegacyRef<SectionList<T[]>> | undefined,
 ) {
@@ -103,7 +105,7 @@ const SectionListWithColumns = React.forwardRef(function SectionListWithColumns(
     | undefined = sectionListGetItemLayout({
     // The height of the row with rowData at the given sectionIndex and rowIndex
     getItemHeight: (rowData: T[][], sectionIndex: number, rowIndex: number) => itemHeight,
-    getSectionHeaderHeight: () => 30, // The height of your section headers
+    getSectionHeaderHeight: () => sectionHeaderHeight, // The height of your section headers
     getSeparatorHeight: () => separatorSpace,
   });
 

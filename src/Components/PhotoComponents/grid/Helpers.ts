@@ -3,7 +3,7 @@ import {
   PhotosLocalType,
   PhotosServerType,
 } from '~/Context/ReduxStore/Slices/Photos';
-import { areDatesEqual, withoutTime } from '~/Helpers/Date';
+import { areDatesEqual, formatDate, withoutTime } from '~/Helpers/Date';
 
 export function getPhotoServerOrLocal(
   localPhotos: PhotosLocalType,
@@ -71,7 +71,7 @@ export function getPhotosPerDay(
     const firstPhoto = getPhotoServerOrLocal(localPhotos, serverPhotos, photos[0]);
     let currentDate = withoutTime(firstPhoto?.created) ?? '';
     let currentBasket: DayType = {
-      title: currentDate,
+      title: formatDate(currentDate),
       day: currentDate,
       data: [],
     };
@@ -86,7 +86,7 @@ export function getPhotosPerDay(
         photosPerDay.push(currentBasket);
         currentDate = photoDate;
         currentBasket = {
-          title: photoDate,
+          title: formatDate(photoDate),
           day: photoDate,
           data: [photo],
         };

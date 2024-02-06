@@ -220,12 +220,12 @@ export const PhotosServerMock = {
 export const PhotosPerDayMock = [
   {
     day: '2024-02-03T00:00:00.000Z',
-    title: '2024-02-03T00:00:00.000Z',
+    title: 'Feb 3, 2024',
     data: photosGallery.slice(0, 5),
   },
   {
     day: '2024-02-02T00:00:00.000Z',
-    title: '2024-02-02T00:00:00.000Z',
+    title: 'Feb 2, 2024',
     data: photosGallery.slice(5, 10),
   },
 ];
