@@ -29,13 +29,13 @@ export const colors1 = {
 };
 
 export const colors = {
-  DARK: '#272D34',
+  DARK: '#020D17',
   GREEN: '#364D56',
-  LIGHT_GREEN: '#72878D',
+  LIGHT_GREEN: '#454C53',
   WHITE: 'white',
   LIGHT_GREY: '#F5F5F6',
   SOFT_GREY: '#E8E8E8',
-  ORANGE: '#CE8C1E',
+  CYAN: '#2CA7AF',
   TRANSPARENT: `rgba(0,0,0,0)`,
   COLOR_SUCCESS_500: '#5aa97e',
   COLOR_SUCCESS_400: '#acd3be',
@@ -56,7 +56,7 @@ export const appColors = {
   TEXT_LIGHT: colors.LIGHT_GREEN,
   TEXT_INVERSE: colors.WHITE,
   PRIMARY: colors.DARK,
-  ACCENT: colors.ORANGE,
+  ACCENT: colors.CYAN,
   FORM_BORDER: colors.LIGHT_GREEN,
   UNDERLAY: colors.LIGHT_GREY,
 };
