@@ -20,6 +20,18 @@ export interface MainModuleType {
   getServiceState: () => Promise<'STARTUP' | 'DESTROYED' | 'INACTIVE' | 'FAILED'>;
   getIds: () => Promise<string[]>;
   getCurrentIndex: () => Promise<number>;
+  getPhotoById: (id: string) => Promise<{
+    id: string;
+    type: string;
+    group_name: string[];
+    timestamp: number;
+    modificationTimestamp: number;
+    uri: string;
+    filename: string;
+    fileSize: number;
+    width: number;
+    height: number;
+  }>;
   getWindowInsets: () => Promise<{
     valid: boolean;
     top: number;
