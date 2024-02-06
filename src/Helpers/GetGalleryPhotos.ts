@@ -4,6 +4,9 @@ import { CameraRoll } from '@react-native-camera-roll/camera-roll';
 import { DeleteMedia } from 'react-native-delete-media';
 import RNFS from 'react-native-fs';
 
+import { ParseGetPhotoByIdLocal } from '~/Context/ReduxStore/Slices/Functions';
+import { PhotoLocalType } from '~/Context/ReduxStore/Slices/Photos';
+
 const { MainModule } = NativeModules;
 
 export function GalleryGetPhotos(n: number, offset: number = 0) {
@@ -47,6 +50,12 @@ export async function getFirstPossibleFileName(imageName: string) {
   }
 
   return currentPathSplit.pop() as string;
+}
+
+export async function getPhotoFromDevice(mediaId: string): Promise<PhotoLocalType> {
+  const photo = await MainModule.getPhotoById(mediaId);
+
+  return ParseGetPhotoByIdLocal(photo);
 }
 
 export async function addPhotoToDevice<

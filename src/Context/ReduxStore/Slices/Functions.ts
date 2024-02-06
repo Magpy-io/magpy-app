@@ -1,7 +1,8 @@
 import { uniqueDeviceId } from '~/Config/config';
 import { APIPhoto } from '~/Helpers/ServerQueries/Types';
+import { LocalPhotoById } from '~/NativeModules/extendNativeModulesType';
 
-import { PhotoServerType } from './Photos';
+import { PhotoLocalType, PhotoServerType } from './Photos';
 
 export function ParseApiPhoto(photo: APIPhoto): PhotoServerType {
   return {
@@ -16,5 +17,20 @@ export function ParseApiPhoto(photo: APIPhoto): PhotoServerType {
       ?.path,
     uriThumbnail: undefined,
     uriCompressed: undefined,
+  };
+}
+
+export function ParseGetPhotoByIdLocal(photo: LocalPhotoById): PhotoLocalType {
+  return {
+    id: photo.id,
+    uri: photo.uri,
+    fileSize: photo.fileSize,
+    fileName: photo.filename,
+    height: photo.height,
+    width: photo.width,
+    group_name: photo.group_name,
+    created: new Date(photo.timestamp * 1000).toISOString(),
+    modified: new Date(photo.modificationTimestamp * 1000).toISOString(),
+    type: photo.type,
   };
 }
