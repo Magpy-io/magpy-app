@@ -146,5 +146,4 @@ const styles = StyleSheet.create({
     width: '100%',
     backgroundColor: appColors.BACKGROUND,
   },
-  flatListStyle: {},
 });
