@@ -21,8 +21,10 @@ import com.reactnativecommunity.cameraroll.Utils;
 
 import android.app.ActivityManager;
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.media.ExifInterface;
 import android.os.Build;
 import android.os.Bundle;
@@ -120,6 +122,8 @@ public class MainModule extends ReactContextBaseJavaModule{
             output = resolver.openOutputStream(mediaContentUri);
             input = new FileInputStream(source);
             FileUtils.copy(input, output);
+            
+            double id = ContentUris.parseId(mediaContentUri);
 
             long datetime_original = 0L;
             try {
@@ -151,7 +155,7 @@ public class MainModule extends ReactContextBaseJavaModule{
             }
             resolver.update(mediaContentUri, mediaDetails, null, null);
 
-            mPromise.resolve(getRestoredMediaAbsolutePathPrivate() + File.separator + name);
+            mPromise.resolve(id);
         } catch (Exception e) {
             mPromise.reject(e);
         } finally {
