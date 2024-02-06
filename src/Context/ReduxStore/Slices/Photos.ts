@@ -112,10 +112,25 @@ const photosServerSlice = createSlice({
       }
     },
 
-    // addPhotoFromServerToLocal: (
-    //   state,
-    //   action: { payload: { photoLocal: PhotoLocalType; serverId: string } },
-    // ) => {},
+    addPhotoFromServerToLocal: (
+      state,
+      action: { payload: { photoLocal: PhotoLocalType; serverId: string } },
+    ) => {
+      state.photosLocal[action.payload.photoLocal.id] = action.payload.photoLocal;
+
+      insertPhotoKeyWithOrder(
+        state.photosLocal,
+        state.photosLocalIdsOrdered,
+        action.payload.photoLocal,
+      );
+
+      const galleryPhoto = state.photosGallery.find(
+        p => p.serverId == action.payload.serverId,
+      );
+      if (galleryPhoto) {
+        galleryPhoto.mediaId = action.payload.photoLocal.id;
+      }
+    },
   },
 });
 
@@ -125,6 +140,7 @@ export const {
   addCompressedPhotoById,
   addThumbnailPhotoById,
   addPhotoFromLocalToServer,
+  addPhotoFromServerToLocal,
 } = photosServerSlice.actions;
 
 export default photosServerSlice.reducer;
