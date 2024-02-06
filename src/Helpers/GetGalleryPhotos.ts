@@ -11,7 +11,7 @@ export function GalleryGetPhotos(n: number, offset: number = 0) {
     first: n,
     after: String(offset),
     assetType: 'Photos',
-    include: ['fileSize', 'filename', 'imageSize'],
+    include: ['fileSize', 'filename', 'imageSize', 'albums'],
   }).then(r => {
     return { edges: r.edges, endReached: !r.page_info.has_next_page };
   });
