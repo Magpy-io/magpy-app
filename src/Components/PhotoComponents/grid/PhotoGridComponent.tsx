@@ -101,7 +101,6 @@ export default function PhotoGridComponent({
       indexInSectionList.sectionIndex >= 0 &&
       indexInSectionList.rowIndex >= 0
     ) {
-      console.log('indexInSectionList', indexInSectionList);
       sectionlistRef.current?.scrollToLocation({
         sectionIndex: indexInSectionList.sectionIndex,
         itemIndex: indexInSectionList.rowIndex,
@@ -118,6 +117,9 @@ export default function PhotoGridComponent({
         renderSectionHeader={renderSectionHeader}
         keyExtractor={keyExtractor}
         columns={NUM_COLUMNS}
+        separatorSpace={1}
+        onRefresh={onRefresh}
+        refreshing={false}
       />
       <TabBarPadding />
     </View>

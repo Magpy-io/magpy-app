@@ -13,13 +13,14 @@ type NewSection = { title: string; data: T[][] };
 type SectionListWithColumnsType = {
   sections: Section[];
   columns: number;
+  separatorSpace?: number;
   renderItem: ({ item, index }: { item: T; index?: number }) => React.ReactElement | null;
   keyExtractor: (item: T, index: number) => string;
   renderSectionHeader:
-    | ((info: {
-        section: SectionListData<T[], NewSection>;
-      }) => React.ReactElement<any, string | React.JSXElementConstructor<any>> | null)
+    | ((info: { section: SectionListData<T[], NewSection> }) => React.JSX.Element)
     | undefined;
+  onRefresh?: (() => void) | null | undefined;
+  refreshing?: boolean | null | undefined;
 };
 
 // converts any array like to an array of columns elements
@@ -40,11 +41,15 @@ const SectionListWithColumns = React.forwardRef(function SectionListWithColumns(
     renderSectionHeader,
     keyExtractor,
     columns,
+    separatorSpace = 0,
+    onRefresh,
+    refreshing,
   }: SectionListWithColumnsType,
   ref: React.LegacyRef<SectionList<T[]>> | undefined,
 ) {
   const { width } = useOrientation();
-  const itemWidth = width / columns;
+  const totalEmptySpace = separatorSpace * (columns - 1);
+  const itemWidth = (width - totalEmptySpace) / columns;
   const itemHeight = itemWidth;
   if (!sections) {
     return <View />;
@@ -58,23 +63,26 @@ const SectionListWithColumns = React.forwardRef(function SectionListWithColumns(
     });
   });
 
+  // [0,1,2] for columns === 3
+  const ArrayColumns = Array(columns)
+    .fill(0)
+    .map((u, i) => i);
+
   const renderRow = ({ item, index }: { item: T[]; index: number }) => {
     return (
       <View style={{ flexDirection: 'row' }}>
-        {Array(columns)
-          .fill(0)
-          .map((u, i) => i)
-          .map(i => {
-            if (item[i]) {
-              return (
-                <View
-                  style={{ width: itemWidth, height: itemHeight }}
-                  key={keyExtractor(item[i], index)}>
-                  {renderItem({ item: item[i] })}
-                </View>
-              );
-            }
-          })}
+        {ArrayColumns.map(i => {
+          if (item[i]) {
+            const padding = i === 0 ? {} : { marginLeft: separatorSpace };
+            return (
+              <View
+                style={[{ width: itemWidth, height: itemHeight }, padding]}
+                key={keyExtractor(item[i], index)}>
+                {renderItem({ item: item[i] })}
+              </View>
+            );
+          }
+        })}
       </View>
     );
   };
@@ -96,7 +104,10 @@ const SectionListWithColumns = React.forwardRef(function SectionListWithColumns(
     // The height of the row with rowData at the given sectionIndex and rowIndex
     getItemHeight: (rowData: T[][], sectionIndex: number, rowIndex: number) => itemHeight,
     getSectionHeaderHeight: () => 30, // The height of your section headers
+    getSeparatorHeight: () => separatorSpace,
   });
+
+  const Separator = () => <View style={{ height: separatorSpace, width: '100%' }} />;
 
   return (
     <SectionList
@@ -105,6 +116,9 @@ const SectionListWithColumns = React.forwardRef(function SectionListWithColumns(
       renderSectionHeader={renderSectionHeader}
       keyExtractor={rowKeyExtractor}
       getItemLayout={getItemLayout}
+      ItemSeparatorComponent={Separator}
+      refreshing={refreshing}
+      onRefresh={onRefresh}
       ref={ref}
     />
   );

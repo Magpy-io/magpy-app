@@ -58,7 +58,6 @@ function PhotoComponentForGrid(props: PropsType) {
 
 const styles = StyleSheet.create({
   itemStyle: {
-    padding: 1,
     aspectRatio: 1,
   },
 });
