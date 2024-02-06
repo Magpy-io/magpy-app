@@ -23,7 +23,6 @@ import android.app.ActivityManager;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.media.ExifInterface;
 import android.os.Build;
 import android.os.Bundle;
@@ -118,9 +117,6 @@ public class MainModule extends ReactContextBaseJavaModule{
             Uri mediaContentUri = isVideo
                     ? resolver.insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, mediaDetails)
                     : resolver.insert(Images.Media.EXTERNAL_CONTENT_URI, mediaDetails);
-
-            Log.e("Tag", mediaContentUri.toString());
-
             output = resolver.openOutputStream(mediaContentUri);
             input = new FileInputStream(source);
             FileUtils.copy(input, output);
@@ -154,24 +150,6 @@ public class MainModule extends ReactContextBaseJavaModule{
                 mediaDetails.put(MediaStore.MediaColumns.DATE_ADDED, datetime_original/1000);
             }
             resolver.update(mediaContentUri, mediaDetails, null, null);
-
-            String[] projection = {MediaStore.Images.ImageColumns._ID, MediaStore.Images.ImageColumns.DATA, MediaStore.Images.ImageColumns.DATE_ADDED};
-            Cursor cursor = resolver.query(mediaContentUri, projection, null, null, null);
-
-            if (cursor != null && cursor.moveToFirst()) {
-                long id = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Images.ImageColumns._ID));
-                String filePath = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.ImageColumns.DATA));
-                long dateTaken = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Images.ImageColumns.DATE_ADDED));
-
-                Log.d("Tag", "photo found in query");
-                Log.d("Tag", Long.toString(id));
-                Log.d("Tag", filePath);
-                Log.d("Tag", Long.toString(dateTaken));
-
-                cursor.close();
-            }else {
-                Log.d("Tag", "photo not found in query");
-            }
 
             mPromise.resolve(getRestoredMediaAbsolutePathPrivate() + File.separator + name);
         } catch (Exception e) {
