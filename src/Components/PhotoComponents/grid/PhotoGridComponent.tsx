@@ -108,6 +108,7 @@ export default function PhotoGridComponent({
       sectionlistRef.current?.scrollToLocation({
         sectionIndex: indexInSectionList.sectionIndex,
         itemIndex: indexInSectionList.rowIndex,
+        animated: true,
       });
     }
   }, [sectionlistRef, indexInSectionList, photosPerDayMemo]);

@@ -40,9 +40,10 @@ export default function PhotoSliderComponent({
 
   const flatListCurrentIndexRef = useRef<number>(currentPhotoIndex);
   flatListCurrentIndexRef.current = currentPhotoIndex;
+  const hasPhotos = photos && photos.length > 0;
 
   useMemo(() => {
-    if (photos.length > 0) {
+    if (hasPhotos) {
       let indexToScroll = flatListCurrentIndexRef.current;
 
       if (indexToScroll < 0) {
@@ -60,7 +61,7 @@ export default function PhotoSliderComponent({
         animated: false,
       });
     }
-  }, [photos.length, currentPhotoIndex]);
+  }, [hasPhotos, photos.length, currentPhotoIndex]);
 
   const renderItem = useCallback(
     ({ item }: { item: PhotoGalleryType }) => (
