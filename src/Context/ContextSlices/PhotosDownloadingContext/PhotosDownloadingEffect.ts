@@ -1,7 +1,11 @@
 import { useEffect, useRef } from 'react';
 
-import { addPhotoToDevice } from '~/Helpers/GetGalleryPhotos';
+import { uniqueDeviceId } from '~/Config/config';
+import { addPhotoFromServerToLocal } from '~/Context/ReduxStore/Slices/Photos';
+import { useAppDispatch } from '~/Context/ReduxStore/Store';
+import { addPhotoToDevice, getPhotoFromDevice } from '~/Helpers/GetGalleryPhotos';
 import * as Queries from '~/Helpers/Queries';
+import { UpdatePhotoPath } from '~/Helpers/ServerQueries';
 
 import * as PhotosDownloadingActions from './PhotosDownloadingActions';
 import {
@@ -13,6 +17,8 @@ export function usePhotosDownloadingEffect() {
   const photosDownloadingDispatch = usePhotosDownloadingDispatch();
   const photosDownloadingContext = usePhotosDownloadingContext();
   const { photosDownloading } = photosDownloadingContext;
+
+  const AppDisptach = useAppDispatch();
 
   const isEffectRunning = useRef(false);
 
@@ -53,32 +59,32 @@ export function usePhotosDownloadingEffect() {
         }
 
         console.log('photo downloaded');
-        const photo = result.data.photo;
+        const photoServer = result.data.photo;
 
-        const newUri = await addPhotoToDevice({
-          fileName: photo.meta.name,
-          id: photo.id,
-          image64: photo.image64,
+        const mediaId = await addPhotoToDevice({
+          fileName: photoServer.meta.name,
+          id: photoServer.id,
+          image64: photoServer.image64,
         });
 
-        console.log('photo saved to gallery');
+        const localPhoto = await getPhotoFromDevice(mediaId);
 
-        // Add local photo to redux
-        // Update local uri of photo in server
+        AppDisptach(
+          addPhotoFromServerToLocal({ photoLocal: localPhoto, serverId: photoServer.id }),
+        );
 
-        //   photo.image.path = newUri;
-        //   photosDispatch({ type: Actions.addPhotoLocal, payload: { photo: photo } });
+        const result1 = await UpdatePhotoPath.Post({
+          id: photoServer.id,
+          path: localPhoto.uri,
+          deviceUniqueId: uniqueDeviceId,
+        });
 
-        //   const result1 = await UpdatePhotoPath.Post({
-        //     id: photo.id,
-        //     path: newUri,
-        //     deviceUniqueId: uniqueDeviceId,
-        //   });
+        console.log(localPhoto.uri);
 
-        //   if (!result1.ok) {
-        //     console.log(result1.errorCode);
-        //     return;
-        //   }
+        if (!result1.ok) {
+          console.log('Error updating uri on server');
+          console.log(result1.errorCode);
+        }
 
         photosDownloadingDispatch(PhotosDownloadingActions.shift());
       } finally {
@@ -87,5 +93,5 @@ export function usePhotosDownloadingEffect() {
     }
 
     innerAsync().catch(console.log);
-  }, [photosDownloadingDispatch, photosDownloading]);
+  }, [photosDownloadingDispatch, AppDisptach, photosDownloading]);
 }
