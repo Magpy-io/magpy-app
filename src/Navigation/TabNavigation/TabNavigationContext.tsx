@@ -15,6 +15,7 @@ type ContextType = {
   hidden: boolean;
   hideTab: () => void;
   showTab: () => void;
+  resetFocusedTab: () => void;
 };
 
 const TabNavigationContext = createContext<ContextType | undefined>(undefined);
@@ -26,6 +27,7 @@ const TabNavigationProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   const hideTab = useCallback(() => setHidden(true), []);
   const showTab = useCallback(() => setHidden(false), []);
 
+  console.log('focusedTab', focusedTab);
   const navigateTo = useCallback(
     (tabName: TabName) => {
       setFocusedTab(tabName);
@@ -39,12 +41,17 @@ const TabNavigationProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     [navigation],
   );
 
+  const resetFocusedTab = useCallback(() => {
+    setFocusedTab(TabName.Home);
+  }, []);
+
   const value = {
     focusedTab: focusedTab,
     navigateTo: navigateTo,
     hidden: hidden,
     hideTab: hideTab,
     showTab: showTab,
+    resetFocusedTab: resetFocusedTab,
   };
 
   return (

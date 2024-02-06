@@ -4,14 +4,17 @@ import { StyleSheet, TouchableOpacity } from 'react-native';
 import { Text } from 'react-native-elements';
 
 import { useAuthFunctions } from '~/Context/UseContexts/useAuthContext';
+import { useTabNavigationContext } from '~/Navigation/TabNavigation/TabNavigationContext';
 import { colors } from '~/styles/colors';
 import { spacing } from '~/styles/spacing';
 import { typography } from '~/styles/typography';
 
 export default function LogoutComponent() {
   const { logout } = useAuthFunctions();
+  const { resetFocusedTab } = useTabNavigationContext();
   const onPress = () => {
     logout().catch(console.log);
+    resetFocusedTab();
   };
   return (
     <TouchableOpacity style={styles.container} onPress={onPress}>
