@@ -51,17 +51,18 @@ export async function getFirstPossibleFileName(imageName: string) {
 
 export async function addPhotoToDevice<
   T extends { fileName: string; id: string; image64: string },
->(photo: T) {
+>(photo: T): Promise<string> {
   const extention = photo.fileName.split('.').pop();
   const cachePhotoPath =
     RNFS.ExternalCachesDirectoryPath + `/temp_full_image_${photo.id}.${extention}`;
   await RNFS.writeFile(cachePhotoPath, photo.image64, 'base64');
   const imageName = await getFirstPossibleFileName(photo.fileName);
-  const path = await MainModule.saveToRestored(cachePhotoPath, {
+  const id = await MainModule.saveToRestored(cachePhotoPath, {
     name: imageName,
   });
+  const idString = id.toString();
   await RNFS.unlink(cachePhotoPath);
-  return 'file://' + path;
+  return idString;
 }
 
 export async function DeletePhotosFromDevice(uris: Array<string | undefined>) {
