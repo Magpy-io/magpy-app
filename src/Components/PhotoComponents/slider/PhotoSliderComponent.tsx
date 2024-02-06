@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { Dimensions, FlatList, StyleSheet, ViewToken } from 'react-native';
 
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos';
@@ -42,7 +42,7 @@ export default function PhotoSliderComponent({
   flatListCurrentIndexRef.current = currentPhotoIndex;
   const hasPhotos = photos && photos.length > 0;
 
-  useMemo(() => {
+  useEffect(() => {
     if (hasPhotos) {
       let indexToScroll = flatListCurrentIndexRef.current;
 
