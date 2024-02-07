@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MoreIcon } from '~/Components/CommonComponents/Icons';
 import { PhotoGalleryHeader } from '~/Components/PhotoComponents/PhotoGalleryHeader';
 import RecentPhotos from '~/Components/ServerComponents/RecentPhotos';
+import ServerDetails from '~/Components/ServerComponents/ServerDetails';
 import { appColors } from '~/styles/colors';
 import { spacing } from '~/styles/spacing';
 
@@ -16,7 +17,8 @@ export default function ServerScreenTab() {
 
   return (
     <View style={[styles.viewStyle, { paddingTop: insets.top }]}>
-      <PhotoGalleryHeader title="Server" iconRight={optionsButton} />
+      <PhotoGalleryHeader title="Your server" iconRight={optionsButton} />
+      <ServerDetails />
       <RecentPhotos />
     </View>
   );
