@@ -8,7 +8,6 @@ import {
   PhotoLocalType,
   PhotoServerType,
 } from '~/Context/ReduxStore/Slices/Photos';
-import { TabBarPadding } from '~/Navigation/TabNavigation/TabBar';
 import { appColors } from '~/Styles/colors';
 import { spacing } from '~/Styles/spacing';
 
@@ -53,6 +52,14 @@ export default function PhotoGallery(props: PhotoGalleryPropsType) {
   const filterButton = () => (
     <TuneIcon onPress={() => {}} iconStyle={{ padding: spacing.spacing_m }} />
   );
+  const Header = () => (
+    <PhotoGalleryHeader
+      title={props.title}
+      iconRight={filterButton}
+      showBackButton={props.showBackButton}
+      onPressBack={props.onPressBack}
+    />
+  );
   return (
     <View style={styles.viewStyle}>
       <View
@@ -61,23 +68,23 @@ export default function PhotoGallery(props: PhotoGalleryPropsType) {
           { display: displayGrid },
           { paddingTop: insets.top, paddingBottom: insets.bottom },
         ]}>
-        <PhotoGalleryHeader
-          title={props.title}
-          iconRight={filterButton}
-          showBackButton={props.showBackButton}
-          onPressBack={props.onPressBack}
-        />
         <PhotoGridController
+          header={Header}
           photos={props.photos}
           localPhotos={props.localPhotos}
           serverPhotos={props.serverPhotos}
           isSlidingPhotos={isSlidingPhotos}
           currentPhotoIndex={currentPhotoIndex}
           onSwitchMode={onSwitchMode}
+          isInTabScreen={props.isInTabScreen}
         />
-        {(props.isInTabScreen ?? false) && <TabBarPadding />}
       </View>
-      <View style={[styles.viewStyle, { display: displaySlider }]}>
+      <View
+        style={[
+          styles.viewStyle,
+          { display: displaySlider },
+          { paddingBottom: insets.bottom },
+        ]}>
         <PhotoSlider
           photos={props.photos}
           isSlidingPhotos={isSlidingPhotos}

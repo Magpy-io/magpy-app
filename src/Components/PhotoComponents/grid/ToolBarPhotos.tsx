@@ -1,8 +1,6 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
 import { PhotoGalleryType, PhotoLocalType } from '~/Context/ReduxStore/Slices/Photos';
 import { usePhotosFunctionsStore } from '~/Context/ReduxStore/Slices/PhotosFunctions';
 import { useAppSelector } from '~/Context/ReduxStore/Store';
@@ -17,8 +15,6 @@ type ToolBarProps = {
 };
 
 function ToolBarPhotos(props: ToolBarProps) {
-  const insets = useSafeAreaInsets();
-
   const localPhotos = useAppSelector(state => state.photos.photosLocal);
   const galleryPhotos = useAppSelector(state => state.photos.photosGallery);
 
@@ -45,7 +41,7 @@ function ToolBarPhotos(props: ToolBarProps) {
   }
 
   return (
-    <View style={[styles.toolBarView, { paddingBottom: insets.bottom }]}>
+    <View style={[styles.toolBarView]}>
       <View style={styles.toolsView}>
         <ToolComponent
           icon="backup"

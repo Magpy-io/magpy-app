@@ -1,8 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, View, ViewStyle } from 'react-native';
 
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
 import CancelButton from '~/Components/CommonComponents/CancelButton';
 import SelectAllButton from '~/Components/CommonComponents/SelectAllButton';
 import { appColors } from '~/Styles/colors';
@@ -28,9 +26,8 @@ function selectedElementsToString(n: number) {
 }
 
 function SelectionBar(props: SelectionBarProps) {
-  const insets = useSafeAreaInsets();
   return (
-    <View style={[styles.StatusBarStyle, props.style, { paddingTop: insets.top }]}>
+    <View style={[styles.StatusBarStyle, props.style]}>
       <View style={styles.statusBarCancelButtonStyle}>
         <CancelButton onPress={props.onCancelButton} />
       </View>
