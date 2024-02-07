@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect } from 'react';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, TouchableHighlight, View } from 'react-native';
 
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos';
 import { usePhotosFunctionsStore } from '~/Context/ReduxStore/Slices/PhotosFunctions';
@@ -8,6 +8,7 @@ import {
   photoServerSelector,
 } from '~/Context/ReduxStore/Slices/Selectors';
 import { useAppSelector } from '~/Context/ReduxStore/Store';
+import { appColors } from '~/Styles/colors';
 
 import ImageForGrid from './ImageForGrid';
 import SelectionIconForGrid from './SelectionIconForGrid';
@@ -47,15 +48,16 @@ function PhotoComponentForGrid(props: PropsType) {
   }
 
   return (
-    <TouchableOpacity
+    <TouchableHighlight
+      underlayColor={appColors.UNDERLAY}
       onPress={onPressPhoto}
       onLongPress={onLongPressPhoto}
-      delayLongPress={200}>
+      delayLongPress={100}>
       <View style={styles.itemStyle}>
         <ImageForGrid uri={uriSource} />
         {isSelecting && <SelectionIconForGrid isSelected={isSelected} />}
       </View>
-    </TouchableOpacity>
+    </TouchableHighlight>
   );
 }
 
