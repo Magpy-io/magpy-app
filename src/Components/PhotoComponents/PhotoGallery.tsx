@@ -8,7 +8,11 @@ import {
   PhotoLocalType,
   PhotoServerType,
 } from '~/Context/ReduxStore/Slices/Photos';
+import { appColors } from '~/styles/colors';
+import { spacing } from '~/styles/spacing';
 
+import { TuneIcon } from '../CommonComponents/Icons';
+import { PhotoGalleryHeader } from './PhotoGalleryHeader';
 import PhotoGridController from './grid/PhotoGridController';
 import PhotoSlider from './slider/PhotoSliderController';
 
@@ -20,6 +24,7 @@ type PhotoGalleryPropsType = {
   serverPhotos: {
     [key: string]: PhotoServerType;
   };
+  title?: string;
 };
 
 export default function PhotoGallery(props: PhotoGalleryPropsType) {
@@ -41,9 +46,13 @@ export default function PhotoGallery(props: PhotoGalleryPropsType) {
   const displayGrid = isSlidingPhotos ? 'none' : 'flex';
   const insets = useSafeAreaInsets();
 
+  const filterButton = () => (
+    <TuneIcon onPress={() => {}} iconStyle={{ padding: spacing.spacing_m }} />
+  );
   return (
     <View style={styles.viewStyle}>
       <View style={[styles.viewStyle, { display: displayGrid }, { paddingTop: insets.top }]}>
+        <PhotoGalleryHeader title={props.title} iconRight={filterButton} />
         <PhotoGridController
           photos={props.photos}
           localPhotos={props.localPhotos}
@@ -68,5 +77,6 @@ export default function PhotoGallery(props: PhotoGalleryPropsType) {
 const styles = StyleSheet.create({
   viewStyle: {
     flex: 1,
+    backgroundColor: appColors.BACKGROUND,
   },
 });

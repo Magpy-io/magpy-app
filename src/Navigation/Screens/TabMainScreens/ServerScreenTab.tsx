@@ -16,6 +16,7 @@ export default function ServerScreenTab() {
       photos={photosGalleryServer}
       serverPhotos={photosServer}
       localPhotos={photosLocal}
+      title="Server photos"
     />
   );
 }

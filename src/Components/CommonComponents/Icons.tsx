@@ -22,6 +22,12 @@ export function ChevronIcon({ ...props }: Omit<IconProps, 'name'>) {
   );
 }
 
+export function BackIcon({ ...props }: Omit<IconProps, 'name'>) {
+  return (
+    <Icon name="chevron-back" type="ionicon" color={appColors.TEXT} size={22} {...props} />
+  );
+}
+
 export function UploadIcon({ ...props }: Omit<IconProps, 'name'>) {
   return (
     <Icon
@@ -43,6 +49,12 @@ export function PhoneIcon({ ...props }: Omit<IconProps, 'name'>) {
       size={22}
       {...props}
     />
+  );
+}
+
+export function TuneIcon({ ...props }: Omit<IconProps, 'name'>) {
+  return (
+    <Icon name="options-outline" type="ionicon" color={appColors.TEXT} size={22} {...props} />
   );
 }
 

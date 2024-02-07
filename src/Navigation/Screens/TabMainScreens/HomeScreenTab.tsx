@@ -35,6 +35,7 @@ export default function HomeScreenTab() {
           photos={photos}
           serverPhotos={photosServer}
           localPhotos={photosLocal}
+          title="All photos"
         />
       ) : (
         <Text>Permissions needed</Text>
