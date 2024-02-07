@@ -47,7 +47,10 @@ function PhotoComponentForGrid(props: PropsType) {
   }
 
   return (
-    <TouchableOpacity onPress={onPressPhoto} onLongPress={onLongPressPhoto}>
+    <TouchableOpacity
+      onPress={onPressPhoto}
+      onLongPress={onLongPressPhoto}
+      delayLongPress={200}>
       <View style={styles.itemStyle}>
         <ImageForGrid uri={uriSource} />
         {isSelecting && <SelectionIconForGrid isSelected={isSelected} />}
