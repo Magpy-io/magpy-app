@@ -8,7 +8,7 @@ import {
   photoServerSelector,
 } from '~/Context/ReduxStore/Slices/Selectors';
 import { useAppSelector } from '~/Context/ReduxStore/Store';
-import { borderRadius } from '~/styles/spacing';
+import { borderRadius } from '~/Styles/spacing';
 
 export default function RecentPhotoComponent({
   photo,

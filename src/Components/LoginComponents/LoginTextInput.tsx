@@ -1,15 +1,10 @@
 import React, { useRef } from 'react';
-import {
-  TextInput,
-  TextInputProps,
-  StyleSheet,
-  View,
-} from 'react-native';
+import { StyleSheet, TextInput, TextInputProps, View } from 'react-native';
 
 import { Icon } from 'react-native-elements';
 
-import { appColors } from '~/styles/colors';
-import { borderRadius, spacing } from '~/styles/spacing';
+import { appColors } from '~/Styles/colors';
+import { borderRadius, spacing } from '~/Styles/spacing';
 
 import FormError from './FormError';
 import ValidInputIndicator from './ValidInputIndicator';

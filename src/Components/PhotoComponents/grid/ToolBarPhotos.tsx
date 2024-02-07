@@ -6,7 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { PhotoGalleryType, PhotoLocalType } from '~/Context/ReduxStore/Slices/Photos';
 import { usePhotosFunctionsStore } from '~/Context/ReduxStore/Slices/PhotosFunctions';
 import { useAppSelector } from '~/Context/ReduxStore/Store';
-import { appColors } from '~/styles/colors';
+import { appColors } from '~/Styles/colors';
 
 import ToolComponent from '../common/ToolComponent';
 

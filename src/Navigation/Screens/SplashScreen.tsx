@@ -4,8 +4,8 @@ import { StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-elements';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { colors } from '~/styles/colors';
-import { spacing } from '~/styles/spacing';
+import { colors } from '~/Styles/colors';
+import { spacing } from '~/Styles/spacing';
 
 export default function SplashScreen() {
   const insets = useSafeAreaInsets();

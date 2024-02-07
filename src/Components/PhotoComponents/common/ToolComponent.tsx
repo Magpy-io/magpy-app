@@ -3,8 +3,8 @@ import { StyleSheet, Text, TouchableHighlight, View } from 'react-native';
 
 import { Icon } from '@rneui/themed';
 
-import { appColors } from '~/styles/colors';
-import { typography } from '~/styles/typography';
+import { appColors } from '~/Styles/colors';
+import { typography } from '~/Styles/typography';
 
 type ToolComponentProps = {
   icon: string;

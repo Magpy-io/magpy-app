@@ -3,7 +3,7 @@ import { StyleSheet, View, ViewStyle } from 'react-native';
 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { appColors } from '~/styles/colors';
+import { appColors } from '~/Styles/colors';
 
 import ToolComponent from '../common/ToolComponent';
 

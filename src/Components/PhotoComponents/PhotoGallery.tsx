@@ -9,8 +9,8 @@ import {
   PhotoServerType,
 } from '~/Context/ReduxStore/Slices/Photos';
 import { TabBarPadding } from '~/Navigation/TabNavigation/TabBar';
-import { appColors } from '~/styles/colors';
-import { spacing } from '~/styles/spacing';
+import { appColors } from '~/Styles/colors';
+import { spacing } from '~/Styles/spacing';
 
 import { TuneIcon } from '../CommonComponents/Icons';
 import { PhotoGalleryHeader } from './PhotoGalleryHeader';

@@ -5,9 +5,9 @@ import { Text } from 'react-native-elements';
 
 import { useAuthFunctions } from '~/Context/UseContexts/useAuthContext';
 import { useTabNavigationContext } from '~/Navigation/TabNavigation/TabNavigationContext';
-import { colors } from '~/styles/colors';
-import { spacing } from '~/styles/spacing';
-import { typography } from '~/styles/typography';
+import { colors } from '~/Styles/colors';
+import { spacing } from '~/Styles/spacing';
+import { typography } from '~/Styles/typography';
 
 export default function LogoutComponent() {
   const { logout } = useAuthFunctions();

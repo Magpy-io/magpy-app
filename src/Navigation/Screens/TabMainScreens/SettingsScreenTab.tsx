@@ -19,9 +19,9 @@ import ProfileHeader from '~/Components/SettingsComponents/ProfileHeader';
 import SettingComponent from '~/Components/SettingsComponents/SettingComponent';
 import { useMainNavigation } from '~/Navigation/Navigation';
 import { TabBarPadding } from '~/Navigation/TabNavigation/TabBar';
-import { appColors, colors } from '~/styles/colors';
-import { spacing } from '~/styles/spacing';
-import { typography } from '~/styles/typography';
+import { appColors, colors } from '~/Styles/colors';
+import { spacing } from '~/Styles/spacing';
+import { typography } from '~/Styles/typography';
 
 type ItemType = {
   title: string;

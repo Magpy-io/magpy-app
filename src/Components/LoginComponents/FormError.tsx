@@ -3,9 +3,9 @@ import { StyleSheet, View } from 'react-native';
 
 import { Icon, Text } from 'react-native-elements';
 
-import { colors } from '~/styles/colors';
-import { spacing } from '~/styles/spacing';
-import { typography } from '~/styles/typography';
+import { colors } from '~/Styles/colors';
+import { spacing } from '~/Styles/spacing';
+import { typography } from '~/Styles/typography';
 
 export default function FormError({ error }: { error: string | undefined }) {
   if (error) {

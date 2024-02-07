@@ -4,9 +4,9 @@ import { Image, StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-elements';
 
 import { useAuthContext } from '~/Context/UseContexts/useAuthContext';
-import { appColors } from '~/styles/colors';
-import { borderRadius, spacing } from '~/styles/spacing';
-import { typography } from '~/styles/typography';
+import { appColors } from '~/Styles/colors';
+import { borderRadius, spacing } from '~/Styles/spacing';
+import { typography } from '~/Styles/typography';
 
 export default function ProfileHeader() {
   const { user } = useAuthContext();

@@ -7,8 +7,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import BackButton from '~/Components/CommonComponents/BackButton';
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos';
-import { appColors } from '~/styles/colors';
-import { typography } from '~/styles/typography';
+import { appColors } from '~/Styles/colors';
+import { typography } from '~/Styles/typography';
 
 type StatusBarComponentProps = {
   photo: PhotoGalleryType;

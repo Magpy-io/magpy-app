@@ -5,8 +5,8 @@ import { Text } from 'react-native-elements';
 
 import { useServerClaimContext } from '~/Context/UseContexts/useClaimServerContext';
 import { useServerContext } from '~/Context/UseContexts/useServerContext';
-import { spacing } from '~/styles/spacing';
-import { typography } from '~/styles/typography';
+import { spacing } from '~/Styles/spacing';
+import { typography } from '~/Styles/typography';
 
 import ServerComponent from './ServerComponent';
 

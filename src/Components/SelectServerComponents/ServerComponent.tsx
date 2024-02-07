@@ -1,9 +1,9 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import { appColors, colors } from '~/styles/colors';
-import { spacing } from '~/styles/spacing';
-import { typography } from '~/styles/typography';
+import { appColors, colors } from '~/Styles/colors';
+import { spacing } from '~/Styles/spacing';
+import { typography } from '~/Styles/typography';
 
 import { ArrowIcon } from '../CommonComponents/Icons';
 

@@ -3,9 +3,9 @@ import { StyleSheet } from 'react-native';
 
 import { Button, ButtonProps } from 'react-native-elements';
 
-import { appColors, colors } from '~/styles/colors';
-import { borderRadius, spacing } from '~/styles/spacing';
-import { typography } from '~/styles/typography';
+import { appColors, colors } from '~/Styles/colors';
+import { borderRadius, spacing } from '~/Styles/spacing';
+import { typography } from '~/Styles/typography';
 
 export function PrimaryButton(props: ButtonProps) {
   return (

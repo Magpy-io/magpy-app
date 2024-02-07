@@ -8,8 +8,8 @@ import {
   TabName,
   useTabNavigationContext,
 } from '~/Navigation/TabNavigation/TabNavigationContext';
-import { appColors, colors } from '~/styles/colors';
-import { typography } from '~/styles/typography';
+import { appColors, colors } from '~/Styles/colors';
+import { typography } from '~/Styles/typography';
 
 type IconType = { name: string; type: string };
 type RouteType = {

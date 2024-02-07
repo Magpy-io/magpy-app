@@ -5,8 +5,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import CancelButton from '~/Components/CommonComponents/CancelButton';
 import SelectAllButton from '~/Components/CommonComponents/SelectAllButton';
-import { appColors } from '~/styles/colors';
-import { typography } from '~/styles/typography';
+import { appColors } from '~/Styles/colors';
+import { typography } from '~/Styles/typography';
 
 type SelectionBarProps = {
   selectedNb: number;

@@ -3,8 +3,8 @@ import { StyleSheet, View } from 'react-native';
 
 import { Text } from 'react-native-elements';
 
-import { spacing } from '~/styles/spacing';
-import { typography } from '~/styles/typography';
+import { spacing } from '~/Styles/spacing';
+import { typography } from '~/Styles/typography';
 
 import { BackIcon } from '../CommonComponents/Icons';
 

@@ -3,7 +3,7 @@ import { FlatList, StyleSheet, View } from 'react-native';
 
 import ServerComponent from '~/Components/SelectServerComponents/ServerComponent';
 import { Server } from '~/Context/ContextSlices/LocalServersContext';
-import { spacing } from '~/styles/spacing';
+import { spacing } from '~/Styles/spacing';
 
 type ServersListProps = {
   servers: Server[];

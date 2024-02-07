@@ -3,9 +3,9 @@ import { StyleSheet, View } from 'react-native';
 
 import { Icon, Text } from 'react-native-elements';
 
-import { appColors } from '~/styles/colors';
-import { spacing } from '~/styles/spacing';
-import { typography } from '~/styles/typography';
+import { appColors } from '~/Styles/colors';
+import { spacing } from '~/Styles/spacing';
+import { typography } from '~/Styles/typography';
 
 const PASSWORD_REQUIREMENTS =
   'Should have at least one uppercase, one number and one special character';

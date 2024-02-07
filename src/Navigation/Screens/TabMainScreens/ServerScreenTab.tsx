@@ -7,8 +7,8 @@ import { MoreIcon } from '~/Components/CommonComponents/Icons';
 import { PhotoGalleryHeader } from '~/Components/PhotoComponents/PhotoGalleryHeader';
 import RecentPhotos from '~/Components/ServerComponents/RecentPhotos';
 import ServerDetails from '~/Components/ServerComponents/ServerDetails';
-import { appColors } from '~/styles/colors';
-import { spacing } from '~/styles/spacing';
+import { appColors } from '~/Styles/colors';
+import { spacing } from '~/Styles/spacing';
 
 export default function ServerScreenTab() {
   console.log('render screen server');

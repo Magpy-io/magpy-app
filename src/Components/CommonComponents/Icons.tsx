@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Icon, IconProps } from 'react-native-elements';
 
-import { appColors } from '~/styles/colors';
+import { appColors } from '~/Styles/colors';
 
 export function ArrowIcon({ ...props }: Omit<IconProps, 'name'>) {
   return (

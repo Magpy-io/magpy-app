@@ -7,9 +7,9 @@ import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos';
 import { recentServerGalleryPhotos } from '~/Context/ReduxStore/Slices/Selectors';
 import { useAppSelector } from '~/Context/ReduxStore/Store';
 import { useMainNavigation } from '~/Navigation/Navigation';
-import { appColors } from '~/styles/colors';
-import { spacing } from '~/styles/spacing';
-import { typography } from '~/styles/typography';
+import { appColors } from '~/Styles/colors';
+import { spacing } from '~/Styles/spacing';
+import { typography } from '~/Styles/typography';
 
 import RecentPhotoComponent from './RecentPhotoComponent';
 

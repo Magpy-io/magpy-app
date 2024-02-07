@@ -8,9 +8,9 @@ import {
   PhotoLocalType,
   PhotoServerType,
 } from '~/Context/ReduxStore/Slices/Photos';
-import { appColors } from '~/styles/colors';
-import { spacing } from '~/styles/spacing';
-import { typography } from '~/styles/typography';
+import { appColors } from '~/Styles/colors';
+import { spacing } from '~/Styles/spacing';
+import { typography } from '~/Styles/typography';
 
 import { DayType, getIndexInSectionList, getPhotosPerDay } from './Helpers';
 import PhotoComponentForGrid from './PhotoComponentForGrid';

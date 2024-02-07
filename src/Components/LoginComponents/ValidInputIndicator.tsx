@@ -2,8 +2,8 @@ import React, { StyleSheet, View } from 'react-native';
 
 import { Icon } from 'react-native-elements';
 
-import { colors } from '~/styles/colors';
-import { spacing } from '~/styles/spacing';
+import { colors } from '~/Styles/colors';
+import { spacing } from '~/Styles/spacing';
 
 export default function ValidInputIndicator() {
   return (

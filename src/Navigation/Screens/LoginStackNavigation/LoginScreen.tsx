@@ -10,8 +10,8 @@ import KeyboardDismissingView from '~/Components/CommonComponents/KeyboardDismis
 import ScreenTitle from '~/Components/CommonComponents/ScreenTitle';
 import GoogleSignIn from '~/Components/LoginComponents/GoogleSignIn';
 import LoginForm from '~/Components/LoginComponents/LoginForm';
-import { appColors } from '~/styles/colors';
-import { spacing } from '~/styles/spacing';
+import { appColors } from '~/Styles/colors';
+import { spacing } from '~/Styles/spacing';
 
 import { LoginStackParamList } from '../../Navigators/LoginStackNavigator';
 
