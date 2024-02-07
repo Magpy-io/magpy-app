@@ -80,7 +80,7 @@ export default function SettingsScreenTab() {
           icon: <HelpIcon />,
         },
         {
-          title: 'About Propio',
+          title: 'About Magpy',
           onPress: () => {},
           icon: <InfoIcon />,
         },

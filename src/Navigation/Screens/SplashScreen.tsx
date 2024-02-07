@@ -1,10 +1,10 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { Text } from 'react-native-elements';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { colors } from '~/Styles/colors';
+import Logo from '~/Images/LogoCompleteBlackBlue.svg';
+import { appColors, colors } from '~/Styles/colors';
 import { spacing } from '~/Styles/spacing';
 
 export default function SplashScreen() {
@@ -12,7 +12,8 @@ export default function SplashScreen() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
-      <Text style={styles.textStyle}>Propio</Text>
+      {/* <Text style={styles.textStyle}>Propio</Text> */}
+      <Logo width={180} />
     </View>
   );
 }
@@ -26,7 +27,8 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: colors.DARK,
+    backgroundColor: appColors.BACKGROUND,
     justifyContent: 'center',
+    alignItems: 'center',
   },
 });
