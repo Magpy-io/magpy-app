@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { SectionList, SectionListData, View } from 'react-native';
 
 import sectionListGetItemLayout from 'react-native-section-list-get-item-layout';
@@ -53,45 +53,59 @@ const SectionListWithColumns = React.forwardRef(function SectionListWithColumns(
   const totalEmptySpace = separatorSpace * (columns - 1);
   const itemWidth = (width - totalEmptySpace) / columns;
   const itemHeight = itemWidth;
-  if (!sections) {
-    return <View />;
-  }
+  const Separator = useCallback(
+    () => <View style={{ height: separatorSpace, width: '100%' }} />,
+    [separatorSpace],
+  );
 
-  const newSections: NewSection[] = [];
-  sections.forEach(s => {
-    newSections.push({
-      title: s.title,
-      data: makeArrayWithColumns(s.data, columns),
+  const newSections = useMemo(() => {
+    const newSectionsArray: NewSection[] = [];
+    sections.forEach(s => {
+      newSectionsArray.push({
+        title: s.title,
+        data: makeArrayWithColumns(s.data, columns),
+      });
     });
-  });
+    return newSectionsArray;
+  }, [columns, sections]);
 
   // [0,1,2] for columns === 3
-  const ArrayColumns = Array(columns)
-    .fill(0)
-    .map((u, i) => i);
+  const ArrayColumns = useMemo(
+    () =>
+      Array(columns)
+        .fill(0)
+        .map((u, i) => i),
+    [columns],
+  );
 
-  const renderRow = ({ item, index }: { item: T[]; index: number }) => {
-    return (
-      <View style={{ flexDirection: 'row' }}>
-        {ArrayColumns.map(i => {
-          if (item[i]) {
-            const padding = i === 0 ? {} : { marginLeft: separatorSpace };
-            return (
-              <View
-                style={[{ width: itemWidth, height: itemHeight }, padding]}
-                key={keyExtractor(item[i], index)}>
-                {renderItem({ item: item[i] })}
-              </View>
-            );
-          }
-        })}
-      </View>
-    );
-  };
+  const renderRow = useCallback(
+    ({ item, index }: { item: T[]; index: number }) => {
+      return (
+        <View style={{ flexDirection: 'row' }}>
+          {ArrayColumns.map(i => {
+            if (item[i]) {
+              const padding = i === 0 ? {} : { marginLeft: separatorSpace };
+              return (
+                <View
+                  style={[{ width: itemWidth, height: itemHeight }, padding]}
+                  key={keyExtractor(item[i], index)}>
+                  {renderItem({ item: item[i] })}
+                </View>
+              );
+            }
+          })}
+        </View>
+      );
+    },
+    [ArrayColumns, itemHeight, itemWidth, keyExtractor, renderItem, separatorSpace],
+  );
 
-  function rowKeyExtractor(item: T[], index: number) {
-    return keyExtractor(item[0], index);
-  }
+  const rowKeyExtractor = useCallback(
+    (item: T[], index: number) => {
+      return keyExtractor(item[0], index);
+    },
+    [keyExtractor],
+  );
 
   const getItemLayout:
     | ((
@@ -102,14 +116,20 @@ const SectionListWithColumns = React.forwardRef(function SectionListWithColumns(
         offset: number;
         index: number;
       })
-    | undefined = sectionListGetItemLayout({
-    // The height of the row with rowData at the given sectionIndex and rowIndex
-    getItemHeight: () => itemHeight,
-    getSectionHeaderHeight: () => sectionHeaderHeight, // The height of your section headers
-    getSeparatorHeight: () => separatorSpace,
-  });
+    | undefined = useMemo(
+    () =>
+      sectionListGetItemLayout({
+        // The height of the row with rowData at the given sectionIndex and rowIndex
+        getItemHeight: () => itemHeight,
+        getSectionHeaderHeight: () => sectionHeaderHeight, // The height of your section headers
+        getSeparatorHeight: () => separatorSpace,
+      }),
+    [itemHeight, sectionHeaderHeight, separatorSpace],
+  );
 
-  const Separator = () => <View style={{ height: separatorSpace, width: '100%' }} />;
+  if (!sections) {
+    return <View />;
+  }
 
   return (
     <SectionList
@@ -121,6 +141,7 @@ const SectionListWithColumns = React.forwardRef(function SectionListWithColumns(
       ItemSeparatorComponent={Separator}
       refreshing={refreshing}
       onRefresh={onRefresh}
+      windowSize={11}
       ref={ref}
     />
   );
