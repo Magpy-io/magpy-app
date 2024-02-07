@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { SectionList, StyleSheet, View } from 'react-native';
 
 import { Text } from 'react-native-elements';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import {
   PhotoGalleryType,
@@ -61,7 +60,6 @@ export default function PhotoGridComponent({
 }: PhotoGridComponentProps) {
   const sectionlistRef = useRef<SectionList>(null);
   const photosLenRef = useRef<number>(photos.length);
-  const insets = useSafeAreaInsets();
 
   photosLenRef.current = photos.length;
   const renderItem = useCallback(
@@ -114,7 +112,7 @@ export default function PhotoGridComponent({
   }, [sectionlistRef, indexInSectionList, photosPerDayMemo]);
 
   return (
-    <View style={[styles.mainViewStyle, { paddingTop: insets.top }]}>
+    <View style={[styles.mainViewStyle]}>
       <SectionListWithColumns
         ref={sectionlistRef}
         sections={photosPerDayMemo}

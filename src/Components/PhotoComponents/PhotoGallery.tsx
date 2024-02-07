@@ -1,6 +1,8 @@
 import React, { useCallback, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
 import {
   PhotoGalleryType,
   PhotoLocalType,
@@ -37,10 +39,11 @@ export default function PhotoGallery(props: PhotoGalleryPropsType) {
 
   const displaySlider = isSlidingPhotos ? 'flex' : 'none';
   const displayGrid = isSlidingPhotos ? 'none' : 'flex';
+  const insets = useSafeAreaInsets();
 
   return (
     <View style={styles.viewStyle}>
-      <View style={[styles.viewStyle, { display: displayGrid }]}>
+      <View style={[styles.viewStyle, { display: displayGrid }, { paddingTop: insets.top }]}>
         <PhotoGridController
           photos={props.photos}
           localPhotos={props.localPhotos}
