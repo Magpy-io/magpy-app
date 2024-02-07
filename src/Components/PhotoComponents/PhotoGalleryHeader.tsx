@@ -40,7 +40,7 @@ export function PhotoGalleryHeader(props: PhotoGalleryHeaderProps) {
 
 const styles = StyleSheet.create({
   titleStyle: {
-    ...typography.largeTextBold,
+    ...typography.extraLargeTextBold,
   },
   elementPadding: {
     padding: spacing.spacing_m,

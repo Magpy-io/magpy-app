@@ -23,15 +23,21 @@ export const textSize = {
 export const typography: {
   screenTitle: TextStyle;
   sectionTitle: TextStyle;
+
   smallText: TextStyle;
   mediumText: TextStyle;
   largeText: TextStyle;
+  extraLargeText: TextStyle;
+
   smallTextBold: TextStyle;
   mediumTextBold: TextStyle;
   largeTextBold: TextStyle;
+  extraLargeTextBold: TextStyle;
+
   lightSmallText: TextStyle;
   lightMediumText: TextStyle;
   lightLargeText: TextStyle;
+
   formInfo: TextStyle;
   formError: TextStyle;
   tabBarLabel: TextStyle;
@@ -64,6 +70,11 @@ export const typography: {
     color: appColors.TEXT,
     fontFamily: 'Inter-Regular',
   },
+  extraLargeText: {
+    ...textSize.extraLarge,
+    color: appColors.TEXT,
+    fontFamily: 'Inter-Regular',
+  },
 
   // TEXTS in differents sizes but BOLD
   smallTextBold: {
@@ -78,6 +89,11 @@ export const typography: {
   },
   largeTextBold: {
     ...textSize.large,
+    color: appColors.TEXT,
+    fontFamily: 'Inter-Medium',
+  },
+  extraLargeTextBold: {
+    ...textSize.extraLarge,
     color: appColors.TEXT,
     fontFamily: 'Inter-Medium',
   },

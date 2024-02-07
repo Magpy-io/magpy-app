@@ -25,6 +25,8 @@ type PhotoGalleryPropsType = {
     [key: string]: PhotoServerType;
   };
   title?: string;
+  showBackButton?: boolean;
+  onPressBack?: () => void;
 };
 
 export default function PhotoGallery(props: PhotoGalleryPropsType) {
@@ -52,7 +54,12 @@ export default function PhotoGallery(props: PhotoGalleryPropsType) {
   return (
     <View style={styles.viewStyle}>
       <View style={[styles.viewStyle, { display: displayGrid }, { paddingTop: insets.top }]}>
-        <PhotoGalleryHeader title={props.title} iconRight={filterButton} />
+        <PhotoGalleryHeader
+          title={props.title}
+          iconRight={filterButton}
+          showBackButton={props.showBackButton}
+          onPressBack={props.onPressBack}
+        />
         <PhotoGridController
           photos={props.photos}
           localPhotos={props.localPhotos}

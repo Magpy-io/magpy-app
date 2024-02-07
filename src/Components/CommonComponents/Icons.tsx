@@ -28,6 +28,12 @@ export function BackIcon({ ...props }: Omit<IconProps, 'name'>) {
   );
 }
 
+export function MoreIcon({ ...props }: Omit<IconProps, 'name'>) {
+  return (
+    <Icon name="more-vertical" type="feather" color={appColors.TEXT} size={22} {...props} />
+  );
+}
+
 export function UploadIcon({ ...props }: Omit<IconProps, 'name'>) {
   return (
     <Icon

@@ -25,3 +25,10 @@ export const localGalleryPhotosSelector = createSelector(
     return photosGallery.filter(p => !p.serverId);
   },
 );
+
+export const recentServerGalleryPhotos = createSelector(
+  [selectGalleryPhotos],
+  photosGallery => {
+    return photosGallery.filter(p => p.serverId).slice(0, 10);
+  },
+);
