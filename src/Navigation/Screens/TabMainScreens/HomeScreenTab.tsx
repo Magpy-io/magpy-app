@@ -5,7 +5,7 @@ import PhotoGallery from '~/Components/PhotoComponents/PhotoGallery';
 import { useAppSelector } from '~/Context/ReduxStore/Store';
 import * as AndroidPermissions from '~/Helpers/GetPermissionsAndroid';
 
-export default function PhotoGalleryLocalScreenTab() {
+export default function HomeScreenTab() {
   //console.log('render screen local');
   const [hasPermissions, setHasPermissions] = useState<boolean>(true);
 

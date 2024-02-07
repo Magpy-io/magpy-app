@@ -5,7 +5,7 @@ import { Text } from 'react-native-elements';
 
 import PhotoGallery from '~/Components/PhotoComponents/PhotoGallery';
 
-export default function PhotoGalleryScreenTab() {
+export default function ServerScreenTab() {
   console.log('render screen server');
 
   return (
