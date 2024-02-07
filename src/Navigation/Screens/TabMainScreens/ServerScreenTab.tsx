@@ -1,17 +1,21 @@
 import React from 'react';
-import { View } from 'react-native';
-
-import { Text } from 'react-native-elements';
 
 import PhotoGallery from '~/Components/PhotoComponents/PhotoGallery';
+import { serverGalleryPhotosSelector } from '~/Context/ReduxStore/Slices/Selectors';
+import { useAppSelector } from '~/Context/ReduxStore/Store';
 
 export default function ServerScreenTab() {
   console.log('render screen server');
+  const photosGalleryServer = useAppSelector(serverGalleryPhotosSelector);
+  const photosLocal = useAppSelector(state => state.photos.photosLocal);
+  const photosServer = useAppSelector(state => state.photos.photosServer);
 
   return (
-    <View style={{ flex: 1, padding: 30 }}>
-      <Text>Server</Text>
-    </View>
+    <PhotoGallery
+      key={'ServerPhotos'}
+      photos={photosGalleryServer}
+      serverPhotos={photosServer}
+      localPhotos={photosLocal}
+    />
   );
-  return <PhotoGallery key={'gallery_server'} />;
 }

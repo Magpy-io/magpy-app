@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Text } from 'react-native';
 
 import PhotoGallery from '~/Components/PhotoComponents/PhotoGallery';
+import { selectGalleryPhotos } from '~/Context/ReduxStore/Slices/Selectors';
 import { useAppSelector } from '~/Context/ReduxStore/Store';
 import * as AndroidPermissions from '~/Helpers/GetPermissionsAndroid';
 
@@ -9,7 +10,7 @@ export default function HomeScreenTab() {
   //console.log('render screen local');
   const [hasPermissions, setHasPermissions] = useState<boolean>(true);
 
-  const photos = useAppSelector(state => state.photos.photosGallery);
+  const photos = useAppSelector(selectGalleryPhotos);
   const photosLocal = useAppSelector(state => state.photos.photosLocal);
   const photosServer = useAppSelector(state => state.photos.photosServer);
 
@@ -29,7 +30,12 @@ export default function HomeScreenTab() {
   return (
     <>
       {hasPermissions ? (
-        <PhotoGallery photos={photos} serverPhotos={photosServer} localPhotos={photosLocal} />
+        <PhotoGallery
+          key={'AllPhotos'}
+          photos={photos}
+          serverPhotos={photosServer}
+          localPhotos={photosLocal}
+        />
       ) : (
         <Text>Permissions needed</Text>
       )}
