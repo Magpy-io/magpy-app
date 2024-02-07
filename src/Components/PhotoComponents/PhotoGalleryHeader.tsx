@@ -17,24 +17,23 @@ type PhotoGalleryHeaderProps = {
 
 export function PhotoGalleryHeader(props: PhotoGalleryHeaderProps) {
   return (
-    <View
-      style={{
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-      }}>
-      {props.showBackButton ? (
-        <BackIcon
-          onPress={() => (props.onPressBack ? props.onPressBack() : () => {})}
-          iconStyle={styles.elementPadding}
-        />
-      ) : (
-        <View style={styles.elementPadding} />
-      )}
+    <View>
+      <View style={{ alignSelf: 'center', padding: spacing.spacing_m }}>
+        <Text style={styles.titleStyle}>{props.title}</Text>
+      </View>
 
-      <Text style={styles.titleStyle}>{props.title}</Text>
+      <View style={{ position: 'absolute', left: 0 }}>
+        {props.showBackButton && (
+          <BackIcon
+            onPress={() => (props.onPressBack ? props.onPressBack() : () => {})}
+            iconStyle={styles.elementPadding}
+          />
+        )}
+      </View>
 
-      {props.iconRight ? <props.iconRight /> : <View style={styles.elementPadding} />}
+      <View style={{ position: 'absolute', right: 0 }}>
+        {props.iconRight && <props.iconRight />}
+      </View>
     </View>
   );
 }
