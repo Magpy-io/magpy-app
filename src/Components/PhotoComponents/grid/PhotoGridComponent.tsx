@@ -8,7 +8,6 @@ import {
   PhotoLocalType,
   PhotoServerType,
 } from '~/Context/ReduxStore/Slices/Photos';
-import { TabBarPadding } from '~/Navigation/TabNavigation/TabBar';
 import { appColors } from '~/styles/colors';
 import { spacing } from '~/styles/spacing';
 import { typography } from '~/styles/typography';
@@ -125,7 +124,6 @@ export default function PhotoGridComponent({
         onRefresh={onRefresh}
         refreshing={false}
       />
-      <TabBarPadding />
     </View>
   );
 }
@@ -141,8 +139,7 @@ const styles = StyleSheet.create({
     ...typography.largeText,
   },
   mainViewStyle: {
-    height: '100%',
-    width: '100%',
     backgroundColor: appColors.BACKGROUND,
+    flex: 1,
   },
 });

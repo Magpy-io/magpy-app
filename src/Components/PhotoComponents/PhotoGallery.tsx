@@ -8,6 +8,7 @@ import {
   PhotoLocalType,
   PhotoServerType,
 } from '~/Context/ReduxStore/Slices/Photos';
+import { TabBarPadding } from '~/Navigation/TabNavigation/TabBar';
 import { appColors } from '~/styles/colors';
 import { spacing } from '~/styles/spacing';
 
@@ -27,6 +28,7 @@ type PhotoGalleryPropsType = {
   title?: string;
   showBackButton?: boolean;
   onPressBack?: () => void;
+  isInTabScreen?: boolean;
 };
 
 export default function PhotoGallery(props: PhotoGalleryPropsType) {
@@ -53,7 +55,12 @@ export default function PhotoGallery(props: PhotoGalleryPropsType) {
   );
   return (
     <View style={styles.viewStyle}>
-      <View style={[styles.viewStyle, { display: displayGrid }, { paddingTop: insets.top }]}>
+      <View
+        style={[
+          styles.viewStyle,
+          { display: displayGrid },
+          { paddingTop: insets.top, paddingBottom: insets.bottom },
+        ]}>
         <PhotoGalleryHeader
           title={props.title}
           iconRight={filterButton}
@@ -68,6 +75,7 @@ export default function PhotoGallery(props: PhotoGalleryPropsType) {
           currentPhotoIndex={currentPhotoIndex}
           onSwitchMode={onSwitchMode}
         />
+        {(props.isInTabScreen ?? false) && <TabBarPadding />}
       </View>
       <View style={[styles.viewStyle, { display: displaySlider }]}>
         <PhotoSlider

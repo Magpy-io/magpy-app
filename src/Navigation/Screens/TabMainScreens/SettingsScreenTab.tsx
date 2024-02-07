@@ -97,7 +97,7 @@ export default function SettingsScreenTab() {
   };
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
+    <View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
       <SectionList
         ListHeaderComponent={Header}
         sections={data}

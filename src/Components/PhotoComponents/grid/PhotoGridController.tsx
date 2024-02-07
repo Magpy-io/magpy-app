@@ -127,7 +127,7 @@ function PhotoGridController({
   }, [RefreshAllPhotos]);
 
   return (
-    <View>
+    <View style={{ flex: 1 }}>
       <PhotoGridComponent
         photos={photos}
         localPhotos={localPhotos}
