@@ -8,7 +8,7 @@ import { useServerContext } from '~/Context/UseContexts/useServerContext';
 import { spacing } from '~/styles/spacing';
 import { typography } from '~/styles/typography';
 
-import ServerComponent from '../SelectServerComponents/ServerComponent';
+import ServerComponent from './ServerComponent';
 
 export default function ServerDetails() {
   const { server } = useServerClaimContext();

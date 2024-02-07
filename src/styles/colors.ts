@@ -31,4 +31,5 @@ export const appColors = {
   ACCENT: colors.CYAN,
   FORM_BORDER: colors.LIGHT_GREEN,
   UNDERLAY: colors.LIGHT_GREY,
+  OUTLINE_BORDER: colors.SOFT_GREY,
 };
