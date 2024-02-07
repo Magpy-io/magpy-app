@@ -12,7 +12,6 @@ export default function SplashScreen() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
-      {/* <Text style={styles.textStyle}>Propio</Text> */}
       <Logo width={180} />
     </View>
   );
