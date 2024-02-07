@@ -1,11 +1,12 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
+import { Badge } from 'react-native-elements';
+
+import Logo from '~/Images/logoWhite.svg';
 import { appColors, colors } from '~/Styles/colors';
 import { borderRadius, spacing } from '~/Styles/spacing';
 import { typography } from '~/Styles/typography';
-
-import { InfoIcon } from '../CommonComponents/Icons';
 
 type ServerComponentProps = {
   name: string;
@@ -17,7 +18,13 @@ export default function ServerComponent({ name, ip, port }: ServerComponentProps
   const IpAddress = `${ip}: ${port}`;
   return (
     <View style={styles.viewStyle}>
-      <InfoIcon iconStyle={styles.iconStyle} />
+      <View style={styles.iconStyle}>
+        <Logo width={20} height={20} />
+        <Badge
+          status="success"
+          containerStyle={{ position: 'absolute', top: -2, right: -2 }}
+        />
+      </View>
       <View>
         <Text style={styles.name}>{name}</Text>
         <Text style={styles.ipAddress}>{IpAddress}</Text>
@@ -28,10 +35,10 @@ export default function ServerComponent({ name, ip, port }: ServerComponentProps
 
 const styles = StyleSheet.create({
   iconStyle: {
-    backgroundColor: appColors.ACCENT,
+    backgroundColor: appColors.PRIMARY,
     padding: spacing.spacing_xs,
     borderRadius: borderRadius.avatar,
-    color: appColors.TEXT_INVERSE,
+    alignContent: 'center',
   },
   ipAddress: {
     ...typography.lightMediumText,
@@ -47,7 +54,7 @@ const styles = StyleSheet.create({
     borderColor: appColors.OUTLINE_BORDER,
     padding: spacing.spacing_m,
     flexDirection: 'row',
-    gap: spacing.spacing_s,
-    alignItems: 'flex-start',
+    gap: spacing.spacing_m,
+    alignItems: 'center',
   },
 });
