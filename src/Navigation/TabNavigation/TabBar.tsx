@@ -119,7 +119,7 @@ export function TabBarPadding() {
 
 const TAB_BAR_HEIGHT = 80;
 const COLOR = colors.LIGHT_GREEN;
-const FOCUSED_COLOR = appColors.SECONDARY;
+const FOCUSED_COLOR = appColors.ACCENT;
 const ICON_SIZE = 22;
 
 const styles = StyleSheet.create({
