@@ -1,25 +1,26 @@
 import React from 'react';
-import { FlatList, StyleSheet, View } from 'react-native';
+import { FlatList, StyleSheet, TouchableHighlight, View } from 'react-native';
 
 import { Text } from 'react-native-elements';
 
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos';
-import { serverGalleryPhotosSelector } from '~/Context/ReduxStore/Slices/Selectors';
+import { recentServerGalleryPhotos } from '~/Context/ReduxStore/Slices/Selectors';
 import { useAppSelector } from '~/Context/ReduxStore/Store';
 import { useMainNavigation } from '~/Navigation/Navigation';
+import { appColors } from '~/styles/colors';
 import { spacing } from '~/styles/spacing';
 import { typography } from '~/styles/typography';
 
 import RecentPhotoComponent from './RecentPhotoComponent';
 
 export default function RecentPhotos() {
-  const photosGalleryServer = useAppSelector(serverGalleryPhotosSelector);
-  const renderItem = ({ item }: { item: PhotoGalleryType }) => {
-    return <RecentPhotoComponent photo={item} />;
-  };
+  const photosGalleryServer = useAppSelector(recentServerGalleryPhotos);
   const navigation = useMainNavigation();
   const onPressSeeAll = () => {
     navigation.navigate('ServerGalleryScreen');
+  };
+  const renderItem = ({ item }: { item: PhotoGalleryType }) => {
+    return <RecentPhotoComponent photo={item} />;
   };
 
   return (
@@ -31,15 +32,17 @@ export default function RecentPhotos() {
         </Text>
       </View>
 
-      <FlatList
-        data={photosGalleryServer}
-        renderItem={renderItem}
-        horizontal
-        ItemSeparatorComponent={Separator}
-        ListFooterComponent={Footer}
-        contentContainerStyle={styles.flatlistContainerStyle}
-        showsHorizontalScrollIndicator={false}
-      />
+      <TouchableHighlight onPress={onPressSeeAll} underlayColor={appColors.UNDERLAY}>
+        <FlatList
+          data={photosGalleryServer}
+          renderItem={renderItem}
+          horizontal
+          ItemSeparatorComponent={Separator}
+          ListFooterComponent={Footer}
+          contentContainerStyle={styles.flatlistContainerStyle}
+          showsHorizontalScrollIndicator={false}
+        />
+      </TouchableHighlight>
     </>
   );
 }
