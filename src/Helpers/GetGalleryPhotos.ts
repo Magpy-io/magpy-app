@@ -68,17 +68,15 @@ export async function getPhotoFromDevice(mediaId: string): Promise<PhotoLocalTyp
 export async function addPhotoToDevice<
   T extends { fileName: string; id: string; image64: string },
 >(photo: T): Promise<string> {
-  const extention = photo.fileName.split('.').pop();
-  const cachePhotoPath =
-    RNFS.ExternalCachesDirectoryPath + `/temp_full_image_${photo.id}.${extention}`;
-  await RNFS.writeFile(cachePhotoPath, photo.image64, 'base64');
   const imageName = await getFirstPossibleFileName(photo.fileName);
-  const id = await MainModule.saveToRestored(cachePhotoPath, {
-    name: imageName,
-  });
-  const idString = id.toString();
+
+  const cachePhotoPath = RNFS.ExternalCachesDirectoryPath + `/${imageName}`;
+  await RNFS.writeFile(cachePhotoPath, photo.image64, 'base64');
+
+  const imageData = await CameraRoll.saveAsset(cachePhotoPath, { album: 'Restored' });
+
   await RNFS.unlink(cachePhotoPath);
-  return idString;
+  return imageData.node.id;
 }
 
 export async function DeletePhotosFromDevice(uris: Array<string | undefined>) {

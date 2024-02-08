@@ -90,7 +90,6 @@ public class MainModule extends ReactContextBaseJavaModule{
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @ReactMethod
-    public void getPhotoExifDate(String uri, Promise mPromise) {
         try {
 
             Uri mUri = Uri.parse(uri);
@@ -110,94 +109,6 @@ public class MainModule extends ReactContextBaseJavaModule{
 
         } catch (Exception e) {
            mPromise.resolve(-1);
-        }
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.Q)
-    @ReactMethod
-    public void saveToRestored(String uri, ReadableMap mOptions, Promise mPromise) {
-        Uri mUri = Uri.parse(uri);
-        ReactContext mContext = getReactApplicationContext();
-        File source = new File(mUri.getPath());
-        FileInputStream input = null;
-        OutputStream output = null;
-
-        String mimeType = Utils.getMimeType(mUri.getPath());
-        Boolean isVideo = mimeType != null && mimeType.contains("video");
-
-        try {
-            String name = mOptions.getString("name");
-            boolean isNamePresent = !TextUtils.isEmpty(name);
-
-            ContentValues mediaDetails = new ContentValues();
-            String relativePath = getRestoredMediaRelativePath();
-            mediaDetails.put(MediaStore.MediaColumns.RELATIVE_PATH, relativePath);
-            mediaDetails.put(MediaStore.MediaColumns.MIME_TYPE, mimeType);
-
-            if(!isNamePresent){
-                name = source.getName();
-            }
-            mediaDetails.put(Images.Media.DISPLAY_NAME, name);
-
-            mediaDetails.put(Images.Media.IS_PENDING, 1);
-            ContentResolver resolver = mContext.getContentResolver();
-            Uri mediaContentUri = isVideo
-                    ? resolver.insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, mediaDetails)
-                    : resolver.insert(Images.Media.EXTERNAL_CONTENT_URI, mediaDetails);
-            output = resolver.openOutputStream(mediaContentUri);
-            input = new FileInputStream(source);
-            FileUtils.copy(input, output);
-            
-            double id = ContentUris.parseId(mediaContentUri);
-
-            long datetime_original = 0L;
-            try {
-                ExifInterface exifInterface = new ExifInterface(source.getPath());
-
-                String date_time = exifInterface.getAttribute(
-                        ExifInterface.TAG_DATETIME_ORIGINAL);
-
-                DateFormat df = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss");
-                Date date = df.parse(date_time);
-
-                if(date == null){
-                    Log.e("Tag", "Could not parse date from exif data");
-                }else{
-                    datetime_original = date.getTime();
-                }
-
-            } catch (Exception e) {
-                Log.e("Tag", e.getMessage());
-                if(source.exists()) {
-                    datetime_original = source.lastModified();
-                }
-            }
-
-            mediaDetails.clear();
-            mediaDetails.put(Images.Media.IS_PENDING, 0);
-            if(datetime_original != 0){
-                mediaDetails.put(MediaStore.MediaColumns.DATE_ADDED, datetime_original / 1000);
-            }
-            resolver.update(mediaContentUri, mediaDetails, null, null);
-
-            mPromise.resolve(id);
-        } catch (Exception e) {
-            mPromise.reject(e);
-        } finally {
-            if (input != null) {
-                try {
-                    input.close();
-                } catch (IOException e) {
-                    FLog.e(ReactConstants.TAG, "Could not close input channel", e);
-                }
-            }
-            if (output != null) {
-                try {
-                    output.close();
-                } catch (IOException e) {
-                    FLog.e(ReactConstants.TAG, "Could not close output channel", e);
-                }
-            }
         }
     }
 

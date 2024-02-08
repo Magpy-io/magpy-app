@@ -29,7 +29,6 @@ export interface MainModuleType {
     right: number;
     isFullScreen: boolean;
   }>;
-  saveToRestored: (photoPath: string, data: { name: string }) => Promise<number>;
   getPhotoExifDate: (uri: string) => Promise<number>;
 }
 
