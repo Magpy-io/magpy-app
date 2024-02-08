@@ -17,6 +17,9 @@ export async function GalleryGetPhotos(n: number, offset: number = 0) {
     include: ['fileSize', 'filename', 'imageSize', 'albums'],
   });
 
+  // Need to be sorted because CameraRoll sorts them by DATE_ADDED, but the timestamp value comes
+  // from DATE_TAKEN if available (exif date), and if not then from DATE_ADDED
+
   result.edges.sort((a, b) => {
     return b.node.timestamp - a.node.timestamp;
   });
