@@ -30,11 +30,12 @@ export function usePhotosDownloadingEffect() {
 
       try {
         isEffectRunning.current = true;
-        const photoDownloading = photosDownloading[0];
 
-        if (!photoDownloading) {
+        if (photosDownloading.length == 0) {
           return;
         }
+
+        const photoDownloading = photosDownloading[0];
 
         console.log('Downloading  photo', photoDownloading.serverId);
 

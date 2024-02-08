@@ -113,7 +113,6 @@ function TabElement({ routeName, icon, iconFocused }: TabElementProps) {
 }
 
 export function TabBarPadding() {
-  // const insets = useSafeAreaInsets();
   return <View style={{ height: TAB_BAR_HEIGHT }} />;
 }
 
