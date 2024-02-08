@@ -48,8 +48,6 @@ const renderSectionHeader = ({ section: { title } }: { section: { title: string 
 
 export default function PhotoGridComponent({
   photos,
-  localPhotos,
-  serverPhotos,
   onLongPressPhoto,
   onPressPhoto,
   currentPhotoIndex,
