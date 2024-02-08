@@ -88,6 +88,31 @@ public class MainModule extends ReactContextBaseJavaModule{
         return Environment.DIRECTORY_DCIM + File.separator + "Restored";
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    @ReactMethod
+    public void getPhotoExifDate(String uri, Promise mPromise) {
+        try {
+
+            Uri mUri = Uri.parse(uri);
+            ExifInterface exifInterface = new ExifInterface(mUri.getPath());
+
+            String date_time = exifInterface.getAttribute(
+                    ExifInterface.TAG_DATETIME_ORIGINAL);
+
+            DateFormat df = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss");
+            Date date = df.parse(date_time);
+
+            if(date == null){
+                Log.e("Tag", "Could not parse date from exif data");
+            }else{
+                mPromise.resolve((double)(date.getTime() / 1000));
+            }
+
+        } catch (Exception e) {
+           mPromise.resolve(-1);
+        }
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.Q)
     @ReactMethod
     public void saveToRestored(String uri, ReadableMap mOptions, Promise mPromise) {
@@ -151,7 +176,7 @@ public class MainModule extends ReactContextBaseJavaModule{
             mediaDetails.clear();
             mediaDetails.put(Images.Media.IS_PENDING, 0);
             if(datetime_original != 0){
-                mediaDetails.put(MediaStore.MediaColumns.DATE_ADDED, datetime_original/1000);
+                mediaDetails.put(MediaStore.MediaColumns.DATE_ADDED, datetime_original / 1000);
             }
             resolver.update(mediaContentUri, mediaDetails, null, null);
 
