@@ -29,6 +29,7 @@ export interface MainModuleType {
     right: number;
     isFullScreen: boolean;
   }>;
+  saveToRestored: (photoPath: string, data: { name: string }) => Promise<number>;
 }
 
 declare module 'react-native' {
