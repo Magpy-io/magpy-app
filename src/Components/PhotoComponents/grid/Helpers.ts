@@ -1,25 +1,5 @@
-import {
-  PhotoGalleryType,
-  PhotosLocalType,
-  PhotosServerType,
-} from '~/Context/ReduxStore/Slices/Photos';
+import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos';
 import { areDatesEqual, formatDate, withoutTime } from '~/Helpers/Date';
-
-export function getPhotoServerOrLocal(
-  localPhotos: PhotosLocalType,
-  serverPhotos: PhotosServerType,
-  photo?: PhotoGalleryType,
-) {
-  const ret = photo?.mediaId
-    ? localPhotos[photo?.mediaId]
-    : serverPhotos[photo?.serverId ?? ''];
-  if (!ret) {
-    throw new Error(
-      'getPhotoServerOrLocal: no such photo was found in localPhotos or serverPhotos',
-    );
-  }
-  return ret;
-}
 
 export function getClosestPhotoToIndex(currentPhotoIndex: number, photos: PhotoGalleryType[]) {
   const len = photos.length;
@@ -41,14 +21,11 @@ export type DayType = {
 export function getIndexInSectionList(
   currentPhotoIndex: number,
   photosPerDayMemo: DayType[],
-  localPhotos: PhotosLocalType,
-  serverPhotos: PhotosServerType,
   photos: PhotoGalleryType[],
   columns: number,
 ) {
   const currentPhoto = getClosestPhotoToIndex(currentPhotoIndex, photos);
-  const currentPhotoData = getPhotoServerOrLocal(localPhotos, serverPhotos, currentPhoto);
-  const currentPhotoDate = withoutTime(currentPhotoData.created);
+  const currentPhotoDate = withoutTime(currentPhoto.date);
   const sectionIndex = photosPerDayMemo.findIndex(e => e.day === currentPhotoDate);
 
   const itemIndex = photosPerDayMemo[sectionIndex]?.data.findIndex(

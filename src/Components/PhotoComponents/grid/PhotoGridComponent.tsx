@@ -82,17 +82,10 @@ export default function PhotoGridComponent({
 
   const indexInSectionList = useMemo(() => {
     if (photosPerDayMemo && photosPerDayMemo.length > 0) {
-      return getIndexInSectionList(
-        currentPhotoIndex,
-        photosPerDayMemo,
-        localPhotos,
-        serverPhotos,
-        photos,
-        NUM_COLUMNS,
-      );
+      return getIndexInSectionList(currentPhotoIndex, photosPerDayMemo, photos, NUM_COLUMNS);
     }
     return { sectionIndex: 0, rowIndex: 0 };
-  }, [currentPhotoIndex, localPhotos, photos, photosPerDayMemo, serverPhotos]);
+  }, [currentPhotoIndex, photos, photosPerDayMemo]);
 
   useEffect(() => {
     if (
