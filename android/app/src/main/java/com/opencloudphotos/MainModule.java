@@ -90,6 +90,7 @@ public class MainModule extends ReactContextBaseJavaModule{
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @ReactMethod
+    public void getPhotoExifDate(String uri, Promise mPromise) {
         try {
 
             Uri mUri = Uri.parse(uri);
