@@ -28,8 +28,12 @@ export type PhotoLocalType = {
   type: string;
 };
 
+// The same photo can have different dates in photosLocal and photosServer
+// See https://trello.com/c/wH97h64t/44-get-date-from-exif-data-for-local-photos
+
 export type PhotoGalleryType = {
   key: string;
+  date: string;
 } & (
   | { serverId: string; mediaId: undefined }
   | { serverId: undefined; mediaId: string }

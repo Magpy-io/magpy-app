@@ -118,8 +118,8 @@ export default function PhotoGridComponent({
   const photosPerDayMemo: DayType[] = useMemo(() => {
     if (photos && photos.length > 0) {
       const photosPerDay: DayType[] = [];
-      const firstPhoto = getPhotoServerOrLocal(localPhotos, serverPhotos, photos[0]);
-      let currentDate = withoutTime(firstPhoto?.created) ?? '';
+
+      let currentDate = withoutTime(photos[0]?.date) ?? '';
       let currentBasket: DayType = {
         title: currentDate,
         day: currentDate,
@@ -127,8 +127,7 @@ export default function PhotoGridComponent({
       };
 
       photos.forEach(photo => {
-        const photoData = getPhotoServerOrLocal(localPhotos, serverPhotos, photo);
-        const photoDate = withoutTime(photoData.created) ?? '';
+        const photoDate = withoutTime(photo.date) ?? '';
 
         if (areDatesEqual(photoDate, currentDate)) {
           currentBasket.data.push(photo);
@@ -146,7 +145,7 @@ export default function PhotoGridComponent({
     } else {
       return [];
     }
-  }, [localPhotos, photos, serverPhotos]);
+  }, [photos]);
 
   const indexInSectionList = useMemo(() => {
     if (photosPerDayMemo && photosPerDayMemo.length > 0) {
