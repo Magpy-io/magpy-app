@@ -17,6 +17,10 @@ export async function GalleryGetPhotos(n: number, offset: number = 0) {
     include: ['fileSize', 'filename', 'imageSize', 'albums'],
   });
 
+  result.edges.sort((a, b) => {
+    return b.node.timestamp - a.node.timestamp;
+  });
+
   return { edges: result.edges, endReached: !result.page_info.has_next_page };
 }
 
