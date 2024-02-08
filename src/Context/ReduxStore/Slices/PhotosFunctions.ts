@@ -45,8 +45,8 @@ export function usePhotosFunctionsStore() {
           height: edge.node.image.height,
           width: edge.node.image.width,
           group_name: edge.node.group_name,
-          created: new Date(edge.node.timestamp * 1000).toISOString(),
-          modified: new Date(edge.node.modificationTimestamp * 1000).toISOString(),
+          created: new Date(Math.floor(edge.node.timestamp) * 1000).toISOString(),
+          modified: new Date(Math.floor(edge.node.modificationTimestamp) * 1000).toISOString(),
           type: edge.node.type,
         };
       });
@@ -193,7 +193,7 @@ export function usePhotosStoreEffect() {
   const { isServerReachable } = useServerContext();
 
   useEffect(() => {
-    RefreshAllPhotos(3000, 3000)
+    RefreshAllPhotos(30, 30)
       // .then(() => {
       //   return RefreshAllPhotos(300, 300);
       // })

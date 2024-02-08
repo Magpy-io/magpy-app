@@ -29,8 +29,8 @@ export function ParseGetPhotoByIdLocal(photo: LocalPhotoById): PhotoLocalType {
     height: photo.height,
     width: photo.width,
     group_name: photo.group_name,
-    created: new Date(photo.timestamp * 1000).toISOString(),
-    modified: new Date(photo.modificationTimestamp * 1000).toISOString(),
+    created: new Date(Math.floor(photo.timestamp) * 1000).toISOString(),
+    modified: new Date(Math.floor(photo.modificationTimestamp) * 1000).toISOString(),
     type: photo.type,
   };
 }
