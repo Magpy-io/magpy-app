@@ -9,15 +9,15 @@ import { PhotoLocalType } from '~/Context/ReduxStore/Slices/Photos';
 
 const { MainModule } = NativeModules;
 
-export function GalleryGetPhotos(n: number, offset: number = 0) {
-  return CameraRoll.getPhotos({
+export async function GalleryGetPhotos(n: number, offset: number = 0) {
+  const result = await CameraRoll.getPhotos({
     first: n,
     after: String(offset),
     assetType: 'Photos',
     include: ['fileSize', 'filename', 'imageSize', 'albums'],
-  }).then(r => {
-    return { edges: r.edges, endReached: !r.page_info.has_next_page };
   });
+
+  return { edges: result.edges, endReached: !result.page_info.has_next_page };
 }
 
 export async function getFirstPossibleFileName(imageName: string) {
