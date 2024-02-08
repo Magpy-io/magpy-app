@@ -4,28 +4,7 @@ import { CameraRoll } from '@react-native-camera-roll/camera-roll';
 import { DeleteMedia } from 'react-native-delete-media';
 import RNFS from 'react-native-fs';
 
-import { ParseGetPhotoByIdLocal } from '~/Context/ReduxStore/Slices/Functions';
-import { PhotoLocalType } from '~/Context/ReduxStore/Slices/Photos';
-
 const { MainModule } = NativeModules;
-
-export async function GalleryGetPhotos(n: number, offset: number = 0) {
-  const result = await CameraRoll.getPhotos({
-    first: n,
-    after: String(offset),
-    assetType: 'Photos',
-    include: ['fileSize', 'filename', 'imageSize', 'albums'],
-  });
-
-  // Need to be sorted because CameraRoll sorts them by DATE_ADDED, but the timestamp value comes
-  // from DATE_TAKEN if available (exif date), and if not then from DATE_ADDED
-
-  result.edges.sort((a, b) => {
-    return b.node.timestamp - a.node.timestamp;
-  });
-
-  return { edges: result.edges, endReached: !result.page_info.has_next_page };
-}
 
 export async function getFirstPossibleFileName(imageName: string) {
   const path = (await MainModule.getRestoredMediaAbsolutePath()) + '/' + imageName;
@@ -57,12 +36,6 @@ export async function getFirstPossibleFileName(imageName: string) {
   }
 
   return currentPathSplit.pop() as string;
-}
-
-export async function getPhotoFromDevice(mediaId: string): Promise<PhotoLocalType> {
-  const photo = await MainModule.getPhotoById(mediaId);
-
-  return ParseGetPhotoByIdLocal(photo);
 }
 
 export async function addPhotoToDevice<

@@ -5,11 +5,11 @@ import { Promise as BluebirdPromise } from 'bluebird';
 import { useBackgroundServiceFunctions } from '~/Context/UseContexts/useBackgroundServiceContext';
 import { useServerContext } from '~/Context/UseContexts/useServerContext';
 import {
-  GalleryGetPhotos,
   addPhotoCompressedToCache,
   addPhotoThumbnailToCache,
   photoCompressedExistsInCache,
-} from '~/Helpers/GetGalleryPhotos';
+} from '~/Helpers/GalleryFunctions/Functions';
+import { GalleryGetPhotos } from '~/Helpers/GalleryFunctions/GetGalleryPhotos';
 import { GetPhotos, GetPhotosById } from '~/Helpers/ServerQueries';
 
 import { useAppDispatch } from '../Store';
@@ -34,24 +34,9 @@ export function usePhotosFunctionsStore() {
 
   const RefreshLocalPhotos = useCallback(
     async (n: number) => {
-      const photosFromDevice = await GalleryGetPhotos(n);
+      const photosFromDevice: PhotoLocalType[] = await GalleryGetPhotos(n);
 
-      const photos: PhotoLocalType[] = photosFromDevice.edges.map(edge => {
-        return {
-          id: edge.node.id,
-          uri: edge.node.image.uri,
-          fileSize: edge.node.image.fileSize ?? 0,
-          fileName: edge.node.image.filename ?? '',
-          height: edge.node.image.height,
-          width: edge.node.image.width,
-          group_name: edge.node.group_name,
-          created: new Date(Math.floor(edge.node.timestamp) * 1000).toISOString(),
-          modified: new Date(Math.floor(edge.node.modificationTimestamp) * 1000).toISOString(),
-          type: edge.node.type,
-        };
-      });
-
-      dispatch(setPhotosLocal(photos));
+      dispatch(setPhotosLocal(photosFromDevice));
     },
     [dispatch],
   );
