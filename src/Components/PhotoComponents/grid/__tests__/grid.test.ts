@@ -1,82 +1,23 @@
-import {
-  getClosestPhotoToIndex,
-  getIndexInSectionList,
-  getPhotoServerOrLocal,
-  getPhotosPerDay,
-} from '../Helpers';
-import {
-  PhotosLocalMock,
-  PhotosPerDayMock,
-  PhotosServerMock,
-  photoLocal1,
-  photoServer1,
-  photosGallery,
-} from './MockValues';
+import { getClosestPhotoToIndex, getIndexInSectionList, getPhotosPerDay } from '../Helpers';
+import { PhotosPerDayMock, photoGallery1, photoGallery10, photosGallery } from './MockValues';
 
 describe('Tests for getClosestPhotoToIndex', () => {
   it('Should return closest to index 0', () => {
     const index = 0;
     const closestPhoto = getClosestPhotoToIndex(index, photosGallery);
-    expect(closestPhoto).toStrictEqual({
-      key: 'local1',
-      mediaId: 'local1',
-      serverId: undefined,
-    });
+    expect(closestPhoto).toStrictEqual(photoGallery1);
   });
 
   it('Should return closest to index -20', () => {
     const index = -20;
     const closestPhoto = getClosestPhotoToIndex(index, photosGallery);
-    expect(closestPhoto).toStrictEqual({
-      key: 'local1',
-      mediaId: 'local1',
-      serverId: undefined,
-    });
+    expect(closestPhoto).toStrictEqual(photoGallery1);
   });
 
   it('Should return closest to index 1000', () => {
     const index = 1000;
     const closestPhoto = getClosestPhotoToIndex(index, photosGallery);
-    expect(closestPhoto).toStrictEqual({
-      key: 'server5',
-      mediaId: undefined,
-      serverId: 'server5',
-    });
-  });
-});
-
-describe('Tests for getPhotoServerOrLocal', () => {
-  it('Should return local photo', () => {
-    const photo = {
-      key: 'local1',
-      mediaId: 'local1',
-      serverId: undefined,
-    };
-    const photoData = getPhotoServerOrLocal(PhotosLocalMock, PhotosServerMock, photo);
-    expect(photoData).toBe(photoLocal1);
-  });
-
-  it('Should return server photo', () => {
-    const photo = {
-      key: 'server1',
-      mediaId: undefined,
-      serverId: 'server1',
-    };
-
-    const photoData = getPhotoServerOrLocal(PhotosLocalMock, PhotosServerMock, photo);
-    expect(photoData).toBe(photoServer1);
-  });
-
-  it('Should throw error', () => {
-    const photo = {
-      key: 'local1',
-      mediaId: 'someUnexistingMediaId',
-      serverId: undefined,
-    };
-
-    expect(() => getPhotoServerOrLocal(PhotosLocalMock, PhotosServerMock, photo)).toThrow(
-      Error,
-    );
+    expect(closestPhoto).toStrictEqual(photoGallery10);
   });
 });
 
@@ -87,8 +28,6 @@ describe('Tests for function getIndexInSectionList', () => {
     const { sectionIndex, rowIndex } = getIndexInSectionList(
       currentPhotoIndex,
       PhotosPerDayMock,
-      PhotosLocalMock,
-      PhotosServerMock,
       photosGallery,
       nbColumns,
     );
@@ -102,8 +41,6 @@ describe('Tests for function getIndexInSectionList', () => {
     const { sectionIndex, rowIndex } = getIndexInSectionList(
       currentPhotoIndex,
       PhotosPerDayMock,
-      PhotosLocalMock,
-      PhotosServerMock,
       photosGallery,
       nbColumns,
     );
@@ -117,8 +54,6 @@ describe('Tests for function getIndexInSectionList', () => {
     const { sectionIndex, rowIndex } = getIndexInSectionList(
       currentPhotoIndex,
       PhotosPerDayMock,
-      PhotosLocalMock,
-      PhotosServerMock,
       photosGallery,
       nbColumns,
     );
@@ -132,8 +67,6 @@ describe('Tests for function getIndexInSectionList', () => {
     const { sectionIndex, rowIndex } = getIndexInSectionList(
       currentPhotoIndex,
       PhotosPerDayMock,
-      PhotosLocalMock,
-      PhotosServerMock,
       photosGallery,
       nbColumns,
     );
@@ -143,7 +76,7 @@ describe('Tests for function getIndexInSectionList', () => {
 });
 
 it('Should return make me photosPerDay', () => {
-  const photosPerDay = getPhotosPerDay(photosGallery, PhotosLocalMock, PhotosServerMock);
+  const photosPerDay = getPhotosPerDay(photosGallery);
   console.log('photosPerDay', photosPerDay);
   expect(photosPerDay).toStrictEqual(PhotosPerDayMock);
 });

@@ -4,7 +4,6 @@ export const photoLocal1 = {
   fileSize: undefined,
   height: undefined,
   width: undefined,
-  modified: '2024-02-03T12:30:00.000Z',
   created: '2024-02-03T12:30:00.000Z',
   uri: 'uri1',
   group_name: [],
@@ -17,7 +16,6 @@ export const photoLocal2 = {
   fileSize: undefined,
   height: undefined,
   width: undefined,
-  modified: '2024-02-03T11:45:00.000Z',
   created: '2024-02-03T11:45:00.000Z',
   uri: 'uri2',
   group_name: [],
@@ -30,7 +28,6 @@ export const photoServer1 = {
   fileSize: undefined,
   height: undefined,
   width: undefined,
-  modified: '2024-02-03T11:00:00.000Z',
   created: '2024-02-03T11:00:00.000Z',
   uri: 'uri3',
   uriCompressed: undefined,
@@ -43,7 +40,6 @@ export const photoLocal3 = {
   fileSize: undefined,
   height: undefined,
   width: undefined,
-  modified: '2024-02-03T10:15:00.000Z',
   created: '2024-02-03T10:15:00.000Z',
   uri: 'uri4',
   group_name: [],
@@ -56,7 +52,6 @@ export const photoServer2 = {
   fileSize: undefined,
   height: undefined,
   width: undefined,
-  modified: '2024-02-03T09:30:00.000Z',
   created: '2024-02-03T09:30:00.000Z',
   uri: 'uri5',
   uriCompressed: undefined,
@@ -69,7 +64,6 @@ export const photoServer3 = {
   fileSize: undefined,
   height: undefined,
   width: undefined,
-  modified: '2024-02-02T12:00:00.000Z',
   created: '2024-02-02T12:00:00.000Z',
   uri: 'uri6',
   uriCompressed: undefined,
@@ -82,7 +76,6 @@ export const photoLocal4 = {
   fileSize: undefined,
   height: undefined,
   width: undefined,
-  modified: '2024-02-02T11:15:00.000Z',
   created: '2024-02-02T11:15:00.000Z',
   uri: 'uri7',
   group_name: [],
@@ -95,7 +88,6 @@ export const photoLocal5 = {
   fileSize: undefined,
   height: undefined,
   width: undefined,
-  modified: '2024-02-02T10:30:00.000Z',
   created: '2024-02-02T10:30:00.000Z',
   uri: 'uri8',
   group_name: [],
@@ -108,7 +100,6 @@ export const photoServer4 = {
   fileSize: undefined,
   height: undefined,
   width: undefined,
-  modified: '2024-02-02T09:45:00.000Z',
   created: '2024-02-02T09:45:00.000Z',
   uri: 'uri9',
   uriCompressed: undefined,
@@ -121,7 +112,6 @@ export const photoServer5 = {
   fileSize: undefined,
   height: undefined,
   width: undefined,
-  modified: '2024-02-02T09:00:00.000Z',
   created: '2024-02-02T09:00:00.000Z',
   uri: 'uri10',
   uriCompressed: undefined,
@@ -130,60 +120,70 @@ export const photoServer5 = {
 
 export const photoGallery1 = {
   key: 'local1',
+  date: '2024-02-03T12:30:00.000Z',
   mediaId: 'local1',
   serverId: undefined,
 };
 
 export const photoGallery2 = {
   key: 'local2',
+  date: '2024-02-03T11:45:00.000Z',
   mediaId: 'local2',
   serverId: undefined,
 };
 
 export const photoGallery3 = {
   key: 'server1',
+  date: '2024-02-03T11:00:00.000Z',
   mediaId: undefined,
   serverId: 'server1',
 };
 
 export const photoGallery4 = {
   key: 'local3',
+  date: '2024-02-03T10:15:00.000Z',
   mediaId: 'local3',
   serverId: undefined,
 };
 
 export const photoGallery5 = {
   key: 'server2',
+  date: '2024-02-03T09:30:00.000Z',
   mediaId: undefined,
   serverId: 'server2',
 };
 
 export const photoGallery6 = {
   key: 'server3',
+  date: '2024-02-02T12:00:00.000Z',
   mediaId: undefined,
   serverId: 'server3',
 };
 
 export const photoGallery7 = {
   key: 'local4',
+  date: '2024-02-02T11:15:00.000Z',
   mediaId: 'local4',
   serverId: undefined,
 };
 
 export const photoGallery8 = {
   key: 'local5',
+  date: '2024-02-02T10:30:00.000Z',
   mediaId: 'local5',
   serverId: undefined,
 };
 
 export const photoGallery9 = {
   key: 'server4',
+  date: '2024-02-02T09:45:00.000Z',
   mediaId: undefined,
   serverId: 'server4',
 };
 
 export const photoGallery10 = {
   key: 'server5',
+  date: '2024-02-02T09:00:00.000Z',
   mediaId: undefined,
   serverId: 'server5',
 };
