@@ -27,7 +27,6 @@ const TabNavigationProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   const hideTab = useCallback(() => setHidden(true), []);
   const showTab = useCallback(() => setHidden(false), []);
 
-  console.log('focusedTab', focusedTab);
   const navigateTo = useCallback(
     (tabName: TabName) => {
       setFocusedTab(tabName);
