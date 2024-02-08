@@ -25,6 +25,8 @@ export async function GalleryGetPhotos(
   });
 
   return result.edges.map(edge => {
+    const timestamp = getCorrectDate(edge.node) * 1000;
+
     return {
       id: edge.node.id,
       uri: edge.node.image.uri,
@@ -33,8 +35,7 @@ export async function GalleryGetPhotos(
       height: edge.node.image.height,
       width: edge.node.image.width,
       group_name: edge.node.group_name,
-      created: new Date(Math.floor(edge.node.timestamp) * 1000).toISOString(),
-      modified: new Date(Math.floor(edge.node.modificationTimestamp) * 1000).toISOString(),
+      created: new Date(timestamp).toISOString(),
       type: edge.node.type,
     };
   });
@@ -42,6 +43,8 @@ export async function GalleryGetPhotos(
 
 export async function getPhotoFromDevice(mediaId: string): Promise<PhotoLocalType> {
   const photo = await MainModule.getPhotoById(mediaId);
+
+  const timestamp = getCorrectDate(photo) * 1000;
 
   return {
     id: photo.id,
@@ -51,8 +54,22 @@ export async function getPhotoFromDevice(mediaId: string): Promise<PhotoLocalTyp
     height: photo.height,
     width: photo.width,
     group_name: photo.group_name,
-    created: new Date(Math.floor(photo.timestamp) * 1000).toISOString(),
-    modified: new Date(Math.floor(photo.modificationTimestamp) * 1000).toISOString(),
+    created: new Date(timestamp).toISOString(),
     type: photo.type,
   };
+}
+
+// timestamp is obtained from either DATE_TAKEN if available or DATE_ADDED if not from the MediaStore
+// modificationTimestamp is obtained from DATE_MODIFIED from the MediaStore
+//
+// We get the minimum of the two so that if we got the date from DATE_TAKEN we use it,
+// if not DATE_MODIFIED will be a better choice than DATE_ADDED
+// because in case of moving the photo from one path to another or from albums
+// the image file will be moved and a new DATE_ADDED will be set but DATE_MODIFIED
+// wont change and it will be older than DATE_ADDED
+
+function getCorrectDate<T extends { timestamp: number; modificationTimestamp: number }>(
+  photo: T,
+): number {
+  return Math.min(photo.timestamp, photo.modificationTimestamp);
 }

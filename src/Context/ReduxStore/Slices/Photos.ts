@@ -24,7 +24,6 @@ export type PhotoLocalType = {
   width: number;
   group_name: string[];
   created: string;
-  modified: string;
   type: string;
 };
 
