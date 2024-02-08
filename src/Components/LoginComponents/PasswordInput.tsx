@@ -1,16 +1,10 @@
 import React, { useRef, useState } from 'react';
-import {
-  TextInput,
-  TextInputProps,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { StyleSheet, TextInput, TextInputProps, TouchableOpacity, View } from 'react-native';
 
 import { Icon } from 'react-native-elements';
 
-import { appColors } from '~/styles/colors';
-import { borderRadius, spacing } from '~/styles/spacing';
+import { appColors } from '~/Styles/colors';
+import { borderRadius, spacing } from '~/Styles/spacing';
 
 import FormError from './FormError';
 import PasswordRequirements from './PasswordRequirements';

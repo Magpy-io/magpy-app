@@ -8,8 +8,8 @@ import {
   TabName,
   useTabNavigationContext,
 } from '~/Navigation/TabNavigation/TabNavigationContext';
-import { appColors, colors } from '~/styles/colors';
-import { typography } from '~/styles/typography';
+import { appColors, colors } from '~/Styles/colors';
+import { typography } from '~/Styles/typography';
 
 type IconType = { name: string; type: string };
 type RouteType = {
@@ -113,13 +113,13 @@ function TabElement({ routeName, icon, iconFocused }: TabElementProps) {
 }
 
 export function TabBarPadding() {
-  const insets = useSafeAreaInsets();
-  return <View style={{ height: TAB_BAR_HEIGHT + insets.bottom }} />;
+  // const insets = useSafeAreaInsets();
+  return <View style={{ height: TAB_BAR_HEIGHT }} />;
 }
 
 const TAB_BAR_HEIGHT = 80;
 const COLOR = colors.LIGHT_GREEN;
-const FOCUSED_COLOR = appColors.ACCENT;
+const FOCUSED_COLOR = appColors.SECONDARY;
 const ICON_SIZE = 22;
 
 const styles = StyleSheet.create({

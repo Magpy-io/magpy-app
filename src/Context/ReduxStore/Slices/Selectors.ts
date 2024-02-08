@@ -1,17 +1,6 @@
-import { RootState } from '../Store';
-import { PhotoGalleryType } from './Photos';
+import { createSelector } from '@reduxjs/toolkit';
 
-export function photoSelector(photo?: PhotoGalleryType) {
-  return (state: RootState) => {
-    if (photo?.mediaId) {
-      return photoLocalSelector(photo.mediaId)(state);
-    }
-    if (photo?.serverId) {
-      return photoServerSelector(photo.serverId)(state);
-    }
-    return undefined;
-  };
-}
+import { RootState } from '../Store';
 
 export function photoLocalSelector(id?: string) {
   return (state: RootState) => (id ? state.photos.photosLocal[id] : undefined);
@@ -20,3 +9,26 @@ export function photoLocalSelector(id?: string) {
 export function photoServerSelector(id?: string) {
   return (state: RootState) => (id ? state.photos.photosServer[id] : undefined);
 }
+
+export const selectGalleryPhotos = (state: RootState) => state.photos.photosGallery;
+
+export const serverGalleryPhotosSelector = createSelector(
+  [selectGalleryPhotos],
+  photosGallery => {
+    return photosGallery.filter(p => p.serverId);
+  },
+);
+
+export const localGalleryPhotosSelector = createSelector(
+  [selectGalleryPhotos],
+  photosGallery => {
+    return photosGallery.filter(p => !p.serverId);
+  },
+);
+
+export const recentServerGalleryPhotos = createSelector(
+  [selectGalleryPhotos],
+  photosGallery => {
+    return photosGallery.filter(p => p.serverId).slice(0, 10);
+  },
+);

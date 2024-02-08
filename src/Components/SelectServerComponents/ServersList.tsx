@@ -3,7 +3,7 @@ import { FlatList, StyleSheet, View } from 'react-native';
 
 import ServerComponent from '~/Components/SelectServerComponents/ServerComponent';
 import { Server } from '~/Context/ContextSlices/LocalServersContext';
-import { spacing } from '~/styles/spacing';
+import { spacing } from '~/Styles/spacing';
 
 type ServersListProps = {
   servers: Server[];
@@ -24,7 +24,7 @@ export default function ServersList({
         ip={item.ip}
         name={item.name}
         port={item.port}
-        onSelectServer={() => onSelectServer(item)}
+        onPress={() => onSelectServer(item)}
       />
     );
   };
@@ -38,10 +38,14 @@ export default function ServersList({
       refreshing={false}
       ListHeaderComponent={header}
       ItemSeparatorComponent={() => <View style={styles.separator} />}
+      contentContainerStyle={styles.FlatlistStyle}
     />
   );
 }
 const styles = StyleSheet.create({
+  FlatlistStyle: {
+    paddingHorizontal: spacing.spacing_m,
+  },
   separator: {
     height: spacing.spacing_l,
   },

@@ -3,8 +3,8 @@ import { View } from 'react-native';
 
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-import PhotoGalleryLocalScreenTab from '../Screens/TabMainScreens/PhotoGalleryLocalScreenTab';
-import PhotoGalleryServerScreenTab from '../Screens/TabMainScreens/PhotoGalleryServerScreenTab';
+import HomeScreenTab from '../Screens/TabMainScreens/HomeScreenTab';
+import ServerScreenTab from '../Screens/TabMainScreens/ServerScreenTab';
 import SettingsScreenTab from '../Screens/TabMainScreens/SettingsScreenTab';
 import TabBar from '../TabNavigation/TabBar';
 import { TabName } from '../TabNavigation/TabNavigationContext';
@@ -23,8 +23,8 @@ export function TabStackNavigator() {
         screenOptions={{
           headerShown: false,
         }}>
-        <TabStack.Screen name={TabName.Home} component={PhotoGalleryLocalScreenTab} />
-        <TabStack.Screen name={TabName.Server} component={PhotoGalleryServerScreenTab} />
+        <TabStack.Screen name={TabName.Home} component={HomeScreenTab} />
+        <TabStack.Screen name={TabName.Server} component={ServerScreenTab} />
         <TabStack.Screen name={TabName.Settings} component={SettingsScreenTab} />
       </TabStack.Navigator>
       <TabBar />

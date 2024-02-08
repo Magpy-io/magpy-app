@@ -8,13 +8,13 @@ import * as Yup from 'yup';
 
 import { PrimaryButtonExtraWide } from '~/Components/CommonComponents/Buttons';
 import ViewWithGap from '~/Components/CommonComponents/ViewWithGap';
-import { PasswordInput } from '~/Components/LoginComponents/PasswordInput';
 import LoginTextInput from '~/Components/LoginComponents/LoginTextInput';
+import { PasswordInput } from '~/Components/LoginComponents/PasswordInput';
 import { useAuthFunctions } from '~/Context/UseContexts/useAuthContext';
 import { Login } from '~/Helpers/BackendQueries';
-import { appColors } from '~/styles/colors';
-import { spacing } from '~/styles/spacing';
-import { textSize } from '~/styles/typography';
+import { appColors } from '~/Styles/colors';
+import { spacing } from '~/Styles/spacing';
+import { textSize } from '~/Styles/typography';
 
 const LoginSchema = Yup.object().shape({
   email: Yup.string()

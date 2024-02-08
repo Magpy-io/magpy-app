@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Icon, IconProps } from 'react-native-elements';
 
-import { appColors } from '~/styles/colors';
+import { appColors } from '~/Styles/colors';
 
 export function ArrowIcon({ ...props }: Omit<IconProps, 'name'>) {
   return (
@@ -19,6 +19,18 @@ export function ChevronIcon({ ...props }: Omit<IconProps, 'name'>) {
       size={16}
       {...props}
     />
+  );
+}
+
+export function BackIcon({ ...props }: Omit<IconProps, 'name'>) {
+  return (
+    <Icon name="chevron-back" type="ionicon" color={appColors.TEXT} size={22} {...props} />
+  );
+}
+
+export function MoreIcon({ ...props }: Omit<IconProps, 'name'>) {
+  return (
+    <Icon name="more-vertical" type="feather" color={appColors.TEXT} size={22} {...props} />
   );
 }
 
@@ -43,6 +55,12 @@ export function PhoneIcon({ ...props }: Omit<IconProps, 'name'>) {
       size={22}
       {...props}
     />
+  );
+}
+
+export function TuneIcon({ ...props }: Omit<IconProps, 'name'>) {
+  return (
+    <Icon name="options-outline" type="ionicon" color={appColors.TEXT} size={22} {...props} />
   );
 }
 

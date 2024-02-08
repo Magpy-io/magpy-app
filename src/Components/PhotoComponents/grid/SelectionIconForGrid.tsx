@@ -1,9 +1,9 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { Icon } from '@rneui/themed';
+import { Icon } from 'react-native-elements';
 
-import { appColors } from '~/styles/colors';
+import { appColors } from '~/Styles/colors';
 
 function SelectionIconForGrid({ isSelected }: { isSelected: boolean }) {
   return (

@@ -7,6 +7,7 @@ import {
   PhotoServerType,
 } from '~/Context/ReduxStore/Slices/Photos';
 import { usePhotosFunctionsStore } from '~/Context/ReduxStore/Slices/PhotosFunctions';
+import { TabBarPadding } from '~/Navigation/TabNavigation/TabBar';
 import { useTabNavigationContext } from '~/Navigation/TabNavigation/TabNavigationContext';
 
 import PhotoGridComponent from './PhotoGridComponent';
@@ -24,6 +25,8 @@ type PropsType = {
   currentPhotoIndex: number;
   isSlidingPhotos: boolean;
   onSwitchMode: (isPhotoSelected: boolean, index: number) => void;
+  isInTabScreen?: boolean;
+  header: () => React.JSX.Element;
 };
 
 function PhotoGridController({
@@ -33,6 +36,8 @@ function PhotoGridController({
   isSlidingPhotos,
   localPhotos,
   serverPhotos,
+  isInTabScreen,
+  header: Header,
 }: PropsType) {
   //console.log('render grid');
 
@@ -127,7 +132,8 @@ function PhotoGridController({
   }, [RefreshAllPhotos]);
 
   return (
-    <View>
+    <View style={{ flex: 1 }}>
+      <Header />
       <PhotoGridComponent
         photos={photos}
         localPhotos={localPhotos}
@@ -149,6 +155,7 @@ function PhotoGridController({
       )}
 
       {isSelecting && <ToolBarPhotos selectedKeys={selectedKeys} />}
+      {(isInTabScreen ?? false) && !isSelecting && <TabBarPadding />}
     </View>
   );
 }

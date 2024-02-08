@@ -1,28 +1,24 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import { appColors } from '~/styles/colors';
-import { spacing } from '~/styles/spacing';
-import { textSize } from '~/styles/typography';
+import { appColors, colors } from '~/Styles/colors';
+import { spacing } from '~/Styles/spacing';
+import { typography } from '~/Styles/typography';
 
 import { ArrowIcon } from '../CommonComponents/Icons';
 
 type ServerComponentProps = {
-  onSelectServer: () => void;
   name: string;
   ip: string;
   port: string;
+  onPress?: () => void;
 };
 
-export default function ServerComponent({
-  onSelectServer,
-  name,
-  ip,
-  port,
-}: ServerComponentProps) {
+export default function ServerComponent({ name, ip, port, onPress }: ServerComponentProps) {
   const IpAddress = `${ip}: ${port}`;
+
   return (
-    <TouchableOpacity onPress={() => onSelectServer()} style={styles.viewStyle}>
+    <TouchableOpacity onPress={onPress} style={styles.pressViewStyle}>
       <View>
         <Text style={styles.name}>{name}</Text>
         <Text style={styles.ipAddress}>{IpAddress}</Text>
@@ -34,17 +30,17 @@ export default function ServerComponent({
 
 const styles = StyleSheet.create({
   ipAddress: {
-    ...textSize.medium,
-    color: appColors.TEXT_LIGHT,
+    ...typography.lightMediumText,
   },
   name: {
-    ...textSize.large,
-    color: appColors.TEXT,
+    ...typography.mediumTextBold,
+    paddingBottom: 4,
   },
-  viewStyle: {
-    marginHorizontal: spacing.spacing_l,
+  pressViewStyle: {
     borderRadius: spacing.spacing_s,
-    backgroundColor: appColors.BACKGROUND_LIGHT,
+    borderWidth: 1,
+    borderColor: appColors.OUTLINE_BORDER,
+    backgroundColor: colors.TRANSPARENT,
     padding: spacing.spacing_m,
     flexDirection: 'row',
     justifyContent: 'space-between',

@@ -4,9 +4,9 @@ import { StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-elements';
 
 import { UploadIcon } from '~/Components/CommonComponents/Icons';
-import { appColors } from '~/styles/colors';
-import { borderRadius, spacing } from '~/styles/spacing';
-import { typography } from '~/styles/typography';
+import { appColors } from '~/Styles/colors';
+import { borderRadius, spacing } from '~/Styles/spacing';
+import { typography } from '~/Styles/typography';
 
 import { OutlineButtonSmall, PrimaryButtonSmall } from '../CommonComponents/Buttons';
 

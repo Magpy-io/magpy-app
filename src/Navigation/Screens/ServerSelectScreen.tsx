@@ -10,9 +10,9 @@ import {
   useLocalServersContext,
   useLocalServersFunctions,
 } from '~/Context/UseContexts/useLocalServersContext';
-import { appColors } from '~/styles/colors';
-import { spacing } from '~/styles/spacing';
-import { typography } from '~/styles/typography';
+import { appColors } from '~/Styles/colors';
+import { spacing } from '~/Styles/spacing';
+import { typography } from '~/Styles/typography';
 
 export default function ServerSelectScreen() {
   const { localServers, isScanning } = useLocalServersContext();

@@ -24,6 +24,7 @@ export type ServerNetworkType = {
   ipLocal: string | null;
   ipPublic: string | null;
   port: string | null;
+  currentIp: string | null;
 };
 
 export function useServerData(): ServerDataType {
@@ -33,6 +34,7 @@ export function useServerData(): ServerDataType {
     ipLocal: null,
     ipPublic: null,
     port: null,
+    currentIp: null,
   });
   return {
     isServerReachable,
@@ -62,6 +64,7 @@ export function useServerEffect() {
           ipLocal: server.ipLocal ?? s.ipLocal,
           ipPublic: server.ipPublic ?? s.ipPublic,
           port: server.port,
+          currentIp: server.ipLocal ?? server.ipPublic ?? '',
         };
       });
       setIsServerReachable(true);

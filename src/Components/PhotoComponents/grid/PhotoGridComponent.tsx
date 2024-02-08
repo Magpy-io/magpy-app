@@ -2,17 +2,15 @@ import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { SectionList, StyleSheet, View } from 'react-native';
 
 import { Text } from 'react-native-elements';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import {
   PhotoGalleryType,
   PhotoLocalType,
   PhotoServerType,
 } from '~/Context/ReduxStore/Slices/Photos';
-import { TabBarPadding } from '~/Navigation/TabNavigation/TabBar';
-import { appColors } from '~/styles/colors';
-import { spacing } from '~/styles/spacing';
-import { typography } from '~/styles/typography';
+import { appColors } from '~/Styles/colors';
+import { spacing } from '~/Styles/spacing';
+import { typography } from '~/Styles/typography';
 
 import { DayType, getIndexInSectionList, getPhotosPerDay } from './Helpers';
 import PhotoComponentForGrid from './PhotoComponentForGrid';
@@ -61,7 +59,6 @@ export default function PhotoGridComponent({
 }: PhotoGridComponentProps) {
   const sectionlistRef = useRef<SectionList>(null);
   const photosLenRef = useRef<number>(photos.length);
-  const insets = useSafeAreaInsets();
 
   photosLenRef.current = photos.length;
   const renderItem = useCallback(
@@ -114,7 +111,7 @@ export default function PhotoGridComponent({
   }, [sectionlistRef, indexInSectionList, photosPerDayMemo]);
 
   return (
-    <View style={[styles.mainViewStyle, { paddingTop: insets.top }]}>
+    <View style={[styles.mainViewStyle]}>
       <SectionListWithColumns
         ref={sectionlistRef}
         sections={photosPerDayMemo}
@@ -127,7 +124,6 @@ export default function PhotoGridComponent({
         onRefresh={onRefresh}
         refreshing={false}
       />
-      <TabBarPadding />
     </View>
   );
 }
@@ -143,8 +139,7 @@ const styles = StyleSheet.create({
     ...typography.largeText,
   },
   mainViewStyle: {
-    height: '100%',
-    width: '100%',
     backgroundColor: appColors.BACKGROUND,
+    flex: 1,
   },
 });

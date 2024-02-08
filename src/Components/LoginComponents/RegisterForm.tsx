@@ -7,12 +7,12 @@ import * as Yup from 'yup';
 
 import { PrimaryButtonExtraWide } from '~/Components/CommonComponents/Buttons';
 import ViewWithGap from '~/Components/CommonComponents/ViewWithGap';
-import { PasswordInput } from '~/Components/LoginComponents/PasswordInput';
 import LoginTextInput from '~/Components/LoginComponents/LoginTextInput';
+import { PasswordInput } from '~/Components/LoginComponents/PasswordInput';
 import { useAuthFunctions } from '~/Context/UseContexts/useAuthContext';
 import { Login, Register } from '~/Helpers/BackendQueries';
 import { ErrorBackendUnreachable } from '~/Helpers/BackendQueries/ExceptionsManager';
-import { spacing } from '~/styles/spacing';
+import { spacing } from '~/Styles/spacing';
 
 const specialChars = /(?=.*[!@#$%^&*()_\-+={}[\]\\|:;'<>,.?/])/;
 

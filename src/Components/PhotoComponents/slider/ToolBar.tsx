@@ -1,9 +1,7 @@
 import React from 'react';
 import { StyleSheet, View, ViewStyle } from 'react-native';
 
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
-import { appColors } from '~/styles/colors';
+import { appColors } from '~/Styles/colors';
 
 import ToolComponent from '../common/ToolComponent';
 
@@ -20,9 +18,8 @@ type ToolBarProps = {
 };
 
 function ToolBar(props: ToolBarProps) {
-  const insets = useSafeAreaInsets();
   return (
-    <View style={[styles.toolBarView, props.style, { paddingBottom: insets.bottom }]}>
+    <View style={[styles.toolBarView, props.style]}>
       <View style={styles.toolsView}>
         {props.inDevice ? (
           <ToolComponent

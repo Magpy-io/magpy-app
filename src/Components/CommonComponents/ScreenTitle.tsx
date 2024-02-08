@@ -3,9 +3,9 @@ import { StyleSheet } from 'react-native';
 
 import { Text } from 'react-native-elements';
 
-import { appColors } from '~/styles/colors';
-import { spacing } from '~/styles/spacing';
-import { typography } from '~/styles/typography';
+import { appColors } from '~/Styles/colors';
+import { spacing } from '~/Styles/spacing';
+import { typography } from '~/Styles/typography';
 
 export default function ScreenTitle({ title }: { title: string }) {
   return <Text style={styles.screenTitleStyle}>{title}</Text>;
