@@ -3121,6 +3121,7 @@ __metadata:
     eslint-plugin-react-hooks: "npm:^4.6.0"
     eslint-plugin-unused-imports: "npm:^3.0.0"
     formik: "npm:^2.4.5"
+    immer: "npm:^10.0.3"
     jest: "npm:^29.7.0"
     prettier: "npm:^3.2.4"
     react: "npm:18.2.0"

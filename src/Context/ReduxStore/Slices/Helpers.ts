@@ -1,55 +1,87 @@
 import { PhotoGalleryType, PhotosState } from './Photos';
 
-export function mergePhotos(photosState: PhotosState): PhotoGalleryType[] {
-  let localIndex = 0;
-  let serverIndex = 0;
+// The same photo can have different dates in photosLocal and photosServer
+// See https://trello.com/c/wH97h64t/44-get-date-from-exif-data-for-local-photos
 
+export function mergePhotos(photosState: PhotosState): PhotoGalleryType[] {
   const { photosLocal, photosLocalIdsOrdered, photosServer, photosServerIdsOrdered } =
     photosState;
 
-  const galleryPhotos: PhotoGalleryType[] = [];
+  const photosServerGallery: PhotoGalleryType[] = [];
+  const photosLocalGallery: PhotoGalleryType[] = [];
 
-  while (
-    localIndex < photosLocalIdsOrdered.length ||
-    serverIndex < photosServerIdsOrdered.length
-  ) {
-    const photoLocal = photosLocal[photosLocalIdsOrdered[localIndex]];
-    const photoServer = photosServer[photosServerIdsOrdered[serverIndex]];
+  for (const photoServerId of photosServerIdsOrdered) {
+    const photoServer = photosServer[photoServerId];
 
-    const diff = compareDates(photoLocal?.created, photoServer?.created);
-
-    if (
-      diff == 0 &&
-      photoLocal.fileSize == photoServer.fileSize &&
-      photoLocal.uri == photoServer.uri
-    ) {
-      galleryPhotos.push({
-        key: photoServer.id,
-        serverId: photoServer.id,
-        mediaId: photoLocal.id,
+    if (!photoServer.uri) {
+      photosServerGallery.push({
+        key: photoServerId,
+        date: photoServer.created,
+        serverId: photoServerId,
+        mediaId: undefined,
       });
-      localIndex += 1;
-      serverIndex += 1;
       continue;
     }
 
-    if (diff >= 0) {
-      galleryPhotos.push({
-        key: photoLocal.id,
-        serverId: undefined,
-        mediaId: photoLocal.id,
-      });
-      localIndex += 1;
-    } else {
-      galleryPhotos.push({
-        key: photoServer.id,
-        serverId: photoServer.id,
+    const photoLocalAssociatedId = photosLocalIdsOrdered.find(mediaId => {
+      const photoLocal = photosLocal[mediaId];
+      if (photoLocal.uri == photoServer.uri) {
+        return true;
+      }
+      return false;
+    });
+
+    if (!photoLocalAssociatedId) {
+      photosServerGallery.push({
+        key: photoServerId,
+        date: photoServer.created,
+        serverId: photoServerId,
         mediaId: undefined,
       });
-      serverIndex += 1;
+    } else {
+      photosServerGallery.push({
+        key: photoServerId,
+        date: photoServer.created,
+        serverId: photoServerId,
+        mediaId: photoLocalAssociatedId,
+      });
     }
   }
 
+  for (const photoLocalId of photosLocalIdsOrdered) {
+    const mergedWithServerPhoto = photosServerGallery.find(
+      photoServerGallery => photoServerGallery.mediaId == photoLocalId,
+    );
+
+    if (!mergedWithServerPhoto) {
+      photosLocalGallery.push({
+        key: photoLocalId,
+        date: photosLocal[photoLocalId].created,
+        serverId: undefined,
+        mediaId: photoLocalId,
+      });
+    }
+  }
+
+  const galleryPhotos: PhotoGalleryType[] = [];
+
+  let localIndex = 0;
+  let serverIndex = 0;
+
+  while (localIndex < photosLocalGallery.length || serverIndex < photosServerGallery.length) {
+    const diff = compareDates(
+      photosLocalGallery[localIndex]?.date,
+      photosServerGallery[serverIndex]?.date,
+    );
+
+    if (diff >= 0) {
+      galleryPhotos.push(photosLocalGallery[localIndex]);
+      localIndex += 1;
+    } else {
+      galleryPhotos.push(photosServerGallery[serverIndex]);
+      serverIndex += 1;
+    }
+  }
   return galleryPhotos;
 }
 

@@ -61,15 +61,10 @@ export function getIndexInSectionList(
   };
 }
 
-export function getPhotosPerDay(
-  photos: PhotoGalleryType[],
-  localPhotos: PhotosLocalType,
-  serverPhotos: PhotosServerType,
-) {
+export function getPhotosPerDay(photos: PhotoGalleryType[]) {
   if (photos && photos.length > 0) {
     const photosPerDay: DayType[] = [];
-    const firstPhoto = getPhotoServerOrLocal(localPhotos, serverPhotos, photos[0]);
-    let currentDate = withoutTime(firstPhoto?.created) ?? '';
+    let currentDate = withoutTime(photos[0].date) ?? '';
     let currentBasket: DayType = {
       title: formatDate(currentDate),
       day: currentDate,
@@ -77,8 +72,7 @@ export function getPhotosPerDay(
     };
 
     photos.forEach(photo => {
-      const photoData = getPhotoServerOrLocal(localPhotos, serverPhotos, photo);
-      const photoDate = withoutTime(photoData.created) ?? '';
+      const photoDate = withoutTime(photo.date) ?? '';
 
       if (areDatesEqual(photoDate, currentDate)) {
         currentBasket.data.push(photo);

@@ -144,3 +144,13 @@ package-lock.json
 # Temporary files created by Metro to check the health of the file watcher
 .metro-health-check*
 android/.idea/
+
+
+# Yarn
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions

@@ -7,8 +7,9 @@ async function getPhotoWithProgress(id: string, f?: (progess: number, total: num
   if (!response.ok) {
     return response;
   }
-
   const totalNbParts = response.data.totalNbOfParts;
+
+  f?.(0, totalNbParts);
 
   const image64Parts = [response.data.photo.image64];
 

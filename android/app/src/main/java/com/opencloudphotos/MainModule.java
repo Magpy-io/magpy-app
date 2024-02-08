@@ -21,8 +21,10 @@ import com.reactnativecommunity.cameraroll.Utils;
 
 import android.app.ActivityManager;
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.media.ExifInterface;
 import android.os.Build;
 import android.os.Bundle;
@@ -86,88 +88,139 @@ public class MainModule extends ReactContextBaseJavaModule{
         return Environment.DIRECTORY_DCIM + File.separator + "Restored";
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.Q)
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @ReactMethod
-    public void saveToRestored(String uri, ReadableMap mOptions, Promise mPromise) {
-        Uri mUri = Uri.parse(uri);
-        ReactContext mContext = getReactApplicationContext();
-        File source = new File(mUri.getPath());
-        FileInputStream input = null;
-        OutputStream output = null;
-
-        String mimeType = Utils.getMimeType(mUri.getPath());
-        Boolean isVideo = mimeType != null && mimeType.contains("video");
-
+    public void getPhotoExifDate(String uri, Promise mPromise) {
         try {
-            String name = mOptions.getString("name");
-            boolean isNamePresent = !TextUtils.isEmpty(name);
 
-            ContentValues mediaDetails = new ContentValues();
-            String relativePath = getRestoredMediaRelativePath();
-            mediaDetails.put(MediaStore.MediaColumns.RELATIVE_PATH, relativePath);
-            mediaDetails.put(MediaStore.MediaColumns.MIME_TYPE, mimeType);
+            Uri mUri = Uri.parse(uri);
+            ExifInterface exifInterface = new ExifInterface(mUri.getPath());
 
-            if(!isNamePresent){
-                name = source.getName();
-            }
-            mediaDetails.put(Images.Media.DISPLAY_NAME, name);
+            String date_time = exifInterface.getAttribute(
+                    ExifInterface.TAG_DATETIME_ORIGINAL);
 
-            mediaDetails.put(Images.Media.IS_PENDING, 1);
-            ContentResolver resolver = mContext.getContentResolver();
-            Uri mediaContentUri = isVideo
-                    ? resolver.insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, mediaDetails)
-                    : resolver.insert(Images.Media.EXTERNAL_CONTENT_URI, mediaDetails);
-            output = resolver.openOutputStream(mediaContentUri);
-            input = new FileInputStream(source);
-            FileUtils.copy(input, output);
+            DateFormat df = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss");
+            Date date = df.parse(date_time);
 
-            long datetime_original = 0L;
-            try {
-                ExifInterface exifInterface = new ExifInterface(source.getPath());
-
-                String date_time = exifInterface.getAttribute(
-                        ExifInterface.TAG_DATETIME_ORIGINAL);
-
-                DateFormat df = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss");
-                Date date = df.parse(date_time);
-
-                if(date == null){
-                    Log.e("Tag", "Could not parse date from exif data");
-                }else{
-                    datetime_original = date.getTime();
-                }
-
-            } catch (Exception e) {
-                Log.e("Tag", e.getMessage());
-                if(source.exists()) {
-                    datetime_original = source.lastModified();
-                }
+            if(date == null){
+                Log.e("Tag", "Could not parse date from exif data");
+            }else{
+                mPromise.resolve((double)(date.getTime() / 1000));
             }
 
-            mediaDetails.clear();
-            mediaDetails.put(Images.Media.IS_PENDING, 0);
-            if(datetime_original != 0){
-                mediaDetails.put(MediaStore.MediaColumns.DATE_ADDED, datetime_original/1000);
-            }
-            resolver.update(mediaContentUri, mediaDetails, null, null);
-            mPromise.resolve(getRestoredMediaAbsolutePathPrivate() + File.separator + name);
         } catch (Exception e) {
-            mPromise.reject(e);
-        } finally {
-            if (input != null) {
-                try {
-                    input.close();
-                } catch (IOException e) {
-                    FLog.e(ReactConstants.TAG, "Could not close input channel", e);
+           mPromise.resolve(-1);
+        }
+    }
+
+    private static final String[] PROJECTION = {
+            Images.Media._ID,
+            Images.Media.MIME_TYPE,
+            Images.Media.BUCKET_DISPLAY_NAME,
+            Images.Media.DATE_TAKEN,
+            MediaStore.MediaColumns.DATE_ADDED,
+            MediaStore.MediaColumns.DATE_MODIFIED,
+            MediaStore.MediaColumns.WIDTH,
+            MediaStore.MediaColumns.HEIGHT,
+            MediaStore.MediaColumns.SIZE,
+            MediaStore.MediaColumns.DATA,
+            MediaStore.MediaColumns.ORIENTATION,
+    };
+
+    @ReactMethod
+    public void getPhotoById(String id, Promise mPromise) {
+        Uri external_images_uri = MediaStore.Files.getContentUri("external");
+        Uri imageUri = Uri.withAppendedPath(external_images_uri, id);
+        ContentResolver cr = getReactApplicationContext().getContentResolver();
+
+        Cursor cursor = cr.query(
+                imageUri,
+                PROJECTION,
+                null,
+                null,
+                null);
+
+        if(cursor != null){
+            try
+            {
+                if (cursor.moveToFirst()) {
+                    WritableMap node = new WritableNativeMap();
+
+                    int idIndex = cursor.getColumnIndex(Images.Media._ID);
+                    int mimeTypeIndex = cursor.getColumnIndex(Images.Media.MIME_TYPE);
+                    int groupNameIndex = cursor.getColumnIndex(Images.Media.BUCKET_DISPLAY_NAME);
+                    int dateTakenIndex = cursor.getColumnIndex(Images.Media.DATE_TAKEN);
+                    int dateAddedIndex = cursor.getColumnIndex(MediaStore.MediaColumns.DATE_ADDED);
+                    int dateModifiedIndex = cursor.getColumnIndex(MediaStore.MediaColumns.DATE_MODIFIED);
+                    int widthIndex = cursor.getColumnIndex(MediaStore.MediaColumns.WIDTH);
+                    int heightIndex = cursor.getColumnIndex(MediaStore.MediaColumns.HEIGHT);
+                    int sizeIndex = cursor.getColumnIndex(MediaStore.MediaColumns.SIZE);
+                    int dataIndex = cursor.getColumnIndex(MediaStore.MediaColumns.DATA);
+                    int orientationIndex = cursor.getColumnIndex(MediaStore.MediaColumns.ORIENTATION);
+
+
+                    long idNumber = cursor.getLong(idIndex);
+                    String mimeType = cursor.getString(mimeTypeIndex);
+                    boolean isVideo = mimeType != null && mimeType.startsWith("video");
+
+
+                    node.putString("id", Long.toString(idNumber));
+                    node.putString("type", mimeType);
+                    WritableArray group_name = Arguments.createArray();
+                    group_name.pushString(cursor.getString(groupNameIndex));
+                    node.putArray("group_name", group_name);
+                    long dateTaken = cursor.getLong(dateTakenIndex);
+                    if (dateTaken == 0L) {
+                        //date added is in seconds, date taken in milliseconds, thus the multiplication
+                        dateTaken = cursor.getLong(dateAddedIndex) * 1000;
+                    }
+                    node.putDouble("timestamp", dateTaken / 1000d);
+                    node.putDouble("modificationTimestamp", cursor.getLong(dateModifiedIndex));
+
+                    Uri photoUri = Uri.parse("file://" + cursor.getString(dataIndex));
+                    node.putString("uri", photoUri.toString());
+
+                    File file = new File(cursor.getString(dataIndex));
+                    String strFileName = file.getName();
+                    node.putString("filename", strFileName);
+
+                    node.putDouble("fileSize", cursor.getLong(sizeIndex));
+
+                    int width = cursor.getInt(widthIndex);
+                    int height = cursor.getInt(heightIndex);
+
+                    if(!cursor.isNull(orientationIndex)) {
+                        int orientation = cursor.getInt(orientationIndex);
+                        if (orientation >= 0 && orientation % 180 != 0) {
+                            int temp = width;
+                            width = height;
+                            height = temp;
+                        }
+                    }
+
+                    node.putDouble("width", width);
+                    node.putDouble("height", height);
+
+                    if(width <= 0 || height <= 0){
+                        Log.d("Tag", "no width or height");
+                        throw new Exception("Media height or width not found.");
+                    }
+
+                    mPromise.resolve(node);
+                }else{
+                    Log.d("Tag", "Media id not found");
+                    mPromise.reject("GetPhotoByIdError", "Media id not found");
                 }
             }
-            if (output != null) {
-                try {
-                    output.close();
-                } catch (IOException e) {
-                    FLog.e(ReactConstants.TAG, "Could not close output channel", e);
-                }
+            catch(Exception e){
+                Log.d("Tag", e.toString());
+                mPromise.reject("GetPhotoByIdError", e);
             }
+            finally {
+                cursor.close();
+            }
+        }else{
+            mPromise.reject("GetPhotoByIdError", "Could not get cursor from ContentProvider query.");
         }
     }
 

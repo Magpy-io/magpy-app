@@ -77,8 +77,8 @@ export default function PhotoGridComponent({
   );
 
   const photosPerDayMemo: DayType[] = useMemo(() => {
-    return getPhotosPerDay(photos, localPhotos, serverPhotos);
-  }, [localPhotos, photos, serverPhotos]);
+    return getPhotosPerDay(photos);
+  }, [photos]);
 
   const indexInSectionList = useMemo(() => {
     if (photosPerDayMemo && photosPerDayMemo.length > 0) {

@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 
+import { usePhotosDownloadingFunctions } from '~/Context/ContextSlices/PhotosDownloadingContext/usePhotosDownloadingContext';
 import { PhotoGalleryType, PhotoLocalType } from '~/Context/ReduxStore/Slices/Photos';
 import { usePhotosFunctionsStore } from '~/Context/ReduxStore/Slices/PhotosFunctions';
 import { useAppSelector } from '~/Context/ReduxStore/Store';
@@ -16,9 +17,12 @@ type ToolBarProps = {
 
 function ToolBarPhotos(props: ToolBarProps) {
   const localPhotos = useAppSelector(state => state.photos.photosLocal);
+  const serverPhotos = useAppSelector(state => state.photos.photosServer);
   const galleryPhotos = useAppSelector(state => state.photos.photosGallery);
 
   const { UploadPhotos } = usePhotosFunctionsStore();
+
+  const { DownloadPhotos } = usePhotosDownloadingFunctions();
 
   const seletedGalleryPhotos: PhotoGalleryType[] = [];
 
@@ -40,6 +44,18 @@ function ToolBarPhotos(props: ToolBarProps) {
     }
   }
 
+  const selectedServerPhotosIds: string[] = [];
+
+  for (const photo of seletedGalleryPhotos) {
+    if (photo.mediaId) {
+      continue;
+    }
+    const serverPhoto = photo.serverId ? serverPhotos[photo.serverId] : undefined;
+    if (serverPhoto) {
+      selectedServerPhotosIds.push(serverPhoto.id);
+    }
+  }
+
   return (
     <View style={[styles.toolBarView]}>
       <View style={styles.toolsView}>
@@ -56,7 +72,7 @@ function ToolBarPhotos(props: ToolBarProps) {
           icon="file-download"
           type="material"
           text="Download"
-          onPress={() => props.onAddServer?.()}
+          onPress={() => DownloadPhotos(selectedServerPhotosIds)}
         />
 
         <ToolComponent
