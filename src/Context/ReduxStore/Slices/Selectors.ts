@@ -32,3 +32,11 @@ export const recentServerGalleryPhotos = createSelector(
     return photosGallery.filter(p => p.serverId).slice(0, 10);
   },
 );
+
+export function photosServerSelector(state: RootState) {
+  return state.photos.photosServer;
+}
+
+export function photosLocalSelector(state: RootState) {
+  return state.photos.photosLocal;
+}

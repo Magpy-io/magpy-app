@@ -5,7 +5,11 @@ import {
   addPhotoFromServerToLocal,
   addUriPhotoById,
 } from '~/Context/ReduxStore/Slices/Photos';
-import { useAppDispatch } from '~/Context/ReduxStore/Store';
+import {
+  photosLocalSelector,
+  photosServerSelector,
+} from '~/Context/ReduxStore/Slices/Selectors';
+import { useAppDispatch, useAppSelector } from '~/Context/ReduxStore/Store';
 import { addPhotoToDevice } from '~/Helpers/GalleryFunctions/Functions';
 import { getPhotoFromDevice } from '~/Helpers/GalleryFunctions/GetGalleryPhotos';
 import * as Queries from '~/Helpers/Queries';
@@ -23,6 +27,8 @@ export function usePhotosDownloadingEffect() {
   const { photosDownloading } = photosDownloadingContext;
 
   const AppDisptach = useAppDispatch();
+  const photosServer = useAppSelector(photosServerSelector);
+  const photosLocal = useAppSelector(photosLocalSelector);
 
   const isEffectRunning = useRef(false);
 
@@ -40,6 +46,15 @@ export function usePhotosDownloadingEffect() {
         }
 
         const photoDownloading = photosDownloading[0];
+
+        const serverPhotoUri = photosServer[photoDownloading.serverId].uri;
+
+        const photoFoundInLocal = Object.values(photosLocal).find(
+          photoLocal => photoLocal.uri == serverPhotoUri,
+        );
+        if (photoFoundInLocal) {
+          return;
+        }
 
         console.log('Downloading  photo', photoDownloading.serverId);
 
@@ -98,5 +113,5 @@ export function usePhotosDownloadingEffect() {
     }
 
     innerAsync().catch(console.log);
-  }, [photosDownloadingDispatch, AppDisptach, photosDownloading]);
+  }, [photosDownloadingDispatch, AppDisptach, photosDownloading, photosServer, photosLocal]);
 }
