@@ -87,8 +87,7 @@ type TabElementProps = {
 function TabElement({ routeName, icon, iconFocused }: TabElementProps) {
   const { navigateTo, focusedTab } = useTabNavigationContext();
   const focused = useMemo(() => focusedTab === routeName, [focusedTab, routeName]);
-  console.log('focusedTab', focusedTab);
-  console.log('route', routeName, focused);
+
   const onPress = () => {
     if (!focused) {
       navigateTo(routeName);
