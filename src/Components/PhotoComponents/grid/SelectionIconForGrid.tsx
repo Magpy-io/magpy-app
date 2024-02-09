@@ -9,14 +9,25 @@ function SelectionIconForGrid({ isSelected }: { isSelected: boolean }) {
   return (
     <View style={styles.iconViewStyle}>
       {isSelected ? (
-        <Icon style={styles.iconStyle} name="check-circle" size={35} color={SELECT_COLOR} />
+        <Icon
+          style={styles.iconStyle}
+          name="check-circle"
+          size={SELECT_SIZE}
+          color={SELECT_COLOR}
+        />
       ) : (
-        <Icon style={styles.iconStyle} name="radio-button-unchecked" size={35} color="white" />
+        <Icon
+          style={styles.iconStyle}
+          name="radio-button-unchecked"
+          size={SELECT_SIZE}
+          color={SELECT_COLOR}
+        />
       )}
     </View>
   );
 }
 
+const SELECT_SIZE = 28;
 const SELECT_COLOR = appColors.BACKGROUND;
 
 const styles = StyleSheet.create({
@@ -26,6 +37,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     justifyContent: 'flex-end',
     position: 'absolute',
+    backgroundColor: 'rgba(0,0,0,0.3)',
   },
   iconStyle: { margin: 5 },
 });
