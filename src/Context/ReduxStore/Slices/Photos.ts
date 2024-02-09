@@ -97,6 +97,10 @@ const photosServerSlice = createSlice({
       state.photosServer[action.payload.id].uriThumbnail = action.payload.uri;
     },
 
+    addUriPhotoById: (state, action: { payload: { id: string; uri: string } }) => {
+      state.photosServer[action.payload.id].uri = action.payload.uri;
+    },
+
     addPhotoFromLocalToServer: (
       state,
       action: { payload: { photoServer: PhotoServerType; mediaId: string } },
@@ -142,6 +146,7 @@ export const {
   setPhotosLocal,
   addCompressedPhotoById,
   addThumbnailPhotoById,
+  addUriPhotoById,
   addPhotoFromLocalToServer,
   addPhotoFromServerToLocal,
 } = photosServerSlice.actions;

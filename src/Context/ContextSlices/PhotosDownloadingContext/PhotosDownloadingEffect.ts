@@ -1,7 +1,10 @@
 import { useEffect, useRef } from 'react';
 
 import { uniqueDeviceId } from '~/Config/config';
-import { addPhotoFromServerToLocal } from '~/Context/ReduxStore/Slices/Photos';
+import {
+  addPhotoFromServerToLocal,
+  addUriPhotoById,
+} from '~/Context/ReduxStore/Slices/Photos';
 import { useAppDispatch } from '~/Context/ReduxStore/Store';
 import { addPhotoToDevice } from '~/Helpers/GalleryFunctions/Functions';
 import { getPhotoFromDevice } from '~/Helpers/GalleryFunctions/GetGalleryPhotos';
@@ -81,12 +84,12 @@ export function usePhotosDownloadingEffect() {
           deviceUniqueId: uniqueDeviceId,
         });
 
-        console.log(localPhoto.uri);
-
         if (!result1.ok) {
           console.log('Error updating uri on server');
           console.log(result1.errorCode);
         }
+
+        AppDisptach(addUriPhotoById({ id: photoServer.id, uri: localPhoto.uri }));
 
         photosDownloadingDispatch(PhotosDownloadingActions.shift());
       } finally {
