@@ -8,7 +8,7 @@ import { useOrientation } from '~/Hooks/useOrientation';
 
 type T = PhotoGalleryType;
 type Section = { title: string; data: T[] };
-type NewSection = { title: string; data: T[][] };
+export type NewSection = { title: string; data: T[][] };
 
 type SectionListWithColumnsType = {
   sections: Section[];

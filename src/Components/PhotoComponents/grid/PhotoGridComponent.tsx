@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
-import { SectionList, StyleSheet, View } from 'react-native';
+import { SectionList, StyleSheet, TouchableHighlight, View } from 'react-native';
 
 import { Text } from 'react-native-elements';
 
@@ -9,12 +9,12 @@ import {
   PhotoServerType,
 } from '~/Context/ReduxStore/Slices/Photos';
 import { appColors } from '~/Styles/colors';
-import { spacing } from '~/Styles/spacing';
+import { borderRadius, spacing } from '~/Styles/spacing';
 import { typography } from '~/Styles/typography';
 
 import { DayType, getIndexInSectionList, getPhotosPerDay } from './Helpers';
 import PhotoComponentForGrid from './PhotoComponentForGrid';
-import SectionListWithColumns from './SectionListWithColumns';
+import SectionListWithColumns, { NewSection } from './SectionListWithColumns';
 
 const NUM_COLUMNS = 3;
 const SECTION_HEADER_HEIGHT = 60;
@@ -38,13 +38,8 @@ type PhotoGridComponentProps = {
   onRefresh: () => void;
   isSelecting: boolean;
   selectedKeys: Set<string>;
+  onSelectPhotoGroup: (items: PhotoGalleryType[]) => void;
 };
-
-const renderSectionHeader = ({ section: { title } }: { section: { title: string } }) => (
-  <View style={styles.sectionHeaderStyle}>
-    <Text style={styles.headerTitleStyle}>{title}</Text>
-  </View>
-);
 
 export default function PhotoGridComponent({
   photos,
@@ -54,6 +49,7 @@ export default function PhotoGridComponent({
   onRefresh,
   isSelecting,
   selectedKeys,
+  onSelectPhotoGroup,
 }: PhotoGridComponentProps) {
   const sectionlistRef = useRef<SectionList>(null);
   const photosLenRef = useRef<number>(photos.length);
@@ -95,6 +91,25 @@ export default function PhotoGridComponent({
     }
   }, [sectionlistRef, sectionIndex, rowIndex]);
 
+  const renderSectionHeader = ({ section }: { section: NewSection }) => {
+    const photos = section.data.flat();
+    return (
+      <View style={styles.sectionHeaderStyle}>
+        <Text style={styles.headerTitleStyle}>{section.title}</Text>
+        {isSelecting && (
+          <TouchableHighlight
+            style={styles.headerButtonStyle}
+            onPress={() => {
+              onSelectPhotoGroup(photos);
+            }}
+            underlayColor={appColors.UNDERLAY}>
+            <Text style={styles.headerButtonTextStyle}>Select all</Text>
+          </TouchableHighlight>
+        )}
+      </View>
+    );
+  };
+
   return (
     <View style={[styles.mainViewStyle]}>
       <SectionListWithColumns
@@ -116,12 +131,22 @@ export default function PhotoGridComponent({
 const styles = StyleSheet.create({
   sectionHeaderStyle: {
     height: SECTION_HEADER_HEIGHT,
-    justifyContent: 'center',
+    justifyContent: 'space-between',
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   headerTitleStyle: {
-    paddingTop: spacing.spacing_s,
+    paddingTop: spacing.spacing_xxs,
     paddingLeft: spacing.spacing_m,
     ...typography.largeText,
+  },
+  headerButtonStyle: {
+    paddingVertical: spacing.spacing_xxs,
+    paddingHorizontal: spacing.spacing_m,
+    borderRadius: borderRadius.button,
+  },
+  headerButtonTextStyle: {
+    ...typography.mediumTextBold,
   },
   mainViewStyle: {
     backgroundColor: appColors.BACKGROUND,

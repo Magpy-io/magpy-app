@@ -99,6 +99,27 @@ function PhotoGridController({
     [isSelecting, onSwitchMode, findPhotoIndex],
   );
 
+  const onSelectPhotoGroup = useCallback((items: PhotoGalleryType[]) => {
+    setSelectedKeys(sKeys => {
+      const newSet = new Set(sKeys);
+
+      const isAllGroupSelected = !items.find(item => !sKeys.has(item.key));
+
+      if (isAllGroupSelected) {
+        items.forEach(item => {
+          newSet.delete(item.key);
+        });
+      } else {
+        items.forEach(item => {
+          if (!sKeys.has(item.key)) {
+            newSet.add(item.key);
+          }
+        });
+      }
+      return newSet;
+    });
+  }, []);
+
   const onRenderItemLongPress = useCallback(
     (item: PhotoGalleryType) => {
       if (!isSelecting) {
@@ -144,6 +165,7 @@ function PhotoGridController({
         onRefresh={onRefresh}
         isSelecting={isSelecting}
         selectedKeys={selectedKeys}
+        onSelectPhotoGroup={onSelectPhotoGroup}
       />
 
       {isSelecting && (
