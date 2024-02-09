@@ -78,7 +78,7 @@ export default function PhotoGridComponent({
     return getPhotosPerDay(photos);
   }, [photos]);
 
-  const indexInSectionList = useMemo(() => {
+  const { sectionIndex, rowIndex } = useMemo(() => {
     if (photosPerDayMemo && photosPerDayMemo.length > 0) {
       return getIndexInSectionList(currentPhotoIndex, photosPerDayMemo, photos, NUM_COLUMNS);
     }
@@ -86,20 +86,14 @@ export default function PhotoGridComponent({
   }, [currentPhotoIndex, photos, photosPerDayMemo]);
 
   useEffect(() => {
-    if (
-      photosPerDayMemo &&
-      photosPerDayMemo.length > 0 &&
-      indexInSectionList &&
-      indexInSectionList.sectionIndex >= 0 &&
-      indexInSectionList.rowIndex >= 0
-    ) {
+    if (photosLenRef.current > 0 && sectionIndex >= 0 && rowIndex >= 0) {
       sectionlistRef.current?.scrollToLocation({
-        sectionIndex: indexInSectionList.sectionIndex,
-        itemIndex: indexInSectionList.rowIndex,
+        sectionIndex: sectionIndex,
+        itemIndex: rowIndex,
         animated: true,
       });
     }
-  }, [sectionlistRef, indexInSectionList, photosPerDayMemo]);
+  }, [sectionlistRef, sectionIndex, rowIndex]);
 
   return (
     <View style={[styles.mainViewStyle]}>

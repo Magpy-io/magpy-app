@@ -178,7 +178,7 @@ export function usePhotosStoreEffect() {
   const { isServerReachable } = useServerContext();
 
   useEffect(() => {
-    RefreshAllPhotos(30, 30)
+    RefreshAllPhotos(3000, 3000)
       // .then(() => {
       //   return RefreshAllPhotos(300, 300);
       // })

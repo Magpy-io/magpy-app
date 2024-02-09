@@ -39,7 +39,7 @@ function PhotoGridController({
   isInTabScreen,
   header: Header,
 }: PropsType) {
-  //console.log('render grid');
+  console.log('render grid');
 
   const photosRef = useRef<PhotoGalleryType[]>(photos);
   photosRef.current = photos;
@@ -128,7 +128,7 @@ function PhotoGridController({
   }, [photos]);
 
   const onRefresh = useCallback(() => {
-    RefreshAllPhotos(30, 30).catch(console.log);
+    RefreshAllPhotos(3000, 3000).catch(console.log);
   }, [RefreshAllPhotos]);
 
   return (
