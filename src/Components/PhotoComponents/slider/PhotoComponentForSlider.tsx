@@ -16,6 +16,7 @@ import {
   photoServerSelector,
 } from '~/Context/ReduxStore/Slices/Selectors';
 import { useAppSelector } from '~/Context/ReduxStore/Store';
+import { useTheme } from '~/Context/ThemeContext';
 
 const H = Dimensions.get('screen').height;
 const W = Dimensions.get('screen').width;
@@ -30,6 +31,7 @@ type PropsType = {
 function PhotoComponentForSlider(props: PropsType) {
   //console.log('render photo for slider');
 
+  const { colors } = useTheme();
   const localPhoto = useAppSelector(photoLocalSelector(props.photo.mediaId));
   const serverPhoto = useAppSelector(photoServerSelector(props.photo.serverId));
 
@@ -130,7 +132,9 @@ function PhotoComponentForSlider(props: PropsType) {
             resizeMode={FastImage.resizeMode.contain}
             style={[
               styles.imageStyle,
-              props.isFullScreen ? { backgroundColor: 'black' } : { backgroundColor: 'white' },
+              props.isFullScreen
+                ? { backgroundColor: 'black' }
+                : { backgroundColor: colors.BACKGROUND },
             ]}
           />
         </Animated.View>
@@ -150,7 +154,6 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     borderRadius: 0,
-    backgroundColor: 'red',
   },
 });
 

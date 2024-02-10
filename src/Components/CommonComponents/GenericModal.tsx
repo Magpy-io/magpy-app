@@ -1,6 +1,14 @@
 import React from 'react';
-import { Modal, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
+import {
+  Modal,
+  StyleSheet,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
+} from 'react-native';
 
+import { useStyles } from '~/Hooks/useStyles';
+import { colorsType } from '~/Styles/colors';
 
 type GenericModalProps = {
   modalVisible: boolean;
@@ -13,6 +21,7 @@ export default function GenericModal({
   handleModal,
   children,
 }: GenericModalProps) {
+  const styles = useStyles(makeStyles);
   return (
     <Modal
       animationType="slide"
@@ -20,26 +29,31 @@ export default function GenericModal({
       visible={modalVisible}
       onRequestClose={handleModal}>
       <View style={{ flex: 1 }}>
-        <TouchableOpacity
-          style={{ flex: 1, opacity: 0.1, backgroundColor: 'black' }}
-          onPress={handleModal}></TouchableOpacity>
+        <TouchableOpacity style={styles.touchable} onPress={handleModal}></TouchableOpacity>
         <TouchableWithoutFeedback>
-          <View
-            style={{
-              backgroundColor: 'white',
-              height: '80%',
-              width: '100%',
-              position: 'absolute',
-              bottom: 0,
-              borderTopLeftRadius: 25,
-              borderTopRightRadius: 25,
-              padding: 20,
-              paddingTop: 30,
-            }}>
-            {children}
-          </View>
+          <View style={styles.viewStyle}>{children}</View>
         </TouchableWithoutFeedback>
       </View>
     </Modal>
   );
 }
+
+const makeStyles = (colors: colorsType) =>
+  StyleSheet.create({
+    viewStyle: {
+      backgroundColor: colors.BACKGROUND,
+      height: '80%',
+      width: '100%',
+      position: 'absolute',
+      bottom: 0,
+      borderTopLeftRadius: 25,
+      borderTopRightRadius: 25,
+      padding: 20,
+      paddingTop: 30,
+    },
+    touchable: {
+      flex: 1,
+      opacity: 0.1,
+      backgroundColor: 'black',
+    },
+  });

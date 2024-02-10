@@ -19,7 +19,7 @@ export default function SelectAllButton(props: PropsType) {
         style={[styles.backButtonStyle, props.style]}
         onPress={props.onPress}
         underlayColor={colors.UNDERLAY}>
-        <Icon name="select-all" color={'black'} size={26} style={styles.backIconStyle} />
+        <Icon name="select-all" color={colors.TEXT} size={26} style={styles.backIconStyle} />
       </TouchableHighlight>
     </View>
   );
