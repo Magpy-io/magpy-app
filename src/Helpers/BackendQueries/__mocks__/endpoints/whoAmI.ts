@@ -1,7 +1,8 @@
+import * as mockValues from '../mockValues';
+
 import { GetUserToken, verifyHasUserToken } from '../../TokenManager';
 import { WhoAmI } from '../../Types/';
 import { ResponseTypeFrom } from '../../Types/ApiGlobalTypes';
-import * as mockValues from '../mockValues';
 
 export const Post = async (data: WhoAmI.RequestData): Promise<ResponseType> => {
   verifyHasUserToken();

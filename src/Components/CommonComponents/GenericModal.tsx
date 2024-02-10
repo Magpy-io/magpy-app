@@ -1,7 +1,6 @@
 import React from 'react';
 import { Modal, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 
-
 type GenericModalProps = {
   modalVisible: boolean;
   handleModal: () => void;

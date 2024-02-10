@@ -1,11 +1,7 @@
-
-
 import { ErrorIdNotFound, ErrorServerNotClaimed, ErrorsAuthorization } from '../ErrorTypes';
 import { TokenAuthentification } from '../Types';
 
 export type ResponseData = string;
-
-
 
 export type ResponseErrorTypes = ErrorIdNotFound | ErrorServerNotClaimed | ErrorsAuthorization;
 

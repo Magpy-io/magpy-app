@@ -1,5 +1,3 @@
-
-
 import {
   ErrorIdNotFound,
   ErrorInvalidPartNumber,
@@ -13,8 +11,6 @@ export type ResponseData = {
   part: number;
   totalNbOfParts: number;
 };
-
-
 
 export type ResponseErrorTypes =
   | ErrorInvalidPartNumber

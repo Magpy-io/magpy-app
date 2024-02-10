@@ -1,6 +1,7 @@
+import * as mockValues from '../mockValues';
+
 import { Register } from '../../Types/';
 import { ResponseTypeFrom } from '../../Types/ApiGlobalTypes';
-import * as mockValues from '../mockValues';
 
 export const Post = async (data: Register.RequestData): Promise<ResponseType> => {
   await mockValues.timeout(10);
