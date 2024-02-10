@@ -1,5 +1,5 @@
 import React, { ReactNode, createContext, useContext, useState } from 'react';
-import { useColorScheme } from 'react-native';
+import { StatusBar, useColorScheme } from 'react-native';
 
 import { DarkTheme, LightTheme, colorsType } from '~/Styles/colors';
 
@@ -23,6 +23,8 @@ type PropsType = {
 const ThemeContextProvider: React.FC<PropsType> = props => {
   const scheme = useColorScheme();
   const [theme, setTheme] = useState<ThemeType>(scheme === 'dark' ? DarkTheme : LightTheme);
+  StatusBar.setBarStyle(scheme === 'light' ? 'dark-content' : 'light-content');
+  StatusBar.setBackgroundColor(theme.colors.BACKGROUND);
 
   const value = {
     theme: theme,
