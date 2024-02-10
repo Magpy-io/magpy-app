@@ -18,6 +18,8 @@ const colors = {
   COLOR_ERROR_300: '#f2d5cf',
   COLOR_ERROR_400: '#e7aca0',
   COLOR_ERROR_500: '#d15b43',
+  GREY: '#C8C8C8',
+  DARKER_GREY: '#9B9B9B',
 };
 
 export type colorsType = {
@@ -62,8 +64,8 @@ export const DarkTheme = {
   colors: {
     BACKGROUND_LIGHT: colors.LESS_DARK,
     BACKGROUND: colors.DARK,
-    TEXT: colors.SOFT_GREY,
-    TEXT_LIGHT: colors.SOFT_GREY,
+    TEXT: colors.GREY,
+    TEXT_LIGHT: colors.DARKER_GREY,
     TEXT_INVERSE: colors.DARK,
     PRIMARY: colors.CYAN,
     SECONDARY: colors.CYAN,

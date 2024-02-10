@@ -10,7 +10,7 @@ import { useTheme } from '~/Context/ThemeContext';
 import { useStyles } from '~/Hooks/useStyles';
 import { useMainNavigation } from '~/Navigation/Navigation';
 import { colorsType } from '~/Styles/colors';
-import { spacing } from '~/Styles/spacing';
+import { borderRadius, spacing } from '~/Styles/spacing';
 import { typography } from '~/Styles/typography';
 
 import RecentPhotoComponent from './RecentPhotoComponent';
@@ -31,9 +31,13 @@ export default function RecentPhotos() {
     <>
       <View style={styles.headerStyle}>
         <Text style={styles.titleStyle}>Recently added</Text>
-        <Text style={styles.textStyle} onPress={onPressSeeAll}>
-          See all
-        </Text>
+
+        <TouchableHighlight
+          style={styles.touchable}
+          onPress={onPressSeeAll}
+          underlayColor={colors.UNDERLAY}>
+          <Text style={styles.textStyle}>See all</Text>
+        </TouchableHighlight>
       </View>
 
       <TouchableHighlight onPress={onPressSeeAll} underlayColor={colors.UNDERLAY}>
@@ -56,6 +60,11 @@ const Footer = () => <View style={{ width: spacing.spacing_m }} />;
 
 const makeStyles = (colors: colorsType) =>
   StyleSheet.create({
+    touchable: {
+      padding: spacing.spacing_xs,
+      margin: spacing.spacing_xs,
+      borderRadius: borderRadius.button,
+    },
     flatlistContainerStyle: {
       paddingLeft: spacing.spacing_m,
     },
@@ -64,11 +73,11 @@ const makeStyles = (colors: colorsType) =>
     },
     titleStyle: {
       ...typography(colors).largeTextBold,
+      paddingLeft: spacing.spacing_m,
     },
     headerStyle: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      padding: spacing.spacing_m,
     },
   });
