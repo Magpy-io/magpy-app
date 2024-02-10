@@ -16,6 +16,7 @@ export function SettingsStackNavigator() {
     <SettingsStack.Navigator
       screenOptions={{
         headerShown: false,
+        animation: 'fade',
       }}>
       <SettingsStack.Screen name="AccountSettings" component={AccountSettingsScreen} />
       <SettingsStack.Screen name="ServerSettings" component={AccountSettingsScreen} />

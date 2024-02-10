@@ -20,6 +20,7 @@ export function MainStackNavigator() {
     <ParentStack.Navigator
       screenOptions={{
         headerShown: false,
+        animation: 'fade',
       }}>
       <ParentStack.Screen name="Tabs" component={TabStackNavigator} />
       <ParentStack.Screen name="SettingsStackNavigator" component={SettingsStackNavigator} />

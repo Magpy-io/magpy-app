@@ -22,9 +22,10 @@ export function TabStackNavigator() {
       <TabStack.Navigator
         screenOptions={{
           headerShown: false,
+          animation: 'fade',
         }}>
-        <TabStack.Screen name={TabName.Home} component={HomeScreenTab} />
         <TabStack.Screen name={TabName.Server} component={ServerScreenTab} />
+        <TabStack.Screen name={TabName.Home} component={HomeScreenTab} />
         <TabStack.Screen name={TabName.Settings} component={SettingsScreenTab} />
       </TabStack.Navigator>
       <TabBar />

@@ -18,6 +18,7 @@ export function LoginStackNavigator() {
     <LoginStack.Navigator
       screenOptions={{
         headerShown: false,
+        animation: 'fade',
       }}>
       <LoginStack.Screen name="Login" component={LoginScreen} />
       <LoginStack.Screen name="Register" component={RegisterScreen} />
