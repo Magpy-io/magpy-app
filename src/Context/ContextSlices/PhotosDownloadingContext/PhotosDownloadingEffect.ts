@@ -2,8 +2,8 @@ import { useEffect, useRef } from 'react';
 
 import { uniqueDeviceId } from '~/Config/config';
 import {
+  addMediaIdToServerPhoto,
   addPhotoFromServerToLocal,
-  addUriPhotoById,
 } from '~/Context/ReduxStore/Slices/Photos';
 import {
   photosLocalSelector,
@@ -13,7 +13,7 @@ import { useAppDispatch, useAppSelector } from '~/Context/ReduxStore/Store';
 import { addPhotoToDevice } from '~/Helpers/GalleryFunctions/Functions';
 import { getPhotoFromDevice } from '~/Helpers/GalleryFunctions/GetGalleryPhotos';
 import * as Queries from '~/Helpers/Queries';
-import { UpdatePhotoPath } from '~/Helpers/ServerQueries';
+import { UpdatePhotoMediaId } from '~/Helpers/ServerQueries';
 
 import * as PhotosDownloadingActions from './PhotosDownloadingActions';
 import {
@@ -47,11 +47,10 @@ export function usePhotosDownloadingEffect() {
 
         const photoDownloading = photosDownloading[0];
 
-        const serverPhotoUri = photosServer[photoDownloading.serverId].uri;
+        const serverPhotoMediaId = photosServer[photoDownloading.serverId].mediaId;
 
-        const photoFoundInLocal = Object.values(photosLocal).find(
-          photoLocal => photoLocal.uri == serverPhotoUri,
-        );
+        const photoFoundInLocal = photosLocal[serverPhotoMediaId ?? ''];
+
         if (photoFoundInLocal) {
           return;
         }
@@ -93,9 +92,9 @@ export function usePhotosDownloadingEffect() {
           addPhotoFromServerToLocal({ photoLocal: localPhoto, serverId: photoServer.id }),
         );
 
-        const result1 = await UpdatePhotoPath.Post({
+        const result1 = await UpdatePhotoMediaId.Post({
           id: photoServer.id,
-          path: localPhoto.uri,
+          mediaId: localPhoto.id,
           deviceUniqueId: uniqueDeviceId,
         });
 
@@ -104,7 +103,7 @@ export function usePhotosDownloadingEffect() {
           console.log(result1.errorCode);
         }
 
-        AppDisptach(addUriPhotoById({ id: photoServer.id, uri: localPhoto.uri }));
+        AppDisptach(addMediaIdToServerPhoto({ id: photoServer.id, mediaId: localPhoto.id }));
 
         photosDownloadingDispatch(PhotosDownloadingActions.shift());
       } finally {

@@ -12,8 +12,8 @@ export function ParseApiPhoto(photo: APIPhoto): PhotoServerType {
     width: photo.meta.width,
     created: photo.meta.date,
     syncDate: photo.meta.syncDate,
-    uri: photo.meta.clientPaths.find(clientPath => clientPath.deviceUniqueId == uniqueDeviceId)
-      ?.path,
+    mediaId: photo.meta.mediaIds.find(mediaId => mediaId.deviceUniqueId == uniqueDeviceId)
+      ?.mediaId,
     uriThumbnail: undefined,
     uriCompressed: undefined,
   };

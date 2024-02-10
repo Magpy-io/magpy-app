@@ -13,37 +13,21 @@ export function mergePhotos(photosState: PhotosState): PhotoGalleryType[] {
   for (const photoServerId of photosServerIdsOrdered) {
     const photoServer = photosServer[photoServerId];
 
-    if (!photoServer.uri) {
+    const photoLocalAssociatedId = photosLocal[photoServer.mediaId ?? ''];
+
+    if (photoLocalAssociatedId) {
       photosServerGallery.push({
         key: photoServerId,
         date: photoServer.created,
         serverId: photoServerId,
-        mediaId: undefined,
-      });
-      continue;
-    }
-
-    const photoLocalAssociatedId = photosLocalIdsOrdered.find(mediaId => {
-      const photoLocal = photosLocal[mediaId];
-      if (photoLocal.uri == photoServer.uri) {
-        return true;
-      }
-      return false;
-    });
-
-    if (!photoLocalAssociatedId) {
-      photosServerGallery.push({
-        key: photoServerId,
-        date: photoServer.created,
-        serverId: photoServerId,
-        mediaId: undefined,
+        mediaId: photoServer.mediaId,
       });
     } else {
       photosServerGallery.push({
         key: photoServerId,
         date: photoServer.created,
         serverId: photoServerId,
-        mediaId: photoLocalAssociatedId,
+        mediaId: undefined,
       });
     }
   }

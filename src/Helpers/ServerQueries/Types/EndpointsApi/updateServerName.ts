@@ -1,5 +1,3 @@
-
-
 import {
   ErrorBackendServerUnreachable,
   ErrorInvalidName,
@@ -8,8 +6,6 @@ import {
 import { TokenAuthentification } from '../Types';
 
 export type ResponseData = string;
-
-
 
 export type ResponseErrorTypes =
   | ErrorInvalidName

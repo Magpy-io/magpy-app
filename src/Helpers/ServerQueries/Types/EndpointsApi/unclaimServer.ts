@@ -1,11 +1,7 @@
-
-
 import { ErrorBackendServerUnreachable, ErrorsNotFromLocal } from '../ErrorTypes';
 import { TokenAuthentification } from '../Types';
 
 export type ResponseData = string;
-
-
 
 export type ResponseErrorTypes = ErrorsNotFromLocal | ErrorBackendServerUnreachable;
 

@@ -1,13 +1,9 @@
-
-
 import { ErrorServerNotClaimed, ErrorsAuthorization } from '../ErrorTypes';
 import { TokenAuthentification } from '../Types';
 
 export type ResponseData = {
   deletedIds: string[];
 };
-
-
 
 export type ResponseErrorTypes = ErrorServerNotClaimed | ErrorsAuthorization;
 

@@ -160,6 +160,7 @@ public class SendingMediaForegroundService extends HeadlessJsTaskService {
         Bundle b = new Bundle();
 
         b.putString("path", paths[index]);
+        b.putString("mediaId", ids[index]);
         b.putString("name", names[index]);
         b.putString("date", dates[index]);
         b.putInt("height", heights[index]);
