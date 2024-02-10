@@ -17,7 +17,7 @@ type StatusBarComponentProps = {
   onBackButton?: () => void;
 };
 
-function StatusBarComponent({ photo, onBackButton }: StatusBarComponentProps) {
+function PhotoSliderHeader({ photo, onBackButton }: StatusBarComponentProps) {
   const styles = useStyles(makeStyles);
 
   const photoInDevice = !!photo.mediaId;
@@ -90,4 +90,4 @@ const makeStyles = (colors: colorsType) =>
     statusComponentStyle: {},
   });
 
-export default React.memo(StatusBarComponent);
+export default React.memo(PhotoSliderHeader);

@@ -8,7 +8,7 @@ import { useTabNavigationContext } from '~/Navigation/TabNavigation/TabNavigatio
 
 import ToolBarPhotos from '../grid/ToolBarPhotos';
 import PhotoSliderComponent from './PhotoSliderComponent';
-import StatusBarComponent from './StatusBarComponent';
+import StatusBarComponent from './PhotoSliderHeader';
 
 const { MainModule } = NativeModules;
 
