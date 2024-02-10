@@ -7,8 +7,6 @@ export interface RequestData {
   deviceUniqueId: string;
   photoType: 'data' | 'thumbnail' | 'compressed' | 'original';
   photosData: {
-    date: string;
     mediaId: string;
-    size: number;
   }[];
 }
