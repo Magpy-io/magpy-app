@@ -9,7 +9,7 @@
     "test": "jest --verbose=true",
     "lint": "eslint ./src",
     "format": "prettier --write ./src",
-    "types:check": "tsc --noEmit"
+    "types:check": "tsc --noEmit && echo No typescript errors found"
   },
   "dependencies": {
     "@babel/plugin-transform-template-literals": "^7.23.3",
