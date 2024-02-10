@@ -4,11 +4,13 @@ import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Icon, Text } from 'react-native-elements';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { useTheme } from '~/Context/ThemeContext';
+import { useStyles } from '~/Hooks/useStyles';
 import {
   TabName,
   useTabNavigationContext,
 } from '~/Navigation/TabNavigation/TabNavigationContext';
-import { appColors, colors } from '~/Styles/colors';
+import { colorsType } from '~/Styles/colors';
 import { typography } from '~/Styles/typography';
 
 type IconType = { name: string; type: string };
@@ -57,6 +59,7 @@ const routes: RouteType[] = [
 export default function TabBar() {
   const { hidden } = useTabNavigationContext();
   const insets = useSafeAreaInsets();
+  const styles = useStyles(makeStyles);
   if (hidden) {
     return <View />;
   }
@@ -87,6 +90,10 @@ type TabElementProps = {
 function TabElement({ routeName, icon, iconFocused }: TabElementProps) {
   const { navigateTo, focusedTab } = useTabNavigationContext();
   const focused = useMemo(() => focusedTab === routeName, [focusedTab, routeName]);
+  const styles = useStyles(makeStyles);
+  const { colors } = useTheme();
+  const COLOR = colors.TEXT_LIGHT;
+  const FOCUSED_COLOR = colors.SECONDARY;
 
   const onPress = () => {
     if (!focused) {
@@ -116,31 +123,30 @@ export function TabBarPadding() {
 }
 
 const TAB_BAR_HEIGHT = 80;
-const COLOR = colors.LIGHT_GREEN;
-const FOCUSED_COLOR = appColors.SECONDARY;
 const ICON_SIZE = 22;
 
-const styles = StyleSheet.create({
-  tabElementView: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1,
-  },
-  label: {
-    ...typography.tabBarLabel,
-    paddingTop: 4,
-  },
-  tabView: {
-    height: TAB_BAR_HEIGHT,
-    backgroundColor: 'white',
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    shadowColor: colors.DARK,
-    elevation: 12,
-  },
-  container: {
-    position: 'absolute',
-    bottom: 0,
-    width: '100%',
-  },
-});
+const makeStyles = (colors: colorsType) =>
+  StyleSheet.create({
+    tabElementView: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      flex: 1,
+    },
+    label: {
+      ...typography(colors).tabBarLabel,
+      paddingTop: 4,
+    },
+    tabView: {
+      height: TAB_BAR_HEIGHT,
+      flexDirection: 'row',
+      justifyContent: 'space-evenly',
+      shadowColor: colors.TEXT,
+      backgroundColor: colors.BACKGROUND,
+      elevation: 12,
+    },
+    container: {
+      position: 'absolute',
+      bottom: 0,
+      width: '100%',
+    },
+  });

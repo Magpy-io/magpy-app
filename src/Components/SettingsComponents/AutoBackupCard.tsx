@@ -4,7 +4,8 @@ import { StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-elements';
 
 import { UploadIcon } from '~/Components/CommonComponents/Icons';
-import { appColors } from '~/Styles/colors';
+import { useStyles } from '~/Hooks/useStyles';
+import { colorsType } from '~/Styles/colors';
 import { borderRadius, spacing } from '~/Styles/spacing';
 import { typography } from '~/Styles/typography';
 
@@ -15,6 +16,8 @@ const BACKUP_ON_TITLE = 'Automatic backup is on';
 const TEXT = 'Automatically back up your media even when the app is closed';
 
 export default function AutoBackupCard() {
+  const styles = useStyles(makeStyles);
+
   const [enabled, setEnabled] = useState(false);
   const switchStatus = () => setEnabled(prev => !prev);
 
@@ -44,28 +47,29 @@ export default function AutoBackupCard() {
   );
 }
 
-const styles = StyleSheet.create({
-  buttonStyle: {
-    alignSelf: 'flex-end',
-  },
-  container: {
-    backgroundColor: appColors.BACKGROUND_LIGHT,
-    borderRadius: borderRadius.default,
-    padding: spacing.spacing_l,
-    gap: spacing.spacing_s,
-  },
-  title: {
-    ...typography.largeTextBold,
-    paddingBottom: spacing.spacing_xxs,
-  },
-  text: {
-    ...typography.lightMediumText,
-    flex: 1,
-    flexWrap: 'wrap',
-    width: '70%',
-  },
-  row: {
-    flexDirection: 'row',
-    gap: spacing.spacing_s,
-  },
-});
+const makeStyles = (colors: colorsType) =>
+  StyleSheet.create({
+    buttonStyle: {
+      alignSelf: 'flex-end',
+    },
+    container: {
+      backgroundColor: colors.BACKGROUND_LIGHT,
+      borderRadius: borderRadius.default,
+      padding: spacing.spacing_l,
+      gap: spacing.spacing_s,
+    },
+    title: {
+      ...typography(colors).largeTextBold,
+      paddingBottom: spacing.spacing_xxs,
+    },
+    text: {
+      ...typography(colors).lightMediumText,
+      flex: 1,
+      flexWrap: 'wrap',
+      width: '70%',
+    },
+    row: {
+      flexDirection: 'row',
+      gap: spacing.spacing_s,
+    },
+  });

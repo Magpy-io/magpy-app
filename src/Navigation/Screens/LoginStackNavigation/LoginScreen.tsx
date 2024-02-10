@@ -10,14 +10,16 @@ import KeyboardDismissingView from '~/Components/CommonComponents/KeyboardDismis
 import ScreenTitle from '~/Components/CommonComponents/ScreenTitle';
 import GoogleSignIn from '~/Components/LoginComponents/GoogleSignIn';
 import LoginForm from '~/Components/LoginComponents/LoginForm';
-import { appColors } from '~/Styles/colors';
+import { useTheme } from '~/Context/ThemeContext';
+import { useStyles } from '~/Hooks/useStyles';
+import { colorsType } from '~/Styles/colors';
 import { spacing } from '~/Styles/spacing';
 
 import { LoginStackParamList } from '../../Navigators/LoginStackNavigator';
 
 export default function LoginScreen() {
   const insets = useSafeAreaInsets();
-
+  const styles = useStyles(makeStyles);
   return (
     <View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
       <KeyboardDismissingView>
@@ -30,6 +32,8 @@ export default function LoginScreen() {
 }
 
 function LoginFooter() {
+  const styles = useStyles(makeStyles);
+  const { colors } = useTheme();
   const navigation = useNavigation<StackNavigationProp<LoginStackParamList>>();
   return (
     <View style={styles.loginFooterStyle}>
@@ -39,13 +43,13 @@ function LoginFooter() {
           flexDirection: 'row',
           alignItems: 'center',
         }}>
-        <Text style={{ color: appColors.TEXT }}>{"Don't have an account ? "}</Text>
+        <Text style={{ color: colors.TEXT }}>{"Don't have an account ? "}</Text>
         <TouchableOpacity
           onPress={() => {
             navigation.navigate('Register');
           }}
           style={{ paddingVertical: spacing.spacing_s }}>
-          <Text style={{ color: appColors.ACCENT, fontWeight: 'bold' }}>Register !</Text>
+          <Text style={{ color: colors.ACCENT, fontWeight: 'bold' }}>Register !</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -54,19 +58,20 @@ function LoginFooter() {
 
 const PADDING_HORIZONTAl = spacing.spacing_xxl;
 
-const styles = StyleSheet.create({
-  loginFooterStyle: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    paddingBottom: spacing.spacing_xxl_5,
-    paddingHorizontal: PADDING_HORIZONTAl,
-    alignItems: 'center',
-  },
-  container: {
-    flex: 1,
-    paddingHorizontal: PADDING_HORIZONTAl,
-    backgroundColor: appColors.BACKGROUND,
-  },
-});
+const makeStyles = (colors: colorsType) =>
+  StyleSheet.create({
+    loginFooterStyle: {
+      position: 'absolute',
+      bottom: 0,
+      left: 0,
+      right: 0,
+      paddingBottom: spacing.spacing_xxl_5,
+      paddingHorizontal: PADDING_HORIZONTAl,
+      alignItems: 'center',
+    },
+    container: {
+      flex: 1,
+      paddingHorizontal: PADDING_HORIZONTAl,
+      backgroundColor: colors.BACKGROUND,
+    },
+  });

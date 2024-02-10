@@ -7,11 +7,13 @@ import { MoreIcon } from '~/Components/CommonComponents/Icons';
 import { PhotoGalleryHeader } from '~/Components/PhotoComponents/PhotoGalleryHeader';
 import RecentPhotos from '~/Components/ServerComponents/RecentPhotos';
 import ServerDetails from '~/Components/ServerComponents/ServerDetails';
-import { appColors } from '~/Styles/colors';
+import { useStyles } from '~/Hooks/useStyles';
+import { colorsType } from '~/Styles/colors';
 import { spacing } from '~/Styles/spacing';
 
 export default function ServerScreenTab() {
   console.log('render screen server');
+  const styles = useStyles(makeStyles);
   const optionsButton = () => <MoreIcon onPress={() => {}} iconStyle={styles.iconStyle} />;
   const insets = useSafeAreaInsets();
 
@@ -24,12 +26,13 @@ export default function ServerScreenTab() {
   );
 }
 
-const styles = StyleSheet.create({
-  viewStyle: {
-    flex: 1,
-    backgroundColor: appColors.BACKGROUND,
-  },
-  iconStyle: {
-    padding: spacing.spacing_m,
-  },
-});
+const makeStyles = (colors: colorsType) =>
+  StyleSheet.create({
+    viewStyle: {
+      flex: 1,
+      backgroundColor: colors.BACKGROUND,
+    },
+    iconStyle: {
+      padding: spacing.spacing_m,
+    },
+  });

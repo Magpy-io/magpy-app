@@ -1,7 +1,8 @@
 import React from 'react';
 import { StyleSheet, View, ViewStyle } from 'react-native';
 
-import { appColors } from '~/Styles/colors';
+import { useStyles } from '~/Hooks/useStyles';
+import { colorsType } from '~/Styles/colors';
 
 import ToolComponent from '../common/ToolComponent';
 
@@ -18,6 +19,8 @@ type ToolBarProps = {
 };
 
 function ToolBar(props: ToolBarProps) {
+  const styles = useStyles(makeStyles);
+
   return (
     <View style={[styles.toolBarView, props.style]}>
       <View style={styles.toolsView}>
@@ -68,21 +71,20 @@ function ToolBar(props: ToolBarProps) {
   );
 }
 
-const TOOLBAR_COLOR = appColors.BACKGROUND;
-
-const styles = StyleSheet.create({
-  toolBarView: {
-    width: '100%',
-    position: 'absolute',
-    backgroundColor: TOOLBAR_COLOR,
-    bottom: 0,
-  },
-  toolsView: {
-    height: 100,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  iconContainerStyle: {},
-});
+const makeStyles = (colors: colorsType) =>
+  StyleSheet.create({
+    toolBarView: {
+      width: '100%',
+      position: 'absolute',
+      backgroundColor: colors.BACKGROUND,
+      bottom: 0,
+    },
+    toolsView: {
+      height: 100,
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    iconContainerStyle: {},
+  });
 
 export default React.memo(ToolBar);

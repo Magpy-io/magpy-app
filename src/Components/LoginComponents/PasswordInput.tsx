@@ -3,7 +3,9 @@ import { StyleSheet, TextInput, TextInputProps, TouchableOpacity, View } from 'r
 
 import { Icon } from 'react-native-elements';
 
-import { appColors } from '~/Styles/colors';
+import { useTheme } from '~/Context/ThemeContext';
+import { useStyles } from '~/Hooks/useStyles';
+import { colorsType } from '~/Styles/colors';
 import { borderRadius, spacing } from '~/Styles/spacing';
 
 import FormError from './FormError';
@@ -17,6 +19,8 @@ type PasswordInputProps = {
 } & TextInputProps;
 
 export function PasswordInput(props: PasswordInputProps) {
+  const styles = useStyles(makeStyles);
+  const { colors } = useTheme();
   const [passwordVisible, setPasswordVisible] = useState(false);
   const togglePasswordVisibility = () => {
     setPasswordVisible(!passwordVisible);
@@ -30,7 +34,7 @@ export function PasswordInput(props: PasswordInputProps) {
         <TextInput
           testID={props.testID}
           placeholder="Password"
-          placeholderTextColor={appColors.TEXT_LIGHT}
+          placeholderTextColor={colors.TEXT_LIGHT}
           secureTextEntry={!passwordVisible}
           style={styles.textInputStyle}
           ref={inputRef}
@@ -45,8 +49,8 @@ export function PasswordInput(props: PasswordInputProps) {
               name={passwordVisible ? 'visibility-off' : 'visibility'}
               size={16}
               disabled={props.value === ''}
-              disabledStyle={{ backgroundColor: 'white' }}
-              color={props.value === '' ? appColors.TEXT_LIGHT : appColors.TEXT}
+              disabledStyle={{ backgroundColor: colors.BACKGROUND }}
+              color={props.value === '' ? colors.TEXT_LIGHT : colors.TEXT}
             />
           </TouchableOpacity>
         }
@@ -60,7 +64,7 @@ export function PasswordInput(props: PasswordInputProps) {
             <Icon
               name="lock"
               size={16}
-              color={props.value === '' ? appColors.TEXT_LIGHT : appColors.TEXT}
+              color={props.value === '' ? colors.TEXT_LIGHT : colors.TEXT}
             />
           </View>
         )}
@@ -73,33 +77,34 @@ export function PasswordInput(props: PasswordInputProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  labelIconView: {
-    position: 'absolute',
-    left: spacing.spacing_l,
-    top: 0,
-    bottom: 0,
-    justifyContent: 'center',
-  },
-  hideIconContainer: {
-    paddingHorizontal: spacing.spacing_l,
-    height: spacing.spacing_xxl_3,
-    alignContent: 'center',
-    alignItems: 'center',
-    justifyContent: 'center',
-    alignSelf: 'center',
-  },
-  textInputStyle: {
-    flex: 1,
-    height: spacing.spacing_xxl_3,
-  },
-  viewStyle: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingLeft: spacing.spacing_xxl_2,
-    borderColor: appColors.FORM_BORDER,
-    borderWidth: 1,
-    borderRadius: borderRadius.input,
-  },
-});
+const makeStyles = (colors: colorsType) =>
+  StyleSheet.create({
+    labelIconView: {
+      position: 'absolute',
+      left: spacing.spacing_l,
+      top: 0,
+      bottom: 0,
+      justifyContent: 'center',
+    },
+    hideIconContainer: {
+      paddingHorizontal: spacing.spacing_l,
+      height: spacing.spacing_xxl_3,
+      alignContent: 'center',
+      alignItems: 'center',
+      justifyContent: 'center',
+      alignSelf: 'center',
+    },
+    textInputStyle: {
+      flex: 1,
+      height: spacing.spacing_xxl_3,
+    },
+    viewStyle: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingLeft: spacing.spacing_xxl_2,
+      borderColor: colors.FORM_BORDER,
+      borderWidth: 0.5,
+      borderRadius: borderRadius.input,
+    },
+  });

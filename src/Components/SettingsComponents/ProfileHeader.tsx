@@ -3,20 +3,24 @@ import { Image, StyleSheet, View } from 'react-native';
 
 import { Text } from 'react-native-elements';
 
+import { useTheme } from '~/Context/ThemeContext';
 import { useAuthContext } from '~/Context/UseContexts/useAuthContext';
-import { appColors } from '~/Styles/colors';
+import { useStyles } from '~/Hooks/useStyles';
+import { colorsType } from '~/Styles/colors';
 import { borderRadius, spacing } from '~/Styles/spacing';
 import { typography } from '~/Styles/typography';
 
 export default function ProfileHeader() {
   const { user } = useAuthContext();
+  const { colors } = useTheme();
+  const styles = useStyles(makeStyles);
 
   if (!user) {
     return <View />;
   }
 
   const name = user.name;
-  const uri = `https://ui-avatars.com/api/?name=${name}&format=png&background=${appColors.SECONDARY.slice(1, -1)}&color=fff&length=1`;
+  const uri = `https://ui-avatars.com/api/?name=${name}&format=png&background=${colors.SECONDARY.slice(1, -1)}&color=fff&length=1`;
 
   return (
     <View style={styles.container}>
@@ -27,6 +31,8 @@ export default function ProfileHeader() {
 }
 
 function Details({ name, email }: { name: string; email: string }) {
+  const styles = useStyles(makeStyles);
+
   return (
     <View>
       <Text style={styles.name}>{name}</Text>
@@ -37,21 +43,22 @@ function Details({ name, email }: { name: string; email: string }) {
 
 const AVATAR_SIZE = 60;
 
-const styles = StyleSheet.create({
-  name: {
-    ...typography.largeTextBold,
-  },
-  email: {
-    ...typography.lightMediumText,
-  },
-  container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.spacing_l,
-  },
-  avatarStyle: {
-    height: AVATAR_SIZE,
-    width: AVATAR_SIZE,
-    borderRadius: borderRadius.button,
-  },
-});
+const makeStyles = (colors: colorsType) =>
+  StyleSheet.create({
+    name: {
+      ...typography(colors).largeTextBold,
+    },
+    email: {
+      ...typography(colors).lightMediumText,
+    },
+    container: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.spacing_l,
+    },
+    avatarStyle: {
+      height: AVATAR_SIZE,
+      width: AVATAR_SIZE,
+      borderRadius: borderRadius.button,
+    },
+  });

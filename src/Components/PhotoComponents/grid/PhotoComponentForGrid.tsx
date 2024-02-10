@@ -8,7 +8,7 @@ import {
   photoServerSelector,
 } from '~/Context/ReduxStore/Slices/Selectors';
 import { useAppSelector } from '~/Context/ReduxStore/Store';
-import { appColors } from '~/Styles/colors';
+import { useTheme } from '~/Context/ThemeContext';
 
 import ImageForGrid from './ImageForGrid';
 import SelectionIconForGrid from './SelectionIconForGrid';
@@ -24,6 +24,7 @@ type PropsType = {
 function PhotoComponentForGrid(props: PropsType) {
   const { photo, isSelecting, isSelected, onPress, onLongPress } = props;
   //console.log('Render photo for grid');
+  const { colors } = useTheme();
 
   const localPhoto = useAppSelector(photoLocalSelector(photo.mediaId));
   const serverPhoto = useAppSelector(photoServerSelector(photo.serverId));
@@ -49,7 +50,7 @@ function PhotoComponentForGrid(props: PropsType) {
 
   return (
     <TouchableHighlight
-      underlayColor={appColors.UNDERLAY}
+      underlayColor={colors.UNDERLAY}
       onPress={onPressPhoto}
       onLongPress={onLongPressPhoto}
       delayLongPress={100}>

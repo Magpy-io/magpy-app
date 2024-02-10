@@ -1,7 +1,8 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import { appColors, colors } from '~/Styles/colors';
+import { useStyles } from '~/Hooks/useStyles';
+import { colorsType } from '~/Styles/colors';
 import { spacing } from '~/Styles/spacing';
 import { typography } from '~/Styles/typography';
 
@@ -16,6 +17,7 @@ type ServerComponentProps = {
 
 export default function ServerComponent({ name, ip, port, onPress }: ServerComponentProps) {
   const IpAddress = `${ip}: ${port}`;
+  const styles = useStyles(makeStyles);
 
   return (
     <TouchableOpacity onPress={onPress} style={styles.pressViewStyle}>
@@ -28,22 +30,23 @@ export default function ServerComponent({ name, ip, port, onPress }: ServerCompo
   );
 }
 
-const styles = StyleSheet.create({
-  ipAddress: {
-    ...typography.lightMediumText,
-  },
-  name: {
-    ...typography.mediumTextBold,
-    paddingBottom: 4,
-  },
-  pressViewStyle: {
-    borderRadius: spacing.spacing_s,
-    borderWidth: 1,
-    borderColor: appColors.OUTLINE_BORDER,
-    backgroundColor: colors.TRANSPARENT,
-    padding: spacing.spacing_m,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-});
+const makeStyles = (colors: colorsType) =>
+  StyleSheet.create({
+    ipAddress: {
+      ...typography(colors).lightMediumText,
+    },
+    name: {
+      ...typography(colors).mediumTextBold,
+      paddingBottom: 4,
+    },
+    pressViewStyle: {
+      borderRadius: spacing.spacing_s,
+      borderWidth: 1,
+      borderColor: colors.OUTLINE_BORDER,
+      backgroundColor: colors.TRANSPARENT,
+      padding: spacing.spacing_m,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+  });

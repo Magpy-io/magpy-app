@@ -5,7 +5,7 @@ import { TouchableHighlight } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Icon } from '@rneui/themed';
 
-import { appColors } from '~/Styles/colors';
+import { useTheme } from '~/Context/ThemeContext';
 
 type PropsType = {
   style?: ViewStyle;
@@ -14,6 +14,7 @@ type PropsType = {
 
 export default function BackButton(props: PropsType) {
   const navigation = useNavigation();
+  const { colors } = useTheme();
   return (
     <View>
       <TouchableHighlight
@@ -25,11 +26,11 @@ export default function BackButton(props: PropsType) {
             navigation.goBack();
           }
         }}
-        underlayColor={appColors.UNDERLAY}>
+        underlayColor={colors.UNDERLAY}>
         <Icon
           name="chevron-back"
           type="ionicon"
-          color={appColors.TEXT}
+          color={colors.TEXT}
           size={26}
           style={styles.backIconStyle}
         />

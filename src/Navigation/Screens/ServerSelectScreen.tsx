@@ -5,12 +5,14 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import ServersList from '~/Components/SelectServerComponents/ServersList';
 import { Server } from '~/Context/ContextSlices/LocalServersContext';
+import { useTheme } from '~/Context/ThemeContext';
 import { useServerClaimFunctions } from '~/Context/UseContexts/useClaimServerContext';
 import {
   useLocalServersContext,
   useLocalServersFunctions,
 } from '~/Context/UseContexts/useLocalServersContext';
-import { appColors } from '~/Styles/colors';
+import { useStyles } from '~/Hooks/useStyles';
+import { colorsType } from '~/Styles/colors';
 import { spacing } from '~/Styles/spacing';
 import { typography } from '~/Styles/typography';
 
@@ -29,7 +31,7 @@ export default function ServerSelectScreen() {
   }, [refreshData]);
 
   const insets = useSafeAreaInsets();
-
+  const styles = useStyles(makeStyles);
   return (
     <View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
       <ServersList
@@ -46,33 +48,37 @@ export default function ServerSelectScreen() {
 
 function Header({ isScanning }: { isScanning: boolean }) {
   const title = isScanning ? 'Searching for your local server' : 'Select your local server';
+  const styles = useStyles(makeStyles);
+  const { colors } = useTheme();
+
   return (
     <View style={styles.headerView}>
       {isScanning && (
-        <ActivityIndicator style={styles.indicatorStyle} color={appColors.PRIMARY} />
+        <ActivityIndicator style={styles.indicatorStyle} color={colors.PRIMARY} />
       )}
       <Text style={styles.title}>{title}</Text>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  indicatorStyle: {
-    position: 'absolute',
-    top: spacing.spacing_xxl_4,
-    alignSelf: 'center',
-  },
-  headerView: {
-    paddingBottom: spacing.spacing_xxl,
-    paddingTop: spacing.spacing_xxl_5,
-  },
-  title: {
-    paddingHorizontal: spacing.spacing_xxl,
-    textAlign: 'center',
-    ...typography.screenTitle,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: appColors.BACKGROUND,
-  },
-});
+const makeStyles = (colors: colorsType) =>
+  StyleSheet.create({
+    indicatorStyle: {
+      position: 'absolute',
+      top: spacing.spacing_xxl_4,
+      alignSelf: 'center',
+    },
+    headerView: {
+      paddingBottom: spacing.spacing_xxl,
+      paddingTop: spacing.spacing_xxl_5,
+    },
+    title: {
+      paddingHorizontal: spacing.spacing_xxl,
+      textAlign: 'center',
+      ...typography(colors).screenTitle,
+    },
+    container: {
+      flex: 1,
+      backgroundColor: colors.BACKGROUND,
+    },
+  });

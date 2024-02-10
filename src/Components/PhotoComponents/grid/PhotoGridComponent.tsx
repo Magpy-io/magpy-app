@@ -8,7 +8,9 @@ import {
   PhotoLocalType,
   PhotoServerType,
 } from '~/Context/ReduxStore/Slices/Photos';
-import { appColors } from '~/Styles/colors';
+import { useTheme } from '~/Context/ThemeContext';
+import { useStyles } from '~/Hooks/useStyles';
+import { colorsType } from '~/Styles/colors';
 import { borderRadius, spacing } from '~/Styles/spacing';
 import { typography } from '~/Styles/typography';
 
@@ -53,6 +55,8 @@ export default function PhotoGridComponent({
 }: PhotoGridComponentProps) {
   const sectionlistRef = useRef<SectionList>(null);
   const photosLenRef = useRef<number>(photos.length);
+  const { colors } = useTheme();
+  const styles = useStyles(makeStyles);
 
   photosLenRef.current = photos.length;
   const renderItem = useCallback(
@@ -102,7 +106,7 @@ export default function PhotoGridComponent({
             onPress={() => {
               onSelectPhotoGroup(photos);
             }}
-            underlayColor={appColors.UNDERLAY}>
+            underlayColor={colors.UNDERLAY}>
             <Text style={styles.headerButtonTextStyle}>Select all</Text>
           </TouchableHighlight>
         )}
@@ -111,7 +115,7 @@ export default function PhotoGridComponent({
   };
 
   return (
-    <View style={[styles.mainViewStyle]}>
+    <View style={[styles.mainViewStyle, { backgroundColor: colors.BACKGROUND }]}>
       <SectionListWithColumns
         ref={sectionlistRef}
         sections={photosPerDayMemo}
@@ -128,28 +132,28 @@ export default function PhotoGridComponent({
   );
 }
 
-const styles = StyleSheet.create({
-  sectionHeaderStyle: {
-    height: SECTION_HEADER_HEIGHT,
-    justifyContent: 'space-between',
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  headerTitleStyle: {
-    paddingTop: spacing.spacing_xxs,
-    paddingLeft: spacing.spacing_m,
-    ...typography.largeText,
-  },
-  headerButtonStyle: {
-    paddingVertical: spacing.spacing_xxs,
-    paddingHorizontal: spacing.spacing_m,
-    borderRadius: borderRadius.button,
-  },
-  headerButtonTextStyle: {
-    ...typography.mediumTextBold,
-  },
-  mainViewStyle: {
-    backgroundColor: appColors.BACKGROUND,
-    flex: 1,
-  },
-});
+const makeStyles = (colors: colorsType) =>
+  StyleSheet.create({
+    sectionHeaderStyle: {
+      height: SECTION_HEADER_HEIGHT,
+      justifyContent: 'space-between',
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    headerTitleStyle: {
+      paddingTop: spacing.spacing_xxs,
+      paddingLeft: spacing.spacing_m,
+      ...typography(colors).largeText,
+    },
+    headerButtonStyle: {
+      paddingVertical: spacing.spacing_xxs,
+      paddingHorizontal: spacing.spacing_m,
+      borderRadius: borderRadius.button,
+    },
+    headerButtonTextStyle: {
+      ...typography(colors).mediumTextBold,
+    },
+    mainViewStyle: {
+      flex: 1,
+    },
+  });

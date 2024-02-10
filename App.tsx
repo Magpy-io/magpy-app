@@ -8,6 +8,7 @@ import { ConfigModules } from '~/Config/configModules';
 import MainContextEffects from '~/Context/MainContextEffects';
 import { ContextProvider } from '~/Context/MainContextProvider';
 import { store } from '~/Context/ReduxStore/Store';
+import { ThemeContextProvider } from '~/Context/ThemeContext';
 import Navigation from '~/Navigation/Navigation';
 
 function App(): React.JSX.Element {
@@ -18,7 +19,9 @@ function App(): React.JSX.Element {
         <MainContextEffects>
           <GestureHandlerRootView style={{ flex: 1 }}>
             <SafeAreaProvider>
-              <Navigation />
+              <ThemeContextProvider>
+                <Navigation />
+              </ThemeContextProvider>
             </SafeAreaProvider>
           </GestureHandlerRootView>
         </MainContextEffects>

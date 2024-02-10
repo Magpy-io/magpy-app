@@ -3,7 +3,9 @@ import { StyleSheet, TextInput, TextInputProps, View } from 'react-native';
 
 import { Icon } from 'react-native-elements';
 
-import { appColors } from '~/Styles/colors';
+import { useTheme } from '~/Context/ThemeContext';
+import { useStyles } from '~/Hooks/useStyles';
+import { colorsType } from '~/Styles/colors';
 import { borderRadius, spacing } from '~/Styles/spacing';
 
 import FormError from './FormError';
@@ -16,6 +18,9 @@ type LoginTextInputProps = {
 } & TextInputProps;
 
 export default function LoginTextInput(props: LoginTextInputProps) {
+  const styles = useStyles(makeStyles);
+  const { colors } = useTheme();
+
   const inputRef = useRef<TextInput>(null);
   const showError = !inputRef?.current?.isFocused() && props.value !== '';
   return (
@@ -24,7 +29,7 @@ export default function LoginTextInput(props: LoginTextInputProps) {
         <TextInput
           testID={props.testID}
           style={styles.textInputStyle}
-          placeholderTextColor={appColors.TEXT_LIGHT}
+          placeholderTextColor={colors.TEXT_LIGHT}
           ref={inputRef}
           {...props}
         />
@@ -38,7 +43,7 @@ export default function LoginTextInput(props: LoginTextInputProps) {
             <Icon
               name={props.icon}
               size={16}
-              color={props.value === '' ? appColors.TEXT_LIGHT : appColors.TEXT}
+              color={props.value === '' ? colors.TEXT_LIGHT : colors.TEXT}
             />
           </View>
         )}
@@ -49,23 +54,24 @@ export default function LoginTextInput(props: LoginTextInputProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  labelIconView: {
-    position: 'absolute',
-    left: spacing.spacing_l,
-    top: 0,
-    bottom: 0,
-    justifyContent: 'center',
-  },
-  textInputStyle: {
-    flex: 1,
-  },
-  viewStyle: {
-    flexDirection: 'row',
-    paddingLeft: spacing.spacing_xxl_2,
-    borderColor: appColors.FORM_BORDER,
-    borderWidth: 1,
-    borderRadius: borderRadius.input,
-    height: spacing.spacing_xxl_3,
-  },
-});
+const makeStyles = (colors: colorsType) =>
+  StyleSheet.create({
+    labelIconView: {
+      position: 'absolute',
+      left: spacing.spacing_l,
+      top: 0,
+      bottom: 0,
+      justifyContent: 'center',
+    },
+    textInputStyle: {
+      flex: 1,
+    },
+    viewStyle: {
+      flexDirection: 'row',
+      paddingLeft: spacing.spacing_xxl_2,
+      borderColor: colors.FORM_BORDER,
+      borderWidth: 0.5,
+      borderRadius: borderRadius.input,
+      height: spacing.spacing_xxl_3,
+    },
+  });

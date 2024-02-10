@@ -17,9 +17,10 @@ import AutoBackupCard from '~/Components/SettingsComponents/AutoBackupCard';
 import LogoutComponent from '~/Components/SettingsComponents/LogoutComponent';
 import ProfileHeader from '~/Components/SettingsComponents/ProfileHeader';
 import SettingComponent from '~/Components/SettingsComponents/SettingComponent';
+import { useStyles } from '~/Hooks/useStyles';
 import { useMainNavigation } from '~/Navigation/Navigation';
 import { TabBarPadding } from '~/Navigation/TabNavigation/TabBar';
-import { appColors, colors } from '~/Styles/colors';
+import { colorsType } from '~/Styles/colors';
 import { spacing } from '~/Styles/spacing';
 import { typography } from '~/Styles/typography';
 
@@ -32,7 +33,7 @@ type ItemType = {
 export default function SettingsScreenTab() {
   const insets = useSafeAreaInsets();
   const navigation = useMainNavigation();
-
+  const styles = useStyles(makeStyles);
   const data = [
     {
       title: 'Storage settings',
@@ -112,6 +113,7 @@ export default function SettingsScreenTab() {
 }
 
 function Header() {
+  const styles = useStyles(makeStyles);
   return (
     <View style={styles.header}>
       <ProfileHeader />
@@ -120,21 +122,22 @@ function Header() {
   );
 }
 
-const styles = StyleSheet.create({
-  header: {
-    paddingTop: spacing.spacing_xl,
-    gap: spacing.spacing_xl,
-  },
-  logoutText: {
-    ...typography.mediumTextBold,
-    color: colors.COLOR_ERROR_500,
-  },
-  title: {
-    ...typography.sectionTitle,
-    paddingVertical: spacing.spacing_l,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: appColors.BACKGROUND,
-  },
-});
+const makeStyles = (colors: colorsType) =>
+  StyleSheet.create({
+    header: {
+      paddingTop: spacing.spacing_xl,
+      gap: spacing.spacing_xl,
+    },
+    logoutText: {
+      ...typography(colors).mediumTextBold,
+      color: colors.ERROR,
+    },
+    title: {
+      ...typography(colors).sectionTitle,
+      paddingVertical: spacing.spacing_l,
+    },
+    container: {
+      flex: 1,
+      backgroundColor: colors.BACKGROUND,
+    },
+  });

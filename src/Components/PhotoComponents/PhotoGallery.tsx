@@ -8,7 +8,8 @@ import {
   PhotoLocalType,
   PhotoServerType,
 } from '~/Context/ReduxStore/Slices/Photos';
-import { appColors } from '~/Styles/colors';
+import { useStyles } from '~/Hooks/useStyles';
+import { colorsType } from '~/Styles/colors';
 import { spacing } from '~/Styles/spacing';
 
 import { TuneIcon } from '../CommonComponents/Icons';
@@ -31,6 +32,8 @@ type PhotoGalleryPropsType = {
 };
 
 export default function PhotoGallery(props: PhotoGalleryPropsType) {
+  const styles = useStyles(makeStyles);
+
   const [switchingState, setSwitchingState] = useState({
     isSlidingPhotos: false,
     currentPhotoIndex: 0,
@@ -96,9 +99,10 @@ export default function PhotoGallery(props: PhotoGalleryPropsType) {
   );
 }
 
-const styles = StyleSheet.create({
-  viewStyle: {
-    flex: 1,
-    backgroundColor: appColors.BACKGROUND,
-  },
-});
+const makeStyles = (colors: colorsType) =>
+  StyleSheet.create({
+    viewStyle: {
+      flex: 1,
+      backgroundColor: colors.BACKGROUND,
+    },
+  });

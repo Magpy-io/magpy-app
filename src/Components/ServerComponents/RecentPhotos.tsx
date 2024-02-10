@@ -6,8 +6,10 @@ import { Text } from 'react-native-elements';
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos';
 import { recentServerGalleryPhotos } from '~/Context/ReduxStore/Slices/Selectors';
 import { useAppSelector } from '~/Context/ReduxStore/Store';
+import { useTheme } from '~/Context/ThemeContext';
+import { useStyles } from '~/Hooks/useStyles';
 import { useMainNavigation } from '~/Navigation/Navigation';
-import { appColors } from '~/Styles/colors';
+import { colorsType } from '~/Styles/colors';
 import { spacing } from '~/Styles/spacing';
 import { typography } from '~/Styles/typography';
 
@@ -22,6 +24,8 @@ export default function RecentPhotos() {
   const renderItem = ({ item }: { item: PhotoGalleryType }) => {
     return <RecentPhotoComponent photo={item} />;
   };
+  const { colors } = useTheme();
+  const styles = useStyles(makeStyles);
 
   return (
     <>
@@ -32,7 +36,7 @@ export default function RecentPhotos() {
         </Text>
       </View>
 
-      <TouchableHighlight onPress={onPressSeeAll} underlayColor={appColors.UNDERLAY}>
+      <TouchableHighlight onPress={onPressSeeAll} underlayColor={colors.UNDERLAY}>
         <FlatList
           data={photosGalleryServer}
           renderItem={renderItem}
@@ -50,20 +54,21 @@ export default function RecentPhotos() {
 const Separator = () => <View style={{ width: spacing.spacing_xs }} />;
 const Footer = () => <View style={{ width: spacing.spacing_m }} />;
 
-const styles = StyleSheet.create({
-  flatlistContainerStyle: {
-    paddingLeft: spacing.spacing_m,
-  },
-  textStyle: {
-    ...typography.lightMediumText,
-  },
-  titleStyle: {
-    ...typography.largeTextBold,
-  },
-  headerStyle: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: spacing.spacing_m,
-  },
-});
+const makeStyles = (colors: colorsType) =>
+  StyleSheet.create({
+    flatlistContainerStyle: {
+      paddingLeft: spacing.spacing_m,
+    },
+    textStyle: {
+      ...typography(colors).lightMediumText,
+    },
+    titleStyle: {
+      ...typography(colors).largeTextBold,
+    },
+    headerStyle: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      padding: spacing.spacing_m,
+    },
+  });

@@ -3,9 +3,10 @@ import { StyleSheet, View } from 'react-native';
 
 import { Icon } from 'react-native-elements';
 
-import { appColors } from '~/Styles/colors';
+import { useTheme } from '~/Context/ThemeContext';
 
 function SelectionIconForGrid({ isSelected }: { isSelected: boolean }) {
+  const { colors } = useTheme();
   return (
     <View style={styles.iconViewStyle}>
       {isSelected ? (
@@ -13,14 +14,14 @@ function SelectionIconForGrid({ isSelected }: { isSelected: boolean }) {
           style={styles.iconStyle}
           name="check-circle"
           size={SELECT_SIZE}
-          color={SELECT_COLOR}
+          color={colors.SELECT}
         />
       ) : (
         <Icon
           style={styles.iconStyle}
           name="radio-button-unchecked"
           size={SELECT_SIZE}
-          color={SELECT_COLOR}
+          color={colors.SELECT}
         />
       )}
     </View>
@@ -28,7 +29,6 @@ function SelectionIconForGrid({ isSelected }: { isSelected: boolean }) {
 }
 
 const SELECT_SIZE = 28;
-const SELECT_COLOR = appColors.BACKGROUND;
 
 const styles = StyleSheet.create({
   iconViewStyle: {

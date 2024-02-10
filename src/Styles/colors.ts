@@ -1,8 +1,8 @@
-export const colors = {
+const colors = {
   CYAN: '#2CA7AF',
   BLUE: '#1B8699',
   DARK: '#020D17',
-  GREEN: '#364D56',
+  LESS_DARK: '#121A22',
   LIGHT_GREEN: '#454C53',
   WHITE: 'white',
   LIGHT_GREY: '#F5F5F6',
@@ -20,16 +20,59 @@ export const colors = {
   COLOR_ERROR_500: '#d15b43',
 };
 
-export const appColors = {
-  BACKGROUND_LIGHT: colors.LIGHT_GREY,
-  BACKGROUND: colors.WHITE,
-  TEXT: colors.DARK,
-  TEXT_LIGHT: colors.LIGHT_GREEN,
-  TEXT_INVERSE: colors.WHITE,
-  PRIMARY: colors.DARK,
-  SECONDARY: colors.BLUE,
-  ACCENT: colors.CYAN,
-  FORM_BORDER: colors.LIGHT_GREEN,
-  UNDERLAY: colors.LIGHT_GREY,
-  OUTLINE_BORDER: colors.SOFT_GREY,
+export type colorsType = {
+  BACKGROUND_LIGHT: string;
+  BACKGROUND: string;
+  TEXT: string;
+  TEXT_LIGHT: string;
+  TEXT_INVERSE: string;
+  PRIMARY: string;
+  SECONDARY: string;
+  ACCENT: string;
+  FORM_BORDER: string;
+  UNDERLAY: string;
+  OUTLINE_BORDER: string;
+  TRANSPARENT: string;
+  SELECT: string;
+  ERROR: string;
+};
+
+export const LightTheme = {
+  dark: false,
+  colors: {
+    BACKGROUND_LIGHT: colors.LIGHT_GREY,
+    BACKGROUND: colors.WHITE,
+    TEXT: colors.DARK,
+    TEXT_LIGHT: colors.LIGHT_GREEN,
+    TEXT_INVERSE: colors.WHITE,
+    PRIMARY: colors.DARK,
+    SECONDARY: colors.BLUE,
+    ACCENT: colors.CYAN,
+    FORM_BORDER: colors.LIGHT_GREEN,
+    UNDERLAY: colors.LIGHT_GREY,
+    OUTLINE_BORDER: colors.SOFT_GREY,
+    TRANSPARENT: colors.TRANSPARENT,
+    SELECT: colors.WHITE,
+    ERROR: colors.COLOR_ERROR_500,
+  },
+};
+
+export const DarkTheme = {
+  dark: true,
+  colors: {
+    BACKGROUND_LIGHT: colors.LESS_DARK,
+    BACKGROUND: colors.DARK,
+    TEXT: colors.SOFT_GREY,
+    TEXT_LIGHT: colors.SOFT_GREY,
+    TEXT_INVERSE: colors.DARK,
+    PRIMARY: colors.CYAN,
+    SECONDARY: colors.CYAN,
+    ACCENT: colors.BLUE,
+    FORM_BORDER: colors.LIGHT_GREEN,
+    UNDERLAY: colors.LESS_DARK,
+    OUTLINE_BORDER: colors.LESS_DARK,
+    TRANSPARENT: colors.TRANSPARENT,
+    SELECT: colors.WHITE,
+    ERROR: colors.COLOR_ERROR_500,
+  },
 };

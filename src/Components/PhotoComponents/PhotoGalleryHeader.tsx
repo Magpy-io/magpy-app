@@ -3,6 +3,8 @@ import { StyleSheet, View } from 'react-native';
 
 import { Text } from 'react-native-elements';
 
+import { useStyles } from '~/Hooks/useStyles';
+import { colorsType } from '~/Styles/colors';
 import { spacing } from '~/Styles/spacing';
 import { typography } from '~/Styles/typography';
 
@@ -16,6 +18,8 @@ type PhotoGalleryHeaderProps = {
 };
 
 export function PhotoGalleryHeader(props: PhotoGalleryHeaderProps) {
+  const styles = useStyles(makeStyles);
+
   return (
     <View>
       <View style={{ alignSelf: 'center', padding: spacing.spacing_m }}>
@@ -38,11 +42,12 @@ export function PhotoGalleryHeader(props: PhotoGalleryHeaderProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  titleStyle: {
-    ...typography.extraLargeTextBold,
-  },
-  elementPadding: {
-    padding: spacing.spacing_m,
-  },
-});
+const makeStyles = (colors: colorsType) =>
+  StyleSheet.create({
+    titleStyle: {
+      ...typography(colors).extraLargeTextBold,
+    },
+    elementPadding: {
+      padding: spacing.spacing_m,
+    },
+  });

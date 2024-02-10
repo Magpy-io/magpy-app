@@ -5,17 +5,18 @@ import { usePhotosDownloadingFunctions } from '~/Context/ContextSlices/PhotosDow
 import { PhotoGalleryType, PhotoLocalType } from '~/Context/ReduxStore/Slices/Photos';
 import { usePhotosFunctionsStore } from '~/Context/ReduxStore/Slices/PhotosFunctions';
 import { useAppSelector } from '~/Context/ReduxStore/Store';
-import { appColors } from '~/Styles/colors';
+import { useStyles } from '~/Hooks/useStyles';
+import { colorsType } from '~/Styles/colors';
 
 import ToolComponent from '../common/ToolComponent';
-
-const TOOLBAR_COLOR = appColors.BACKGROUND;
 
 type ToolBarProps = {
   selectedKeys: Set<string>;
 };
 
 function ToolBarPhotos(props: ToolBarProps) {
+  const styles = useStyles(makeStyles);
+
   const localPhotos = useAppSelector(state => state.photos.photosLocal);
   const serverPhotos = useAppSelector(state => state.photos.photosServer);
   const galleryPhotos = useAppSelector(state => state.photos.photosGallery);
@@ -107,18 +108,19 @@ function ToolBarPhotos(props: ToolBarProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  toolBarView: {
-    width: '100%',
-    position: 'absolute',
-    backgroundColor: TOOLBAR_COLOR,
-    bottom: 0,
-  },
-  toolsView: {
-    height: 80,
-    flexDirection: 'row',
-  },
-  iconContainerStyle: {},
-});
+const makeStyles = (colors: colorsType) =>
+  StyleSheet.create({
+    toolBarView: {
+      width: '100%',
+      position: 'absolute',
+      backgroundColor: colors.BACKGROUND,
+      bottom: 0,
+    },
+    toolsView: {
+      height: 80,
+      flexDirection: 'row',
+    },
+    iconContainerStyle: {},
+  });
 
 export default React.memo(ToolBarPhotos);

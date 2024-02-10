@@ -3,21 +3,24 @@ import { StyleSheet } from 'react-native';
 
 import { Text } from 'react-native-elements';
 
-import { appColors } from '~/Styles/colors';
+import { useStyles } from '~/Hooks/useStyles';
+import { colorsType } from '~/Styles/colors';
 import { spacing } from '~/Styles/spacing';
 import { typography } from '~/Styles/typography';
 
 export default function ScreenTitle({ title }: { title: string }) {
+  const styles = useStyles(makeStyles);
   return <Text style={styles.screenTitleStyle}>{title}</Text>;
 }
 
-const styles = StyleSheet.create({
-  screenTitleStyle: {
-    paddingTop: spacing.spacing_xxl_6,
-    alignSelf: 'center',
-    textAlign: 'center',
-    ...typography.screenTitle,
-    color: appColors.TEXT,
-    paddingHorizontal: spacing.spacing_l,
-  },
-});
+const makeStyles = (colors: colorsType) =>
+  StyleSheet.create({
+    screenTitleStyle: {
+      paddingTop: spacing.spacing_xxl_6,
+      alignSelf: 'center',
+      textAlign: 'center',
+      ...typography(colors).screenTitle,
+      color: colors.TEXT,
+      paddingHorizontal: spacing.spacing_l,
+    },
+  });

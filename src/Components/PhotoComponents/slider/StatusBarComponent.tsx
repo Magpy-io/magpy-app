@@ -7,7 +7,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import BackButton from '~/Components/CommonComponents/BackButton';
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos';
-import { appColors } from '~/Styles/colors';
+import { useTheme } from '~/Context/ThemeContext';
+import { useStyles } from '~/Hooks/useStyles';
+import { colorsType } from '~/Styles/colors';
 import { typography } from '~/Styles/typography';
 
 type StatusBarComponentProps = {
@@ -16,6 +18,8 @@ type StatusBarComponentProps = {
 };
 
 function StatusBarComponent({ photo, onBackButton }: StatusBarComponentProps) {
+  const styles = useStyles(makeStyles);
+
   const photoInDevice = !!photo.mediaId;
   const photoInServer = !!photo.serverId;
   const deviceStatusIcon = photoInDevice ? 'mobile-friendly' : 'phonelink-erase';
@@ -43,6 +47,9 @@ type StatusComponentProps = {
 };
 
 const StatusComponent = React.memo(function StatusComponent(props: StatusComponentProps) {
+  const styles = useStyles(makeStyles);
+  const { colors } = useTheme();
+
   return (
     <View style={styles.statusComponentStyle}>
       <Icon
@@ -50,39 +57,37 @@ const StatusComponent = React.memo(function StatusComponent(props: StatusCompone
         type={props.type ?? 'material'}
         containerStyle={{}}
         size={26}
-        color={props.valid ? VALID_COLOR : INVALID_COLOR}
+        color={props.valid ? colors.PRIMARY : colors.TEXT_LIGHT}
       />
     </View>
   );
 });
 
-const VALID_COLOR = appColors.PRIMARY;
-const INVALID_COLOR = appColors.TEXT_LIGHT;
-
-const styles = StyleSheet.create({
-  title: {
-    ...typography.largeTextBold,
-  },
-  StatusBarStyle: {
-    width: '100%',
-    backgroundColor: appColors.BACKGROUND,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    position: 'absolute',
-    top: 0,
-  },
-  BackButtonTitleView: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  statusBarComponentStyle: {
-    flexDirection: 'row',
-    gap: 20,
-    padding: 20,
-  },
-  statusComponentStyle: {},
-});
+const makeStyles = (colors: colorsType) =>
+  StyleSheet.create({
+    title: {
+      ...typography(colors).largeTextBold,
+    },
+    StatusBarStyle: {
+      width: '100%',
+      backgroundColor: colors.BACKGROUND,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      position: 'absolute',
+      top: 0,
+    },
+    BackButtonTitleView: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+    },
+    statusBarComponentStyle: {
+      flexDirection: 'row',
+      gap: 20,
+      padding: 20,
+    },
+    statusComponentStyle: {},
+  });
 
 export default React.memo(StatusBarComponent);

@@ -3,13 +3,13 @@ import { StyleSheet, View } from 'react-native';
 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { useStyles } from '~/Hooks/useStyles';
 import Logo from '~/Images/LogoCompleteBlackBlue.svg';
-import { appColors, colors } from '~/Styles/colors';
-import { spacing } from '~/Styles/spacing';
+import { colorsType } from '~/Styles/colors';
 
 export default function SplashScreen() {
   const insets = useSafeAreaInsets();
-
+  const styles = useStyles(makeStyles);
   return (
     <View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
       <Logo width={180} />
@@ -17,17 +17,12 @@ export default function SplashScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  textStyle: {
-    fontSize: spacing.spacing_xxl,
-    alignSelf: 'center',
-    color: colors.SOFT_GREY,
-    fontFamily: 'Inter-Medium',
-  },
-  container: {
-    flex: 1,
-    backgroundColor: appColors.BACKGROUND,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-});
+const makeStyles = (colors: colorsType) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.BACKGROUND,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+  });

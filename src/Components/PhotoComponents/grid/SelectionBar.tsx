@@ -3,7 +3,8 @@ import { StyleSheet, Text, View, ViewStyle } from 'react-native';
 
 import CancelButton from '~/Components/CommonComponents/CancelButton';
 import SelectAllButton from '~/Components/CommonComponents/SelectAllButton';
-import { appColors } from '~/Styles/colors';
+import { useStyles } from '~/Hooks/useStyles';
+import { colorsType } from '~/Styles/colors';
 import { typography } from '~/Styles/typography';
 
 type SelectionBarProps = {
@@ -26,6 +27,8 @@ function selectedElementsToString(n: number) {
 }
 
 function SelectionBar(props: SelectionBarProps) {
+  const styles = useStyles(makeStyles);
+
   return (
     <View style={[styles.StatusBarStyle, props.style]}>
       <View style={styles.statusBarCancelButtonStyle}>
@@ -43,22 +46,23 @@ function SelectionBar(props: SelectionBarProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  StatusBarStyle: {
-    width: '100%',
-    backgroundColor: appColors.BACKGROUND,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    position: 'absolute',
-    top: 0,
-    padding: 10,
-  },
-  statusBarCancelButtonStyle: {},
-  statusBarSelectAllButtonStyle: {},
-  textElementsSelectedStyle: {
-    ...typography.largeTextBold,
-  },
-});
+const makeStyles = (colors: colorsType) =>
+  StyleSheet.create({
+    StatusBarStyle: {
+      width: '100%',
+      backgroundColor: colors.BACKGROUND,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      position: 'absolute',
+      top: 0,
+      padding: 10,
+    },
+    statusBarCancelButtonStyle: {},
+    statusBarSelectAllButtonStyle: {},
+    textElementsSelectedStyle: {
+      ...typography(colors).largeTextBold,
+    },
+  });
 
 export default React.memo(SelectionBar);

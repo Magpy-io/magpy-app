@@ -1,6 +1,6 @@
 import { TextStyle } from 'react-native/types';
 
-import { appColors, colors } from './colors';
+import { colorsType } from './colors';
 
 export const textSize = {
   small: {
@@ -20,7 +20,7 @@ export const textSize = {
   },
 };
 
-export const typography: {
+type typographyType = (colors: colorsType) => {
   screenTitle: TextStyle;
   sectionTitle: TextStyle;
 
@@ -41,97 +41,101 @@ export const typography: {
   formInfo: TextStyle;
   formError: TextStyle;
   tabBarLabel: TextStyle;
-} = {
-  // TITLES & HEADERS
-  screenTitle: {
-    ...textSize.extraLarge2,
-    color: appColors.TEXT,
-    fontFamily: 'Inter-Regular',
-  },
-  sectionTitle: {
-    ...textSize.extraLarge,
-    color: appColors.TEXT,
-    fontFamily: 'Inter-Medium',
-  },
+};
 
-  // TEXTS in differents sizes
-  smallText: {
-    ...textSize.small,
-    color: appColors.TEXT,
-    fontFamily: 'Inter-Regular',
-  },
-  mediumText: {
-    ...textSize.medium,
-    color: appColors.TEXT,
-    fontFamily: 'Inter-Regular',
-  },
-  largeText: {
-    ...textSize.large,
-    color: appColors.TEXT,
-    fontFamily: 'Inter-Regular',
-  },
-  extraLargeText: {
-    ...textSize.extraLarge,
-    color: appColors.TEXT,
-    fontFamily: 'Inter-Regular',
-  },
+export const typography: typographyType = (colors: colorsType) => {
+  return {
+    // TITLES & HEADERS
+    screenTitle: {
+      ...textSize.extraLarge2,
+      color: colors.TEXT,
+      fontFamily: 'Inter-Regular',
+    },
+    sectionTitle: {
+      ...textSize.extraLarge,
+      color: colors.TEXT,
+      fontFamily: 'Inter-Medium',
+    },
 
-  // TEXTS in differents sizes but BOLD
-  smallTextBold: {
-    ...textSize.small,
-    color: appColors.TEXT,
-    fontFamily: 'Inter-Medium',
-  },
-  mediumTextBold: {
-    ...textSize.medium,
-    color: appColors.TEXT,
-    fontFamily: 'Inter-Medium',
-  },
-  largeTextBold: {
-    ...textSize.large,
-    color: appColors.TEXT,
-    fontFamily: 'Inter-Medium',
-  },
-  extraLargeTextBold: {
-    ...textSize.extraLarge,
-    color: appColors.TEXT,
-    fontFamily: 'Inter-Medium',
-  },
+    // TEXTS in differents sizes
+    smallText: {
+      ...textSize.small,
+      color: colors.TEXT,
+      fontFamily: 'Inter-Regular',
+    },
+    mediumText: {
+      ...textSize.medium,
+      color: colors.TEXT,
+      fontFamily: 'Inter-Regular',
+    },
+    largeText: {
+      ...textSize.large,
+      color: colors.TEXT,
+      fontFamily: 'Inter-Regular',
+    },
+    extraLargeText: {
+      ...textSize.extraLarge,
+      color: colors.TEXT,
+      fontFamily: 'Inter-Regular',
+    },
 
-  // TEXTS in differents sizes in Lighter color (grey)
-  lightSmallText: {
-    ...textSize.small,
-    color: appColors.TEXT_LIGHT,
-    fontFamily: 'Inter-Regular',
-  },
-  lightMediumText: {
-    ...textSize.medium,
-    color: appColors.TEXT_LIGHT,
-    fontFamily: 'Inter-Regular',
-  },
-  lightLargeText: {
-    ...textSize.large,
-    color: appColors.TEXT_LIGHT,
-    fontFamily: 'Inter-Medium',
-  },
+    // TEXTS in differents sizes but BOLD
+    smallTextBold: {
+      ...textSize.small,
+      color: colors.TEXT,
+      fontFamily: 'Inter-Medium',
+    },
+    mediumTextBold: {
+      ...textSize.medium,
+      color: colors.TEXT,
+      fontFamily: 'Inter-Medium',
+    },
+    largeTextBold: {
+      ...textSize.large,
+      color: colors.TEXT,
+      fontFamily: 'Inter-Medium',
+    },
+    extraLargeTextBold: {
+      ...textSize.extraLarge,
+      color: colors.TEXT,
+      fontFamily: 'Inter-Medium',
+    },
 
-  // FORM specific typography
-  formError: {
-    color: colors.COLOR_ERROR_500,
-    fontSize: 13,
-    letterSpacing: 0.5,
-    fontFamily: 'Inter-Medium',
-  },
-  formInfo: {
-    color: appColors.TEXT_LIGHT,
-    fontSize: 13,
-    letterSpacing: 0.5,
-    fontFamily: 'Inter-Medium',
-  },
+    // TEXTS in differents sizes in Lighter color (grey)
+    lightSmallText: {
+      ...textSize.small,
+      color: colors.TEXT_LIGHT,
+      fontFamily: 'Inter-Regular',
+    },
+    lightMediumText: {
+      ...textSize.medium,
+      color: colors.TEXT_LIGHT,
+      fontFamily: 'Inter-Regular',
+    },
+    lightLargeText: {
+      ...textSize.large,
+      color: colors.TEXT_LIGHT,
+      fontFamily: 'Inter-Medium',
+    },
 
-  // Bottom navigation tab bar text style
-  tabBarLabel: {
-    fontSize: 10,
-    fontFamily: 'Inter-Medium',
-  },
+    // FORM specific typography
+    formError: {
+      color: colors.ERROR,
+      fontSize: 13,
+      letterSpacing: 0.5,
+      fontFamily: 'Inter-Medium',
+    },
+    formInfo: {
+      color: colors.TEXT_LIGHT,
+      fontSize: 13,
+      letterSpacing: 0.5,
+      fontFamily: 'Inter-Medium',
+    },
+
+    // Bottom navigation tab bar text style
+    tabBarLabel: {
+      fontSize: 10,
+      fontFamily: 'Inter-Medium',
+    },
+  };
 };

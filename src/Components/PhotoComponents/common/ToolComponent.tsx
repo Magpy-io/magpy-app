@@ -3,7 +3,9 @@ import { StyleSheet, Text, TouchableHighlight, View } from 'react-native';
 
 import { Icon } from '@rneui/themed';
 
-import { appColors } from '~/Styles/colors';
+import { useTheme } from '~/Context/ThemeContext';
+import { useStyles } from '~/Hooks/useStyles';
+import { colorsType } from '~/Styles/colors';
 import { typography } from '~/Styles/typography';
 
 type ToolComponentProps = {
@@ -14,16 +16,18 @@ type ToolComponentProps = {
 };
 
 const ToolComponent = React.memo(function ToolComponent(props: ToolComponentProps) {
+  const styles = useStyles(makeStyles);
+  const { colors } = useTheme();
   return (
     <TouchableHighlight
       onPress={props.onPress}
       style={styles.toolComponent}
-      underlayColor={appColors.UNDERLAY}>
+      underlayColor={colors.UNDERLAY}>
       <View style={styles.iconTextView}>
         <Icon
           name={props.icon}
           type={props.type}
-          color={TOOL_COLOR}
+          color={colors.TEXT}
           size={ICON_SIZE}
           containerStyle={styles.iconContainerStyle}
         />
@@ -34,25 +38,25 @@ const ToolComponent = React.memo(function ToolComponent(props: ToolComponentProp
 });
 
 const ICON_SIZE = 22;
-const TOOL_COLOR = appColors.TEXT;
 
-const styles = StyleSheet.create({
-  textStyle: {
-    color: TOOL_COLOR,
-    maxWidth: '70%',
-    textAlign: 'center',
-    paddingTop: 4,
-    ...typography.smallText,
-  },
-  iconTextView: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  toolComponent: {
-    flex: 1,
-  },
-  iconContainerStyle: {},
-});
+const makeStyles = (colors: colorsType) =>
+  StyleSheet.create({
+    textStyle: {
+      color: colors.TEXT,
+      maxWidth: '70%',
+      textAlign: 'center',
+      paddingTop: 4,
+      ...typography(colors).smallText,
+    },
+    iconTextView: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    toolComponent: {
+      flex: 1,
+    },
+    iconContainerStyle: {},
+  });
 
 export default ToolComponent;
