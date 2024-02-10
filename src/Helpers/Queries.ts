@@ -35,7 +35,7 @@ async function addPhotoWithProgress(
     fileSize: number;
     height: number;
     name: string;
-    path: string;
+    mediaId: string;
     width: number;
     image64: string;
   },
@@ -51,7 +51,7 @@ async function addPhotoWithProgress(
     width: photo.width,
     height: photo.height,
     date: photo.date,
-    path: photo.path,
+    mediaId: photo.mediaId,
     image64Len: base64Image.length,
     deviceUniqueId: uniqueDeviceId,
   });

@@ -8,6 +8,7 @@ const { MainModule } = NativeModules;
 
 export async function UploadPhotoTask(photo: {
   path: string;
+  mediaId: string;
   name: string;
   date: string;
   height: number;
@@ -22,7 +23,7 @@ export async function UploadPhotoTask(photo: {
     width: photo.width,
     height: photo.height,
     date: new Date(photo.date).toJSON(),
-    path: photo.path,
+    mediaId: photo.mediaId,
     image64: res,
   });
 

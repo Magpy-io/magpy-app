@@ -9,7 +9,7 @@ export interface RequestData {
   fileSize: number;
   height: number;
   image64Len: number;
+  mediaId: string;
   name: string;
-  path: string;
   width: number;
 }

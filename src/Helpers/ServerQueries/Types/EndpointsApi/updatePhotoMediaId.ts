@@ -9,9 +9,9 @@ export type ResponseData = string;
 
 export type ResponseErrorTypes = ErrorIdNotFound | ErrorServerNotClaimed | ErrorsAuthorization;
 
-export const endpoint = 'updatePhotoPath';
+export const endpoint = 'updatePhotoMediaId';
 
 export const tokenAuth: TokenAuthentification = 'yes';
 
 //auto-generated file using "yarn types"
-export * from '../RequestTypes/updatePhotoPath';
+export * from '../RequestTypes/updatePhotoMediaId';

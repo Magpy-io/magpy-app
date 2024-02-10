@@ -8,7 +8,7 @@ export interface RequestData {
   photoType: 'data' | 'thumbnail' | 'compressed' | 'original';
   photosData: {
     date: string;
-    path: string;
+    mediaId: string;
     size: number;
   }[];
 }

@@ -6,5 +6,5 @@
 export interface RequestData {
   deviceUniqueId: string;
   id: string;
-  path: string;
+  mediaId: string;
 }

@@ -12,7 +12,7 @@ export type APIPhoto = {
     date: string;
     syncDate: string;
     serverPath: string;
-    clientPaths: Array<{ deviceUniqueId: string; path: string }>;
+    mediaIds: Array<{ deviceUniqueId: string; mediaId: string }>;
   };
   image64: string;
 };
