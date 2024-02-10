@@ -11,6 +11,7 @@ type ThemeType = {
 export type ThemeContextType = {
   theme: ThemeType;
   colors: colorsType;
+  dark: boolean;
   setTheme: React.Dispatch<React.SetStateAction<ThemeType>>;
 };
 
@@ -29,6 +30,7 @@ const ThemeContextProvider: React.FC<PropsType> = props => {
   const value = {
     theme: theme,
     colors: theme.colors,
+    dark: theme.dark,
     setTheme: setTheme,
   };
 
