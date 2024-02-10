@@ -5,19 +5,19 @@ import { useServerClaimContext } from '~/Context/UseContexts/useClaimServerConte
 
 import { LoginStackNavigator } from './Navigators/LoginStackNavigator';
 import { MainStackNavigator } from './Navigators/MainStackNavigator';
-import ServerSelectScreen from './Screens/ServerSelectScreen';
-import SplashScreen from './Screens/SplashScreen';
+import { ServerSelectNavigator } from './Navigators/ServerSelectNavigator';
+import { SplashScreenNavigator } from './Navigators/SplashScreenNavigator';
 
 export const Root = () => {
   const { token, loading } = useAuthContext();
   const { hasServer } = useServerClaimContext();
 
   if (loading) {
-    return <SplashScreen />;
+    return <SplashScreenNavigator />;
   } else if (!token) {
     return <LoginStackNavigator />;
   } else if (!hasServer) {
-    return <ServerSelectScreen />;
+    return <ServerSelectNavigator />;
   } else {
     return <MainStackNavigator />;
   }
