@@ -6,7 +6,7 @@ import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos';
 import { NativeEventsNames } from '~/NativeModules/NativeModulesEventNames';
 import { useTabNavigationContext } from '~/Navigation/TabNavigation/TabNavigationContext';
 
-import ToolBarPhotos from '../grid/ToolBarPhotos';
+import ToolBarPhotos from '../common/ToolBarPhotos';
 import PhotoSliderComponent from './PhotoSliderComponent';
 import StatusBarComponent from './PhotoSliderHeader';
 

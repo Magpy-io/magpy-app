@@ -10,9 +10,9 @@ import { usePhotosFunctionsStore } from '~/Context/ReduxStore/Slices/PhotosFunct
 import { TabBarPadding } from '~/Navigation/TabNavigation/TabBar';
 import { useTabNavigationContext } from '~/Navigation/TabNavigation/TabNavigationContext';
 
+import ToolBarPhotos from '../common/ToolBarPhotos';
 import PhotoGridComponent from './PhotoGridComponent';
 import SelectionBar from './SelectionBar';
-import ToolBarPhotos from './ToolBarPhotos';
 
 type PropsType = {
   photos: Array<PhotoGalleryType>;

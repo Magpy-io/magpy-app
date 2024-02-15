@@ -1,15 +1,6 @@
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
-import {
-  DeleteFromDeviceIcon,
-  DeleteFromServerIcon,
-  DeleteIcon,
-  DownloadIcon,
-  InfoIcon,
-  ShareIcon,
-  UploadIcon,
-} from '~/Components/CommonComponents/Icons';
 import { usePhotosDownloadingFunctions } from '~/Context/ContextSlices/PhotosDownloadingContext/usePhotosDownloadingContext';
 import { PhotoGalleryType, PhotoLocalType } from '~/Context/ReduxStore/Slices/Photos';
 import { usePhotosFunctionsStore } from '~/Context/ReduxStore/Slices/PhotosFunctions';
@@ -17,8 +8,8 @@ import { useAppSelector } from '~/Context/ReduxStore/Store';
 import { useStyles } from '~/Hooks/useStyles';
 import { colorsType } from '~/Styles/colors';
 
-import ToolComponent from '../common/ToolComponent';
 import PhotoDetailsModal from '../slider/PhotoDetailsModal';
+import ToolBarPhotosComponent from './ToolBarPhotosComponent';
 
 type ToolBarProps = {
   selectedKeys: Set<string>;
@@ -92,55 +83,6 @@ function ToolBarPhotos(props: ToolBarProps) {
         />
       )}
     </View>
-  );
-}
-
-type ToolBarPhotosComponentProps = {
-  onBackUp: () => void;
-  onDownload: () => void;
-  onDeleteFromDevice: () => void;
-  onDelete: () => void;
-  onDeleteFromServer: () => void;
-  onShare: () => void;
-  onInfo: () => void;
-  showInfo: boolean;
-};
-
-function ToolBarPhotosComponent({
-  onBackUp,
-  onDelete,
-  onDeleteFromDevice,
-  onDownload,
-  onInfo,
-  onShare,
-  showInfo,
-  onDeleteFromServer,
-}: ToolBarPhotosComponentProps) {
-  const styles = useStyles(makeStyles);
-
-  return (
-    <ScrollView horizontal contentContainerStyle={styles.scrollviewContent}>
-      <ToolComponent icon={UploadIcon} text="Back up" onPress={onBackUp} />
-
-      <ToolComponent icon={DownloadIcon} text="Download" onPress={onDownload} />
-
-      <ToolComponent
-        icon={DeleteFromDeviceIcon}
-        text="Delete from device"
-        onPress={onDeleteFromDevice}
-      />
-      <ToolComponent icon={DeleteIcon} text="Delete everywhere" onPress={onDelete} />
-
-      <ToolComponent
-        icon={DeleteFromServerIcon}
-        text="Delete from server"
-        onPress={onDeleteFromServer}
-      />
-
-      <ToolComponent icon={ShareIcon} text="Share" onPress={onShare} />
-
-      {showInfo && <ToolComponent icon={InfoIcon} text="Details" onPress={onInfo} />}
-    </ScrollView>
   );
 }
 
