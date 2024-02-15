@@ -6,48 +6,7 @@ import { useTheme } from '~/Context/ThemeContext';
 
 export type CustomIconProps = Omit<IconProps, 'name'>;
 
-export function ArrowIcon({ ...props }: CustomIconProps) {
-  const { colors } = useTheme();
-  return <Icon name="arrow-forward" type="ionicon" color={colors.TEXT} size={16} {...props} />;
-}
-
-export function ChevronIcon({ ...props }: CustomIconProps) {
-  const { colors } = useTheme();
-
-  return (
-    <Icon
-      name="chevron-forward-outline"
-      type="ionicon"
-      color={colors.TEXT_LIGHT}
-      size={16}
-      {...props}
-    />
-  );
-}
-
-export function BackIcon({ ...props }: CustomIconProps) {
-  const { colors } = useTheme();
-
-  return <Icon name="chevron-back" type="ionicon" color={colors.TEXT} size={22} {...props} />;
-}
-
-export function MoreIcon({ ...props }: CustomIconProps) {
-  const { colors } = useTheme();
-
-  return <Icon name="more-vertical" type="feather" color={colors.TEXT} size={22} {...props} />;
-}
-
-export function ImageIcon({ ...props }: CustomIconProps) {
-  const { colors } = useTheme();
-
-  return <Icon name="image-outline" type="ionicon" color={colors.TEXT} size={22} {...props} />;
-}
-
-export function TimeIcon({ ...props }: CustomIconProps) {
-  const { colors } = useTheme();
-
-  return <Icon name="time-outline" type="ionicon" color={colors.TEXT} size={22} {...props} />;
-}
+// ---------------------- Actions (upload, download..Etc)
 
 export function UploadIcon({ ...props }: CustomIconProps) {
   const { colors } = useTheme();
@@ -62,6 +21,58 @@ export function UploadIcon({ ...props }: CustomIconProps) {
     />
   );
 }
+
+export function DeleteIcon({ ...props }: CustomIconProps) {
+  const { colors } = useTheme();
+
+  return <Icon name="trash-outline" type="ionicon" color={colors.TEXT} size={22} {...props} />;
+}
+
+export function DeleteFromDeviceIcon({ ...props }: CustomIconProps) {
+  const { colors } = useTheme();
+
+  return (
+    <Icon name="phonelink-erase" type="material" color={colors.TEXT} size={22} {...props} />
+  );
+}
+
+export function DeleteFromServerIcon({ ...props }: CustomIconProps) {
+  const { colors } = useTheme();
+
+  return (
+    <Icon
+      name="cloud-offline-outline"
+      type="ionicon"
+      color={colors.TEXT}
+      size={22}
+      {...props}
+    />
+  );
+}
+
+export function DownloadIcon({ ...props }: CustomIconProps) {
+  const { colors } = useTheme();
+
+  return (
+    <Icon name="download-outline" type="ionicon" color={colors.TEXT} size={22} {...props} />
+  );
+}
+
+export function ShareIcon({ ...props }: CustomIconProps) {
+  const { colors } = useTheme();
+
+  return (
+    <Icon
+      name="share-social-outline"
+      type="ionicon"
+      color={colors.TEXT}
+      size={22}
+      {...props}
+    />
+  );
+}
+
+// ---------------------- Photo information icons (in device, in server, date...Etc)
 
 export function InDeviceIcon({ ...props }: CustomIconProps) {
   const { colors } = useTheme();
@@ -101,19 +112,19 @@ export function NotInServerIcon({ ...props }: CustomIconProps) {
   );
 }
 
-export function PhoneIcon({ ...props }: CustomIconProps) {
+export function ImageIcon({ ...props }: CustomIconProps) {
   const { colors } = useTheme();
 
-  return (
-    <Icon
-      name="phone-portrait-outline"
-      type="ionicon"
-      color={colors.TEXT}
-      size={22}
-      {...props}
-    />
-  );
+  return <Icon name="image-outline" type="ionicon" color={colors.TEXT} size={22} {...props} />;
 }
+
+export function TimeIcon({ ...props }: CustomIconProps) {
+  const { colors } = useTheme();
+
+  return <Icon name="time-outline" type="ionicon" color={colors.TEXT} size={22} {...props} />;
+}
+
+// ---------------------- General icons (menu, filter, sort..etc)
 
 export function TuneIcon({ ...props }: CustomIconProps) {
   const { colors } = useTheme();
@@ -122,6 +133,38 @@ export function TuneIcon({ ...props }: CustomIconProps) {
     <Icon name="options-outline" type="ionicon" color={colors.TEXT} size={22} {...props} />
   );
 }
+export function ArrowIcon({ ...props }: CustomIconProps) {
+  const { colors } = useTheme();
+  return <Icon name="arrow-forward" type="ionicon" color={colors.TEXT} size={16} {...props} />;
+}
+
+export function ChevronIcon({ ...props }: CustomIconProps) {
+  const { colors } = useTheme();
+
+  return (
+    <Icon
+      name="chevron-forward-outline"
+      type="ionicon"
+      color={colors.TEXT_LIGHT}
+      size={16}
+      {...props}
+    />
+  );
+}
+
+export function BackIcon({ ...props }: CustomIconProps) {
+  const { colors } = useTheme();
+
+  return <Icon name="chevron-back" type="ionicon" color={colors.TEXT} size={22} {...props} />;
+}
+
+export function MoreIcon({ ...props }: CustomIconProps) {
+  const { colors } = useTheme();
+
+  return <Icon name="more-vertical" type="feather" color={colors.TEXT} size={22} {...props} />;
+}
+
+// ---------------------- SETTINGS icons
 
 export function AccountIcon({ ...props }: CustomIconProps) {
   const { colors } = useTheme();
@@ -178,5 +221,19 @@ export function PreferencesIcon({ ...props }: CustomIconProps) {
 
   return (
     <Icon name="options-outline" type="ionicon" color={colors.TEXT} size={22} {...props} />
+  );
+}
+
+export function PhoneIcon({ ...props }: CustomIconProps) {
+  const { colors } = useTheme();
+
+  return (
+    <Icon
+      name="phone-portrait-outline"
+      type="ionicon"
+      color={colors.TEXT}
+      size={22}
+      {...props}
+    />
   );
 }
