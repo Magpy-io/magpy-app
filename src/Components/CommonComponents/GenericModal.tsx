@@ -25,7 +25,8 @@ export default function GenericModal({
   return (
     <Modal
       animationType="slide"
-      transparent={true}
+      transparent
+      statusBarTranslucent
       visible={modalVisible}
       onRequestClose={handleModal}>
       <View style={{ flex: 1 }}>
@@ -42,7 +43,6 @@ const makeStyles = (colors: colorsType) =>
   StyleSheet.create({
     viewStyle: {
       backgroundColor: colors.BACKGROUND,
-      height: '80%',
       width: '100%',
       position: 'absolute',
       bottom: 0,
