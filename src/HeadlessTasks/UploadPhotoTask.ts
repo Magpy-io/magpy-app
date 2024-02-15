@@ -15,24 +15,28 @@ export async function UploadPhotoTask(photo: {
   width: number;
   size: number;
 }) {
-  const res = await RNFS.readFile(photo.path, 'base64');
+  try {
+    const res = await RNFS.readFile(photo.path, 'base64');
 
-  const result = await Queries.addPhotoWithProgress({
-    name: photo.name,
-    fileSize: photo.size,
-    width: photo.width,
-    height: photo.height,
-    date: new Date(photo.date).toJSON(),
-    mediaId: photo.mediaId,
-    image64: res,
-  });
+    const result = await Queries.addPhotoWithProgress({
+      name: photo.name,
+      fileSize: photo.size,
+      width: photo.width,
+      height: photo.height,
+      date: new Date(photo.date).toJSON(),
+      mediaId: photo.mediaId,
+      image64: res,
+    });
 
-  if (result.ok && result.data.done) {
-    MainModule.onJsTaskFinished({ code: 'SUCCESS', id: result.data.photo.id });
-    console.log('photo uploaded');
-  } else {
-    MainModule.onJsTaskFinished({ code: 'ERROR', id: '' });
-    console.log('photo upload error');
-    console.log((result as typeof result & { ok: false }).errorCode);
+    if (result.ok && result.data.done) {
+      MainModule.onJsTaskFinished({ code: 'SUCCESS', id: result.data.photo.id });
+      console.log('UploadPhotoTask: photo uploaded');
+    } else {
+      MainModule.onJsTaskFinished({ code: 'ERROR', id: '' });
+      console.log('UploadPhotoTask: photo upload error');
+      console.log((result as typeof result & { ok: false }).errorCode);
+    }
+  } catch (e) {
+    console.log('UploadPhotoTask: Error thrown:', e);
   }
 }
