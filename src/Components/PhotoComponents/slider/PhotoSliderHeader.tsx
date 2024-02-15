@@ -8,6 +8,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BackButton from '~/Components/CommonComponents/BackButton';
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos';
 import { useTheme } from '~/Context/ThemeContext';
+import { formatDate } from '~/Helpers/Date';
 import { useStyles } from '~/Hooks/useStyles';
 import { colorsType } from '~/Styles/colors';
 import { typography } from '~/Styles/typography';
@@ -25,12 +26,12 @@ function PhotoSliderHeader({ photo, onBackButton }: StatusBarComponentProps) {
   const deviceStatusIcon = photoInDevice ? 'mobile-friendly' : 'phonelink-erase';
   const serverStatusIcon = photoInServer ? 'cloud-done-outline' : 'cloud-offline-outline';
   const insets = useSafeAreaInsets();
-
+  const title = formatDate(photo.date);
   return (
     <View style={[styles.StatusBarStyle, { paddingTop: insets.top }]}>
       <View style={styles.BackButtonTitleView}>
         <BackButton onPress={onBackButton} />
-        <Text style={styles.title}>{'title'}</Text>
+        <Text style={styles.title}>{title}</Text>
       </View>
       <View style={styles.statusBarComponentStyle}>
         <StatusComponent icon={serverStatusIcon} type="ionicon" valid={photoInServer} />

@@ -4,12 +4,14 @@ import { Icon, IconProps } from 'react-native-elements';
 
 import { useTheme } from '~/Context/ThemeContext';
 
-export function ArrowIcon({ ...props }: Omit<IconProps, 'name'>) {
+export type CustomIconProps = Omit<IconProps, 'name'>;
+
+export function ArrowIcon({ ...props }: CustomIconProps) {
   const { colors } = useTheme();
   return <Icon name="arrow-forward" type="ionicon" color={colors.TEXT} size={16} {...props} />;
 }
 
-export function ChevronIcon({ ...props }: Omit<IconProps, 'name'>) {
+export function ChevronIcon({ ...props }: CustomIconProps) {
   const { colors } = useTheme();
 
   return (
@@ -23,19 +25,31 @@ export function ChevronIcon({ ...props }: Omit<IconProps, 'name'>) {
   );
 }
 
-export function BackIcon({ ...props }: Omit<IconProps, 'name'>) {
+export function BackIcon({ ...props }: CustomIconProps) {
   const { colors } = useTheme();
 
   return <Icon name="chevron-back" type="ionicon" color={colors.TEXT} size={22} {...props} />;
 }
 
-export function MoreIcon({ ...props }: Omit<IconProps, 'name'>) {
+export function MoreIcon({ ...props }: CustomIconProps) {
   const { colors } = useTheme();
 
   return <Icon name="more-vertical" type="feather" color={colors.TEXT} size={22} {...props} />;
 }
 
-export function UploadIcon({ ...props }: Omit<IconProps, 'name'>) {
+export function ImageIcon({ ...props }: CustomIconProps) {
+  const { colors } = useTheme();
+
+  return <Icon name="image-outline" type="ionicon" color={colors.TEXT} size={22} {...props} />;
+}
+
+export function TimeIcon({ ...props }: CustomIconProps) {
+  const { colors } = useTheme();
+
+  return <Icon name="time-outline" type="ionicon" color={colors.TEXT} size={22} {...props} />;
+}
+
+export function UploadIcon({ ...props }: CustomIconProps) {
   const { colors } = useTheme();
 
   return (
@@ -49,7 +63,45 @@ export function UploadIcon({ ...props }: Omit<IconProps, 'name'>) {
   );
 }
 
-export function PhoneIcon({ ...props }: Omit<IconProps, 'name'>) {
+export function InDeviceIcon({ ...props }: CustomIconProps) {
+  const { colors } = useTheme();
+
+  return (
+    <Icon name="mobile-friendly" type="material" color={colors.TEXT} size={22} {...props} />
+  );
+}
+
+export function NotInDeviceIcon({ ...props }: CustomIconProps) {
+  const { colors } = useTheme();
+
+  return (
+    <Icon name="phonelink-erase" type="material" color={colors.TEXT} size={22} {...props} />
+  );
+}
+
+export function InServerIcon({ ...props }: CustomIconProps) {
+  const { colors } = useTheme();
+
+  return (
+    <Icon name="cloud-done-outline" type="ionicon" color={colors.TEXT} size={22} {...props} />
+  );
+}
+
+export function NotInServerIcon({ ...props }: CustomIconProps) {
+  const { colors } = useTheme();
+
+  return (
+    <Icon
+      name="cloud-offline-outline"
+      type="ionicon"
+      color={colors.TEXT}
+      size={22}
+      {...props}
+    />
+  );
+}
+
+export function PhoneIcon({ ...props }: CustomIconProps) {
   const { colors } = useTheme();
 
   return (
@@ -63,7 +115,7 @@ export function PhoneIcon({ ...props }: Omit<IconProps, 'name'>) {
   );
 }
 
-export function TuneIcon({ ...props }: Omit<IconProps, 'name'>) {
+export function TuneIcon({ ...props }: CustomIconProps) {
   const { colors } = useTheme();
 
   return (
@@ -71,7 +123,7 @@ export function TuneIcon({ ...props }: Omit<IconProps, 'name'>) {
   );
 }
 
-export function AccountIcon({ ...props }: Omit<IconProps, 'name'>) {
+export function AccountIcon({ ...props }: CustomIconProps) {
   const { colors } = useTheme();
 
   return (
@@ -85,7 +137,7 @@ export function AccountIcon({ ...props }: Omit<IconProps, 'name'>) {
   );
 }
 
-export function InfoIcon({ ...props }: Omit<IconProps, 'name'>) {
+export function InfoIcon({ ...props }: CustomIconProps) {
   const { colors } = useTheme();
 
   return (
@@ -99,7 +151,7 @@ export function InfoIcon({ ...props }: Omit<IconProps, 'name'>) {
   );
 }
 
-export function HelpIcon({ ...props }: Omit<IconProps, 'name'>) {
+export function HelpIcon({ ...props }: CustomIconProps) {
   const { colors } = useTheme();
 
   return (
@@ -107,7 +159,7 @@ export function HelpIcon({ ...props }: Omit<IconProps, 'name'>) {
   );
 }
 
-export function NotificationIcon({ ...props }: Omit<IconProps, 'name'>) {
+export function NotificationIcon({ ...props }: CustomIconProps) {
   const { colors } = useTheme();
 
   return (
@@ -121,7 +173,7 @@ export function NotificationIcon({ ...props }: Omit<IconProps, 'name'>) {
   );
 }
 
-export function PreferencesIcon({ ...props }: Omit<IconProps, 'name'>) {
+export function PreferencesIcon({ ...props }: CustomIconProps) {
   const { colors } = useTheme();
 
   return (

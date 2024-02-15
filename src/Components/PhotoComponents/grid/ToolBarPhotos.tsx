@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { usePhotosDownloadingFunctions } from '~/Context/ContextSlices/PhotosDownloadingContext/usePhotosDownloadingContext';
@@ -9,6 +9,7 @@ import { useStyles } from '~/Hooks/useStyles';
 import { colorsType } from '~/Styles/colors';
 
 import ToolComponent from '../common/ToolComponent';
+import PhotoDetailsModal from '../slider/PhotoDetailsModal';
 
 type ToolBarProps = {
   selectedKeys: Set<string>;
@@ -16,6 +17,9 @@ type ToolBarProps = {
 
 function ToolBarPhotos(props: ToolBarProps) {
   const styles = useStyles(makeStyles);
+  const [modalVisible, setModalVisible] = useState(false);
+  const handleModal = () => setModalVisible(prev => !prev);
+  const isOnePhoto = props.selectedKeys.size === 1;
 
   const localPhotos = useAppSelector(state => state.photos.photosLocal);
   const serverPhotos = useAppSelector(state => state.photos.photosServer);
@@ -77,13 +81,6 @@ function ToolBarPhotos(props: ToolBarProps) {
         />
 
         <ToolComponent
-          icon="backup"
-          type="material"
-          text="Back up"
-          onPress={() => props.onAddServer?.()}
-        />
-
-        <ToolComponent
           icon="mobile-off"
           type="material"
           text="Delete from device"
@@ -103,7 +100,18 @@ function ToolBarPhotos(props: ToolBarProps) {
           text="Share"
           onPress={() => props.onShare?.()}
         />
+
+        {isOnePhoto && (
+          <ToolComponent icon="info" type="material" text="Details" onPress={handleModal} />
+        )}
       </View>
+      {isOnePhoto && (
+        <PhotoDetailsModal
+          modalVisible={modalVisible}
+          handleModal={handleModal}
+          photo={galleryPhotos[0]}
+        />
+      )}
     </View>
   );
 }

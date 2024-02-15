@@ -1,6 +1,22 @@
 import React from 'react';
+import { StyleSheet, View } from 'react-native';
 
+import { Text } from 'react-native-elements';
+
+import {
+  CustomIconProps,
+  ImageIcon,
+  InDeviceIcon,
+  InServerIcon,
+  TimeIcon,
+} from '~/Components/CommonComponents/Icons';
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos';
+import { formatDate } from '~/Helpers/Date';
+import { getReadableFileSizeString } from '~/Helpers/FileSizeFormat';
+import usePhotoData from '~/Hooks/usePhotoData';
+import { useStyles } from '~/Hooks/useStyles';
+import { colorsType } from '~/Styles/colors';
+import { typography } from '~/Styles/typography';
 
 import GenericModal from '../../CommonComponents/GenericModal';
 
@@ -13,53 +29,86 @@ type PhotoDetailsModalProps = {
 export default function PhotoDetailsModal({
   modalVisible,
   handleModal,
+  photo,
 }: PhotoDetailsModalProps) {
+  const photoData = usePhotoData(photo);
+
+  const fileSizeString = photoData?.fileSize
+    ? `(${getReadableFileSizeString(photoData.fileSize)})`
+    : '';
+
+  const filePath = photoData?.devicePath
+    ? `${photoData.devicePath.split('://')?.[1]}`
+    : undefined;
+
+  const dateTaken = photoData?.created
+    ? `Taken on ${formatDate(photoData.created)}`
+    : 'Unknown date taken';
+
   return (
     <GenericModal modalVisible={modalVisible} handleModal={handleModal}>
       <>
-        {/* <PhotoInfo
-          icon="image"
-          title={photo.image.fileName}
-          text={`${photo.image.width} x ${photo.image.height} px`}
-        />
         <PhotoInfo
-          icon="history"
-          title={`Taken on ${formatDate(photo.created)}`}
-          text={photo.modified ? `Modified on ${formatDate(photo.modified)}` : 'Unmodified'}
+          icon={ImageIcon}
+          title={photoData?.fileName ?? ''}
+          text={`${photoData?.width} x ${photoData?.height}`}
         />
-        {photo.inServer && (
+        <PhotoInfo icon={TimeIcon} title={dateTaken} />
+        {photoData.inServer && (
           <PhotoInfo
-            icon="cloud-done"
-            title={`Backed up (${getReadableFileSizeString(photo.image.fileSize)})`}
+            icon={InServerIcon}
+            title={`Backed up ${fileSizeString}`}
             text={`In server`}
           />
         )}
-        {photo.inDevice && (
+        {photoData.inDevice && (
           <PhotoInfo
-            icon="mobile-friendly"
-            title={`On device (${getReadableFileSizeString(photo.image.fileSize)})`}
-            text={`${photo?.image?.path?.split('://')?.[1]}`}
+            icon={InDeviceIcon}
+            title={`On device ${fileSizeString}`}
+            text={filePath}
           />
-        )} */}
+        )}
       </>
     </GenericModal>
   );
 }
 
-// type PhotoInfoProps = {
-//   icon: string;
-//   title: string;
-//   text?: string;
-// };
+type PhotoInfoProps = {
+  icon: (props: CustomIconProps) => JSX.Element;
+  title?: string;
+  text?: string;
+};
 
-// function PhotoInfo({ icon, title, text }: PhotoInfoProps) {
-//   return (
-//     <View style={{ flexDirection: 'row', padding: 5, paddingBottom: 30 }}>
-//       <Icon name={icon} containerStyle={{ padding: 5, paddingRight: 30 }} />
-//       <View>
-//         <Text style={{ fontWeight: '600' }}>{title}</Text>
-//         <Text>{text}</Text>
-//       </View>
-//     </View>
-//   );
-// }
+function PhotoInfo({ icon: Icon, title, text }: PhotoInfoProps) {
+  const styles = useStyles(makeStyles);
+  return (
+    <View style={styles.view}>
+      <Icon containerStyle={styles.iconContainer} />
+      <View>
+        {title && <Text style={styles.titleStyle}>{title}</Text>}
+        {text && <Text style={styles.textStyle}>{text}</Text>}
+      </View>
+    </View>
+  );
+}
+
+const makeStyles = (colors: colorsType) =>
+  StyleSheet.create({
+    iconContainer: {
+      padding: 5,
+      paddingRight: 30,
+    },
+    view: {
+      flexDirection: 'row',
+      padding: 5,
+      paddingBottom: 30,
+      marginRight: 20,
+      alignItems: 'center',
+    },
+    textStyle: {
+      ...typography(colors).mediumText,
+    },
+    titleStyle: {
+      ...typography(colors).mediumText,
+    },
+  });
