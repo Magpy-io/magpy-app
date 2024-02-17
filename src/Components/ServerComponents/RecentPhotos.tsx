@@ -27,6 +27,11 @@ export default function RecentPhotos() {
   const { colors } = useTheme();
   const styles = useStyles(makeStyles);
 
+  const noPhotos = photosGalleryServer?.length === 0;
+  if (noPhotos) {
+    return <View />;
+  }
+
   return (
     <>
       <View style={styles.headerStyle}>

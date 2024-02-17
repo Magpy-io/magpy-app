@@ -3,6 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { Badge } from 'react-native-elements';
 
+import { useTheme } from '~/Context/ThemeContext';
 import { useStyles } from '~/Hooks/useStyles';
 import Logo from '~/Images/logoWhite.svg';
 import { colorsType } from '~/Styles/colors';
@@ -13,24 +14,26 @@ type ServerComponentProps = {
   name: string;
   ip: string;
   port: string;
+  reachable: boolean;
 };
 
-export default function ServerComponent({ name, ip, port }: ServerComponentProps) {
+export default function ServerComponent({ name, ip, port, reachable }: ServerComponentProps) {
   const IpAddress = `${ip}: ${port}`;
   const styles = useStyles(makeStyles);
-
+  const { colors } = useTheme();
   return (
     <View style={styles.viewStyle}>
       <View style={styles.iconStyle}>
         <Logo width={20} height={20} />
         <Badge
-          status="success"
+          badgeStyle={{ backgroundColor: reachable ? colors.SUCCESS : colors.WARNING }}
           containerStyle={{ position: 'absolute', top: -2, right: -2 }}
         />
       </View>
       <View>
         <Text style={styles.name}>{name}</Text>
-        <Text style={styles.ipAddress}>{IpAddress}</Text>
+        {reachable && <Text style={styles.ipAddress}>{IpAddress}</Text>}
+        {!reachable && <Text style={styles.unreachable}>Server unreachable</Text>}
       </View>
     </View>
   );
@@ -46,6 +49,10 @@ const makeStyles = (colors: colorsType) =>
     },
     ipAddress: {
       ...typography(colors).lightMediumText,
+    },
+    unreachable: {
+      ...typography(colors).mediumTextBold,
+      color: colors.WARNING,
     },
     name: {
       ...typography(colors).mediumTextBold,

@@ -14,7 +14,7 @@ import ServerComponent from './ServerComponent';
 
 export default function ServerDetails() {
   const { server } = useServerClaimContext();
-  const { serverNetwork } = useServerContext();
+  const { serverNetwork, isServerReachable } = useServerContext();
   const styles = useStyles(makeStyles);
 
   return (
@@ -24,6 +24,7 @@ export default function ServerDetails() {
         name={server?.name ?? ''}
         ip={serverNetwork.currentIp ?? ''}
         port={serverNetwork.port ?? ''}
+        reachable={isServerReachable}
       />
     </View>
   );

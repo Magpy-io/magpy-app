@@ -1,10 +1,11 @@
 import React, { useMemo } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
-import { Icon, Text } from 'react-native-elements';
+import { Badge, Icon, Text } from 'react-native-elements';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useTheme } from '~/Context/ThemeContext';
+import { useServerContext } from '~/Context/UseContexts/useServerContext';
 import { useStyles } from '~/Hooks/useStyles';
 import {
   TabName,
@@ -89,6 +90,8 @@ type TabElementProps = {
 
 function TabElement({ routeName, icon, iconFocused }: TabElementProps) {
   const { navigateTo, focusedTab } = useTabNavigationContext();
+  const { isServerReachable } = useServerContext();
+
   const focused = useMemo(() => focusedTab === routeName, [focusedTab, routeName]);
   const styles = useStyles(makeStyles);
   const { colors } = useTheme();
@@ -104,12 +107,22 @@ function TabElement({ routeName, icon, iconFocused }: TabElementProps) {
   return (
     <TouchableOpacity style={{ flex: 1 }} onPress={onPress}>
       <View style={styles.tabElementView}>
-        <Icon
-          name={focused ? iconFocused.name : icon.name}
-          type={focused ? iconFocused.type : icon.type}
-          size={ICON_SIZE}
-          color={focused ? FOCUSED_COLOR : COLOR}
-        />
+        <View>
+          <Icon
+            name={focused ? iconFocused.name : icon.name}
+            type={focused ? iconFocused.type : icon.type}
+            size={ICON_SIZE}
+            color={focused ? FOCUSED_COLOR : COLOR}
+          />
+          {routeName === TabName.Server && (
+            <Badge
+              badgeStyle={{
+                backgroundColor: isServerReachable ? colors.SUCCESS : colors.WARNING,
+              }}
+              containerStyle={{ position: 'absolute', top: -2, right: -2 }}
+            />
+          )}
+        </View>
         <Text style={[styles.label, focused ? { color: FOCUSED_COLOR } : { color: COLOR }]}>
           {routeName}
         </Text>

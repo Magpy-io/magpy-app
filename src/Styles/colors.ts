@@ -18,6 +18,11 @@ const colors = {
   COLOR_ERROR_300: '#f2d5cf',
   COLOR_ERROR_400: '#e7aca0',
   COLOR_ERROR_500: '#d15b43',
+  COLOR_WARNING_100: '#FFF9E5',
+  COLOR_WARNING_200: '#FFF4CC',
+  COLOR_WARNING_300: '#FFEA99',
+  COLOR_WARNING_400: '#FFE066',
+  COLOR_WARNING_500: '#E5B700',
   GREY: '#C8C8C8',
   DARKER_GREY: '#9B9B9B',
 };
@@ -36,7 +41,9 @@ export type colorsType = {
   OUTLINE_BORDER: string;
   TRANSPARENT: string;
   SELECT: string;
+  SUCCESS: string;
   ERROR: string;
+  WARNING: string;
 };
 
 export const LightTheme = {
@@ -55,7 +62,9 @@ export const LightTheme = {
     OUTLINE_BORDER: colors.SOFT_GREY,
     TRANSPARENT: colors.TRANSPARENT,
     SELECT: colors.WHITE,
+    SUCCESS: colors.COLOR_SUCCESS_500,
     ERROR: colors.COLOR_ERROR_500,
+    WARNING: colors.COLOR_WARNING_500,
   },
 };
 
@@ -75,6 +84,8 @@ export const DarkTheme = {
     OUTLINE_BORDER: colors.LESS_DARK,
     TRANSPARENT: colors.TRANSPARENT,
     SELECT: colors.WHITE,
+    SUCCESS: colors.COLOR_SUCCESS_500,
     ERROR: colors.COLOR_ERROR_500,
+    WARNING: colors.COLOR_WARNING_400,
   },
 };
