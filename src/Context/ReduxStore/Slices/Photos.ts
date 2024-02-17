@@ -8,7 +8,7 @@ export type PhotoServerType = {
   fileName: string;
   height: number;
   width: number;
-  created: string;
+  date: string;
   syncDate: string;
   mediaId: string | undefined;
   uriThumbnail: string | undefined;
@@ -23,7 +23,7 @@ export type PhotoLocalType = {
   height: number;
   width: number;
   group_name: string[];
-  created: string;
+  date: string;
   type: string;
 };
 

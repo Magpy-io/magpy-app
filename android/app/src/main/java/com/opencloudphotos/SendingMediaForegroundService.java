@@ -53,12 +53,6 @@ public class SendingMediaForegroundService extends HeadlessJsTaskService {
     private static SendingMediaForegroundService instance;
 
     public String[] ids;
-    public String[] names;
-    public String[] dates;
-    public String[] paths ;
-    public int[] widths;
-    public int[] heights;
-    public int[] sizes;
     public int index;
 
     public String state = "DESTROYED";
@@ -132,12 +126,6 @@ public class SendingMediaForegroundService extends HeadlessJsTaskService {
         Log.d("Service", "service sendPhotos: started");
 
         ids = b.getStringArray("ids");
-        names = b.getStringArray("names");
-        dates = b.getStringArray("dates");
-        paths = b.getStringArray("paths");
-        widths = b.getIntArray("widths");
-        heights = b.getIntArray("heights");
-        sizes = b.getIntArray("sizes");
 
         state = "ACTIVE";
 
@@ -161,13 +149,7 @@ public class SendingMediaForegroundService extends HeadlessJsTaskService {
 
         Bundle b = new Bundle();
 
-        b.putString("path", paths[index]);
         b.putString("mediaId", ids[index]);
-        b.putString("name", names[index]);
-        b.putString("date", dates[index]);
-        b.putInt("height", heights[index]);
-        b.putInt("width", widths[index]);
-        b.putInt("size", sizes[index]);
 
         Log.d("Service", "service startNextTask: start js task");
         try{

@@ -18,14 +18,14 @@ export function mergePhotos(photosState: PhotosState): PhotoGalleryType[] {
     if (photoLocalAssociatedId) {
       photosServerGallery.push({
         key: photoServerId,
-        date: photoServer.created,
+        date: photoServer.date,
         serverId: photoServerId,
         mediaId: photoServer.mediaId,
       });
     } else {
       photosServerGallery.push({
         key: photoServerId,
-        date: photoServer.created,
+        date: photoServer.date,
         serverId: photoServerId,
         mediaId: undefined,
       });
@@ -40,7 +40,7 @@ export function mergePhotos(photosState: PhotosState): PhotoGalleryType[] {
     if (!mergedWithServerPhoto) {
       photosLocalGallery.push({
         key: photoLocalId,
-        date: photosLocal[photoLocalId].created,
+        date: photosLocal[photoLocalId].date,
         serverId: undefined,
         mediaId: photoLocalId,
       });
@@ -90,13 +90,13 @@ export function compareDates(date1: string, date2: string) {
   }
 }
 
-export function insertPhotoKeyWithOrder<T extends { id: string; created: string }>(
+export function insertPhotoKeyWithOrder<T extends { id: string; date: string }>(
   photos: { [key: string]: T },
   photosIdsOrdered: string[],
   photo: T,
 ) {
   const insertIndex = photosIdsOrdered.findIndex(
-    p => compareDates(photos[p].created, photo.created) <= 0,
+    p => compareDates(photos[p].date, photo.date) <= 0,
   );
   if (insertIndex == -1) {
     photosIdsOrdered.push(photo.id);

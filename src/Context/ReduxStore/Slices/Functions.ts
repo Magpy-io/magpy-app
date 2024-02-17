@@ -10,7 +10,7 @@ export function ParseApiPhoto(photo: APIPhoto): PhotoServerType {
     fileName: photo.meta.name,
     height: photo.meta.height,
     width: photo.meta.width,
-    created: photo.meta.date,
+    date: photo.meta.date,
     syncDate: photo.meta.syncDate,
     mediaId: photo.meta.mediaIds.find(mediaId => mediaId.deviceUniqueId == uniqueDeviceId)
       ?.mediaId,

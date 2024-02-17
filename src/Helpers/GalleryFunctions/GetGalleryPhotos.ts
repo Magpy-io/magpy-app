@@ -1,6 +1,6 @@
 import { NativeModules } from 'react-native';
 
-import { CameraRoll } from '@react-native-camera-roll/camera-roll';
+import { CameraRoll, PhotoIdentifier } from '@react-native-camera-roll/camera-roll';
 
 import { PhotoLocalType } from '~/Context/ReduxStore/Slices/Photos';
 
@@ -24,21 +24,7 @@ export async function GalleryGetPhotos(
     return b.node.timestamp - a.node.timestamp;
   });
 
-  return result.edges.map(edge => {
-    const timestamp = getCorrectDate(edge.node) * 1000;
-
-    return {
-      id: edge.node.id,
-      uri: edge.node.image.uri,
-      fileSize: edge.node.image.fileSize ?? 0,
-      fileName: edge.node.image.filename ?? '',
-      height: edge.node.image.height,
-      width: edge.node.image.width,
-      group_name: edge.node.group_name,
-      created: new Date(timestamp).toISOString(),
-      type: edge.node.type,
-    };
-  });
+  return result.edges.map(parsePhotoIdentifierToPhotoLocalType);
 }
 
 export async function getPhotoFromDevice(mediaId: string): Promise<PhotoLocalType> {
@@ -54,8 +40,24 @@ export async function getPhotoFromDevice(mediaId: string): Promise<PhotoLocalTyp
     height: photo.height,
     width: photo.width,
     group_name: photo.group_name,
-    created: new Date(timestamp).toISOString(),
+    date: new Date(timestamp).toISOString(),
     type: photo.type,
+  };
+}
+
+export function parsePhotoIdentifierToPhotoLocalType(edge: PhotoIdentifier) {
+  const timestamp = getCorrectDate(edge.node) * 1000;
+
+  return {
+    id: edge.node.id,
+    uri: edge.node.image.uri,
+    fileSize: edge.node.image.fileSize ?? 0,
+    fileName: edge.node.image.filename ?? '',
+    height: edge.node.image.height,
+    width: edge.node.image.width,
+    group_name: edge.node.group_name,
+    date: new Date(timestamp).toISOString(),
+    type: edge.node.type,
   };
 }
 

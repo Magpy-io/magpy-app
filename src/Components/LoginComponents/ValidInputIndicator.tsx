@@ -2,13 +2,14 @@ import React, { StyleSheet, View } from 'react-native';
 
 import { Icon } from 'react-native-elements';
 
-import { colors } from '~/Styles/colors';
+import { useTheme } from '~/Context/ThemeContext';
 import { spacing } from '~/Styles/spacing';
 
 export default function ValidInputIndicator() {
+  const { colors } = useTheme();
   return (
     <View style={styles.viewStyle}>
-      <Icon name="check-circle" size={16} color={colors.COLOR_SUCCESS_500} />
+      <Icon name="check-circle" size={16} color={colors.ERROR} />
     </View>
   );
 }

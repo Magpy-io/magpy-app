@@ -7,5 +7,5 @@ export function ConfigModules() {
   console.log('Setting backend path to : ', config.backendPath);
   SetPath(config.backendPath);
 
-  axios.defaults.timeout = 3000;
+  axios.defaults.timeout = 30000;
 }

@@ -11,7 +11,6 @@ import {
 } from '~/Context/ReduxStore/Slices/Selectors';
 import { useAppDispatch, useAppSelector } from '~/Context/ReduxStore/Store';
 import { addPhotoToDevice } from '~/Helpers/GalleryFunctions/Functions';
-import { getPhotoFromDevice } from '~/Helpers/GalleryFunctions/GetGalleryPhotos';
 import * as Queries from '~/Helpers/Queries';
 import { UpdatePhotoMediaId } from '~/Helpers/ServerQueries';
 
@@ -80,13 +79,11 @@ export function usePhotosDownloadingEffect() {
         console.log('photo downloaded');
         const photoServer = result.data.photo;
 
-        const mediaId = await addPhotoToDevice({
+        const localPhoto = await addPhotoToDevice({
           fileName: photoServer.meta.name,
           id: photoServer.id,
           image64: photoServer.image64,
         });
-
-        const localPhoto = await getPhotoFromDevice(mediaId);
 
         AppDisptach(
           addPhotoFromServerToLocal({ photoLocal: localPhoto, serverId: photoServer.id }),
