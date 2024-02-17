@@ -1,11 +1,17 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { Icon } from '@rneui/themed';
 import { Text } from 'react-native-elements';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import BackButton from '~/Components/CommonComponents/BackButton';
+import {
+  CustomIconProps,
+  InDeviceIcon,
+  InServerIcon,
+  NotInDeviceIcon,
+  NotInServerIcon,
+} from '~/Components/CommonComponents/Icons';
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos';
 import { useTheme } from '~/Context/ThemeContext';
 import { formatDate } from '~/Helpers/Date';
@@ -23,8 +29,6 @@ function PhotoSliderHeader({ photo, onBackButton }: StatusBarComponentProps) {
 
   const photoInDevice = !!photo.mediaId;
   const photoInServer = !!photo.serverId;
-  const deviceStatusIcon = photoInDevice ? 'mobile-friendly' : 'phonelink-erase';
-  const serverStatusIcon = photoInServer ? 'cloud-done-outline' : 'cloud-offline-outline';
   const insets = useSafeAreaInsets();
   const title = formatDate(photo.date);
   return (
@@ -34,32 +38,38 @@ function PhotoSliderHeader({ photo, onBackButton }: StatusBarComponentProps) {
         <Text style={styles.title}>{title}</Text>
       </View>
       <View style={styles.statusBarComponentStyle}>
-        <StatusComponent icon={serverStatusIcon} type="ionicon" valid={photoInServer} />
-        <StatusComponent icon={deviceStatusIcon} valid={photoInDevice} />
+        <StatusComponent
+          iconValid={InServerIcon}
+          iconInvalid={NotInServerIcon}
+          valid={photoInServer}
+        />
+        <StatusComponent
+          iconValid={InDeviceIcon}
+          iconInvalid={NotInDeviceIcon}
+          valid={photoInDevice}
+        />
       </View>
     </View>
   );
 }
 
 type StatusComponentProps = {
-  icon: string;
+  iconValid: (props: CustomIconProps) => JSX.Element;
+  iconInvalid: (props: CustomIconProps) => JSX.Element;
   valid: boolean;
-  type?: string;
 };
 
-const StatusComponent = React.memo(function StatusComponent(props: StatusComponentProps) {
+const StatusComponent = React.memo(function StatusComponent({
+  iconValid: IconValid,
+  iconInvalid: IconInvalid,
+  valid,
+}: StatusComponentProps) {
   const styles = useStyles(makeStyles);
   const { colors } = useTheme();
 
   return (
     <View style={styles.statusComponentStyle}>
-      <Icon
-        name={props.icon}
-        type={props.type ?? 'material'}
-        containerStyle={{}}
-        size={26}
-        color={props.valid ? colors.PRIMARY : colors.TEXT_LIGHT}
-      />
+      {valid ? <IconValid color={colors.SECONDARY} /> : <IconInvalid color={colors.TEXT} />}
     </View>
   );
 });
