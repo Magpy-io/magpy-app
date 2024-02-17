@@ -4,6 +4,10 @@ import { CameraRoll } from '@react-native-camera-roll/camera-roll';
 import { DeleteMedia } from 'react-native-delete-media';
 import RNFS from 'react-native-fs';
 
+import { PhotoLocalType } from '~/Context/ReduxStore/Slices/Photos';
+
+import { parsePhotoIdentifierToPhotoLocalType } from './GetGalleryPhotos';
+
 const { MainModule } = NativeModules;
 
 export async function getFirstPossibleFileName(imageName: string) {
@@ -40,7 +44,7 @@ export async function getFirstPossibleFileName(imageName: string) {
 
 export async function addPhotoToDevice<
   T extends { fileName: string; id: string; image64: string },
->(photo: T): Promise<string> {
+>(photo: T): Promise<PhotoLocalType> {
   const imageName = await getFirstPossibleFileName(photo.fileName);
 
   const cachePhotoPath = RNFS.ExternalCachesDirectoryPath + `/${imageName}`;
@@ -49,7 +53,7 @@ export async function addPhotoToDevice<
   const imageData = await CameraRoll.saveAsset(cachePhotoPath, { album: 'Restored' });
 
   await RNFS.unlink(cachePhotoPath);
-  return imageData.node.id;
+  return parsePhotoIdentifierToPhotoLocalType(imageData);
 }
 
 export async function DeletePhotosFromDevice(uris: Array<string | undefined>) {
