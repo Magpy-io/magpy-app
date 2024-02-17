@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 import { Dimensions, FlatList, StyleSheet, ViewToken } from 'react-native';
 
-import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos';
+import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
 
 import PhotoComponentForSlider from './PhotoComponentForSlider';
 

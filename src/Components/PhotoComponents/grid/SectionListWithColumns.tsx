@@ -3,7 +3,7 @@ import { SectionList, SectionListData, View } from 'react-native';
 
 import sectionListGetItemLayout from 'react-native-section-list-get-item-layout';
 
-import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos';
+import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { useOrientation } from '~/Hooks/useOrientation';
 
 type T = PhotoGalleryType;

@@ -12,7 +12,7 @@ import {
   NotInDeviceIcon,
   NotInServerIcon,
 } from '~/Components/CommonComponents/Icons';
-import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos';
+import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { useTheme } from '~/Context/ThemeContext';
 import { formatDate } from '~/Helpers/Date';
 import { useStyles } from '~/Hooks/useStyles';

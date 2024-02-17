@@ -4,7 +4,7 @@ import { CameraRoll } from '@react-native-camera-roll/camera-roll';
 import { DeleteMedia } from 'react-native-delete-media';
 import RNFS from 'react-native-fs';
 
-import { PhotoLocalType } from '~/Context/ReduxStore/Slices/Photos';
+import { PhotoLocalType } from '~/Context/ReduxStore/Slices/Photos/Photos';
 
 import { parsePhotoIdentifierToPhotoLocalType } from './GetGalleryPhotos';
 

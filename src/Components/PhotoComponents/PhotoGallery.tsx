@@ -7,7 +7,7 @@ import {
   PhotoGalleryType,
   PhotoLocalType,
   PhotoServerType,
-} from '~/Context/ReduxStore/Slices/Photos';
+} from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { useStyles } from '~/Hooks/useStyles';
 import { colorsType } from '~/Styles/colors';
 

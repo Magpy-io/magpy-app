@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { NativeModules } from 'react-native';
 
-import { PhotoLocalType } from '../ReduxStore/Slices/Photos';
+import { PhotoLocalType } from '../ReduxStore/Slices/Photos/Photos';
 
 const { MainModule } = NativeModules;
 

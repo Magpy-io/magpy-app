@@ -3,8 +3,8 @@ import { FlatList, StyleSheet, TouchableHighlight, View } from 'react-native';
 
 import { Text } from 'react-native-elements';
 
-import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos';
-import { recentServerGalleryPhotos } from '~/Context/ReduxStore/Slices/Selectors';
+import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
+import { recentServerGalleryPhotos } from '~/Context/ReduxStore/Slices/Photos/Selectors';
 import { useAppSelector } from '~/Context/ReduxStore/Store';
 import { useTheme } from '~/Context/ThemeContext';
 import { useStyles } from '~/Hooks/useStyles';

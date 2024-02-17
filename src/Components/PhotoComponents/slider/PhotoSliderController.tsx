@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { BackHandler, StyleSheet, View } from 'react-native';
 import { NativeEventEmitter, NativeModules } from 'react-native';
 
-import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos';
+import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { NativeEventsNames } from '~/NativeModules/NativeModulesEventNames';
 import { useTabNavigationContext } from '~/Navigation/TabNavigation/TabNavigationContext';
 

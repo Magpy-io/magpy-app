@@ -1,8 +1,8 @@
-import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos';
+import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import {
   photoLocalSelector,
   photoServerSelector,
-} from '~/Context/ReduxStore/Slices/Selectors';
+} from '~/Context/ReduxStore/Slices/Photos/Selectors';
 import { useAppSelector } from '~/Context/ReduxStore/Store';
 
 export default function usePhotoData(photo: PhotoGalleryType) {

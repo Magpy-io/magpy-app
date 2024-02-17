@@ -10,7 +10,7 @@ import {
   InServerIcon,
   TimeIcon,
 } from '~/Components/CommonComponents/Icons';
-import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos';
+import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { formatDate } from '~/Helpers/Date';
 import { getReadableFileSizeString } from '~/Helpers/FileSizeFormat';
 import usePhotoData from '~/Hooks/usePhotoData';

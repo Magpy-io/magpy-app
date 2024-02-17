@@ -4,11 +4,11 @@ import { uniqueDeviceId } from '~/Config/config';
 import {
   addMediaIdToServerPhoto,
   addPhotoFromServerToLocal,
-} from '~/Context/ReduxStore/Slices/Photos';
+} from '~/Context/ReduxStore/Slices/Photos/Photos';
 import {
   photosLocalSelector,
   photosServerSelector,
-} from '~/Context/ReduxStore/Slices/Selectors';
+} from '~/Context/ReduxStore/Slices/Photos/Selectors';
 import { useAppDispatch, useAppSelector } from '~/Context/ReduxStore/Store';
 import { addPhotoToDevice } from '~/Helpers/GalleryFunctions/Functions';
 import * as Queries from '~/Helpers/Queries';

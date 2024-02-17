@@ -1,7 +1,7 @@
-import { PhotoGalleryType, PhotosState } from './Photos';
-
 // The same photo can have different dates in photosLocal and photosServer
 // See https://trello.com/c/wH97h64t/44-get-date-from-exif-data-for-local-photos
+import { PhotoGalleryType } from './Photos';
+import { PhotosState } from './Photos';
 
 export function mergePhotos(photosState: PhotosState): PhotoGalleryType[] {
   const { photosLocal, photosLocalIdsOrdered, photosServer, photosServerIdsOrdered } =

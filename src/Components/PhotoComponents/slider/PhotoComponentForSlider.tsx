@@ -9,12 +9,12 @@ import {
 } from 'react-native-gesture-handler';
 import Animated, { runOnJS, useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 
-import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos';
-import { usePhotosFunctionsStore } from '~/Context/ReduxStore/Slices/PhotosFunctions';
+import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
+import { usePhotosFunctionsStore } from '~/Context/ReduxStore/Slices/Photos/PhotosFunctions';
 import {
   photoLocalSelector,
   photoServerSelector,
-} from '~/Context/ReduxStore/Slices/Selectors';
+} from '~/Context/ReduxStore/Slices/Photos/Selectors';
 import { useAppSelector } from '~/Context/ReduxStore/Store';
 import { useTheme } from '~/Context/ThemeContext';
 

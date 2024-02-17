@@ -1,4 +1,4 @@
-import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos';
+import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { areDatesEqual, formatDate, withoutTime } from '~/Helpers/Date';
 
 export function getClosestPhotoToIndex(currentPhotoIndex: number, photos: PhotoGalleryType[]) {

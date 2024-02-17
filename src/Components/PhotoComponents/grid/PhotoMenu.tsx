@@ -4,11 +4,14 @@ import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Text } from 'react-native-elements';
 
 import { FilterIcon, GroupIcon, SortIcon } from '~/Components/CommonComponents/Icons';
-import { setGroupBy, setSortBy } from '~/Context/ReduxStore/Slices/GalleryOptions';
+import {
+  setGroupBy,
+  setSortBy,
+} from '~/Context/ReduxStore/Slices/GalleryOptions/GalleryOptions';
 import {
   GroupOptionSelector,
   SortOptionSelector,
-} from '~/Context/ReduxStore/Slices/Selectors';
+} from '~/Context/ReduxStore/Slices/GalleryOptions/Selectors';
 import { useAppDispatch, useAppSelector } from '~/Context/ReduxStore/Store';
 import { useStyles } from '~/Hooks/useStyles';
 import { colorsType } from '~/Styles/colors';

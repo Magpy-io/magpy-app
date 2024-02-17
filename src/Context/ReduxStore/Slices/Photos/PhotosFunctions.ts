@@ -12,7 +12,7 @@ import {
 import { GalleryGetPhotos } from '~/Helpers/GalleryFunctions/GetGalleryPhotos';
 import { GetPhotos, GetPhotosById } from '~/Helpers/ServerQueries';
 
-import { useAppDispatch } from '../Store';
+import { useAppDispatch } from '../../Store';
 import { ParseApiPhoto } from './Functions';
 import {
   PhotoLocalType,

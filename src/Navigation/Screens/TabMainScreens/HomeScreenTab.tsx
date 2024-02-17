@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Text } from 'react-native';
 
 import PhotoGallery from '~/Components/PhotoComponents/PhotoGallery';
-import { selectGalleryPhotos } from '~/Context/ReduxStore/Slices/Selectors';
+import { selectGalleryPhotos } from '~/Context/ReduxStore/Slices/Photos/Selectors';
 import { useAppSelector } from '~/Context/ReduxStore/Store';
 import * as AndroidPermissions from '~/Helpers/GetPermissionsAndroid';
 

@@ -1,7 +1,7 @@
 import React from 'react';
 
 import PhotoGallery from '~/Components/PhotoComponents/PhotoGallery';
-import { serverGalleryPhotosSelector } from '~/Context/ReduxStore/Slices/Selectors';
+import { serverGalleryPhotosSelector } from '~/Context/ReduxStore/Slices/Photos/Selectors';
 import { useAppSelector } from '~/Context/ReduxStore/Store';
 
 import { useMainNavigation } from '../Navigation';

@@ -1,6 +1,6 @@
 import { createSelector } from '@reduxjs/toolkit';
 
-import { RootState } from '../Store';
+import { RootState } from '../../Store';
 
 export function photoLocalSelector(id?: string) {
   return (state: RootState) => (id ? state.photos.photosLocal[id] : undefined);
@@ -40,6 +40,3 @@ export function photosServerSelector(state: RootState) {
 export function photosLocalSelector(state: RootState) {
   return state.photos.photosLocal;
 }
-
-export const SortOptionSelector = (state: RootState) => state.galleryOptions.sortBy;
-export const GroupOptionSelector = (state: RootState) => state.galleryOptions.groupBy;

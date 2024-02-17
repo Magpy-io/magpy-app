@@ -1,12 +1,12 @@
 import React, { useCallback, useEffect } from 'react';
 import { StyleSheet, TouchableHighlight, View } from 'react-native';
 
-import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos';
-import { usePhotosFunctionsStore } from '~/Context/ReduxStore/Slices/PhotosFunctions';
+import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
+import { usePhotosFunctionsStore } from '~/Context/ReduxStore/Slices/Photos/PhotosFunctions';
 import {
   photoLocalSelector,
   photoServerSelector,
-} from '~/Context/ReduxStore/Slices/Selectors';
+} from '~/Context/ReduxStore/Slices/Photos/Selectors';
 import { useAppSelector } from '~/Context/ReduxStore/Store';
 import { useTheme } from '~/Context/ThemeContext';
 

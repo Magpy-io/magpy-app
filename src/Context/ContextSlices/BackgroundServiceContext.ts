@@ -4,8 +4,8 @@ import { NativeEventEmitter } from 'react-native';
 import { GetPhotosById } from '~/Helpers/ServerQueries';
 import { NativeEventsNames } from '~/NativeModules/NativeModulesEventNames';
 
-import { ParseApiPhoto } from '../ReduxStore/Slices/Functions';
-import { addPhotoFromLocalToServer } from '../ReduxStore/Slices/Photos';
+import { ParseApiPhoto } from '../ReduxStore/Slices/Photos/Functions';
+import { addPhotoFromLocalToServer } from '../ReduxStore/Slices/Photos/Photos';
 import { useAppDispatch } from '../ReduxStore/Store';
 
 //const { MainModule } = NativeModules;

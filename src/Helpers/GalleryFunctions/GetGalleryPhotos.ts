@@ -2,7 +2,7 @@ import { NativeModules } from 'react-native';
 
 import { CameraRoll, PhotoIdentifier } from '@react-native-camera-roll/camera-roll';
 
-import { PhotoLocalType } from '~/Context/ReduxStore/Slices/Photos';
+import { PhotoLocalType } from '~/Context/ReduxStore/Slices/Photos/Photos';
 
 const { MainModule } = NativeModules;
 

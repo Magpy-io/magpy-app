@@ -7,8 +7,8 @@ import {
   PhotoGalleryType,
   PhotoLocalType,
   PhotoServerType,
-} from '~/Context/ReduxStore/Slices/Photos';
-import { usePhotosFunctionsStore } from '~/Context/ReduxStore/Slices/PhotosFunctions';
+} from '~/Context/ReduxStore/Slices/Photos/Photos';
+import { usePhotosFunctionsStore } from '~/Context/ReduxStore/Slices/Photos/PhotosFunctions';
 import { TabBarPadding } from '~/Navigation/TabNavigation/TabBar';
 import { useTabNavigationContext } from '~/Navigation/TabNavigation/TabNavigationContext';
 import { spacing } from '~/Styles/spacing';
