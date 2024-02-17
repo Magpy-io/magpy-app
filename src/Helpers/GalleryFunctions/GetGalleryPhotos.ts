@@ -35,7 +35,7 @@ export async function GalleryGetPhotos(
       height: edge.node.image.height,
       width: edge.node.image.width,
       group_name: edge.node.group_name,
-      created: new Date(timestamp).toISOString(),
+      date: new Date(timestamp).toISOString(),
       type: edge.node.type,
     };
   });
@@ -54,7 +54,7 @@ export async function getPhotoFromDevice(mediaId: string): Promise<PhotoLocalTyp
     height: photo.height,
     width: photo.width,
     group_name: photo.group_name,
-    created: new Date(timestamp).toISOString(),
+    date: new Date(timestamp).toISOString(),
     type: photo.type,
   };
 }

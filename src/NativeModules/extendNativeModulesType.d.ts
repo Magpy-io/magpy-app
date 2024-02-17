@@ -8,12 +8,6 @@ export interface MainModuleType {
   startSendingMediaService: (
     photos: {
       id: string;
-      name: string;
-      date: string;
-      path: string;
-      width: number;
-      height: number;
-      size: number;
     }[],
   ) => Promise<void>;
   stopSendingMediaService: () => Promise<void>;

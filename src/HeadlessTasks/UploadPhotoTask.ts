@@ -2,28 +2,23 @@ import { NativeModules } from 'react-native';
 
 import RNFS from 'react-native-fs';
 
+import { getPhotoFromDevice } from '~/Helpers/GalleryFunctions/GetGalleryPhotos';
 import * as Queries from '~/Helpers/Queries';
 
 const { MainModule } = NativeModules;
 
-export async function UploadPhotoTask(photo: {
-  path: string;
-  mediaId: string;
-  name: string;
-  date: string;
-  height: number;
-  width: number;
-  size: number;
-}) {
+export async function UploadPhotoTask(photo: { mediaId: string }) {
   try {
-    const res = await RNFS.readFile(photo.path, 'base64');
+    const photoLocal = await getPhotoFromDevice(photo.mediaId);
+
+    const res = await RNFS.readFile(photoLocal.uri, 'base64');
 
     const result = await Queries.addPhotoWithProgress({
-      name: photo.name,
-      fileSize: photo.size,
-      width: photo.width,
-      height: photo.height,
-      date: new Date(photo.date).toJSON(),
+      name: photoLocal.fileName,
+      fileSize: photoLocal.fileSize,
+      width: photoLocal.width,
+      height: photoLocal.height,
+      date: new Date(photoLocal.date).toJSON(),
       mediaId: photo.mediaId,
       image64: res,
     });

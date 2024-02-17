@@ -80,7 +80,7 @@ describe('Tests for insertPhotoKeyWithOrder function', () => {
       MockValues.photosLocal,
     ) as typeof MockValues.photosLocal;
 
-    photosLocal['mediaId3'].created = MockValues.photoLocal2.created;
+    photosLocal['mediaId3'].date = MockValues.photoLocal2.date;
 
     insertPhotoKeyWithOrder(photosLocal, photosLocalIdsOrdered, photosLocal['mediaId3']);
     expect(photosLocalIdsOrdered).toEqual([
