@@ -7,7 +7,7 @@
     "ios": "react-native run-ios",
     "start": "react-native start",
     "test": "jest --verbose=true",
-    "lint": "eslint ./src",
+    "lint": "eslint ./src && echo No lint errors",
     "format": "prettier --write ./src",
     "types:check": "tsc --noEmit && echo No typescript errors found"
   },
