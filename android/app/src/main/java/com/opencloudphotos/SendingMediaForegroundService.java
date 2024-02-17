@@ -15,6 +15,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
+import com.facebook.react.bridge.UiThreadUtil;
 import com.facebook.react.HeadlessJsTaskService;
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.bridge.ReactContext;
@@ -22,6 +23,7 @@ import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.jstasks.HeadlessJsTaskConfig;
 import com.facebook.react.bridge.Arguments;
+import com.facebook.react.jstasks.HeadlessJsTaskContext;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
 import java.util.Objects;
@@ -38,7 +40,7 @@ public class SendingMediaForegroundService extends HeadlessJsTaskService {
 
         @Override
         public void run() {
-            Log.d("Service", "runnable: stopping service");
+            Log.d("Service", "runnable: upload timed out stopping service");
             // Stop the foreground service and remove its notification
             service.stopForeground(true);
 
@@ -155,7 +157,7 @@ public class SendingMediaForegroundService extends HeadlessJsTaskService {
     public void startNextTask(){
         //TODO add timer
         Log.d("Service", "service startNextTask: started");
-        handler.postDelayed(timeoutRunnable, 10000);
+        handler.postDelayed(timeoutRunnable, 60000);
 
         Bundle b = new Bundle();
 
@@ -169,7 +171,16 @@ public class SendingMediaForegroundService extends HeadlessJsTaskService {
 
         Log.d("Service", "service startNextTask: start js task");
         try{
-            startTask(new HeadlessJsTaskConfig("MyTask", Arguments.fromBundle(b), 9000, true));
+            Runnable myRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    startTask(new HeadlessJsTaskConfig("MyTask", Arguments.fromBundle(b), 59000, true));
+                }
+            };
+
+            UiThreadUtil.runOnUiThread(myRunnable);
+
+
         }catch (Exception e){
             Log.e("Service", e.getMessage());
         }
