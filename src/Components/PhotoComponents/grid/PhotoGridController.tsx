@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { BackHandler, View } from 'react-native';
 
+import { TuneIcon } from '~/Components/CommonComponents/Icons';
 import {
   PhotoGalleryType,
   PhotoLocalType,
@@ -9,7 +10,9 @@ import {
 import { usePhotosFunctionsStore } from '~/Context/ReduxStore/Slices/PhotosFunctions';
 import { TabBarPadding } from '~/Navigation/TabNavigation/TabBar';
 import { useTabNavigationContext } from '~/Navigation/TabNavigation/TabNavigationContext';
+import { spacing } from '~/Styles/spacing';
 
+import { PhotoGalleryHeader } from '../PhotoGalleryHeader';
 import ToolBarPhotos from '../common/ToolBarPhotos';
 import PhotoGridComponent from './PhotoGridComponent';
 import SelectionBar from './SelectionBar';
@@ -26,7 +29,9 @@ type PropsType = {
   isSlidingPhotos: boolean;
   onSwitchMode: (isPhotoSelected: boolean, index: number) => void;
   isInTabScreen?: boolean;
-  header: () => React.JSX.Element;
+  title?: string;
+  showBackButton?: boolean;
+  onPressBack?: () => void;
 };
 
 function PhotoGridController({
@@ -37,7 +42,9 @@ function PhotoGridController({
   localPhotos,
   serverPhotos,
   isInTabScreen,
-  header: Header,
+  title,
+  showBackButton,
+  onPressBack,
 }: PropsType) {
   console.log('render grid');
 
@@ -152,6 +159,17 @@ function PhotoGridController({
     RefreshAllPhotos(3000, 3000).catch(console.log);
   }, [RefreshAllPhotos]);
 
+  const filterButton = () => (
+    <TuneIcon onPress={() => {}} iconStyle={{ padding: spacing.spacing_m }} />
+  );
+  const Header = () => (
+    <PhotoGalleryHeader
+      title={title}
+      iconRight={filterButton}
+      showBackButton={showBackButton}
+      onPressBack={onPressBack}
+    />
+  );
   return (
     <View style={{ flex: 1 }}>
       <Header />

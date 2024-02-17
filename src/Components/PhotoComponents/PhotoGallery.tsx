@@ -10,10 +10,7 @@ import {
 } from '~/Context/ReduxStore/Slices/Photos';
 import { useStyles } from '~/Hooks/useStyles';
 import { colorsType } from '~/Styles/colors';
-import { spacing } from '~/Styles/spacing';
 
-import { TuneIcon } from '../CommonComponents/Icons';
-import { PhotoGalleryHeader } from './PhotoGalleryHeader';
 import PhotoGridController from './grid/PhotoGridController';
 import PhotoSlider from './slider/PhotoSliderController';
 
@@ -52,17 +49,6 @@ export default function PhotoGallery(props: PhotoGalleryPropsType) {
   const displayGrid = isSlidingPhotos ? 'none' : 'flex';
   const insets = useSafeAreaInsets();
 
-  const filterButton = () => (
-    <TuneIcon onPress={() => {}} iconStyle={{ padding: spacing.spacing_m }} />
-  );
-  const Header = () => (
-    <PhotoGalleryHeader
-      title={props.title}
-      iconRight={filterButton}
-      showBackButton={props.showBackButton}
-      onPressBack={props.onPressBack}
-    />
-  );
   return (
     <View style={styles.viewStyle}>
       <View
@@ -72,7 +58,9 @@ export default function PhotoGallery(props: PhotoGalleryPropsType) {
           { paddingTop: insets.top, paddingBottom: insets.bottom },
         ]}>
         <PhotoGridController
-          header={Header}
+          title={props.title}
+          showBackButton={props.showBackButton}
+          onPressBack={props.onPressBack}
           photos={props.photos}
           localPhotos={props.localPhotos}
           serverPhotos={props.serverPhotos}
