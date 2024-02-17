@@ -133,6 +133,25 @@ export function TuneIcon({ ...props }: CustomIconProps) {
     <Icon name="options-outline" type="ionicon" color={colors.TEXT} size={22} {...props} />
   );
 }
+
+export function FilterIcon({ ...props }: CustomIconProps) {
+  const { colors } = useTheme();
+
+  return <Icon name="filter" type="antdesign" color={colors.TEXT} size={22} {...props} />;
+}
+
+export function GroupIcon({ ...props }: CustomIconProps) {
+  const { colors } = useTheme();
+
+  return <Icon name="grid-outline" type="ionicon" color={colors.TEXT} size={22} {...props} />;
+}
+
+export function SortIcon({ ...props }: CustomIconProps) {
+  const { colors } = useTheme();
+
+  return <Icon name="swap-vertical" type="ionicon" color={colors.TEXT} size={22} {...props} />;
+}
+
 export function ArrowIcon({ ...props }: CustomIconProps) {
   const { colors } = useTheme();
   return <Icon name="arrow-forward" type="ionicon" color={colors.TEXT} size={16} {...props} />;

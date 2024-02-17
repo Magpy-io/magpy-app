@@ -50,10 +50,9 @@ const makeStyles = (colors: colorsType) =>
       borderTopRightRadius: 25,
       padding: 20,
       paddingTop: 30,
+      elevation: 2,
     },
     touchable: {
       flex: 1,
-      opacity: 0.1,
-      backgroundColor: 'black',
     },
   });

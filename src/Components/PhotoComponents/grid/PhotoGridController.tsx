@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { BackHandler, View } from 'react-native';
+import { BackHandler, Pressable, View } from 'react-native';
 
 import { TuneIcon } from '~/Components/CommonComponents/Icons';
+import MenuModal from '~/Components/CommonComponents/MenuModal';
 import {
   PhotoGalleryType,
   PhotoLocalType,
@@ -15,6 +16,7 @@ import { spacing } from '~/Styles/spacing';
 import { PhotoGalleryHeader } from '../PhotoGalleryHeader';
 import ToolBarPhotos from '../common/ToolBarPhotos';
 import PhotoGridComponent from './PhotoGridComponent';
+import PhotoMenu from './PhotoMenu';
 import SelectionBar from './SelectionBar';
 
 type PropsType = {
@@ -53,6 +55,10 @@ function PhotoGridController({
 
   const [isSelecting, setIsSelecting] = useState(false);
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
+  const [menuModalVisible, setMenuModalVisible] = useState(false);
+
+  const showMenuModal = useCallback(() => setMenuModalVisible(true), []);
+  const handleMenuModal = useCallback(() => setMenuModalVisible(prev => !prev), []);
 
   const { hideTab, showTab } = useTabNavigationContext();
   const { RefreshAllPhotos } = usePhotosFunctionsStore();
@@ -159,13 +165,15 @@ function PhotoGridController({
     RefreshAllPhotos(3000, 3000).catch(console.log);
   }, [RefreshAllPhotos]);
 
-  const filterButton = () => (
-    <TuneIcon onPress={() => {}} iconStyle={{ padding: spacing.spacing_m }} />
+  const menuButton = () => (
+    <Pressable onPress={showMenuModal}>
+      <TuneIcon iconStyle={{ padding: spacing.spacing_m }} />
+    </Pressable>
   );
   const Header = () => (
     <PhotoGalleryHeader
       title={title}
-      iconRight={filterButton}
+      iconRight={menuButton}
       showBackButton={showBackButton}
       onPressBack={onPressBack}
     />
@@ -196,6 +204,10 @@ function PhotoGridController({
 
       {isSelecting && <ToolBarPhotos selectedKeys={selectedKeys} />}
       {(isInTabScreen ?? false) && !isSelecting && <TabBarPadding />}
+
+      <MenuModal modalVisible={menuModalVisible} handleModal={handleMenuModal}>
+        <PhotoMenu />
+      </MenuModal>
     </View>
   );
 }

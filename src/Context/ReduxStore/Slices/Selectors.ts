@@ -40,3 +40,6 @@ export function photosServerSelector(state: RootState) {
 export function photosLocalSelector(state: RootState) {
   return state.photos.photosLocal;
 }
+
+export const SortOptionSelector = (state: RootState) => state.galleryOptions.sortBy;
+export const GroupOptionSelector = (state: RootState) => state.galleryOptions.groupBy;

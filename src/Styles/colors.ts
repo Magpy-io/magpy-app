@@ -44,6 +44,7 @@ export type colorsType = {
   SUCCESS: string;
   ERROR: string;
   WARNING: string;
+  MODAL_BACKGROUND: string;
 };
 
 export const LightTheme = {
@@ -65,6 +66,7 @@ export const LightTheme = {
     SUCCESS: colors.COLOR_SUCCESS_500,
     ERROR: colors.COLOR_ERROR_500,
     WARNING: colors.COLOR_WARNING_500,
+    MODAL_BACKGROUND: colors.WHITE,
   },
 };
 
@@ -87,5 +89,6 @@ export const DarkTheme = {
     SUCCESS: colors.COLOR_SUCCESS_500,
     ERROR: colors.COLOR_ERROR_500,
     WARNING: colors.COLOR_WARNING_400,
+    MODAL_BACKGROUND: colors.LESS_DARK,
   },
 };

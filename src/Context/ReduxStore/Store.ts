@@ -1,11 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 
+import GalleryOptions from './Slices/GalleryOptions';
 import photosReducer from './Slices/Photos';
 
 export const store = configureStore({
   reducer: {
     photos: photosReducer,
+    galleryOptions: GalleryOptions,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({
