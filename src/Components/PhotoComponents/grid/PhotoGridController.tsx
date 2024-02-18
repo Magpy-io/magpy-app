@@ -4,6 +4,8 @@ import { BackHandler, Pressable, View } from 'react-native';
 import { TuneIcon } from '~/Components/CommonComponents/Icons';
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { usePhotosFunctionsStore } from '~/Context/ReduxStore/Slices/Photos/PhotosFunctions';
+import { photosGalleryFilteredSelector } from '~/Context/ReduxStore/Slices/Photos/Selectors';
+import { RootState, useAppSelector } from '~/Context/ReduxStore/Store';
 import { TabBarPadding } from '~/Navigation/TabNavigation/TabBar';
 import { useTabNavigationContext } from '~/Navigation/TabNavigation/TabNavigationContext';
 import { spacing } from '~/Styles/spacing';
@@ -42,12 +44,16 @@ function PhotoGridController({
   photosRef.current = photos;
 
   const [isSelecting, setIsSelecting] = useState(false);
-  const { selectedKeys, selectSingle, selectGroup, selectAll, resetSelection } =
-    useKeysSelection();
+  const keysSelection = useKeysSelection();
+  const { selectSingle, selectGroup, selectAll, resetSelection, isSelected } = keysSelection;
   const [menuModalVisible, setMenuModalVisible] = useState(false);
 
   const { hideTab, showTab } = useTabNavigationContext();
   const { RefreshAllPhotos } = usePhotosFunctionsStore();
+
+  const selectedPhotos = useAppSelector((state: RootState) =>
+    photosGalleryFilteredSelector(state, isSelected),
+  );
 
   useEffect(() => {
     if (isSelecting) {
@@ -146,15 +152,15 @@ function PhotoGridController({
         currentPhotoIndex={currentPhotoIndex}
         onRefresh={onRefresh}
         isSelecting={isSelecting}
-        selectedKeys={selectedKeys}
+        keysSelection={keysSelection}
         onSelectPhotoGroup={onSelectPhotoGroup}
       />
 
-      {isSelecting && <ToolBarPhotos selectedKeys={selectedKeys} />}
+      {isSelecting && <ToolBarPhotos seletedGalleryPhotos={selectedPhotos} />}
 
       {isSelecting && (
         <SelectionBar
-          selectedNb={selectedKeys.size}
+          selectedNb={keysSelection.numberSelected()}
           onCancelButton={onBackButton}
           onSelectAllButton={onSelectAll}
         />

@@ -1,9 +1,20 @@
 import { useCallback, useState } from 'react';
 
-export function useKeysSelection() {
+type ContainsKey = { key: string; [key: string]: unknown };
+
+export interface KeysSelection {
+  selectSingle: (item: ContainsKey) => void;
+  selectGroup: (items: ContainsKey[]) => void;
+  selectAll: (items: ContainsKey[]) => void;
+  resetSelection: (item?: ContainsKey) => void;
+  isSelected: (item: ContainsKey) => boolean;
+  numberSelected: () => number;
+}
+
+export function useKeysSelection(): KeysSelection {
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
 
-  const selectSingle = useCallback(<T extends { key: string }>(item: T) => {
+  const selectSingle = useCallback((item: ContainsKey) => {
     setSelectedKeys(sKeys => {
       if (sKeys.has(item.key)) {
         const newSet = new Set(sKeys);
@@ -17,7 +28,7 @@ export function useKeysSelection() {
     });
   }, []);
 
-  const selectGroup = useCallback(<T extends { key: string }>(items: T[]) => {
+  const selectGroup = useCallback((items: ContainsKey[]) => {
     setSelectedKeys(sKeys => {
       const newSet = new Set(sKeys);
 
@@ -38,7 +49,7 @@ export function useKeysSelection() {
     });
   }, []);
 
-  const selectAll = useCallback(<T extends { key: string }>(items: T[]) => {
+  const selectAll = useCallback((items: ContainsKey[]) => {
     setSelectedKeys(sKeys => {
       if (sKeys.size == items.length) {
         return new Set<string>();
@@ -48,7 +59,7 @@ export function useKeysSelection() {
     });
   }, []);
 
-  const resetSelection = useCallback(<T extends { key: string }>(item?: T) => {
+  const resetSelection = useCallback((item?: ContainsKey) => {
     const newKeys = new Set<string>();
     if (item) {
       newKeys.add(item.key);
@@ -56,5 +67,16 @@ export function useKeysSelection() {
     setSelectedKeys(newKeys);
   }, []);
 
-  return { selectedKeys, selectSingle, selectGroup, selectAll, resetSelection };
+  const isSelected = useCallback(
+    (item: ContainsKey) => {
+      return selectedKeys.has(item.key);
+    },
+    [selectedKeys],
+  );
+
+  const numberSelected = useCallback(() => {
+    return selectedKeys.size;
+  }, [selectedKeys]);
+
+  return { numberSelected, isSelected, selectSingle, selectGroup, selectAll, resetSelection };
 }

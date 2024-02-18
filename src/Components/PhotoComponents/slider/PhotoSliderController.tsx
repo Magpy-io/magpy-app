@@ -36,11 +36,6 @@ function PhotoSliderController({
 
   const currentPhoto = photos[flatListCurrentIndex] as PhotoGalleryType | undefined;
 
-  const selectedKeys = new Set<string>();
-  if (currentPhoto) {
-    selectedKeys.add(currentPhoto.key);
-  }
-
   useEffect(() => {
     if (isSlidingPhotos && photos.length == 0) {
       onSwitchMode(false, 0);
@@ -121,7 +116,9 @@ function PhotoSliderController({
         <StatusBarComponent photo={currentPhoto} onBackButton={onStatusBarBackButton} />
       )}
 
-      {!isFullScreen && <ToolBarPhotos selectedKeys={selectedKeys} />}
+      {!isFullScreen && (
+        <ToolBarPhotos seletedGalleryPhotos={currentPhoto ? [currentPhoto] : []} />
+      )}
     </View>
   );
 }

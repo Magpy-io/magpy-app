@@ -17,14 +17,14 @@ import PhotoDetailsModal from '../slider/PhotoDetailsModal';
 import ToolBarPhotosComponent from './ToolBarPhotosComponent';
 
 type ToolBarProps = {
-  selectedKeys: Set<string>;
+  seletedGalleryPhotos: PhotoGalleryType[];
 };
 
-function ToolBarPhotos(props: ToolBarProps) {
+function ToolBarPhotos({ seletedGalleryPhotos }: ToolBarProps) {
   const styles = useStyles(makeStyles);
   const [modalVisible, setModalVisible] = useState(false);
   const handleModal = () => setModalVisible(prev => !prev);
-  const isOnePhoto = props.selectedKeys.size === 1;
+  const isOnePhoto = seletedGalleryPhotos.length == 1;
 
   const localPhotos = useAppSelector(photosLocalSelector);
   const serverPhotos = useAppSelector(photosServerSelector);
@@ -33,14 +33,6 @@ function ToolBarPhotos(props: ToolBarProps) {
   const { UploadPhotos } = usePhotosFunctionsStore();
 
   const { DownloadPhotos } = usePhotosDownloadingFunctions();
-
-  const seletedGalleryPhotos: PhotoGalleryType[] = [];
-
-  for (const galleryPhoto of galleryPhotos) {
-    if (props.selectedKeys.has(galleryPhoto.key)) {
-      seletedGalleryPhotos.push(galleryPhoto);
-    }
-  }
 
   const selectedLocalPhotos: PhotoLocalType[] = [];
 

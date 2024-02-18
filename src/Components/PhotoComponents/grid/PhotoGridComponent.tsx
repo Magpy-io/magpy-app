@@ -13,6 +13,7 @@ import { typography } from '~/Styles/typography';
 import { DayType, getIndexInSectionList, getPhotosPerDay } from './Helpers';
 import PhotoComponentForGrid from './PhotoComponentForGrid';
 import SectionListWithColumns, { NewSection } from './SectionListWithColumns';
+import { KeysSelection } from './useKeysSelection';
 
 const NUM_COLUMNS = 3;
 const SECTION_HEADER_HEIGHT = 60;
@@ -29,7 +30,7 @@ type PhotoGridComponentProps = {
   currentPhotoIndex: number;
   onRefresh: () => void;
   isSelecting: boolean;
-  selectedKeys: Set<string>;
+  keysSelection: KeysSelection;
   onSelectPhotoGroup: (items: PhotoGalleryType[]) => void;
 };
 
@@ -40,7 +41,7 @@ export default function PhotoGridComponent({
   currentPhotoIndex,
   onRefresh,
   isSelecting,
-  selectedKeys,
+  keysSelection,
   onSelectPhotoGroup,
 }: PhotoGridComponentProps) {
   const sectionlistRef = useRef<SectionList>(null);
@@ -49,19 +50,20 @@ export default function PhotoGridComponent({
   const styles = useStyles(makeStyles);
 
   photosLenRef.current = photos.length;
+
   const renderItem = useCallback(
     ({ item }: { item: PhotoGalleryType }) => {
       return (
         <PhotoComponentForGrid
           photo={item}
           isSelecting={isSelecting}
-          isSelected={selectedKeys.has(item.key)}
+          isSelected={keysSelection.isSelected(item)}
           onPress={onPressPhoto}
           onLongPress={onLongPressPhoto}
         />
       );
     },
-    [onLongPressPhoto, onPressPhoto, isSelecting, selectedKeys],
+    [onLongPressPhoto, onPressPhoto, isSelecting, keysSelection],
   );
 
   const photosPerDayMemo: DayType[] = useMemo(() => {
