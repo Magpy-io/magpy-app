@@ -40,3 +40,15 @@ export function withoutTime(date: string) {
   setTimeToZero(dateObj);
   return dateObj.toISOString();
 }
+
+export function areDatesTheSameMonth(date1: string, date2: string) {
+  const dateObj1 = StringToDate(date1);
+  const dateObj2 = StringToDate(date2);
+  if (
+    dateObj1.getMonth() !== dateObj2.getMonth() ||
+    dateObj1.getFullYear() !== dateObj2.getFullYear()
+  ) {
+    return false;
+  }
+  return true;
+}

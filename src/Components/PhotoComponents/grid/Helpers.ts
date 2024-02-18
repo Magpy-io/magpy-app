@@ -1,5 +1,5 @@
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
-import { areDatesEqual, formatDate, withoutTime } from '~/Helpers/Date';
+import { areDatesEqual, areDatesTheSameMonth, formatDate, withoutTime } from '~/Helpers/Date';
 
 export function getClosestPhotoToIndex(currentPhotoIndex: number, photos: PhotoGalleryType[]) {
   const len = photos.length;
@@ -18,6 +18,12 @@ export type DayType = {
   data: PhotoGalleryType[];
 };
 
+export function getSectionIndex(currentPhoto: PhotoGalleryType, photosPerDayMemo: DayType[]) {
+  const currentPhotoDate = withoutTime(currentPhoto.date);
+  const sectionIndex = photosPerDayMemo.findIndex(e => e.day === currentPhotoDate);
+  return sectionIndex;
+}
+
 export function getIndexInSectionList(
   currentPhotoIndex: number,
   photosPerDayMemo: DayType[],
@@ -25,9 +31,7 @@ export function getIndexInSectionList(
   columns: number,
 ) {
   const currentPhoto = getClosestPhotoToIndex(currentPhotoIndex, photos);
-  const currentPhotoDate = withoutTime(currentPhoto.date);
-  const sectionIndex = photosPerDayMemo.findIndex(e => e.day === currentPhotoDate);
-
+  const sectionIndex = getSectionIndex(currentPhoto, photosPerDayMemo);
   const itemIndex = photosPerDayMemo[sectionIndex]?.data.findIndex(
     e => e.key === currentPhoto.key,
   );
@@ -65,6 +69,38 @@ export function getPhotosPerDay(photos: PhotoGalleryType[]) {
     });
     photosPerDay.push(currentBasket);
     return photosPerDay;
+  } else {
+    return [];
+  }
+}
+
+export function getPhotosPerMonth(photos: PhotoGalleryType[]) {
+  if (photos && photos.length > 0) {
+    const photosPerMonth: DayType[] = [];
+    let currentDate = photos[0].date ?? '';
+    let currentBasket: DayType = {
+      title: formatDate(currentDate),
+      day: currentDate,
+      data: [],
+    };
+
+    photos.forEach(photo => {
+      const photoDate = photo.date ?? '';
+
+      if (areDatesTheSameMonth(photoDate, currentDate)) {
+        currentBasket.data.push(photo);
+      } else {
+        photosPerMonth.push(currentBasket);
+        currentDate = photoDate;
+        currentBasket = {
+          title: formatDate(photoDate),
+          day: photoDate,
+          data: [photo],
+        };
+      }
+    });
+    photosPerMonth.push(currentBasket);
+    return photosPerMonth;
   } else {
     return [];
   }
