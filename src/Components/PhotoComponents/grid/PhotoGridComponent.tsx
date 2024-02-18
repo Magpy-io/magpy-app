@@ -3,11 +3,7 @@ import { SectionList, StyleSheet, TouchableHighlight, View } from 'react-native'
 
 import { Text } from 'react-native-elements';
 
-import {
-  PhotoGalleryType,
-  PhotoLocalType,
-  PhotoServerType,
-} from '~/Context/ReduxStore/Slices/Photos/Photos';
+import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { useTheme } from '~/Context/ThemeContext';
 import { useStyles } from '~/Hooks/useStyles';
 import { colorsType } from '~/Styles/colors';
@@ -28,12 +24,6 @@ function keyExtractor(item: PhotoGalleryType) {
 
 type PhotoGridComponentProps = {
   photos: Array<PhotoGalleryType>;
-  localPhotos: {
-    [key: string]: PhotoLocalType;
-  };
-  serverPhotos: {
-    [key: string]: PhotoServerType;
-  };
   onPressPhoto: (item: PhotoGalleryType) => void;
   onLongPressPhoto: (item: PhotoGalleryType) => void;
   currentPhotoIndex: number;

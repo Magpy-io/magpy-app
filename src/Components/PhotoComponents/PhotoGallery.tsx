@@ -3,25 +3,15 @@ import { StyleSheet, View } from 'react-native';
 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import {
-  PhotoGalleryType,
-  PhotoLocalType,
-  PhotoServerType,
-} from '~/Context/ReduxStore/Slices/Photos/Photos';
+import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { useStyles } from '~/Hooks/useStyles';
 import { colorsType } from '~/Styles/colors';
 
 import PhotoGridController from './grid/PhotoGridController';
-import PhotoSlider from './slider/PhotoSliderController';
+import PhotoSliderController from './slider/PhotoSliderController';
 
 type PhotoGalleryPropsType = {
   photos: Array<PhotoGalleryType>;
-  localPhotos: {
-    [key: string]: PhotoLocalType;
-  };
-  serverPhotos: {
-    [key: string]: PhotoServerType;
-  };
   title?: string;
   showBackButton?: boolean;
   onPressBack?: () => void;
@@ -62,8 +52,6 @@ export default function PhotoGallery(props: PhotoGalleryPropsType) {
           showBackButton={props.showBackButton}
           onPressBack={props.onPressBack}
           photos={props.photos}
-          localPhotos={props.localPhotos}
-          serverPhotos={props.serverPhotos}
           isSlidingPhotos={isSlidingPhotos}
           currentPhotoIndex={currentPhotoIndex}
           onSwitchMode={onSwitchMode}
@@ -76,7 +64,7 @@ export default function PhotoGallery(props: PhotoGalleryPropsType) {
           { display: displaySlider },
           { paddingBottom: insets.bottom },
         ]}>
-        <PhotoSlider
+        <PhotoSliderController
           photos={props.photos}
           isSlidingPhotos={isSlidingPhotos}
           currentPhotoIndex={currentPhotoIndex}

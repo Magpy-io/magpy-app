@@ -8,12 +8,12 @@ import { colorsType } from '~/Styles/colors';
 import { borderRadius, spacing } from '~/Styles/spacing';
 
 type MenuModalProps = {
-  modalVisible: boolean;
-  handleModal: () => void;
+  visible: boolean;
+  onRequestClose: () => void;
   children: JSX.Element;
 };
 
-export default function MenuModal({ modalVisible, handleModal, children }: MenuModalProps) {
+export default function MenuModal({ visible, onRequestClose, children }: MenuModalProps) {
   const styles = useStyles(makeStyles);
   const insets = useSafeAreaInsets();
   return (
@@ -21,10 +21,10 @@ export default function MenuModal({ modalVisible, handleModal, children }: MenuM
       animationType="fade"
       transparent
       statusBarTranslucent
-      visible={modalVisible}
-      onRequestClose={handleModal}>
+      visible={visible}
+      onRequestClose={onRequestClose}>
       <View style={{ flex: 1 }}>
-        <Pressable style={styles.touchable} onPress={handleModal} />
+        <Pressable style={styles.touchable} onPress={onRequestClose} />
         <TouchableWithoutFeedback>
           <View style={[styles.viewStyle, { marginTop: insets.top }]}>{children}</View>
         </TouchableWithoutFeedback>

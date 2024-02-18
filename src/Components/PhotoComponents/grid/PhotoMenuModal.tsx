@@ -4,6 +4,7 @@ import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Text } from 'react-native-elements';
 
 import { FilterIcon, GroupIcon, SortIcon } from '~/Components/CommonComponents/Icons';
+import MenuModal from '~/Components/CommonComponents/MenuModal';
 import {
   setGroupBy,
   setSortBy,
@@ -18,14 +19,20 @@ import { colorsType } from '~/Styles/colors';
 import { borderRadius, spacing } from '~/Styles/spacing';
 import { typography } from '~/Styles/typography';
 
-const ICON_SIZE = 18;
-export default function PhotoMenu() {
+type PhotoMenuProps = {
+  visible: boolean;
+  onRequestClose: () => void;
+};
+
+export default function PhotoMenu(props: PhotoMenuProps) {
   return (
-    <View style={{ gap: spacing.spacing_xs }}>
-      <Filter />
-      <Sort />
-      <Group />
-    </View>
+    <MenuModal visible={props.visible} onRequestClose={props.onRequestClose}>
+      <View style={{ gap: spacing.spacing_xs }}>
+        <Filter />
+        <Sort />
+        <Group />
+      </View>
+    </MenuModal>
   );
 }
 
@@ -97,6 +104,8 @@ function Group() {
     </View>
   );
 }
+
+const ICON_SIZE = 18;
 
 const makeStyles = (colors: colorsType, dark: boolean) =>
   StyleSheet.create({

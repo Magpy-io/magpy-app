@@ -2,12 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { BackHandler, Pressable, View } from 'react-native';
 
 import { TuneIcon } from '~/Components/CommonComponents/Icons';
-import MenuModal from '~/Components/CommonComponents/MenuModal';
-import {
-  PhotoGalleryType,
-  PhotoLocalType,
-  PhotoServerType,
-} from '~/Context/ReduxStore/Slices/Photos/Photos';
+import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { usePhotosFunctionsStore } from '~/Context/ReduxStore/Slices/Photos/PhotosFunctions';
 import { TabBarPadding } from '~/Navigation/TabNavigation/TabBar';
 import { useTabNavigationContext } from '~/Navigation/TabNavigation/TabNavigationContext';
@@ -16,17 +11,11 @@ import { spacing } from '~/Styles/spacing';
 import { PhotoGalleryHeader } from '../PhotoGalleryHeader';
 import ToolBarPhotos from '../common/ToolBarPhotos';
 import PhotoGridComponent from './PhotoGridComponent';
-import PhotoMenu from './PhotoMenu';
+import PhotoMenuModal from './PhotoMenuModal';
 import SelectionBar from './SelectionBar';
 
 type PropsType = {
   photos: Array<PhotoGalleryType>;
-  localPhotos: {
-    [key: string]: PhotoLocalType;
-  };
-  serverPhotos: {
-    [key: string]: PhotoServerType;
-  };
   currentPhotoIndex: number;
   isSlidingPhotos: boolean;
   onSwitchMode: (isPhotoSelected: boolean, index: number) => void;
@@ -36,32 +25,21 @@ type PropsType = {
   onPressBack?: () => void;
 };
 
-function PhotoGridController({
-  photos,
-  onSwitchMode,
-  currentPhotoIndex,
-  isSlidingPhotos,
-  localPhotos,
-  serverPhotos,
-  isInTabScreen,
-  title,
-  showBackButton,
-  onPressBack,
-}: PropsType) {
+function PhotoGridController(props: PropsType) {
   console.log('render grid');
 
-  const photosRef = useRef<PhotoGalleryType[]>(photos);
-  photosRef.current = photos;
+  const photosRef = useRef<PhotoGalleryType[]>(props.photos);
+  photosRef.current = props.photos;
 
   const [isSelecting, setIsSelecting] = useState(false);
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
   const [menuModalVisible, setMenuModalVisible] = useState(false);
 
-  const showMenuModal = useCallback(() => setMenuModalVisible(true), []);
-  const handleMenuModal = useCallback(() => setMenuModalVisible(prev => !prev), []);
-
   const { hideTab, showTab } = useTabNavigationContext();
   const { RefreshAllPhotos } = usePhotosFunctionsStore();
+
+  const showMenuModal = useCallback(() => setMenuModalVisible(true), []);
+  const hideMenuModal = useCallback(() => setMenuModalVisible(prev => !prev), []);
 
   useEffect(() => {
     if (isSelecting) {
@@ -78,10 +56,10 @@ function PhotoGridController({
   }, [isSelecting, showTab]);
 
   useEffect(() => {
-    if (!isSlidingPhotos) {
+    if (!props.isSlidingPhotos) {
       showTab();
     }
-  }, [isSlidingPhotos, showTab]);
+  }, [props.isSlidingPhotos, showTab]);
 
   const findPhotoIndex = useCallback((item: PhotoGalleryType) => {
     let index = photosRef.current.findIndex(photo => photo.key == item.key);
@@ -91,6 +69,7 @@ function PhotoGridController({
     return index;
   }, []);
 
+  const propsOnSwitchMode = props.onSwitchMode;
   const onRenderItemPress = useCallback(
     (item: PhotoGalleryType) => {
       if (isSelecting) {
@@ -106,10 +85,10 @@ function PhotoGridController({
           }
         });
       } else {
-        onSwitchMode(true, findPhotoIndex(item) || 0);
+        propsOnSwitchMode(true, findPhotoIndex(item) || 0);
       }
     },
-    [isSelecting, onSwitchMode, findPhotoIndex],
+    [isSelecting, propsOnSwitchMode, findPhotoIndex],
   );
 
   const onSelectPhotoGroup = useCallback((items: PhotoGalleryType[]) => {
@@ -153,13 +132,13 @@ function PhotoGridController({
 
   const onSelectAll = useCallback(() => {
     setSelectedKeys(sKeys => {
-      if (sKeys.size == photos.length) {
+      if (sKeys.size == props.photos.length) {
         return new Set<string>();
       }
 
-      return new Set(photos.map(photo => photo.key));
+      return new Set(props.photos.map(photo => photo.key));
     });
-  }, [photos]);
+  }, [props.photos]);
 
   const onRefresh = useCallback(() => {
     RefreshAllPhotos(3000, 3000).catch(console.log);
@@ -172,27 +151,27 @@ function PhotoGridController({
   );
   const Header = () => (
     <PhotoGalleryHeader
-      title={title}
+      title={props.title}
       iconRight={menuButton}
-      showBackButton={showBackButton}
-      onPressBack={onPressBack}
+      showBackButton={props.showBackButton}
+      onPressBack={props.onPressBack}
     />
   );
   return (
     <View style={{ flex: 1 }}>
       <Header />
       <PhotoGridComponent
-        photos={photos}
-        localPhotos={localPhotos}
-        serverPhotos={serverPhotos}
+        photos={props.photos}
         onPressPhoto={onRenderItemPress}
         onLongPressPhoto={onRenderItemLongPress}
-        currentPhotoIndex={currentPhotoIndex}
+        currentPhotoIndex={props.currentPhotoIndex}
         onRefresh={onRefresh}
         isSelecting={isSelecting}
         selectedKeys={selectedKeys}
         onSelectPhotoGroup={onSelectPhotoGroup}
       />
+
+      {isSelecting && <ToolBarPhotos selectedKeys={selectedKeys} />}
 
       {isSelecting && (
         <SelectionBar
@@ -202,12 +181,9 @@ function PhotoGridController({
         />
       )}
 
-      {isSelecting && <ToolBarPhotos selectedKeys={selectedKeys} />}
-      {(isInTabScreen ?? false) && !isSelecting && <TabBarPadding />}
+      {props.isInTabScreen && !isSelecting && <TabBarPadding />}
 
-      <MenuModal modalVisible={menuModalVisible} handleModal={handleMenuModal}>
-        <PhotoMenu />
-      </MenuModal>
+      <PhotoMenuModal visible={menuModalVisible} onRequestClose={hideMenuModal} />
     </View>
   );
 }

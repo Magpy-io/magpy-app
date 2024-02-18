@@ -19,7 +19,12 @@ type PropsType = {
   onSwitchMode: (isPhotoSelected: boolean, index: number) => void;
 };
 
-function PhotoSlider({ photos, onSwitchMode, isSlidingPhotos, currentPhotoIndex }: PropsType) {
+function PhotoSliderController({
+  photos,
+  onSwitchMode,
+  isSlidingPhotos,
+  currentPhotoIndex,
+}: PropsType) {
   //console.log('render slider');
 
   const [flatListCurrentIndex, setFlatListCurrentIndex] = useState(currentPhotoIndex);
@@ -128,4 +133,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default React.memo(PhotoSlider);
+export default React.memo(PhotoSliderController);
