@@ -49,9 +49,6 @@ function PhotoGridController({
   const { hideTab, showTab } = useTabNavigationContext();
   const { RefreshAllPhotos } = usePhotosFunctionsStore();
 
-  const showMenuModal = useCallback(() => setMenuModalVisible(true), []);
-  const hideMenuModal = useCallback(() => setMenuModalVisible(prev => !prev), []);
-
   useEffect(() => {
     if (isSelecting) {
       const backAction = () => {
@@ -79,6 +76,9 @@ function PhotoGridController({
     }
     return index;
   }, []);
+
+  const showMenuModal = useCallback(() => setMenuModalVisible(true), []);
+  const hideMenuModal = useCallback(() => setMenuModalVisible(prev => !prev), []);
 
   const onRenderItemPress = useCallback(
     (item: PhotoGalleryType) => {
@@ -127,6 +127,7 @@ function PhotoGridController({
       <TuneIcon iconStyle={{ padding: spacing.spacing_m }} />
     </Pressable>
   );
+
   const Header = () => (
     <PhotoGalleryHeader
       title={title}
