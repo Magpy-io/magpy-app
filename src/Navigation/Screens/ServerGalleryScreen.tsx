@@ -1,7 +1,11 @@
 import React from 'react';
 
 import PhotoGallery from '~/Components/PhotoComponents/PhotoGallery';
-import { serverGalleryPhotosSelector } from '~/Context/ReduxStore/Slices/Photos/Selectors';
+import {
+  photosLocalSelector,
+  photosServerSelector,
+  serverGalleryPhotosSelector,
+} from '~/Context/ReduxStore/Slices/Photos/Selectors';
 import { useAppSelector } from '~/Context/ReduxStore/Store';
 
 import { useMainNavigation } from '../Navigation';
@@ -9,8 +13,8 @@ import { useMainNavigation } from '../Navigation';
 export default function ServerGalleryScreen() {
   console.log('render server gallery screen');
   const photosGalleryServer = useAppSelector(serverGalleryPhotosSelector);
-  const photosLocal = useAppSelector(state => state.photos.photosLocal);
-  const photosServer = useAppSelector(state => state.photos.photosServer);
+  const photosLocal = useAppSelector(photosLocalSelector);
+  const photosServer = useAppSelector(photosServerSelector);
   const navigation = useMainNavigation();
 
   return (
