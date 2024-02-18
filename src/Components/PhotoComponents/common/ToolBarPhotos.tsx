@@ -4,6 +4,11 @@ import { StyleSheet, View } from 'react-native';
 import { usePhotosDownloadingFunctions } from '~/Context/ContextSlices/PhotosDownloadingContext/usePhotosDownloadingContext';
 import { PhotoGalleryType, PhotoLocalType } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { usePhotosFunctionsStore } from '~/Context/ReduxStore/Slices/Photos/PhotosFunctions';
+import {
+  photosGallerySelector,
+  photosLocalSelector,
+  photosServerSelector,
+} from '~/Context/ReduxStore/Slices/Photos/Selectors';
 import { useAppSelector } from '~/Context/ReduxStore/Store';
 import { useStyles } from '~/Hooks/useStyles';
 import { colorsType } from '~/Styles/colors';
@@ -21,9 +26,9 @@ function ToolBarPhotos(props: ToolBarProps) {
   const handleModal = () => setModalVisible(prev => !prev);
   const isOnePhoto = props.selectedKeys.size === 1;
 
-  const localPhotos = useAppSelector(state => state.photos.photosLocal);
-  const serverPhotos = useAppSelector(state => state.photos.photosServer);
-  const galleryPhotos = useAppSelector(state => state.photos.photosGallery);
+  const localPhotos = useAppSelector(photosLocalSelector);
+  const serverPhotos = useAppSelector(photosServerSelector);
+  const galleryPhotos = useAppSelector(photosGallerySelector);
 
   const { UploadPhotos } = usePhotosFunctionsStore();
 
