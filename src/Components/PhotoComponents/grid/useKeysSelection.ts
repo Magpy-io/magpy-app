@@ -8,7 +8,7 @@ export interface KeysSelection {
   selectAll: (items: ContainsKey[]) => void;
   resetSelection: (item?: ContainsKey) => void;
   isSelected: (item: ContainsKey) => boolean;
-  numberSelected: () => number;
+  countSelected: () => number;
 }
 
 export function useKeysSelection(): KeysSelection {
@@ -74,9 +74,9 @@ export function useKeysSelection(): KeysSelection {
     [selectedKeys],
   );
 
-  const numberSelected = useCallback(() => {
+  const countSelected = useCallback(() => {
     return selectedKeys.size;
   }, [selectedKeys]);
 
-  return { numberSelected, isSelected, selectSingle, selectGroup, selectAll, resetSelection };
+  return { countSelected, isSelected, selectSingle, selectGroup, selectAll, resetSelection };
 }

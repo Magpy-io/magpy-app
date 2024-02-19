@@ -30,8 +30,7 @@ type PhotoGridComponentProps = {
   currentPhotoIndex: number;
   onRefresh: () => void;
   isSelecting: boolean;
-  keysSelection: KeysSelection;
-  onSelectPhotoGroup: (items: PhotoGalleryType[]) => void;
+  photosSelection: KeysSelection;
 };
 
 export default function PhotoGridComponent({
@@ -41,8 +40,7 @@ export default function PhotoGridComponent({
   currentPhotoIndex,
   onRefresh,
   isSelecting,
-  keysSelection,
-  onSelectPhotoGroup,
+  photosSelection,
 }: PhotoGridComponentProps) {
   const sectionlistRef = useRef<SectionList>(null);
   const photosLenRef = useRef<number>(photos.length);
@@ -57,13 +55,13 @@ export default function PhotoGridComponent({
         <PhotoComponentForGrid
           photo={item}
           isSelecting={isSelecting}
-          isSelected={keysSelection.isSelected(item)}
+          isSelected={photosSelection.isSelected(item)}
           onPress={onPressPhoto}
           onLongPress={onLongPressPhoto}
         />
       );
     },
-    [onLongPressPhoto, onPressPhoto, isSelecting, keysSelection],
+    [onLongPressPhoto, onPressPhoto, isSelecting, photosSelection],
   );
 
   const photosPerDayMemo: DayType[] = useMemo(() => {
@@ -96,7 +94,7 @@ export default function PhotoGridComponent({
           <TouchableHighlight
             style={styles.headerButtonStyle}
             onPress={() => {
-              onSelectPhotoGroup(photos);
+              photosSelection.selectGroup(photos);
             }}
             underlayColor={colors.UNDERLAY}>
             <Text style={styles.headerButtonTextStyle}>Select all</Text>

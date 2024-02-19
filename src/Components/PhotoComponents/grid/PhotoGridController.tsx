@@ -44,8 +44,8 @@ function PhotoGridController({
   photosRef.current = photos;
 
   const [isSelecting, setIsSelecting] = useState(false);
-  const keysSelection = useKeysSelection();
-  const { selectSingle, selectGroup, selectAll, resetSelection, isSelected } = keysSelection;
+  const photosSelection = useKeysSelection();
+  const { selectSingle, selectAll, resetSelection, isSelected } = photosSelection;
   const [menuModalVisible, setMenuModalVisible] = useState(false);
 
   const { hideTab, showTab } = useTabNavigationContext();
@@ -97,13 +97,6 @@ function PhotoGridController({
     [isSelecting, selectSingle, onSwitchMode, findPhotoIndex],
   );
 
-  const onSelectPhotoGroup = useCallback(
-    (items: PhotoGalleryType[]) => {
-      selectGroup(items);
-    },
-    [selectGroup],
-  );
-
   const onRenderItemLongPress = useCallback(
     (item: PhotoGalleryType) => {
       if (!isSelecting) {
@@ -152,15 +145,14 @@ function PhotoGridController({
         currentPhotoIndex={currentPhotoIndex}
         onRefresh={onRefresh}
         isSelecting={isSelecting}
-        keysSelection={keysSelection}
-        onSelectPhotoGroup={onSelectPhotoGroup}
+        photosSelection={photosSelection}
       />
 
       {isSelecting && <ToolBarPhotos seletedGalleryPhotos={selectedPhotos} />}
 
       {isSelecting && (
         <SelectionBar
-          selectedNb={keysSelection.numberSelected()}
+          selectedNb={photosSelection.countSelected()}
           onCancelButton={onBackButton}
           onSelectAllButton={onSelectAll}
         />
