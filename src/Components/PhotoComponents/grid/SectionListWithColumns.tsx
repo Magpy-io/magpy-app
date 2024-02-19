@@ -53,6 +53,7 @@ const SectionListWithColumns = React.forwardRef(function SectionListWithColumns(
   const totalEmptySpace = separatorSpace * (columns - 1);
   const itemWidth = (width - totalEmptySpace) / columns;
   const itemHeight = itemWidth;
+
   const Separator = useCallback(
     () => <View style={{ height: separatorSpace, width: '100%' }} />,
     [separatorSpace],
@@ -69,20 +70,11 @@ const SectionListWithColumns = React.forwardRef(function SectionListWithColumns(
     return newSectionsArray;
   }, [columns, sections]);
 
-  // [0,1,2] for columns === 3
-  const ArrayColumns = useMemo(
-    () =>
-      Array(columns)
-        .fill(0)
-        .map((u, i) => i),
-    [columns],
-  );
-
   const renderRow = useCallback(
     ({ item, index }: { item: T[]; index: number }) => {
       return (
         <View style={{ flexDirection: 'row' }}>
-          {ArrayColumns.map(i => {
+          {Array(columns).map((_, i) => {
             if (item[i]) {
               const padding = i === 0 ? {} : { marginLeft: separatorSpace };
               return (
@@ -97,7 +89,7 @@ const SectionListWithColumns = React.forwardRef(function SectionListWithColumns(
         </View>
       );
     },
-    [ArrayColumns, itemHeight, itemWidth, keyExtractor, renderItem, separatorSpace],
+    [itemHeight, itemWidth, keyExtractor, renderItem, separatorSpace, columns],
   );
 
   const rowKeyExtractor = useCallback(
