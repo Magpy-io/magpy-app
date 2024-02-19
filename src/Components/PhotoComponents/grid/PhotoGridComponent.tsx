@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
-import { SectionList, StyleSheet, TouchableHighlight, View } from 'react-native';
+import { StyleSheet, TouchableHighlight, View } from 'react-native';
 
 import { Text } from 'react-native-elements';
 
@@ -12,7 +12,10 @@ import { typography } from '~/Styles/typography';
 
 import { DayType, getIndexInSectionList, getPhotosPerDay } from './Helpers';
 import PhotoComponentForGrid from './PhotoComponentForGrid';
-import SectionListWithColumns, { NewSection } from './SectionListWithColumns';
+import SectionListWithColumns, {
+  SectionListWithColumnsType,
+  SectionType,
+} from './SectionListWithColumns';
 import { KeysSelection } from './useKeysSelection';
 
 const NUM_COLUMNS = 3;
@@ -42,7 +45,7 @@ export default function PhotoGridComponent({
   isSelecting,
   photosSelection,
 }: PhotoGridComponentProps) {
-  const sectionlistRef = useRef<SectionList<PhotoGalleryType[], NewSection>>(null);
+  const sectionlistRef = useRef<SectionListWithColumnsType | null>(null);
   const photosLenRef = useRef<number>(photos.length);
   const { colors } = useTheme();
   const styles = useStyles(makeStyles);
@@ -86,16 +89,15 @@ export default function PhotoGridComponent({
   );
 
   const renderSectionHeader = useCallback(
-    ({ section }: { section: NewSection }) => {
-      const photos = section.data.flat();
+    ({ section }: { section: SectionType }) => {
       return (
         <View style={styles.sectionHeaderStyle}>
-          <Text style={styles.headerTitleStyle}>{section.title}</Text>
+          <Text style={styles.headerTitleStyle}>{section.sectionData?.title}</Text>
           {isSelecting && (
             <TouchableHighlight
               style={styles.headerButtonStyle}
               onPress={() => {
-                photosSelection.selectGroup(photos);
+                photosSelection.selectGroup(section.data);
               }}
               underlayColor={colors.UNDERLAY}>
               <Text style={styles.headerButtonTextStyle}>Select all</Text>
