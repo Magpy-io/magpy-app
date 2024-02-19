@@ -1,49 +1,36 @@
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
-import { areDatesEqual, formatDate, withoutTime } from '~/Helpers/Date';
+import { areDatesTheSameDay, formatDate, withoutTime } from '~/Helpers/Date';
+import { clamp } from '~/Helpers/Utilities';
 
 import { SectionType } from '../../CommonComponents/SectionListWithColumns/Types';
 
-export function getClosestPhotoToIndex(currentPhotoIndex: number, photos: PhotoGalleryType[]) {
-  const len = photos.length;
-  if (currentPhotoIndex >= len) {
-    return photos[len - 1];
-  }
-  if (currentPhotoIndex < 0) {
-    return photos[0];
-  }
-  return photos[currentPhotoIndex];
-}
-
 export type SectionDataType = { title: string; day: string };
-
 export type SectionTypePhotoGrid = SectionType<PhotoGalleryType, SectionDataType>;
 
 export function getSectionIndex(
   currentPhoto: PhotoGalleryType,
-  photosPerDayMemo: SectionTypePhotoGrid[],
+  sections: SectionTypePhotoGrid[],
 ) {
   const currentPhotoDate = withoutTime(currentPhoto.date);
-  const sectionIndex = photosPerDayMemo.findIndex(
-    e => e.sectionData?.day === currentPhotoDate,
-  );
+  const sectionIndex = sections.findIndex(e => e.sectionData.day === currentPhotoDate);
   return sectionIndex;
 }
 
 export function getIndexInSectionList(
   currentPhotoIndex: number,
-  photosPerDayMemo: SectionTypePhotoGrid[],
+  sections: SectionTypePhotoGrid[],
   photos: PhotoGalleryType[],
   columns: number,
 ) {
-  const currentPhoto = getClosestPhotoToIndex(currentPhotoIndex, photos);
-  const sectionIndex = getSectionIndex(currentPhoto, photosPerDayMemo);
-  const itemIndex = photosPerDayMemo[sectionIndex]?.data.findIndex(
-    e => e.key === currentPhoto.key,
-  );
+  const currentPhotoIndexClamped = clamp(currentPhotoIndex, photos.length - 1);
+  const currentPhoto = photos[currentPhotoIndexClamped];
+  const sectionIndex = getSectionIndex(currentPhoto, sections);
+  const itemIndex = sections[sectionIndex].data.findIndex(e => e.key === currentPhoto.key);
   const rowIndex = Math.floor(itemIndex / columns);
+
   return {
-    sectionIndex: sectionIndex,
-    rowIndex: rowIndex,
+    sectionIndex,
+    rowIndex,
   };
 }
 
@@ -59,7 +46,7 @@ export function getPhotosPerDay(photos: PhotoGalleryType[]): SectionTypePhotoGri
     photos.forEach(photo => {
       const photoDate = withoutTime(photo.date) ?? '';
 
-      if (areDatesEqual(photoDate, currentDate)) {
+      if (areDatesTheSameDay(photoDate, currentDate)) {
         currentBasket.data.push(photo);
       } else {
         photosPerDay.push(currentBasket);

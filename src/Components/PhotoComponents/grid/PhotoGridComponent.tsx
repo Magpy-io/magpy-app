@@ -22,8 +22,6 @@ import PhotoComponentForGrid from './PhotoComponentForGrid';
 import { KeysSelection } from './useKeysSelection';
 
 const NUM_COLUMNS = 3;
-const SECTION_HEADER_HEIGHT = 60;
-const SPACE_BETWEEN_PHOTOS = 1;
 
 function keyExtractor(item: PhotoGalleryType) {
   return `grid_${item.key}`;
@@ -98,7 +96,7 @@ export default function PhotoGridComponent({
     ({ section }: { section: SectionTypePhotoGrid }) => {
       return (
         <View style={styles.sectionHeaderStyle}>
-          <Text style={styles.headerTitleStyle}>{section.sectionData?.title}</Text>
+          <Text style={styles.headerTitleStyle}>{section.sectionData.title}</Text>
           {isSelecting && (
             <TouchableHighlight
               style={styles.headerButtonStyle}
@@ -132,6 +130,9 @@ export default function PhotoGridComponent({
     </View>
   );
 }
+
+const SECTION_HEADER_HEIGHT = 60;
+const SPACE_BETWEEN_PHOTOS = 1;
 
 const makeStyles = (colors: colorsType) =>
   StyleSheet.create({

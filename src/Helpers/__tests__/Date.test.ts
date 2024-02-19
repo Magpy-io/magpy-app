@@ -1,17 +1,17 @@
-import { areDatesEqual, withoutTime } from '../Date';
+import { areDatesTheSameDay, withoutTime } from '../Date';
 
-describe('Tests for areDatesEqual function', () => {
+describe('Tests for areDatesTheSameDay function', () => {
   it('Should return true if same date', () => {
     const d1 = '2023-06-22T14:43:51.880Z';
     const d2 = '2023-06-22T14:48:40.880Z';
-    const ret = areDatesEqual(d1, d2);
+    const ret = areDatesTheSameDay(d1, d2);
     expect(ret).toBe(true);
   });
 
   it('Should return false if not same date', () => {
     const d1 = '2023-06-23T14:43:51.880Z';
     const d2 = '2023-06-22T14:48:40.880Z';
-    const ret = areDatesEqual(d1, d2);
+    const ret = areDatesTheSameDay(d1, d2);
     expect(ret).toBe(false);
   });
 });
