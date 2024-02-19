@@ -10,7 +10,12 @@ import { colorsType } from '~/Styles/colors';
 import { borderRadius, spacing } from '~/Styles/spacing';
 import { typography } from '~/Styles/typography';
 
-import { DayType, getIndexInSectionList, getPhotosPerDay } from './Helpers';
+import {
+  SectionDataType,
+  SectionTypePhotoGrid,
+  getIndexInSectionList,
+  getPhotosPerDay,
+} from './Helpers';
 import PhotoComponentForGrid from './PhotoComponentForGrid';
 import SectionListWithColumns, {
   SectionListWithColumnsType,
@@ -45,14 +50,17 @@ export default function PhotoGridComponent({
   isSelecting,
   photosSelection,
 }: PhotoGridComponentProps) {
-  const sectionlistRef = useRef<SectionListWithColumnsType | null>(null);
+  const sectionlistRef = useRef<SectionListWithColumnsType<
+    PhotoGalleryType,
+    SectionDataType
+  > | null>(null);
   const photosLenRef = useRef<number>(photos.length);
   const { colors } = useTheme();
   const styles = useStyles(makeStyles);
 
   photosLenRef.current = photos.length;
 
-  const photosPerDayMemo: DayType[] = useMemo(() => {
+  const photosPerDayMemo: SectionTypePhotoGrid[] = useMemo(() => {
     return getPhotosPerDay(photos);
   }, [photos]);
 
@@ -89,7 +97,7 @@ export default function PhotoGridComponent({
   );
 
   const renderSectionHeader = useCallback(
-    ({ section }: { section: SectionType }) => {
+    ({ section }: { section: SectionType<PhotoGalleryType, SectionDataType> }) => {
       return (
         <View style={styles.sectionHeaderStyle}>
           <Text style={styles.headerTitleStyle}>{section.sectionData?.title}</Text>

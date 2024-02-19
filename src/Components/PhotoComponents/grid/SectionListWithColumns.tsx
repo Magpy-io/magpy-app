@@ -3,32 +3,37 @@ import { SectionList, View } from 'react-native';
 
 import sectionListGetItemLayout from 'react-native-section-list-get-item-layout';
 
-import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { useOrientation } from '~/Hooks/useOrientation';
 
-type U = { title: string };
-type T = PhotoGalleryType;
-export type RowType = T[];
+type RowType<T> = T[];
+type SectionWithRowsType<T, U> = { data: Array<RowType<T>>; sectionData?: U };
 
-export type SectionType = { data: Array<T>; sectionData?: U };
-export type SectionWithRowsType = { data: Array<RowType>; sectionData?: U };
+export type SectionType<ItemType, SectionData> = {
+  data: Array<ItemType>;
+  sectionData?: SectionData;
+};
 
-export type SectionListWithColumnsType = SectionList<T[], SectionWithRowsType>;
+export type SectionListWithColumnsType<ItemType, SectionData> = SectionList<
+  ItemType[],
+  SectionWithRowsType<ItemType, SectionData>
+>;
 
-type SectionListWithColumnsProps = {
-  sections: SectionType[];
+type SectionListWithColumnsProps<ItemType, SectionData> = {
+  sections: SectionType<ItemType, SectionData>[];
   columns: number;
   separatorSpace?: number;
-  renderItem: ({ item }: { item: T }) => React.ReactElement | null;
-  keyExtractor: (item: T, index: number) => string;
-  renderSectionHeader: (info: { section: SectionType }) => React.JSX.Element;
+  renderItem: ({ item }: { item: ItemType }) => React.ReactElement | null;
+  keyExtractor: (item: ItemType, index: number) => string;
+  renderSectionHeader: (info: {
+    section: SectionType<ItemType, SectionData>;
+  }) => React.JSX.Element;
   onRefresh?: () => void;
   refreshing?: boolean;
   sectionHeaderHeight: number;
-  mref?: React.Ref<SectionListWithColumnsType>;
+  mref?: React.Ref<SectionListWithColumnsType<ItemType, SectionData>>;
 };
 
-function makeArrayOfRows(array: Array<T>, columns: number): T[][] {
+function makeArrayOfRows<T>(array: Array<T>, columns: number): T[][] {
   const newArray = [];
   const newArrayLength = Math.ceil(array.length / columns);
   for (let i = 0; i < newArrayLength; i++) {
@@ -37,7 +42,7 @@ function makeArrayOfRows(array: Array<T>, columns: number): T[][] {
   return newArray;
 }
 
-function SectionListWithColumns({
+function SectionListWithColumns<ItemType, SectionData>({
   sections,
   renderItem,
   renderSectionHeader,
@@ -48,7 +53,7 @@ function SectionListWithColumns({
   refreshing,
   sectionHeaderHeight,
   mref,
-}: SectionListWithColumnsProps) {
+}: SectionListWithColumnsProps<ItemType, SectionData>) {
   const { width } = useOrientation();
   const totalEmptySpace = separatorSpace * (columns - 1);
   const itemWidth = (width - totalEmptySpace) / columns;
@@ -60,9 +65,9 @@ function SectionListWithColumns({
   );
 
   const sectionsWithRows = useMemo(() => {
-    const newSectionsArray: SectionWithRowsType[] = [];
+    const newSectionsArray: SectionWithRowsType<ItemType, SectionData>[] = [];
     sections.forEach(s => {
-      const newSection: SectionWithRowsType = {
+      const newSection: SectionWithRowsType<ItemType, SectionData> = {
         sectionData: s.sectionData,
         data: makeArrayOfRows(s.data, columns),
       };
@@ -73,7 +78,7 @@ function SectionListWithColumns({
   }, [columns, sections]);
 
   const renderRow = useCallback(
-    ({ item, index }: { item: RowType; index: number }) => {
+    ({ item, index }: { item: RowType<ItemType>; index: number }) => {
       return (
         <View style={{ flexDirection: 'row' }}>
           {Array(columns)
@@ -97,21 +102,21 @@ function SectionListWithColumns({
   );
 
   const rowKeyExtractor = useCallback(
-    (item: T[], index: number) => {
+    (item: RowType<ItemType>, index: number) => {
       return keyExtractor(item[0], index);
     },
     [keyExtractor],
   );
 
   const getItemLayout: (
-    data: SectionWithRowsType[] | null,
+    data: SectionWithRowsType<ItemType, SectionData>[] | null,
     index: number,
   ) => {
     length: number;
     offset: number;
     index: number;
   } = useMemo(() => {
-    const getItemLayoutFunction = sectionListGetItemLayout<RowType>({
+    const getItemLayoutFunction = sectionListGetItemLayout<RowType<ItemType>>({
       getItemHeight: () => itemHeight,
       getSectionHeaderHeight: () => sectionHeaderHeight,
       getSeparatorHeight: () => separatorSpace,
@@ -121,8 +126,8 @@ function SectionListWithColumns({
   }, [itemHeight, sectionHeaderHeight, separatorSpace]);
 
   const renderSectionHeaderInner = useCallback(
-    (info: { section: SectionWithRowsType }) => {
-      const sectionOriginal: SectionType = {
+    (info: { section: SectionWithRowsType<ItemType, SectionData> }) => {
+      const sectionOriginal: SectionType<ItemType, SectionData> = {
         sectionData: info.section.sectionData,
         data: info.section.data.flat(),
       };

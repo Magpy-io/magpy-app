@@ -1,5 +1,7 @@
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
-import { areDatesEqual, areDatesTheSameMonth, formatDate, withoutTime } from '~/Helpers/Date';
+import { areDatesEqual, formatDate, withoutTime } from '~/Helpers/Date';
+
+import { SectionType } from './SectionListWithColumns';
 
 export function getClosestPhotoToIndex(currentPhotoIndex: number, photos: PhotoGalleryType[]) {
   const len = photos.length;
@@ -12,21 +14,24 @@ export function getClosestPhotoToIndex(currentPhotoIndex: number, photos: PhotoG
   return photos[currentPhotoIndex];
 }
 
-export type DayType = {
-  title: string;
-  day: string;
-  data: PhotoGalleryType[];
-};
+export type SectionDataType = { title: string; day: string };
 
-export function getSectionIndex(currentPhoto: PhotoGalleryType, photosPerDayMemo: DayType[]) {
+export type SectionTypePhotoGrid = SectionType<PhotoGalleryType, SectionDataType>;
+
+export function getSectionIndex(
+  currentPhoto: PhotoGalleryType,
+  photosPerDayMemo: SectionTypePhotoGrid[],
+) {
   const currentPhotoDate = withoutTime(currentPhoto.date);
-  const sectionIndex = photosPerDayMemo.findIndex(e => e.day === currentPhotoDate);
+  const sectionIndex = photosPerDayMemo.findIndex(
+    e => e.sectionData?.day === currentPhotoDate,
+  );
   return sectionIndex;
 }
 
 export function getIndexInSectionList(
   currentPhotoIndex: number,
-  photosPerDayMemo: DayType[],
+  photosPerDayMemo: SectionTypePhotoGrid[],
   photos: PhotoGalleryType[],
   columns: number,
 ) {
@@ -42,13 +47,12 @@ export function getIndexInSectionList(
   };
 }
 
-export function getPhotosPerDay(photos: PhotoGalleryType[]) {
+export function getPhotosPerDay(photos: PhotoGalleryType[]): SectionTypePhotoGrid[] {
   if (photos && photos.length > 0) {
-    const photosPerDay: DayType[] = [];
+    const photosPerDay: SectionTypePhotoGrid[] = [];
     let currentDate = withoutTime(photos[0].date) ?? '';
-    let currentBasket: DayType = {
-      title: formatDate(currentDate),
-      day: currentDate,
+    let currentBasket: SectionTypePhotoGrid = {
+      sectionData: { title: formatDate(currentDate), day: currentDate },
       data: [],
     };
 
@@ -61,8 +65,8 @@ export function getPhotosPerDay(photos: PhotoGalleryType[]) {
         photosPerDay.push(currentBasket);
         currentDate = photoDate;
         currentBasket = {
-          title: formatDate(photoDate),
-          day: photoDate,
+          sectionData: { title: formatDate(photoDate), day: photoDate },
+
           data: [photo],
         };
       }
@@ -74,34 +78,34 @@ export function getPhotosPerDay(photos: PhotoGalleryType[]) {
   }
 }
 
-export function getPhotosPerMonth(photos: PhotoGalleryType[]) {
-  if (photos && photos.length > 0) {
-    const photosPerMonth: DayType[] = [];
-    let currentDate = photos[0].date ?? '';
-    let currentBasket: DayType = {
-      title: formatDate(currentDate),
-      day: currentDate,
-      data: [],
-    };
+// export function getPhotosPerMonth(photos: PhotoGalleryType[]) {
+//   if (photos && photos.length > 0) {
+//     const photosPerMonth: DayType[] = [];
+//     let currentDate = photos[0].date ?? '';
+//     let currentBasket: DayType = {
+//       title: formatDate(currentDate),
+//       day: currentDate,
+//       data: [],
+//     };
 
-    photos.forEach(photo => {
-      const photoDate = photo.date ?? '';
+//     photos.forEach(photo => {
+//       const photoDate = photo.date ?? '';
 
-      if (areDatesTheSameMonth(photoDate, currentDate)) {
-        currentBasket.data.push(photo);
-      } else {
-        photosPerMonth.push(currentBasket);
-        currentDate = photoDate;
-        currentBasket = {
-          title: formatDate(photoDate),
-          day: photoDate,
-          data: [photo],
-        };
-      }
-    });
-    photosPerMonth.push(currentBasket);
-    return photosPerMonth;
-  } else {
-    return [];
-  }
-}
+//       if (areDatesTheSameMonth(photoDate, currentDate)) {
+//         currentBasket.data.push(photo);
+//       } else {
+//         photosPerMonth.push(currentBasket);
+//         currentDate = photoDate;
+//         currentBasket = {
+//           title: formatDate(photoDate),
+//           day: photoDate,
+//           data: [photo],
+//         };
+//       }
+//     });
+//     photosPerMonth.push(currentBasket);
+//     return photosPerMonth;
+//   } else {
+//     return [];
+//   }
+// }
