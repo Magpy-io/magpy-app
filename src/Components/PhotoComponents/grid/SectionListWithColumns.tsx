@@ -16,12 +16,13 @@ type SectionListWithColumnsType = {
   separatorSpace?: number;
   renderItem: ({ item, index }: { item: T; index?: number }) => React.ReactElement | null;
   keyExtractor: (item: T, index: number) => string;
-  renderSectionHeader:
-    | ((info: { section: SectionListData<T[], NewSection> }) => React.JSX.Element)
-    | undefined;
-  onRefresh?: (() => void) | null | undefined;
-  refreshing?: boolean | null | undefined;
+  renderSectionHeader?: (info: {
+    section: SectionListData<T[], NewSection>;
+  }) => React.JSX.Element;
+  onRefresh?: (() => void) | null;
+  refreshing?: boolean | null;
   sectionHeaderHeight: number;
+  mref: React.Ref<SectionList<T[], NewSection>> | null;
 };
 
 // converts any array like to an array of columns elements
@@ -35,20 +36,18 @@ function makeArrayWithColumns<T>(array: T[], columns: number) {
   return newArray;
 }
 
-const SectionListWithColumns = React.forwardRef(function SectionListWithColumns(
-  {
-    sections,
-    renderItem,
-    renderSectionHeader,
-    keyExtractor,
-    columns,
-    separatorSpace = 0,
-    onRefresh,
-    refreshing,
-    sectionHeaderHeight,
-  }: SectionListWithColumnsType,
-  ref: React.LegacyRef<SectionList<T[]>> | undefined,
-) {
+function SectionListWithColumns({
+  sections,
+  renderItem,
+  renderSectionHeader,
+  keyExtractor,
+  columns,
+  separatorSpace = 0,
+  onRefresh,
+  refreshing,
+  sectionHeaderHeight,
+  mref,
+}: SectionListWithColumnsType) {
   const { width } = useOrientation();
   const totalEmptySpace = separatorSpace * (columns - 1);
   const itemWidth = (width - totalEmptySpace) / columns;
@@ -99,25 +98,28 @@ const SectionListWithColumns = React.forwardRef(function SectionListWithColumns(
     [keyExtractor],
   );
 
-  const getItemLayout:
-    | ((
-        data: SectionListData<PhotoGalleryType[], NewSection>[] | null,
-        index: number,
-      ) => {
-        length: number;
-        offset: number;
-        index: number;
-      })
-    | undefined = useMemo(
-    () =>
-      sectionListGetItemLayout({
-        // The height of the row with rowData at the given sectionIndex and rowIndex
-        getItemHeight: () => itemHeight,
-        getSectionHeaderHeight: () => sectionHeaderHeight, // The height of your section headers
-        getSeparatorHeight: () => separatorSpace,
-      }),
-    [itemHeight, sectionHeaderHeight, separatorSpace],
-  );
+  const getItemLayout: (
+    data: SectionListData<PhotoGalleryType[], NewSection>[] | null,
+    index: number,
+  ) => {
+    length: number;
+    offset: number;
+    index: number;
+  } = useMemo(() => {
+    const getItemLayoutFunction = sectionListGetItemLayout({
+      // The height of the row with rowData at the given sectionIndex and rowIndex
+      getItemHeight: () => itemHeight,
+      getSectionHeaderHeight: () => sectionHeaderHeight, // The height of your section headers
+      getSeparatorHeight: () => separatorSpace,
+    });
+
+    return (data: SectionListData<PhotoGalleryType[], NewSection>[] | null, index: number) => {
+      if (!data) {
+        return { length: 0, offset: 0, index: 0 };
+      }
+      return getItemLayoutFunction(data, index);
+    };
+  }, [itemHeight, sectionHeaderHeight, separatorSpace]);
 
   if (!sections) {
     return <View />;
@@ -134,9 +136,9 @@ const SectionListWithColumns = React.forwardRef(function SectionListWithColumns(
       refreshing={refreshing}
       onRefresh={onRefresh}
       windowSize={11}
-      ref={ref}
+      ref={mref}
     />
   );
-});
+}
 
 export default SectionListWithColumns;

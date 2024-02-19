@@ -42,7 +42,7 @@ export default function PhotoGridComponent({
   isSelecting,
   photosSelection,
 }: PhotoGridComponentProps) {
-  const sectionlistRef = useRef<SectionList>(null);
+  const sectionlistRef = useRef<SectionList<PhotoGalleryType[], NewSection>>(null);
   const photosLenRef = useRef<number>(photos.length);
   const { colors } = useTheme();
   const styles = useStyles(makeStyles);
@@ -110,7 +110,7 @@ export default function PhotoGridComponent({
   return (
     <View style={[styles.mainViewStyle, { backgroundColor: colors.BACKGROUND }]}>
       <SectionListWithColumns
-        ref={sectionlistRef}
+        mref={sectionlistRef}
         sections={photosPerDayMemo}
         renderItem={renderItem}
         renderSectionHeader={renderSectionHeader}
