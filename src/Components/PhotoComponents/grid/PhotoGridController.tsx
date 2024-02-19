@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { BackHandler, Pressable, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 
 import { TuneIcon } from '~/Components/CommonComponents/Icons';
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
@@ -12,6 +12,7 @@ import { spacing } from '~/Styles/spacing';
 
 import { PhotoGalleryHeader } from '../PhotoGalleryHeader';
 import ToolBarPhotos from '../common/ToolBarPhotos';
+import { useCustomBackPress } from '../common/useCustomBackPress';
 import PhotoGridComponent from './PhotoGridComponent';
 import PhotoMenuModal from './PhotoMenuModal';
 import SelectionBar from './SelectionBar';
@@ -55,19 +56,12 @@ function PhotoGridController({
     photosGalleryFilteredSelector(state, isSelected),
   );
 
-  useEffect(() => {
-    if (isSelecting) {
-      const backAction = () => {
-        setIsSelecting(false);
-        showTab();
-        return true;
-      };
+  const backPressAction = useCallback(() => {
+    setIsSelecting(false);
+    showTab();
+  }, [showTab]);
 
-      const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
-
-      return () => backHandler.remove();
-    }
-  }, [isSelecting, showTab]);
+  useCustomBackPress(backPressAction, isSelecting);
 
   useEffect(() => {
     if (!isSlidingPhotos) {

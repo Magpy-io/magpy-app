@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { BackHandler, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { NativeEventEmitter, NativeModules } from 'react-native';
 
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
@@ -7,6 +7,7 @@ import { NativeEventsNames } from '~/NativeModules/NativeModulesEventNames';
 import { useTabNavigationContext } from '~/Navigation/TabNavigation/TabNavigationContext';
 
 import ToolBarPhotos from '../common/ToolBarPhotos';
+import { useCustomBackPress } from '../common/useCustomBackPress';
 import PhotoSliderComponent from './PhotoSliderComponent';
 import StatusBarComponent from './PhotoSliderHeader';
 
@@ -42,22 +43,11 @@ function PhotoSliderController({
     }
   }, [isSlidingPhotos, photos.length, onSwitchMode]);
 
-  useEffect(() => {
-    const backAction = () => {
-      if (isSlidingPhotos) {
-        onSwitchMode(false, flatListCurrentIndexRef.current);
-        backHandler.remove();
-        return true;
-      } else {
-        return false;
-      }
-    };
-    const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+  const backPressAction = useCallback(() => {
+    onSwitchMode(false, flatListCurrentIndexRef.current);
+  }, [onSwitchMode]);
 
-    return () => {
-      return backHandler.remove();
-    };
-  }, [onSwitchMode, isSlidingPhotos]);
+  useCustomBackPress(backPressAction, isSlidingPhotos);
 
   useEffect(() => {
     const emitter = new NativeEventEmitter();

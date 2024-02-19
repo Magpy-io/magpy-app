@@ -49,21 +49,6 @@ export default function PhotoGridComponent({
 
   photosLenRef.current = photos.length;
 
-  const renderItem = useCallback(
-    ({ item }: { item: PhotoGalleryType }) => {
-      return (
-        <PhotoComponentForGrid
-          photo={item}
-          isSelecting={isSelecting}
-          isSelected={photosSelection.isSelected(item)}
-          onPress={onPressPhoto}
-          onLongPress={onLongPressPhoto}
-        />
-      );
-    },
-    [onLongPressPhoto, onPressPhoto, isSelecting, photosSelection],
-  );
-
   const photosPerDayMemo: DayType[] = useMemo(() => {
     return getPhotosPerDay(photos);
   }, [photos]);
@@ -85,24 +70,42 @@ export default function PhotoGridComponent({
     }
   }, [sectionlistRef, sectionIndex, rowIndex]);
 
-  const renderSectionHeader = ({ section }: { section: NewSection }) => {
-    const photos = section.data.flat();
-    return (
-      <View style={styles.sectionHeaderStyle}>
-        <Text style={styles.headerTitleStyle}>{section.title}</Text>
-        {isSelecting && (
-          <TouchableHighlight
-            style={styles.headerButtonStyle}
-            onPress={() => {
-              photosSelection.selectGroup(photos);
-            }}
-            underlayColor={colors.UNDERLAY}>
-            <Text style={styles.headerButtonTextStyle}>Select all</Text>
-          </TouchableHighlight>
-        )}
-      </View>
-    );
-  };
+  const renderItem = useCallback(
+    ({ item }: { item: PhotoGalleryType }) => {
+      return (
+        <PhotoComponentForGrid
+          photo={item}
+          isSelecting={isSelecting}
+          isSelected={photosSelection.isSelected(item)}
+          onPress={onPressPhoto}
+          onLongPress={onLongPressPhoto}
+        />
+      );
+    },
+    [onLongPressPhoto, onPressPhoto, isSelecting, photosSelection],
+  );
+
+  const renderSectionHeader = useCallback(
+    ({ section }: { section: NewSection }) => {
+      const photos = section.data.flat();
+      return (
+        <View style={styles.sectionHeaderStyle}>
+          <Text style={styles.headerTitleStyle}>{section.title}</Text>
+          {isSelecting && (
+            <TouchableHighlight
+              style={styles.headerButtonStyle}
+              onPress={() => {
+                photosSelection.selectGroup(photos);
+              }}
+              underlayColor={colors.UNDERLAY}>
+              <Text style={styles.headerButtonTextStyle}>Select all</Text>
+            </TouchableHighlight>
+          )}
+        </View>
+      );
+    },
+    [colors, styles, isSelecting, photosSelection],
+  );
 
   return (
     <View style={[styles.mainViewStyle, { backgroundColor: colors.BACKGROUND }]}>
