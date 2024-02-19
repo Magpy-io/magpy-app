@@ -3,6 +3,7 @@ import { StyleSheet, TouchableHighlight, View } from 'react-native';
 
 import { Text } from 'react-native-elements';
 
+import { SectionListWithColumnsType } from '~/Components/CommonComponents/SectionListWithColumns/Types';
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { useTheme } from '~/Context/ThemeContext';
 import { useStyles } from '~/Hooks/useStyles';
@@ -10,6 +11,7 @@ import { colorsType } from '~/Styles/colors';
 import { borderRadius, spacing } from '~/Styles/spacing';
 import { typography } from '~/Styles/typography';
 
+import SectionListWithColumns from '../../CommonComponents/SectionListWithColumns/SectionListWithColumns';
 import {
   SectionDataType,
   SectionTypePhotoGrid,
@@ -17,10 +19,6 @@ import {
   getPhotosPerDay,
 } from './Helpers';
 import PhotoComponentForGrid from './PhotoComponentForGrid';
-import SectionListWithColumns, {
-  SectionListWithColumnsType,
-  SectionType,
-} from './SectionListWithColumns';
 import { KeysSelection } from './useKeysSelection';
 
 const NUM_COLUMNS = 3;
@@ -97,7 +95,7 @@ export default function PhotoGridComponent({
   );
 
   const renderSectionHeader = useCallback(
-    ({ section }: { section: SectionType<PhotoGalleryType, SectionDataType> }) => {
+    ({ section }: { section: SectionTypePhotoGrid }) => {
       return (
         <View style={styles.sectionHeaderStyle}>
           <Text style={styles.headerTitleStyle}>{section.sectionData?.title}</Text>
@@ -125,8 +123,8 @@ export default function PhotoGridComponent({
         renderItem={renderItem}
         renderSectionHeader={renderSectionHeader}
         keyExtractor={keyExtractor}
-        columns={NUM_COLUMNS}
-        separatorSpace={SPACE_BETWEEN_PHOTOS}
+        numberColumns={NUM_COLUMNS}
+        itemSpacing={SPACE_BETWEEN_PHOTOS}
         sectionHeaderHeight={SECTION_HEADER_HEIGHT}
         onRefresh={onRefresh}
         refreshing={false}

@@ -1,7 +1,7 @@
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { areDatesEqual, formatDate, withoutTime } from '~/Helpers/Date';
 
-import { SectionType } from './SectionListWithColumns';
+import { SectionType } from '../../CommonComponents/SectionListWithColumns/Types';
 
 export function getClosestPhotoToIndex(currentPhotoIndex: number, photos: PhotoGalleryType[]) {
   const len = photos.length;

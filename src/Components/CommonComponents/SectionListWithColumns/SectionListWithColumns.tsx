@@ -5,105 +5,78 @@ import sectionListGetItemLayout from 'react-native-section-list-get-item-layout'
 
 import { useOrientation } from '~/Hooks/useOrientation';
 
-type RowType<T> = T[];
-type SectionWithRowsType<T, U> = { data: Array<RowType<T>>; sectionData?: U };
-
-export type SectionType<ItemType, SectionData> = {
-  data: Array<ItemType>;
-  sectionData?: SectionData;
-};
-
-export type SectionListWithColumnsType<ItemType, SectionData> = SectionList<
-  ItemType[],
-  SectionWithRowsType<ItemType, SectionData>
->;
+import { makeArrayOfRows } from './Helpers';
+import {
+  RowType,
+  SectionListWithColumnsType,
+  SectionType,
+  SectionWithRowsType,
+} from './Types';
 
 type SectionListWithColumnsProps<ItemType, SectionData> = {
   sections: SectionType<ItemType, SectionData>[];
-  columns: number;
-  separatorSpace?: number;
+  numberColumns: number;
   renderItem: ({ item }: { item: ItemType }) => React.ReactElement | null;
-  keyExtractor: (item: ItemType, index: number) => string;
+  keyExtractor: (item: ItemType) => string;
   renderSectionHeader: (info: {
     section: SectionType<ItemType, SectionData>;
   }) => React.JSX.Element;
   onRefresh?: () => void;
   refreshing?: boolean;
+  itemSpacing?: number;
   sectionHeaderHeight: number;
   mref?: React.Ref<SectionListWithColumnsType<ItemType, SectionData>>;
 };
-
-function makeArrayOfRows<T>(array: Array<T>, columns: number): T[][] {
-  const newArray = [];
-  const newArrayLength = Math.ceil(array.length / columns);
-  for (let i = 0; i < newArrayLength; i++) {
-    newArray.push(array.slice(i * columns, i * columns + columns));
-  }
-  return newArray;
-}
 
 function SectionListWithColumns<ItemType, SectionData>({
   sections,
   renderItem,
   renderSectionHeader,
   keyExtractor,
-  columns,
-  separatorSpace = 0,
+  numberColumns,
+  itemSpacing = 0,
   onRefresh,
   refreshing,
   sectionHeaderHeight,
   mref,
 }: SectionListWithColumnsProps<ItemType, SectionData>) {
   const { width } = useOrientation();
-  const totalEmptySpace = separatorSpace * (columns - 1);
-  const itemWidth = (width - totalEmptySpace) / columns;
-  const itemHeight = itemWidth;
 
-  const Separator = useCallback(
-    () => <View style={{ height: separatorSpace, width: '100%' }} />,
-    [separatorSpace],
-  );
+  const totalSpacingHorizontal = itemSpacing * (numberColumns - 1);
+  const itemSize = (width - totalSpacingHorizontal) / numberColumns;
 
   const sectionsWithRows = useMemo(() => {
-    const newSectionsArray: SectionWithRowsType<ItemType, SectionData>[] = [];
-    sections.forEach(s => {
-      const newSection: SectionWithRowsType<ItemType, SectionData> = {
-        sectionData: s.sectionData,
-        data: makeArrayOfRows(s.data, columns),
+    return sections.map(section => {
+      return {
+        sectionData: section.sectionData,
+        data: makeArrayOfRows(section.data, numberColumns),
       };
-
-      newSectionsArray.push(newSection);
     });
-    return newSectionsArray;
-  }, [columns, sections]);
+  }, [numberColumns, sections]);
 
   const renderRow = useCallback(
-    ({ item, index }: { item: RowType<ItemType>; index: number }) => {
+    ({ item: row }: { item: RowType<ItemType>; index: number }) => {
       return (
         <View style={{ flexDirection: 'row' }}>
-          {Array(columns)
-            .fill(0)
-            .map((_, i) => {
-              if (item[i]) {
-                const padding = i === 0 ? {} : { marginLeft: separatorSpace };
-                return (
-                  <View
-                    style={[{ width: itemWidth, height: itemHeight }, padding]}
-                    key={keyExtractor(item[i], index)}>
-                    {renderItem({ item: item[i] })}
-                  </View>
-                );
-              }
-            })}
+          {row.map((rowItem, i) => {
+            const marginLeft = i === 0 ? 0 : itemSpacing;
+            return (
+              <View
+                style={[{ width: itemSize, height: itemSize }, { marginLeft: marginLeft }]}
+                key={keyExtractor(rowItem)}>
+                {renderItem({ item: rowItem })}
+              </View>
+            );
+          })}
         </View>
       );
     },
-    [itemHeight, itemWidth, keyExtractor, renderItem, separatorSpace, columns],
+    [itemSize, keyExtractor, renderItem, itemSpacing],
   );
 
   const rowKeyExtractor = useCallback(
-    (item: RowType<ItemType>, index: number) => {
-      return keyExtractor(item[0], index);
+    (item: RowType<ItemType>) => {
+      return keyExtractor(item[0]);
     },
     [keyExtractor],
   );
@@ -117,13 +90,13 @@ function SectionListWithColumns<ItemType, SectionData>({
     index: number;
   } = useMemo(() => {
     const getItemLayoutFunction = sectionListGetItemLayout<RowType<ItemType>>({
-      getItemHeight: () => itemHeight,
+      getItemHeight: () => itemSize,
       getSectionHeaderHeight: () => sectionHeaderHeight,
-      getSeparatorHeight: () => separatorSpace,
+      getSeparatorHeight: () => itemSpacing,
     });
 
     return getItemLayoutFunction;
-  }, [itemHeight, sectionHeaderHeight, separatorSpace]);
+  }, [itemSize, sectionHeaderHeight, itemSpacing]);
 
   const renderSectionHeaderInner = useCallback(
     (info: { section: SectionWithRowsType<ItemType, SectionData> }) => {
@@ -137,9 +110,10 @@ function SectionListWithColumns<ItemType, SectionData>({
     [renderSectionHeader],
   );
 
-  if (!sections) {
-    return <View />;
-  }
+  const Separator = useCallback(
+    () => <View style={{ height: itemSpacing, width: '100%' }} />,
+    [itemSpacing],
+  );
 
   return (
     <SectionList
