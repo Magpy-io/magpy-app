@@ -18,7 +18,7 @@ export function formatDate(date: string, locale?: string) {
 }
 
 // if two dates are equal, time doesn't matter
-export function areDatesEqual(date1: string, date2: string) {
+export function areDatesTheSameDay(date1: string, date2: string) {
   const dateObj1 = StringToDate(date1);
   const dateObj2 = StringToDate(date2);
   if (!dateObj1 || !dateObj2) {

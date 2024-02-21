@@ -1,68 +1,59 @@
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
-import { areDatesEqual, areDatesTheSameMonth, formatDate, withoutTime } from '~/Helpers/Date';
+import { areDatesTheSameDay, formatDate, withoutTime } from '~/Helpers/Date';
+import { clamp } from '~/Helpers/Utilities';
 
-export function getClosestPhotoToIndex(currentPhotoIndex: number, photos: PhotoGalleryType[]) {
-  const len = photos.length;
-  if (currentPhotoIndex >= len) {
-    return photos[len - 1];
-  }
-  if (currentPhotoIndex < 0) {
-    return photos[0];
-  }
-  return photos[currentPhotoIndex];
-}
+import { SectionType } from '../../CommonComponents/SectionListWithColumns/Types';
 
-export type DayType = {
-  title: string;
-  day: string;
-  data: PhotoGalleryType[];
-};
+export type SectionDataType = { title: string; day: string };
+export type SectionTypePhotoGrid = SectionType<PhotoGalleryType, SectionDataType>;
 
-export function getSectionIndex(currentPhoto: PhotoGalleryType, photosPerDayMemo: DayType[]) {
+export function getSectionIndex(
+  currentPhoto: PhotoGalleryType,
+  sections: SectionTypePhotoGrid[],
+) {
   const currentPhotoDate = withoutTime(currentPhoto.date);
-  const sectionIndex = photosPerDayMemo.findIndex(e => e.day === currentPhotoDate);
+  const sectionIndex = sections.findIndex(e => e.sectionData.day === currentPhotoDate);
   return sectionIndex;
 }
 
 export function getIndexInSectionList(
   currentPhotoIndex: number,
-  photosPerDayMemo: DayType[],
+  sections: SectionTypePhotoGrid[],
   photos: PhotoGalleryType[],
   columns: number,
 ) {
-  const currentPhoto = getClosestPhotoToIndex(currentPhotoIndex, photos);
-  const sectionIndex = getSectionIndex(currentPhoto, photosPerDayMemo);
-  const itemIndex = photosPerDayMemo[sectionIndex]?.data.findIndex(
-    e => e.key === currentPhoto.key,
-  );
+  const currentPhotoIndexClamped = clamp(currentPhotoIndex, photos.length - 1);
+  const currentPhoto = photos[currentPhotoIndexClamped];
+  const sectionIndex = getSectionIndex(currentPhoto, sections);
+  const itemIndex = sections[sectionIndex].data.findIndex(e => e.key === currentPhoto.key);
   const rowIndex = Math.floor(itemIndex / columns);
+
   return {
-    sectionIndex: sectionIndex,
-    rowIndex: rowIndex,
+    sectionIndex,
+    rowIndex,
   };
 }
 
-export function getPhotosPerDay(photos: PhotoGalleryType[]) {
+export function getPhotosPerDay(photos: PhotoGalleryType[]): SectionTypePhotoGrid[] {
   if (photos && photos.length > 0) {
-    const photosPerDay: DayType[] = [];
+    const photosPerDay: SectionTypePhotoGrid[] = [];
     let currentDate = withoutTime(photos[0].date) ?? '';
-    let currentBasket: DayType = {
-      title: formatDate(currentDate),
-      day: currentDate,
+    let currentBasket: SectionTypePhotoGrid = {
+      sectionData: { title: formatDate(currentDate), day: currentDate },
       data: [],
     };
 
     photos.forEach(photo => {
       const photoDate = withoutTime(photo.date) ?? '';
 
-      if (areDatesEqual(photoDate, currentDate)) {
+      if (areDatesTheSameDay(photoDate, currentDate)) {
         currentBasket.data.push(photo);
       } else {
         photosPerDay.push(currentBasket);
         currentDate = photoDate;
         currentBasket = {
-          title: formatDate(photoDate),
-          day: photoDate,
+          sectionData: { title: formatDate(photoDate), day: photoDate },
+
           data: [photo],
         };
       }
@@ -74,34 +65,34 @@ export function getPhotosPerDay(photos: PhotoGalleryType[]) {
   }
 }
 
-export function getPhotosPerMonth(photos: PhotoGalleryType[]) {
-  if (photos && photos.length > 0) {
-    const photosPerMonth: DayType[] = [];
-    let currentDate = photos[0].date ?? '';
-    let currentBasket: DayType = {
-      title: formatDate(currentDate),
-      day: currentDate,
-      data: [],
-    };
+// export function getPhotosPerMonth(photos: PhotoGalleryType[]) {
+//   if (photos && photos.length > 0) {
+//     const photosPerMonth: DayType[] = [];
+//     let currentDate = photos[0].date ?? '';
+//     let currentBasket: DayType = {
+//       title: formatDate(currentDate),
+//       day: currentDate,
+//       data: [],
+//     };
 
-    photos.forEach(photo => {
-      const photoDate = photo.date ?? '';
+//     photos.forEach(photo => {
+//       const photoDate = photo.date ?? '';
 
-      if (areDatesTheSameMonth(photoDate, currentDate)) {
-        currentBasket.data.push(photo);
-      } else {
-        photosPerMonth.push(currentBasket);
-        currentDate = photoDate;
-        currentBasket = {
-          title: formatDate(photoDate),
-          day: photoDate,
-          data: [photo],
-        };
-      }
-    });
-    photosPerMonth.push(currentBasket);
-    return photosPerMonth;
-  } else {
-    return [];
-  }
-}
+//       if (areDatesTheSameMonth(photoDate, currentDate)) {
+//         currentBasket.data.push(photo);
+//       } else {
+//         photosPerMonth.push(currentBasket);
+//         currentDate = photoDate;
+//         currentBasket = {
+//           title: formatDate(photoDate),
+//           day: photoDate,
+//           data: [photo],
+//         };
+//       }
+//     });
+//     photosPerMonth.push(currentBasket);
+//     return photosPerMonth;
+//   } else {
+//     return [];
+//   }
+// }

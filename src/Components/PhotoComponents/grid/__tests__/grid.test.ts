@@ -1,25 +1,5 @@
-import { getClosestPhotoToIndex, getIndexInSectionList, getPhotosPerDay } from '../Helpers';
-import { PhotosPerDayMock, photoGallery1, photoGallery10, photosGallery } from './MockValues';
-
-describe('Tests for getClosestPhotoToIndex', () => {
-  it('Should return closest to index 0', () => {
-    const index = 0;
-    const closestPhoto = getClosestPhotoToIndex(index, photosGallery);
-    expect(closestPhoto).toStrictEqual(photoGallery1);
-  });
-
-  it('Should return closest to index -20', () => {
-    const index = -20;
-    const closestPhoto = getClosestPhotoToIndex(index, photosGallery);
-    expect(closestPhoto).toStrictEqual(photoGallery1);
-  });
-
-  it('Should return closest to index 1000', () => {
-    const index = 1000;
-    const closestPhoto = getClosestPhotoToIndex(index, photosGallery);
-    expect(closestPhoto).toStrictEqual(photoGallery10);
-  });
-});
+import { getIndexInSectionList, getPhotosPerDay } from '../Helpers';
+import { PhotosPerDayMock, photosGallery } from './MockValues';
 
 describe('Tests for function getIndexInSectionList', () => {
   it('Should return section position 0', () => {

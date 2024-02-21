@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
-import { SectionList, StyleSheet, TouchableHighlight, View } from 'react-native';
+import { StyleSheet, TouchableHighlight, View } from 'react-native';
 
 import { Text } from 'react-native-elements';
 
+import { SectionListWithColumnsType } from '~/Components/CommonComponents/SectionListWithColumns/Types';
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { useTheme } from '~/Context/ThemeContext';
 import { useStyles } from '~/Hooks/useStyles';
@@ -10,14 +11,17 @@ import { colorsType } from '~/Styles/colors';
 import { borderRadius, spacing } from '~/Styles/spacing';
 import { typography } from '~/Styles/typography';
 
-import { DayType, getIndexInSectionList, getPhotosPerDay } from './Helpers';
+import SectionListWithColumns from '../../CommonComponents/SectionListWithColumns/SectionListWithColumns';
+import {
+  SectionDataType,
+  SectionTypePhotoGrid,
+  getIndexInSectionList,
+  getPhotosPerDay,
+} from './Helpers';
 import PhotoComponentForGrid from './PhotoComponentForGrid';
-import SectionListWithColumns, { NewSection } from './SectionListWithColumns';
 import { KeysSelection } from './useKeysSelection';
 
 const NUM_COLUMNS = 3;
-const SECTION_HEADER_HEIGHT = 60;
-const SPACE_BETWEEN_PHOTOS = 1;
 
 function keyExtractor(item: PhotoGalleryType) {
   return `grid_${item.key}`;
@@ -42,14 +46,17 @@ export default function PhotoGridComponent({
   isSelecting,
   photosSelection,
 }: PhotoGridComponentProps) {
-  const sectionlistRef = useRef<SectionList<PhotoGalleryType[], NewSection>>(null);
+  const sectionlistRef = useRef<SectionListWithColumnsType<
+    PhotoGalleryType,
+    SectionDataType
+  > | null>(null);
   const photosLenRef = useRef<number>(photos.length);
   const { colors } = useTheme();
   const styles = useStyles(makeStyles);
 
   photosLenRef.current = photos.length;
 
-  const photosPerDayMemo: DayType[] = useMemo(() => {
+  const photosPerDayMemo: SectionTypePhotoGrid[] = useMemo(() => {
     return getPhotosPerDay(photos);
   }, [photos]);
 
@@ -86,16 +93,15 @@ export default function PhotoGridComponent({
   );
 
   const renderSectionHeader = useCallback(
-    ({ section }: { section: NewSection }) => {
-      const photos = section.data.flat();
+    ({ section }: { section: SectionTypePhotoGrid }) => {
       return (
         <View style={styles.sectionHeaderStyle}>
-          <Text style={styles.headerTitleStyle}>{section.title}</Text>
+          <Text style={styles.headerTitleStyle}>{section.sectionData.title}</Text>
           {isSelecting && (
             <TouchableHighlight
               style={styles.headerButtonStyle}
               onPress={() => {
-                photosSelection.selectGroup(photos);
+                photosSelection.selectGroup(section.data);
               }}
               underlayColor={colors.UNDERLAY}>
               <Text style={styles.headerButtonTextStyle}>Select all</Text>
@@ -115,8 +121,8 @@ export default function PhotoGridComponent({
         renderItem={renderItem}
         renderSectionHeader={renderSectionHeader}
         keyExtractor={keyExtractor}
-        columns={NUM_COLUMNS}
-        separatorSpace={SPACE_BETWEEN_PHOTOS}
+        numberColumns={NUM_COLUMNS}
+        itemSpacing={SPACE_BETWEEN_PHOTOS}
         sectionHeaderHeight={SECTION_HEADER_HEIGHT}
         onRefresh={onRefresh}
         refreshing={false}
@@ -124,6 +130,9 @@ export default function PhotoGridComponent({
     </View>
   );
 }
+
+const SECTION_HEADER_HEIGHT = 60;
+const SPACE_BETWEEN_PHOTOS = 1;
 
 const makeStyles = (colors: colorsType) =>
   StyleSheet.create({
