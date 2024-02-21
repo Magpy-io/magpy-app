@@ -3,7 +3,6 @@ import { StyleSheet, TouchableHighlight, View } from 'react-native';
 
 import { Text } from 'react-native-elements';
 
-import { SectionListWithColumnsType } from '~/Components/CommonComponents/SectionListWithColumns/Types';
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { useTheme } from '~/Context/ThemeContext';
 import { useStyles } from '~/Hooks/useStyles';
@@ -11,13 +10,10 @@ import { colorsType } from '~/Styles/colors';
 import { borderRadius, spacing } from '~/Styles/spacing';
 import { typography } from '~/Styles/typography';
 
-import SectionListWithColumns from '../../CommonComponents/SectionListWithColumns/SectionListWithColumns';
-import {
-  SectionDataType,
-  SectionTypePhotoGrid,
-  getIndexInSectionList,
-  getPhotosPerDay,
-} from './Helpers';
+import SectionListWithColumns, {
+  SectionListWithColumnsRefType,
+} from '../../CommonComponents/SectionListWithColumns/SectionListWithColumns';
+import { SectionTypePhotoGrid, getIndexInSectionList, getPhotosPerDay } from './Helpers';
 import PhotoComponentForGrid from './PhotoComponentForGrid';
 import { KeysSelection } from './useKeysSelection';
 
@@ -46,10 +42,7 @@ export default function PhotoGridComponent({
   isSelecting,
   photosSelection,
 }: PhotoGridComponentProps) {
-  const sectionlistRef = useRef<SectionListWithColumnsType<
-    PhotoGalleryType,
-    SectionDataType
-  > | null>(null);
+  const sectionlistRef = useRef<SectionListWithColumnsRefType>(null);
   const photosLenRef = useRef<number>(photos.length);
   const { colors } = useTheme();
   const styles = useStyles(makeStyles);
@@ -60,22 +53,22 @@ export default function PhotoGridComponent({
     return getPhotosPerDay(photos);
   }, [photos]);
 
-  const { sectionIndex, rowIndex } = useMemo(() => {
+  const { sectionIndex, itemIndex } = useMemo(() => {
     if (photosPerDayMemo && photosPerDayMemo.length > 0) {
-      return getIndexInSectionList(currentPhotoIndex, photosPerDayMemo, photos, NUM_COLUMNS);
+      return getIndexInSectionList(currentPhotoIndex, photosPerDayMemo, photos);
     }
-    return { sectionIndex: 0, rowIndex: 0 };
+    return { sectionIndex: 0, itemIndex: 0 };
   }, [currentPhotoIndex, photos, photosPerDayMemo]);
 
   useEffect(() => {
-    if (photosLenRef.current > 0 && sectionIndex >= 0 && rowIndex >= 0) {
+    if (photosLenRef.current > 0 && sectionIndex >= 0 && itemIndex >= 0) {
       sectionlistRef.current?.scrollToLocation({
         sectionIndex: sectionIndex,
-        itemIndex: rowIndex,
+        itemIndex: itemIndex,
         animated: true,
       });
     }
-  }, [sectionlistRef, sectionIndex, rowIndex]);
+  }, [sectionlistRef, sectionIndex, itemIndex]);
 
   const renderItem = useCallback(
     ({ item }: { item: PhotoGalleryType }) => {

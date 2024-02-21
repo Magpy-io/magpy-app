@@ -20,17 +20,15 @@ export function getIndexInSectionList(
   currentPhotoIndex: number,
   sections: SectionTypePhotoGrid[],
   photos: PhotoGalleryType[],
-  columns: number,
 ) {
   const currentPhotoIndexClamped = clamp(currentPhotoIndex, photos.length - 1);
   const currentPhoto = photos[currentPhotoIndexClamped];
   const sectionIndex = getSectionIndex(currentPhoto, sections);
   const itemIndex = sections[sectionIndex].data.findIndex(e => e.key === currentPhoto.key);
-  const rowIndex = Math.floor(itemIndex / columns);
 
   return {
     sectionIndex,
-    rowIndex,
+    itemIndex,
   };
 }
 
