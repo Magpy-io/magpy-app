@@ -5,6 +5,7 @@ import { Text } from 'react-native-elements';
 
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { useTheme } from '~/Context/ThemeContext';
+import { clamp } from '~/Helpers/Utilities';
 import { useStyles } from '~/Hooks/useStyles';
 import { colorsType } from '~/Styles/colors';
 import { borderRadius, spacing } from '~/Styles/spacing';
@@ -55,7 +56,9 @@ export default function PhotoGridComponent({
 
   const { sectionIndex, itemIndex } = useMemo(() => {
     if (photosPerDayMemo && photosPerDayMemo.length > 0) {
-      return getIndexInSectionList(currentPhotoIndex, photosPerDayMemo, photos);
+      const currentPhotoIndexClamped = clamp(currentPhotoIndex, photos.length - 1);
+      const currentPhoto = photos[currentPhotoIndexClamped];
+      return getIndexInSectionList(currentPhoto, photosPerDayMemo);
     }
     return { sectionIndex: 0, itemIndex: 0 };
   }, [currentPhotoIndex, photos, photosPerDayMemo]);

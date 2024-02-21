@@ -1,62 +1,49 @@
 import { getIndexInSectionList, getPhotosPerDay } from '../Helpers';
 import { PhotosPerDayMock, photosGallery } from './MockValues';
 
-describe('Tests for function getIndexInSectionList', () => {
-  it('Should return section position 0', () => {
+describe('Tests for function getIndexInSectionList with 2 sections of 5 items each', () => {
+  it('Should return section 0 and itemIndex 0 when passing first photo', () => {
     const currentPhotoIndex = 0;
-    const nbColumns = 3;
-    const { sectionIndex, rowIndex } = getIndexInSectionList(
-      currentPhotoIndex,
-      PhotosPerDayMock,
-      photosGallery,
-      nbColumns,
-    );
+    const currentPhoto = photosGallery[currentPhotoIndex];
+
+    const { sectionIndex, itemIndex } = getIndexInSectionList(currentPhoto, PhotosPerDayMock);
     expect(sectionIndex).toBe(0);
-    expect(rowIndex).toBe(0);
+    expect(itemIndex).toBe(0);
   });
 
-  it('Should return section position', () => {
+  it('Should return sectionIndex 1 and itemIndex 2 when passing 7th photo', () => {
     const currentPhotoIndex = 7;
-    const nbColumns = 3;
-    const { sectionIndex, rowIndex } = getIndexInSectionList(
-      currentPhotoIndex,
-      PhotosPerDayMock,
-      photosGallery,
-      nbColumns,
-    );
+    const currentPhoto = photosGallery[currentPhotoIndex];
+    const { sectionIndex, itemIndex } = getIndexInSectionList(currentPhoto, PhotosPerDayMock);
     expect(sectionIndex).toBe(1);
-    expect(rowIndex).toBe(0);
+    expect(itemIndex).toBe(2);
   });
 
-  it('Should return section position 0', () => {
-    const currentPhotoIndex = -20;
-    const nbColumns = 3;
-    const { sectionIndex, rowIndex } = getIndexInSectionList(
-      currentPhotoIndex,
-      PhotosPerDayMock,
-      photosGallery,
-      nbColumns,
-    );
+  it('Should return sectionIndex -1 when photo section not found', () => {
+    const newPhoto = {
+      key: 'server',
+      date: '0000-01-01T00:00:00.000Z',
+      mediaId: undefined,
+      serverId: 'server',
+    };
+    const { sectionIndex } = getIndexInSectionList(newPhoto, PhotosPerDayMock);
+    expect(sectionIndex).toBe(-1);
+  });
+
+  it('Should return sectionIndex 0 and itemIndex -1 when photo section is found but does not exist in the section', () => {
+    const newPhoto = {
+      key: 'server',
+      date: '2024-02-03T00:00:00.000Z',
+      mediaId: undefined,
+      serverId: 'server',
+    };
+    const { sectionIndex, itemIndex } = getIndexInSectionList(newPhoto, PhotosPerDayMock);
     expect(sectionIndex).toBe(0);
-    expect(rowIndex).toBe(0);
-  });
-
-  it('Should return section last position', () => {
-    const currentPhotoIndex = 1000;
-    const nbColumns = 3;
-    const { sectionIndex, rowIndex } = getIndexInSectionList(
-      currentPhotoIndex,
-      PhotosPerDayMock,
-      photosGallery,
-      nbColumns,
-    );
-    expect(sectionIndex).toBe(1);
-    expect(rowIndex).toBe(1);
+    expect(itemIndex).toBe(-1);
   });
 });
 
-it('Should return make me photosPerDay', () => {
+it('Should make me photosPerDay', () => {
   const photosPerDay = getPhotosPerDay(photosGallery);
-  console.log('photosPerDay', photosPerDay);
   expect(photosPerDay).toStrictEqual(PhotosPerDayMock);
 });
