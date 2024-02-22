@@ -1,4 +1,5 @@
 import React from 'react';
+import { StatusBar } from 'react-native';
 
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -20,6 +21,7 @@ function App(): React.JSX.Element {
           <GestureHandlerRootView style={{ flex: 1 }}>
             <SafeAreaProvider>
               <ThemeContextProvider>
+                <StatusBar backgroundColor={'transparent'} translucent />
                 <Navigation />
               </ThemeContextProvider>
             </SafeAreaProvider>

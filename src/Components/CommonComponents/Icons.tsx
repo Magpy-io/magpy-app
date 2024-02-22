@@ -183,6 +183,12 @@ export function MoreIcon({ ...props }: CustomIconProps) {
   return <Icon name="more-vertical" type="feather" color={colors.TEXT} size={22} {...props} />;
 }
 
+export function CloseIcon({ ...props }: CustomIconProps) {
+  const { colors } = useTheme();
+
+  return <Icon name="close-outline" type="ionicon" color={colors.TEXT} size={22} {...props} />;
+}
+
 // ---------------------- SETTINGS icons
 
 export function AccountIcon({ ...props }: CustomIconProps) {

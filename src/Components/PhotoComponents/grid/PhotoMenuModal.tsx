@@ -22,13 +22,18 @@ import { typography } from '~/Styles/typography';
 type PhotoMenuProps = {
   visible: boolean;
   onRequestClose: () => void;
+  onFilter: () => void;
 };
 
 export default function PhotoMenu(props: PhotoMenuProps) {
+  const onPressFilter = () => {
+    props.onFilter();
+    props.onRequestClose();
+  };
   return (
     <MenuModal visible={props.visible} onRequestClose={props.onRequestClose}>
       <View style={{ gap: spacing.spacing_xs }}>
-        <Filter />
+        <Filter onPress={onPressFilter} />
         <Sort />
         <Group />
       </View>
@@ -36,11 +41,15 @@ export default function PhotoMenu(props: PhotoMenuProps) {
   );
 }
 
-function Filter() {
+type FilterProps = {
+  onPress: () => void;
+};
+
+function Filter({ onPress }: FilterProps) {
   const styles = useStyles(makeStyles);
   return (
     <View style={styles.filterView}>
-      <TouchableOpacity style={styles.iconText} onPress={() => {}}>
+      <TouchableOpacity style={styles.iconText} onPress={onPress}>
         <FilterIcon size={ICON_SIZE} />
         <Text style={styles.text}>Filter</Text>
       </TouchableOpacity>

@@ -3,6 +3,7 @@ import { StyleSheet, View } from 'react-native';
 
 import { Text } from 'react-native-elements';
 
+import BottomModal from '~/Components/CommonComponents/BottomModal';
 import {
   CustomIconProps,
   ImageIcon,
@@ -17,8 +18,6 @@ import usePhotoData from '~/Hooks/usePhotoData';
 import { useStyles } from '~/Hooks/useStyles';
 import { colorsType } from '~/Styles/colors';
 import { typography } from '~/Styles/typography';
-
-import GenericModal from '../../CommonComponents/GenericModal';
 
 type PhotoDetailsModalProps = {
   modalVisible: boolean;
@@ -46,7 +45,7 @@ export default function PhotoDetailsModal({
     : 'Unknown date taken';
 
   return (
-    <GenericModal modalVisible={modalVisible} handleModal={handleModal}>
+    <BottomModal modalVisible={modalVisible} handleModal={handleModal}>
       <>
         <PhotoInfo
           icon={ImageIcon}
@@ -69,7 +68,7 @@ export default function PhotoDetailsModal({
           />
         )}
       </>
-    </GenericModal>
+    </BottomModal>
   );
 }
 

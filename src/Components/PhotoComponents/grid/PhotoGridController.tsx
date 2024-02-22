@@ -13,6 +13,7 @@ import { spacing } from '~/Styles/spacing';
 import { PhotoGalleryHeader } from '../PhotoGalleryHeader';
 import ToolBarPhotos from '../common/ToolBarPhotos';
 import { useCustomBackPress } from '../common/useCustomBackPress';
+import FilterModal from './FilterModal';
 import PhotoGridComponent from './PhotoGridComponent';
 import PhotoMenuModal from './PhotoMenuModal';
 import SelectionBar from './SelectionBar';
@@ -48,6 +49,7 @@ function PhotoGridController({
   const photosSelection = useKeysSelection();
   const { selectSingle, selectAll, resetSelection, isSelected } = photosSelection;
   const [menuModalVisible, setMenuModalVisible] = useState(false);
+  const [filterModalVisible, setFilterModalVisible] = useState(false);
 
   const { hideTab, showTab } = useTabNavigationContext();
   const { RefreshAllPhotos } = usePhotosFunctionsStore();
@@ -78,7 +80,9 @@ function PhotoGridController({
   }, []);
 
   const showMenuModal = useCallback(() => setMenuModalVisible(true), []);
-  const hideMenuModal = useCallback(() => setMenuModalVisible(prev => !prev), []);
+  const hideMenuModal = useCallback(() => setMenuModalVisible(false), []);
+  const showFilterModal = useCallback(() => setFilterModalVisible(true), []);
+  const handleFilterModal = useCallback(() => setFilterModalVisible(prev => !prev), []);
 
   const onRenderItemPress = useCallback(
     (item: PhotoGalleryType) => {
@@ -154,7 +158,12 @@ function PhotoGridController({
 
       {isInTabScreen && !isSelecting && <TabBarPadding />}
 
-      <PhotoMenuModal visible={menuModalVisible} onRequestClose={hideMenuModal} />
+      <PhotoMenuModal
+        visible={menuModalVisible}
+        onRequestClose={hideMenuModal}
+        onFilter={showFilterModal}
+      />
+      <FilterModal visible={filterModalVisible} handleModal={handleFilterModal} />
     </View>
   );
 }

@@ -1,11 +1,13 @@
 import React from 'react';
-import { Modal, Pressable, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useStyles } from '~/Hooks/useStyles';
 import { colorsType } from '~/Styles/colors';
 import { borderRadius, spacing } from '~/Styles/spacing';
+
+import GenericModal from './GenericModal';
 
 type MenuModalProps = {
   visible: boolean;
@@ -17,21 +19,35 @@ export default function MenuModal({ visible, onRequestClose, children }: MenuMod
   const styles = useStyles(makeStyles);
   const insets = useSafeAreaInsets();
   return (
-    <Modal
-      animationType="fade"
-      transparent
-      statusBarTranslucent
-      visible={visible}
-      onRequestClose={onRequestClose}>
-      <View style={{ flex: 1 }}>
-        <Pressable style={styles.touchable} onPress={onRequestClose} />
-        <TouchableWithoutFeedback>
-          <View style={[styles.viewStyle, { marginTop: insets.top }]}>{children}</View>
-        </TouchableWithoutFeedback>
-      </View>
-    </Modal>
+    <GenericModal
+      animation="fade"
+      modalVisible={visible}
+      handleModal={onRequestClose}
+      style={[styles.viewStyle, { marginTop: insets.top }]}>
+      {children}
+    </GenericModal>
   );
 }
+
+// export default function MenuModal({ visible, onRequestClose, children }: MenuModalProps) {
+//   const styles = useStyles(makeStyles);
+//   const insets = useSafeAreaInsets();
+//   return (
+//     <Modal
+//       animationType="fade"
+//       transparent
+//       statusBarTranslucent
+//       visible={visible}
+//       onRequestClose={onRequestClose}>
+//       <View style={{ flex: 1 }}>
+//         <Pressable style={styles.touchable} onPress={onRequestClose} />
+//         <TouchableWithoutFeedback>
+//           <View style={[styles.viewStyle, { marginTop: insets.top }]}>{children}</View>
+//         </TouchableWithoutFeedback>
+//       </View>
+//     </Modal>
+//   );
+// }
 
 const makeStyles = (colors: colorsType, dark: boolean) =>
   StyleSheet.create({
