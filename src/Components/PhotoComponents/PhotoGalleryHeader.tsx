@@ -22,7 +22,7 @@ export function PhotoGalleryHeader(props: PhotoGalleryHeaderProps) {
 
   return (
     <View>
-      <View style={{ alignSelf: 'center', padding: spacing.spacing_m }}>
+      <View style={{ alignSelf: 'center', padding: spacing.spacing_s }}>
         <Text style={styles.titleStyle}>{props.title}</Text>
       </View>
 

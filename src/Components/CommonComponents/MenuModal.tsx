@@ -1,11 +1,14 @@
 import React from 'react';
-import { Modal, Pressable, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
+import { StyleSheet } from 'react-native';
+import { View } from 'react-native';
 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useStyles } from '~/Hooks/useStyles';
 import { colorsType } from '~/Styles/colors';
 import { borderRadius, spacing } from '~/Styles/spacing';
+
+import GenericModal from './GenericModal';
 
 type MenuModalProps = {
   visible: boolean;
@@ -19,19 +22,13 @@ export default function MenuModal({ visible, onRequestClose, children }: MenuMod
 
   return (
     <>
-      <Modal
-        animationType="fade"
-        transparent
-        statusBarTranslucent
-        visible={visible}
-        onRequestClose={onRequestClose}>
-        <View style={{ flex: 1 }}>
-          <Pressable style={styles.touchable} onPress={onRequestClose} />
-          <TouchableWithoutFeedback>
-            <View style={[styles.viewStyle, { marginTop: insets.top }]}>{children}</View>
-          </TouchableWithoutFeedback>
-        </View>
-      </Modal>
+      <GenericModal
+        animation="size"
+        modalVisible={visible}
+        handleModal={onRequestClose}
+        style={[styles.modalStyle, { marginTop: insets.top }]}>
+        <View style={styles.viewStyle}>{children}</View>
+      </GenericModal>
     </>
   );
 }
@@ -39,11 +36,13 @@ export default function MenuModal({ visible, onRequestClose, children }: MenuMod
 const makeStyles = (colors: colorsType, dark: boolean) =>
   StyleSheet.create({
     viewStyle: {
+      margin: spacing.spacing_l,
+    },
+    modalStyle: {
       backgroundColor: colors.MODAL_BACKGROUND,
       position: 'absolute',
       top: spacing.spacing_xxl,
       right: spacing.spacing_xxl,
-      padding: spacing.spacing_l,
       borderRadius: borderRadius.default,
       elevation: 1,
     },
