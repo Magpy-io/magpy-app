@@ -21,13 +21,13 @@ import { typography } from '~/Styles/typography';
 
 type PhotoDetailsModalProps = {
   modalVisible: boolean;
-  handleModal: () => void;
+  onRequestClose: () => void;
   photo: PhotoGalleryType;
 };
 
 export default function PhotoDetailsModal({
   modalVisible,
-  handleModal,
+  onRequestClose,
   photo,
 }: PhotoDetailsModalProps) {
   const photoData = usePhotoData(photo);
@@ -45,7 +45,7 @@ export default function PhotoDetailsModal({
     : 'Unknown date taken';
 
   return (
-    <BottomModal modalVisible={modalVisible} handleModal={handleModal}>
+    <BottomModal modalVisible={modalVisible} onRequestClose={onRequestClose}>
       <>
         <PhotoInfo
           icon={ImageIcon}

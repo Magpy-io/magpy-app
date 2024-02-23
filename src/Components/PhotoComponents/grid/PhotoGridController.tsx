@@ -79,10 +79,10 @@ function PhotoGridController({
     return index;
   }, []);
 
-  const showMenuModal = useCallback(() => setMenuModalVisible(true), []);
-  const hideMenuModal = useCallback(() => setMenuModalVisible(false), []);
-  const showFilterModal = useCallback(() => setFilterModalVisible(true), []);
-  const handleFilterModal = useCallback(() => setFilterModalVisible(prev => !prev), []);
+  const showMenuModal = () => setMenuModalVisible(true);
+  const hideMenuModal = () => setMenuModalVisible(false);
+  const showFilterModal = () => setFilterModalVisible(true);
+  const hideFilterModal = () => setFilterModalVisible(false);
 
   const onRenderItemPress = useCallback(
     (item: PhotoGalleryType) => {
@@ -163,7 +163,7 @@ function PhotoGridController({
         onRequestClose={hideMenuModal}
         onFilter={showFilterModal}
       />
-      <FilterModal visible={filterModalVisible} handleModal={handleFilterModal} />
+      <FilterModal visible={filterModalVisible} onRequestClose={hideFilterModal} />
     </View>
   );
 }

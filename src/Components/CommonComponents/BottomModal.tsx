@@ -5,20 +5,20 @@ import GenericModal from './GenericModal';
 
 type BottomModalProps = {
   modalVisible: boolean;
-  handleModal: () => void;
+  onRequestClose: () => void;
   children: JSX.Element;
 };
 
 export default function BottomModal({
   modalVisible,
-  handleModal,
+  onRequestClose,
   children,
 }: BottomModalProps) {
   return (
     <GenericModal
       modalVisible={modalVisible}
-      handleModal={handleModal}
-      animation="slide"
+      onRequestClose={onRequestClose}
+      animationType="slide"
       style={styles.viewStyle}>
       {children}
     </GenericModal>

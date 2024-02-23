@@ -23,7 +23,8 @@ type ToolBarProps = {
 function ToolBarPhotos({ seletedGalleryPhotos }: ToolBarProps) {
   const styles = useStyles(makeStyles);
   const [modalVisible, setModalVisible] = useState(false);
-  const handleModal = () => setModalVisible(prev => !prev);
+  const onRequestClose = () => setModalVisible(false);
+  const showModal = () => setModalVisible(true);
   const isOnePhoto = seletedGalleryPhotos.length == 1;
 
   const localPhotos = useAppSelector(photosLocalSelector);
@@ -70,12 +71,12 @@ function ToolBarPhotos({ seletedGalleryPhotos }: ToolBarProps) {
         onDeleteFromDevice={() => {}}
         onShare={() => {}}
         showInfo={isOnePhoto}
-        onInfo={handleModal}
+        onInfo={showModal}
       />
       {isOnePhoto && (
         <PhotoDetailsModal
           modalVisible={modalVisible}
-          handleModal={handleModal}
+          onRequestClose={onRequestClose}
           photo={galleryPhotos[0]}
         />
       )}

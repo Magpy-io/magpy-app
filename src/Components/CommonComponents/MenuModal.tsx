@@ -23,9 +23,9 @@ export default function MenuModal({ visible, onRequestClose, children }: MenuMod
   return (
     <>
       <GenericModal
-        animation="size"
+        animationType="size"
         modalVisible={visible}
-        handleModal={onRequestClose}
+        onRequestClose={onRequestClose}
         style={[styles.modalStyle, { marginTop: insets.top }]}>
         <View style={styles.viewStyle}>{children}</View>
       </GenericModal>

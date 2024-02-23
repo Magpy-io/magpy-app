@@ -12,13 +12,13 @@ import { typography } from '~/Styles/typography';
 
 type FilterModalProps = {
   visible: boolean;
-  handleModal: () => void;
+  onRequestClose: () => void;
 };
 
 export default function FilterModal(props: FilterModalProps) {
   const styles = useStyles(makeStyles);
   return (
-    <BottomModal modalVisible={props.visible} handleModal={props.handleModal}>
+    <BottomModal modalVisible={props.visible} onRequestClose={props.onRequestClose}>
       <View style={styles.viewStyle}>
         <Header />
         <Type />
