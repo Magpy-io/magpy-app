@@ -9,6 +9,9 @@ export function getSectionIndex(
   sections: SectionTypePhotoGrid[],
 ) {
   const sectionIndex = sections.findIndex(e => e.sectionData.includesDate(currentPhoto.date));
+  if (sectionIndex < 0) {
+    console.log('getSectionIndex: section not found');
+  }
   return sectionIndex;
 }
 
@@ -21,6 +24,10 @@ export function getIndexInSectionList(
     return { sectionIndex: sectionIndex, itemIndex: 0 };
   }
   const itemIndex = sections[sectionIndex].data.findIndex(e => e.key === currentPhoto.key);
+
+  if (itemIndex < 0) {
+    console.log('getIndexInSectionList: item not found in section');
+  }
 
   return {
     sectionIndex,
@@ -35,10 +42,10 @@ export function getSectionsFromPhotos(
   if (photos && photos.length > 0) {
     const sections: SectionTypePhotoGrid[] = [];
 
-    const sectionDate = new SectionDate(photos[0].date, groupType);
+    const sectionDateInitial = new SectionDate(photos[0].date, groupType);
 
     let currentBasket: SectionTypePhotoGrid = {
-      sectionData: sectionDate,
+      sectionData: sectionDateInitial,
       data: [],
     };
 

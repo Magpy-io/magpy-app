@@ -44,19 +44,19 @@ export class SectionDate {
 
   includesDate(date: string) {
     const { year, month, day } = splitDateComponents(date);
-    if (this.date.type == 'Year' && this.date.year != year) {
-      return false;
+    if (this.date.type == 'Year') {
+      return this.date.year == year;
     }
 
-    if (this.date.type == 'Month' && this.date.month != month) {
-      return false;
+    if (this.date.type == 'Month') {
+      return this.date.year == year && this.date.month == month;
     }
 
-    if (this.date.type == 'Day' && this.date.day != day) {
-      return false;
+    if (this.date.type == 'Day') {
+      return this.date.year == year && this.date.month == month && this.date.day == day;
     }
 
-    return true;
+    return false;
   }
 
   getTitle() {
