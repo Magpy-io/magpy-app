@@ -32,7 +32,7 @@ export default function PhotoMenu(props: PhotoMenuProps) {
   };
   return (
     <MenuModal visible={props.visible} onRequestClose={props.onRequestClose}>
-      <View style={{ gap: spacing.spacing_xs }}>
+      <View>
         <Filter onPress={onPressFilter} />
         <Sort />
         <Group />
@@ -129,6 +129,7 @@ const makeStyles = (colors: colorsType, dark: boolean) =>
       flexDirection: 'row',
       gap: spacing.spacing_s,
       alignItems: 'center',
+      paddingVertical: spacing.spacing_xs,
     },
     text: {
       ...typography(colors).mediumText,
