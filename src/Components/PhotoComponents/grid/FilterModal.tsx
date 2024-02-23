@@ -20,7 +20,7 @@ export default function FilterModal(props: FilterModalProps) {
   return (
     <BottomModal modalVisible={props.visible} onRequestClose={props.onRequestClose}>
       <View style={styles.viewStyle}>
-        <Header />
+        <Header onClose={props.onRequestClose} />
         <Type />
       </View>
     </BottomModal>
@@ -36,11 +36,11 @@ function Type() {
   );
 }
 
-function Header() {
+function Header({ onClose }: { onClose: () => void }) {
   const styles = useStyles(makeStyles);
   return (
     <View style={styles.header}>
-      <CloseIcon iconStyle={styles.closeIcon} onPress={() => {}} />
+      <CloseIcon iconStyle={styles.closeIcon} onPress={onClose} />
       <Text style={styles.headerTitle}>Filters</Text>
     </View>
   );
