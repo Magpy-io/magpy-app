@@ -63,11 +63,6 @@ function SectionListWithColumns<ItemType, SectionData>({
           if (location.itemIndex == null) {
             sectionListRef.current?.scrollToLocation({ ...location, itemIndex: 0 });
           } else {
-            console.log(location);
-            console.log({
-              ...location,
-              itemIndex: Math.floor(location.itemIndex / numberColumns) + 1,
-            });
             // +1 to make an itemIndex of 0 scroll to the first element in the section instead of the section header
             sectionListRef.current?.scrollToLocation({
               ...location,

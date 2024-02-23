@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-type SortType = 'Newest' | 'Oldest';
-type GroupType = 'Day' | 'Month';
+export type SortType = 'Newest' | 'Oldest';
+export type GroupType = 'Day' | 'Month' | 'Year';
 
 type OptionsState = {
   sortBy: SortType;
