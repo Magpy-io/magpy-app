@@ -39,7 +39,6 @@ const makeStyles = (colors: colorsType, dark: boolean) =>
       margin: spacing.spacing_l,
     },
     modalStyle: {
-      backgroundColor: colors.MODAL_BACKGROUND,
       position: 'absolute',
       top: spacing.spacing_xxl,
       right: spacing.spacing_xxl,

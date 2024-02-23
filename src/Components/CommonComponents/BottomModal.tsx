@@ -15,17 +15,13 @@ export default function BottomModal({
   children,
 }: BottomModalProps) {
   return (
-    modalVisible && (
-      <>
-        <GenericModal
-          modalVisible={modalVisible}
-          handleModal={handleModal}
-          animation="slide"
-          style={styles.viewStyle}>
-          {children}
-        </GenericModal>
-      </>
-    )
+    <GenericModal
+      modalVisible={modalVisible}
+      handleModal={handleModal}
+      animation="slide"
+      style={styles.viewStyle}>
+      {children}
+    </GenericModal>
   );
 }
 

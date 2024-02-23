@@ -1,12 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import {
-  LayoutRectangle,
-  Modal,
-  StyleProp,
-  StyleSheet,
-  TouchableOpacity,
-  ViewStyle,
-} from 'react-native';
+import { Modal, StyleProp, StyleSheet, TouchableOpacity, ViewStyle } from 'react-native';
 
 import Animated, {
   AnimatedStyle,
@@ -29,7 +22,7 @@ type GenericModalProps = {
   modalVisible: boolean;
   handleModal: () => void;
   children: JSX.Element;
-  animation?: 'slide' | 'fade' | 'size';
+  animation: 'slide' | 'fade' | 'size';
   style?: StyleProp<AnimatedStyle<StyleProp<ViewStyle>>>;
 };
 
@@ -68,11 +61,6 @@ export default function GenericModal({
   const fade = useSharedValue(1);
   const size = useSharedValue(0);
 
-  function getViewHeight(layout: LayoutRectangle) {
-    const { height } = layout;
-    setContentHeight(height);
-  }
-
   const slidingViewStyle = { transform: [{ translateY: translateY }] };
   const fadingViewStyle = { opacity: fade };
   const increasingViewStyle = { maxWidth: size, maxHeight: size };
@@ -87,21 +75,27 @@ export default function GenericModal({
     };
   });
 
-  const changeBackdropOpacity = useCallback(() => {
-    progress.value = withTiming(1 - progress.value, { duration: duration });
+  // show animation
+  const showBackdrop = useCallback(() => {
+    progress.value = withTiming(1, { duration: duration });
   }, [progress]);
 
   const slideIn = useCallback(() => {
     translateY.value = withTiming(0, slideOptions);
   }, [translateY]);
 
+  const fadeIn = useCallback(() => {
+    fade.value = withTiming(1, fadeOptions);
+  }, [fade]);
+
   const increase = useCallback(() => {
     size.value = withTiming(height, sizeOptions);
   }, [height, size]);
 
-  const fadeIn = useCallback(() => {
-    fade.value = withTiming(1, fadeOptions);
-  }, [fade]);
+  // hide animation
+  const hideBackdrop = useCallback(() => {
+    progress.value = withTiming(0, { duration: duration });
+  }, [progress]);
 
   const slideOut = useCallback(() => {
     translateY.value = withTiming(contentHeight, slideOptions, () => {
@@ -122,7 +116,7 @@ export default function GenericModal({
   }, [size, handleModal]);
 
   const hideModal = () => {
-    changeBackdropOpacity();
+    hideBackdrop();
     if (animation === 'size') {
       decrease();
     }
@@ -136,7 +130,7 @@ export default function GenericModal({
 
   useEffect(() => {
     if (modalVisible) {
-      changeBackdropOpacity();
+      showBackdrop();
       if (animation === 'size') {
         increase();
       }
@@ -147,10 +141,10 @@ export default function GenericModal({
         fadeIn();
       }
     }
-  }, [changeBackdropOpacity, modalVisible, slideIn, fadeIn, animation, increase]);
+  }, [showBackdrop, modalVisible, slideIn, fadeIn, animation, increase]);
 
   return (
-    <Modal visible={modalVisible} transparent statusBarTranslucent>
+    <Modal visible={modalVisible} transparent statusBarTranslucent onRequestClose={hideModal}>
       <Animated.View
         style={[
           styles.modalStyle,
@@ -162,7 +156,7 @@ export default function GenericModal({
         ]}>
         <TouchableOpacity style={styles.touchable} onPress={hideModal}></TouchableOpacity>
         <Animated.View
-          onLayout={event => getViewHeight(event.nativeEvent.layout)}
+          onLayout={event => setContentHeight(event.nativeEvent.layout.width)}
           style={[
             styles.viewStyle,
             animation === 'slide' ? slidingViewStyle : {},
