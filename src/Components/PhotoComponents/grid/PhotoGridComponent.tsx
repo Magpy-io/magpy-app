@@ -1,9 +1,8 @@
-import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { StyleSheet, TouchableHighlight, View } from 'react-native';
 
 import { Text } from 'react-native-elements';
 
-import { SectionListWithColumnsType } from '~/Components/CommonComponents/SectionListWithColumns/Types';
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { useTheme } from '~/Context/ThemeContext';
 import { useStyles } from '~/Hooks/useStyles';
@@ -11,15 +10,13 @@ import { colorsType } from '~/Styles/colors';
 import { borderRadius, spacing } from '~/Styles/spacing';
 import { typography } from '~/Styles/typography';
 
-import SectionListWithColumns from '../../CommonComponents/SectionListWithColumns/SectionListWithColumns';
-import {
-  SectionDataType,
-  SectionTypePhotoGrid,
-  getIndexInSectionList,
-  getPhotosPerDay,
-} from './Helpers';
+import SectionListWithColumns, {
+  SectionListWithColumnsRefType,
+} from '../../CommonComponents/SectionListWithColumns/SectionListWithColumns';
+import { SectionTypePhotoGrid } from './Helpers';
 import PhotoComponentForGrid from './PhotoComponentForGrid';
 import { KeysSelection } from './useKeysSelection';
+import { usePhotosGrouped } from './usePhotosGrouped';
 
 const NUM_COLUMNS = 3;
 
@@ -46,36 +43,26 @@ export default function PhotoGridComponent({
   isSelecting,
   photosSelection,
 }: PhotoGridComponentProps) {
-  const sectionlistRef = useRef<SectionListWithColumnsType<
-    PhotoGalleryType,
-    SectionDataType
-  > | null>(null);
+  const sectionlistRef = useRef<SectionListWithColumnsRefType>(null);
   const photosLenRef = useRef<number>(photos.length);
   const { colors } = useTheme();
   const styles = useStyles(makeStyles);
 
   photosLenRef.current = photos.length;
 
-  const photosPerDayMemo: SectionTypePhotoGrid[] = useMemo(() => {
-    return getPhotosPerDay(photos);
-  }, [photos]);
+  const { sections, indexToSectionLocation } = usePhotosGrouped(photos);
 
-  const { sectionIndex, rowIndex } = useMemo(() => {
-    if (photosPerDayMemo && photosPerDayMemo.length > 0) {
-      return getIndexInSectionList(currentPhotoIndex, photosPerDayMemo, photos, NUM_COLUMNS);
-    }
-    return { sectionIndex: 0, rowIndex: 0 };
-  }, [currentPhotoIndex, photos, photosPerDayMemo]);
+  const { sectionIndex, itemIndex } = indexToSectionLocation(currentPhotoIndex);
 
   useEffect(() => {
-    if (photosLenRef.current > 0 && sectionIndex >= 0 && rowIndex >= 0) {
+    if (photosLenRef.current > 0 && sectionIndex >= 0 && itemIndex >= 0) {
       sectionlistRef.current?.scrollToLocation({
         sectionIndex: sectionIndex,
-        itemIndex: rowIndex,
+        itemIndex: itemIndex,
         animated: true,
       });
     }
-  }, [sectionlistRef, sectionIndex, rowIndex]);
+  }, [sectionlistRef, sectionIndex, itemIndex]);
 
   const renderItem = useCallback(
     ({ item }: { item: PhotoGalleryType }) => {
@@ -117,7 +104,7 @@ export default function PhotoGridComponent({
     <View style={[styles.mainViewStyle, { backgroundColor: colors.BACKGROUND }]}>
       <SectionListWithColumns
         mref={sectionlistRef}
-        sections={photosPerDayMemo}
+        sections={sections}
         renderItem={renderItem}
         renderSectionHeader={renderSectionHeader}
         keyExtractor={keyExtractor}

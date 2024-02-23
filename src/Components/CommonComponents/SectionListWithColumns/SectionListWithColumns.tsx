@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useImperativeHandle, useMemo, useRef } from 'react';
 import { SectionList, View } from 'react-native';
 
 import sectionListGetItemLayout from 'react-native-section-list-get-item-layout';
@@ -13,6 +13,14 @@ import {
   SectionWithRowsType,
 } from './Types';
 
+export type SectionListWithColumnsRefType = {
+  scrollToLocation: (location: {
+    sectionIndex: number;
+    itemIndex?: number;
+    animated?: boolean;
+  }) => void;
+};
+
 type SectionListWithColumnsProps<ItemType, SectionData> = {
   sections: SectionType<ItemType, SectionData>[];
   numberColumns: number;
@@ -25,7 +33,7 @@ type SectionListWithColumnsProps<ItemType, SectionData> = {
   refreshing?: boolean;
   itemSpacing?: number;
   sectionHeaderHeight: number;
-  mref?: React.Ref<SectionListWithColumnsType<ItemType, SectionData>>;
+  mref: React.RefObject<SectionListWithColumnsRefType>;
 };
 
 function SectionListWithColumns<ItemType, SectionData>({
@@ -42,8 +50,35 @@ function SectionListWithColumns<ItemType, SectionData>({
 }: SectionListWithColumnsProps<ItemType, SectionData>) {
   const { width } = useOrientation();
 
+  const sectionListRef = useRef<SectionListWithColumnsType<ItemType, SectionData>>(null);
+
   const totalSpacingHorizontal = itemSpacing * (numberColumns - 1);
   const itemSize = (width - totalSpacingHorizontal) / numberColumns;
+
+  useImperativeHandle(
+    mref,
+    () => {
+      return {
+        scrollToLocation(location) {
+          if (location.itemIndex == null) {
+            sectionListRef.current?.scrollToLocation({ ...location, itemIndex: 0 });
+          } else {
+            console.log(location);
+            console.log({
+              ...location,
+              itemIndex: Math.floor(location.itemIndex / numberColumns) + 1,
+            });
+            // +1 to make an itemIndex of 0 scroll to the first element in the section instead of the section header
+            sectionListRef.current?.scrollToLocation({
+              ...location,
+              itemIndex: Math.floor(location.itemIndex / numberColumns) + 1,
+            });
+          }
+        },
+      };
+    },
+    [numberColumns],
+  );
 
   const sectionsWithRows = useMemo(() => {
     return sections.map(section => {
@@ -126,7 +161,7 @@ function SectionListWithColumns<ItemType, SectionData>({
       refreshing={refreshing}
       onRefresh={onRefresh}
       windowSize={11}
-      ref={mref}
+      ref={sectionListRef}
     />
   );
 }

@@ -1,4 +1,4 @@
-import { compareDates, insertPhotoKeyWithOrder } from '../Photos/Helpers';
+import { compareDates, insertPhotoKeyWithOrder } from '../Helpers';
 import * as MockValues from './MockValues';
 
 const dateRecent = '2024-02-03T11:30:40.000Z';

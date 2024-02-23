@@ -1,6 +1,5 @@
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { areDatesTheSameDay, formatDate, withoutTime } from '~/Helpers/Date';
-import { clamp } from '~/Helpers/Utilities';
 
 import { SectionType } from '../../CommonComponents/SectionListWithColumns/Types';
 
@@ -17,20 +16,18 @@ export function getSectionIndex(
 }
 
 export function getIndexInSectionList(
-  currentPhotoIndex: number,
+  currentPhoto: PhotoGalleryType,
   sections: SectionTypePhotoGrid[],
-  photos: PhotoGalleryType[],
-  columns: number,
 ) {
-  const currentPhotoIndexClamped = clamp(currentPhotoIndex, photos.length - 1);
-  const currentPhoto = photos[currentPhotoIndexClamped];
   const sectionIndex = getSectionIndex(currentPhoto, sections);
+  if (sectionIndex < 0) {
+    return { sectionIndex: sectionIndex, itemIndex: 0 };
+  }
   const itemIndex = sections[sectionIndex].data.findIndex(e => e.key === currentPhoto.key);
-  const rowIndex = Math.floor(itemIndex / columns);
 
   return {
     sectionIndex,
-    rowIndex,
+    itemIndex,
   };
 }
 
