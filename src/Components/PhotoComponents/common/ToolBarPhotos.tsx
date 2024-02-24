@@ -5,7 +5,6 @@ import { usePhotosDownloadingFunctions } from '~/Context/ContextSlices/PhotosDow
 import { PhotoGalleryType, PhotoLocalType } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { usePhotosFunctionsStore } from '~/Context/ReduxStore/Slices/Photos/PhotosFunctions';
 import {
-  photosGallerySelector,
   photosLocalSelector,
   photosServerSelector,
 } from '~/Context/ReduxStore/Slices/Photos/Selectors';
@@ -29,7 +28,6 @@ function ToolBarPhotos({ seletedGalleryPhotos }: ToolBarProps) {
 
   const localPhotos = useAppSelector(photosLocalSelector);
   const serverPhotos = useAppSelector(photosServerSelector);
-  const galleryPhotos = useAppSelector(photosGallerySelector);
 
   const { UploadPhotos } = usePhotosFunctionsStore();
 
@@ -77,7 +75,7 @@ function ToolBarPhotos({ seletedGalleryPhotos }: ToolBarProps) {
         <PhotoDetailsModal
           modalVisible={modalVisible}
           onRequestClose={onRequestClose}
-          photo={galleryPhotos[0]}
+          photo={seletedGalleryPhotos[0]}
         />
       )}
     </View>
