@@ -42,7 +42,6 @@ const PhotoGridController = forwardRef<PhotoGridComponentRefType, PropsType>(
     }: PropsType,
     ref,
   ) => {
-    console.log('render grid');
     const photosRef = useRef<PhotoGalleryType[]>(photos);
     photosRef.current = photos;
 
@@ -73,9 +72,10 @@ const PhotoGridController = forwardRef<PhotoGridComponentRefType, PropsType>(
     }, [isSlidingPhotos, showTab]);
 
     const findPhotoIndex = useCallback((item: PhotoGalleryType) => {
-      let index = photosRef.current.findIndex(photo => photo.key == item.key);
+      const index = photosRef.current.findIndex(photo => photo.key == item.key);
       if (index < 0) {
-        index = 0;
+        console.log('PhotoGridController: findPhotoIndex did not found index for photo');
+        return 0;
       }
       return index;
     }, []);
@@ -90,7 +90,7 @@ const PhotoGridController = forwardRef<PhotoGridComponentRefType, PropsType>(
         if (isSelecting) {
           selectSingle(item);
         } else {
-          onSwitchMode(true, findPhotoIndex(item) || 0);
+          onSwitchMode(true, findPhotoIndex(item));
         }
       },
       [isSelecting, selectSingle, onSwitchMode, findPhotoIndex],

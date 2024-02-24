@@ -21,8 +21,6 @@ type PropsType = {
 
 const PhotoSliderController = React.forwardRef<PhotoSliderComponentRefType, PropsType>(
   ({ photos, onSwitchMode, isSlidingPhotos }: PropsType, ref) => {
-    console.log('render slider');
-
     const [flatListCurrentIndex, setFlatListCurrentIndex] = useState(0);
     const flatListCurrentIndexRef = useRef<number>(0);
 
@@ -43,7 +41,6 @@ const PhotoSliderController = React.forwardRef<PhotoSliderComponentRefType, Prop
       const subscription = emitter.addListener(
         NativeEventsNames.FullScreenChanged,
         (param: { isFullScreen: boolean }) => {
-          console.log('fullscreenChanged');
           setIsFullScreen(param.isFullScreen);
         },
       );
