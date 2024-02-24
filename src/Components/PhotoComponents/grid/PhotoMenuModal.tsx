@@ -35,7 +35,7 @@ export default function PhotoMenu(props: PhotoMenuProps) {
       <View>
         <Filter onPress={onPressFilter} />
         <Sort />
-        <Group />
+        <Group onRequestClose={props.onRequestClose} />
       </View>
     </MenuModal>
   );
@@ -85,7 +85,7 @@ function Sort() {
   );
 }
 
-function Group() {
+function Group({ onRequestClose }: { onRequestClose: () => void }) {
   const styles = useStyles(makeStyles);
   const groupOption = useAppSelector(GroupOptionSelector);
   const dispatch = useAppDispatch();
@@ -99,6 +99,7 @@ function Group() {
       <Text
         style={[styles.textPressable, groupOption === 'Day' ? styles.selected : {}]}
         onPress={() => {
+          onRequestClose();
           dispatch(setGroupBy({ option: 'Day' }));
         }}>
         Day
@@ -106,9 +107,18 @@ function Group() {
       <Text
         style={[styles.textPressable, groupOption === 'Month' ? styles.selected : {}]}
         onPress={() => {
+          onRequestClose();
           dispatch(setGroupBy({ option: 'Month' }));
         }}>
         Month
+      </Text>
+      <Text
+        style={[styles.textPressable, groupOption === 'Year' ? styles.selected : {}]}
+        onPress={() => {
+          onRequestClose();
+          dispatch(setGroupBy({ option: 'Year' }));
+        }}>
+        Year
       </Text>
     </View>
   );

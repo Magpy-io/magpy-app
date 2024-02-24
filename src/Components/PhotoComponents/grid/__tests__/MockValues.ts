@@ -4,7 +4,7 @@ import {
   PhotoServerType,
 } from '~/Context/ReduxStore/Slices/Photos/Photos';
 
-import { SectionTypePhotoGrid } from '../Helpers';
+import { SectionTypePhotoGrid } from '../usePhotosGrouped/Helpers';
 
 export const photoLocal1: PhotoLocalType = {
   id: 'local1',

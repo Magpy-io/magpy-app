@@ -3,8 +3,11 @@ import { StyleSheet, TouchableHighlight, View } from 'react-native';
 
 import { Text } from 'react-native-elements';
 
+import { GroupOptionSelector } from '~/Context/ReduxStore/Slices/GalleryOptions/Selectors';
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
+import { useAppSelector } from '~/Context/ReduxStore/Store';
 import { useTheme } from '~/Context/ThemeContext';
+import { clamp } from '~/Helpers/Utilities';
 import { useStyles } from '~/Hooks/useStyles';
 import { colorsType } from '~/Styles/colors';
 import { borderRadius, spacing } from '~/Styles/spacing';
@@ -13,12 +16,10 @@ import { typography } from '~/Styles/typography';
 import SectionListWithColumns, {
   SectionListWithColumnsRefType,
 } from '../../CommonComponents/SectionListWithColumns/SectionListWithColumns';
-import { SectionTypePhotoGrid } from './Helpers';
 import PhotoComponentForGrid from './PhotoComponentForGrid';
 import { KeysSelection } from './useKeysSelection';
-import { usePhotosGrouped } from './usePhotosGrouped';
-
-const NUM_COLUMNS = 3;
+import { getGridNumberOfColumns } from './usePhotosGrouped/Helpers';
+import { SectionTypePhotoGrid, usePhotosGrouped } from './usePhotosGrouped/usePhotosGrouped';
 
 function keyExtractor(item: PhotoGalleryType) {
   return `grid_${item.key}`;
@@ -45,14 +46,20 @@ export default function PhotoGridComponent({
 }: PhotoGridComponentProps) {
   const sectionlistRef = useRef<SectionListWithColumnsRefType>(null);
   const photosLenRef = useRef<number>(photos.length);
+  photosLenRef.current = photos.length;
+
   const { colors } = useTheme();
   const styles = useStyles(makeStyles);
 
-  photosLenRef.current = photos.length;
+  const groupType = useAppSelector(GroupOptionSelector);
 
-  const { sections, indexToSectionLocation } = usePhotosGrouped(photos);
+  const numberOfColumns = getGridNumberOfColumns(groupType);
+  const { sections, indexToSectionLocation } = usePhotosGrouped(photos, groupType);
 
-  const { sectionIndex, itemIndex } = indexToSectionLocation(currentPhotoIndex);
+  const currentPhotoIndexClamped = clamp(currentPhotoIndex, photos.length - 1);
+  const currentPhoto = photos[currentPhotoIndexClamped];
+
+  const { sectionIndex, itemIndex } = indexToSectionLocation(currentPhoto);
 
   useEffect(() => {
     if (photosLenRef.current > 0 && sectionIndex >= 0 && itemIndex >= 0) {
@@ -83,7 +90,7 @@ export default function PhotoGridComponent({
     ({ section }: { section: SectionTypePhotoGrid }) => {
       return (
         <View style={styles.sectionHeaderStyle}>
-          <Text style={styles.headerTitleStyle}>{section.sectionData.title}</Text>
+          <Text style={styles.headerTitleStyle}>{section.sectionData.getTitle()}</Text>
           {isSelecting && (
             <TouchableHighlight
               style={styles.headerButtonStyle}
@@ -108,7 +115,7 @@ export default function PhotoGridComponent({
         renderItem={renderItem}
         renderSectionHeader={renderSectionHeader}
         keyExtractor={keyExtractor}
-        numberColumns={NUM_COLUMNS}
+        numberColumns={numberOfColumns}
         itemSpacing={SPACE_BETWEEN_PHOTOS}
         sectionHeaderHeight={SECTION_HEADER_HEIGHT}
         onRefresh={onRefresh}

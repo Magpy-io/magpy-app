@@ -1,4 +1,4 @@
-import { getIndexInSectionList, getPhotosPerDay } from '../Helpers';
+import { getIndexInSectionList, getPhotosPerDay } from '../usePhotosGrouped/Helpers';
 import { PhotosPerDayMock, photosGallery } from './MockValues';
 
 describe('Tests for function getIndexInSectionList with 2 sections of 5 items each', () => {
