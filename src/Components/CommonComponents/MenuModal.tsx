@@ -8,7 +8,7 @@ import { useStyles } from '~/Hooks/useStyles';
 import { colorsType } from '~/Styles/colors';
 import { borderRadius, spacing } from '~/Styles/spacing';
 
-import GenericModal from './GenericModal';
+import GenericModal from './GenericModal/GenericModal';
 
 type MenuModalProps = {
   visible: boolean;

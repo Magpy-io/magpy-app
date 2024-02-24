@@ -5,10 +5,11 @@ import Animated, { AnimatedStyle } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useTheme } from '~/Context/ThemeContext';
-import useModalAnimation, { AnimationType } from '~/Hooks/useModalAnimation';
 import { useOrientation } from '~/Hooks/useOrientation';
 import { useStyles } from '~/Hooks/useStyles';
 import { colorsType } from '~/Styles/colors';
+
+import useModalAnimation, { AnimationType } from './useModalAnimation';
 
 type GenericModalProps = {
   modalVisible: boolean;
@@ -33,6 +34,7 @@ export default function GenericModal({
   const [contentHeight, setContentHeight] = useState(height);
   const [visible, setVisible] = useState(modalVisible);
   const modalVisibleLastValue = useRef(false);
+  const visibleLastValue = useRef(false);
 
   const { animation, backdropAnimation } = useModalAnimation({
     animation: animationType,
@@ -56,12 +58,20 @@ export default function GenericModal({
 
     if (modalVisible) {
       setVisible(true);
-      backdropAnimation.open();
-      animation.open();
     } else {
       hideModal();
     }
   }, [animation, backdropAnimation, hideModal, modalVisible]);
+
+  useEffect(() => {
+    if (visibleLastValue.current != visible) {
+      visibleLastValue.current = visible;
+      if (visible) {
+        backdropAnimation.open();
+        animation.open();
+      }
+    }
+  }, [animation, backdropAnimation, visible]);
 
   return (
     <Modal visible={visible} transparent statusBarTranslucent onRequestClose={onRequestClose}>
