@@ -32,9 +32,14 @@ const galleryFiltersSlice = createSlice({
     clearFilters: state => {
       state.filters = [];
     },
+
+    addFilters: (state, action: { payload: { filters: FilterObjectType[] } }) => {
+      state.filters = action.payload.filters;
+    },
   },
 });
 
-export const { addOrEditFilter, removeFilter, clearFilters } = galleryFiltersSlice.actions;
+export const { addOrEditFilter, removeFilter, clearFilters, addFilters } =
+  galleryFiltersSlice.actions;
 
 export default galleryFiltersSlice.reducer;

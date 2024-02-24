@@ -1,12 +1,15 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { FiltersSelector } from '~/Context/ReduxStore/Slices/GalleryFilters/Selectors';
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
+import { useAppSelector } from '~/Context/ReduxStore/Store';
 import { useStyles } from '~/Hooks/useStyles';
 import { colorsType } from '~/Styles/colors';
 
+import { StatusFilter, TypeFilter } from './grid/Filter';
 import PhotoGridController from './grid/PhotoGridController';
 import PhotoSliderController from './slider/PhotoSliderController';
 
@@ -18,8 +21,25 @@ type PhotoGalleryPropsType = {
   isInTabScreen?: boolean;
 };
 
-export default function PhotoGallery(props: PhotoGalleryPropsType) {
+export default function PhotoGallery({ photos, ...props }: PhotoGalleryPropsType) {
   const styles = useStyles(makeStyles);
+  const { filters: storeFilters } = useAppSelector(FiltersSelector);
+
+  console.log('storeFilters', storeFilters);
+
+  const filteredPhotos = useMemo(() => {
+    let newPhotos = [...photos];
+    storeFilters.forEach(f => {
+      if (f.type === 'Type') {
+        const filter = new TypeFilter(f.params.value);
+        newPhotos = filter.filter(photos);
+      } else if (f.type === 'Status') {
+        const filter = new StatusFilter(f.params.value);
+        newPhotos = filter.filter(newPhotos);
+      }
+    });
+    return newPhotos;
+  }, [photos, storeFilters]);
 
   const [switchingState, setSwitchingState] = useState({
     isSlidingPhotos: false,
@@ -51,7 +71,7 @@ export default function PhotoGallery(props: PhotoGalleryPropsType) {
           title={props.title}
           showBackButton={props.showBackButton}
           onPressBack={props.onPressBack}
-          photos={props.photos}
+          photos={filteredPhotos}
           isSlidingPhotos={isSlidingPhotos}
           currentPhotoIndex={currentPhotoIndex}
           onSwitchMode={onSwitchMode}
@@ -65,7 +85,7 @@ export default function PhotoGallery(props: PhotoGalleryPropsType) {
           { paddingBottom: insets.bottom },
         ]}>
         <PhotoSliderController
-          photos={props.photos}
+          photos={filteredPhotos}
           isSlidingPhotos={isSlidingPhotos}
           currentPhotoIndex={currentPhotoIndex}
           onSwitchMode={onSwitchMode}

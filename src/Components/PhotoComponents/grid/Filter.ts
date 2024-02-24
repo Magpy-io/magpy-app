@@ -31,7 +31,12 @@ export class TypeFilter implements Filter {
   }
 
   filter(photos: PhotoGalleryType[]) {
-    return photos;
+    switch (this.value) {
+      case 'photos':
+        return photos;
+      case 'videos':
+        return [];
+    }
   }
 
   toObject() {

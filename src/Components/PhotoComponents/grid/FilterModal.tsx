@@ -7,8 +7,9 @@ import { Text } from 'react-native-elements';
 import BottomModal from '~/Components/CommonComponents/BottomModal';
 import { PrimaryButton } from '~/Components/CommonComponents/Buttons';
 import { CloseIcon } from '~/Components/CommonComponents/Icons';
+import { addFilters } from '~/Context/ReduxStore/Slices/GalleryFilters/GalleryFilters';
 import { FiltersSelector } from '~/Context/ReduxStore/Slices/GalleryFilters/Selectors';
-import { useAppSelector } from '~/Context/ReduxStore/Store';
+import { useAppDispatch, useAppSelector } from '~/Context/ReduxStore/Store';
 import useEffectOnChange from '~/Hooks/useEffectOnChange';
 import { useStyles } from '~/Hooks/useStyles';
 import { colorsType } from '~/Styles/colors';
@@ -33,6 +34,7 @@ export default function FilterModal({ visible, onRequestClose }: FilterModalProp
   const [filters, setFilters] = useState<FilterObjectType[]>([]);
 
   const { filters: storeFilters } = useAppSelector(FiltersSelector);
+  const dispatch = useAppDispatch();
 
   useEffectOnChange(visible, () => {
     setFilters(storeFilters);
@@ -40,7 +42,10 @@ export default function FilterModal({ visible, onRequestClose }: FilterModalProp
 
   console.log('filters', filters);
 
-  const onSubmit = () => {};
+  const onSubmit = () => {
+    onRequestClose();
+    dispatch(addFilters({ filters }));
+  };
 
   const TypeFilter = filters?.find(f => f.type === 'Type') as TypeFilterObjectType | undefined;
   const StatusFilter = filters?.find(f => f.type === 'Status') as
