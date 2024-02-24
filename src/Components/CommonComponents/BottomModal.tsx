@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
 
-import GenericModal from './GenericModal';
+import GenericModal from './GenericModal/GenericModal';
 
 type BottomModalProps = {
   modalVisible: boolean;
