@@ -38,12 +38,17 @@ export default React.forwardRef(function PhotoSliderComponent(
 ) {
   const flatlistRef = useRef<FlatList>(null);
 
+  const photosLen = photos.length;
+
   useImperativeHandle(
     ref,
     () => {
       return {
         scrollToIndex(params) {
-          const indexClamped = clamp(params.index, photos.length - 1);
+          if (photosLen <= 0) {
+            return;
+          }
+          const indexClamped = clamp(params.index, photosLen - 1);
 
           onIndexChanged?.(indexClamped);
 
@@ -54,7 +59,7 @@ export default React.forwardRef(function PhotoSliderComponent(
         },
       };
     },
-    [onIndexChanged, photos.length],
+    [onIndexChanged, photosLen],
   );
 
   const renderItem = useCallback(

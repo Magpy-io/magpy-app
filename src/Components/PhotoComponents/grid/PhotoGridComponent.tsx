@@ -65,6 +65,10 @@ export default forwardRef(function PhotoGridComponent(
     () => {
       return {
         scrollToIndex(params) {
+          if (photos.length <= 0) {
+            return;
+          }
+
           const indexClamped = clamp(params.index, photos.length - 1);
           const currentPhoto = photos[indexClamped];
 
