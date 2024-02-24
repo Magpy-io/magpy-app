@@ -17,7 +17,7 @@ export function usePhotosGrouped(photos: Array<PhotoGalleryType>, groupBy: Group
 
   const indexToSectionLocation = useCallback(
     (currentPhoto: PhotoGalleryType) => {
-      if (sections && sections.length > 0) {
+      if (sections.length > 0) {
         return getIndexInSectionList(currentPhoto, sections);
       }
       return { sectionIndex: 0, itemIndex: 0 };
