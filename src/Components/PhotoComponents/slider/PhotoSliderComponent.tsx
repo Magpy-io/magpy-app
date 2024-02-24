@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef } from 'react';
 import { Dimensions, FlatList, StyleSheet, ViewToken } from 'react-native';
 
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
+import { clamp } from '~/Helpers/Utilities';
 
 import PhotoComponentForSlider from './PhotoComponentForSlider';
 
@@ -44,15 +45,7 @@ export default function PhotoSliderComponent({
 
   useEffect(() => {
     if (hasPhotos) {
-      let indexToScroll = flatListCurrentIndexRef.current;
-
-      if (indexToScroll < 0) {
-        indexToScroll = 0;
-      }
-
-      if (indexToScroll >= photos.length) {
-        indexToScroll = photos.length - 1;
-      }
+      const indexToScroll = clamp(flatListCurrentIndexRef.current, photos.length - 1);
 
       flatListCurrentIndexRef.current = indexToScroll;
 
