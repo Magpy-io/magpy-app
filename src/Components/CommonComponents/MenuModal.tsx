@@ -23,7 +23,7 @@ export default function MenuModal({ visible, onRequestClose, children }: MenuMod
   return (
     <>
       <GenericModal
-        animationType="size"
+        animationType="scale"
         modalVisible={visible}
         onRequestClose={onRequestClose}
         style={[styles.modalStyle, { marginTop: insets.top }]}>

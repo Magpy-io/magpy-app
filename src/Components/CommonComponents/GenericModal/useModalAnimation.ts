@@ -10,7 +10,7 @@ import {
   withTiming,
 } from 'react-native-reanimated';
 
-export type AnimationType = 'slide' | 'fade' | 'size';
+export type AnimationType = 'slide' | 'fade' | 'scale' | 'none';
 
 const duration = 200;
 const slideOptions = {
@@ -40,22 +40,23 @@ export default function useModalAnimation({
   const fadeAnimation = useFadeAnimation();
   const slideAnimation = useSlideAnimation(contentHeight);
   const scaleAnimation = useScaleAnimation();
+  const noAnimation = useNoAnimation();
 
   switch (animation) {
     case 'fade':
       return { animation: fadeAnimation, backdropAnimation };
-    case 'size':
+    case 'scale':
       return { animation: scaleAnimation, backdropAnimation };
     case 'slide':
       return { animation: slideAnimation, backdropAnimation };
-    default:
-      return { animation: fadeAnimation, backdropAnimation };
+    case 'none':
+      return { animation: noAnimation, backdropAnimation };
   }
 }
 
 function useBackdropAnimation() {
   const progress = useSharedValue(0);
-  const backDropAnimatedStyle = useAnimatedStyle(() => {
+  const style = useAnimatedStyle(() => {
     return {
       backgroundColor: interpolateColor(
         progress.value,
@@ -64,13 +65,13 @@ function useBackdropAnimation() {
       ),
     };
   });
-  const backdropAnimationOpen = useCallback(
+  const open = useCallback(
     (callback?: () => void) => {
       progress.value = withTiming(1, { duration: duration }, callbackToRunOnJS(callback));
     },
     [progress],
   );
-  const backdropAnimationClose = useCallback(
+  const close = useCallback(
     (callback?: () => void) => {
       progress.value = withTiming(0, { duration: duration }, callbackToRunOnJS(callback));
     },
@@ -78,73 +79,89 @@ function useBackdropAnimation() {
   );
 
   return {
-    close: backdropAnimationClose,
-    open: backdropAnimationOpen,
-    style: backDropAnimatedStyle,
+    open,
+    close,
+    style,
+  };
+}
+
+function useNoAnimation() {
+  const style = {};
+  const open = (callback?: () => void) => {
+    callback ? callback() : undefined;
+  };
+  const close = (callback?: () => void) => {
+    callback ? callback() : undefined;
+  };
+  return {
+    open,
+    close,
+    style,
   };
 }
 
 function useFadeAnimation() {
   const fade = useSharedValue(1);
-  const fadeViewStyle = { opacity: fade };
+  const style = { opacity: fade };
 
-  const fadeAnimationOpen = useCallback(
+  const open = useCallback(
     (callback?: () => void) => {
       fade.value = withTiming(1, fadeOptions, callbackToRunOnJS(callback));
     },
     [fade],
   );
 
-  const fadeAnimationClose = useCallback(
+  const close = useCallback(
     (callback?: () => void) => {
       fade.value = withTiming(0, fadeOptions, callbackToRunOnJS(callback));
     },
     [fade],
   );
+
   return {
-    open: fadeAnimationOpen,
-    close: fadeAnimationClose,
-    style: fadeViewStyle,
+    open,
+    close,
+    style,
   };
 }
 
 function useSlideAnimation(contentHeight: number) {
   const translateY = useSharedValue(contentHeight);
-  const slideViewStyle = { transform: [{ translateY: translateY }] };
+  const style = { transform: [{ translateY: translateY }] };
 
-  const slideAnimationOpen = useCallback(
+  const open = useCallback(
     (callback?: () => void) => {
       translateY.value = withTiming(0, slideOptions, callbackToRunOnJS(callback));
     },
     [translateY],
   );
 
-  const slideAnimationClose = useCallback(
+  const close = useCallback(
     (callback?: () => void) => {
       translateY.value = withTiming(contentHeight, slideOptions, callbackToRunOnJS(callback));
     },
     [contentHeight, translateY],
   );
+
   return {
-    open: slideAnimationOpen,
-    close: slideAnimationClose,
-    style: slideViewStyle,
+    open,
+    close,
+    style,
   };
 }
 
 function useScaleAnimation() {
   const scale = useSharedValue(0);
+  const style = { transform: [{ scale: scale }], transformOrigin: 'top right' };
 
-  const scaleViewStyle = { transform: [{ scale: scale }], transformOrigin: 'top right' };
-
-  const scaleAnimationOpen = useCallback(
+  const open = useCallback(
     (callback?: () => void) => {
       scale.value = withTiming(1, sizeOptions, callbackToRunOnJS(callback));
     },
     [scale],
   );
 
-  const scaleAnimationClose = useCallback(
+  const close = useCallback(
     (callback?: () => void) => {
       scale.value = withTiming(0, sizeOptions, callbackToRunOnJS(callback));
     },
@@ -152,9 +169,9 @@ function useScaleAnimation() {
   );
 
   return {
-    open: scaleAnimationOpen,
-    close: scaleAnimationClose,
-    style: scaleViewStyle,
+    open,
+    close,
+    style,
   };
 }
 
