@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useImperativeHandle, useRef } from 'react';
 import { Dimensions, FlatList, StyleSheet, ViewToken } from 'react-native';
 
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
@@ -20,41 +20,42 @@ function getItemLayout(data: ArrayLike<PhotoGalleryType> | null | undefined, ind
   };
 }
 
+export type PhotoSliderComponentRefType = {
+  scrollToIndex: (params: { index: number; animated?: boolean }) => void;
+};
+
 type PropsType = {
   photos: PhotoGalleryType[];
-  currentPhotoIndex: number;
   isFullScreen: boolean;
   onIndexChanged?: (index: number) => void;
   onPhotoClick?: (item: PhotoGalleryType) => void;
   onPhotoLongClick?: (item: PhotoGalleryType) => void;
 };
 
-export default function PhotoSliderComponent({
-  onIndexChanged,
-  onPhotoClick,
-  onPhotoLongClick,
-  photos,
-  currentPhotoIndex,
-  isFullScreen,
-}: PropsType) {
+export default React.forwardRef(function PhotoSliderComponent(
+  { onIndexChanged, onPhotoClick, onPhotoLongClick, photos, isFullScreen }: PropsType,
+  ref: React.ForwardedRef<PhotoSliderComponentRefType>,
+) {
   const flatlistRef = useRef<FlatList>(null);
 
-  const flatListCurrentIndexRef = useRef<number>(currentPhotoIndex);
-  flatListCurrentIndexRef.current = currentPhotoIndex;
-  const hasPhotos = photos && photos.length > 0;
+  useImperativeHandle(
+    ref,
+    () => {
+      return {
+        scrollToIndex(params) {
+          const indexClamped = clamp(params.index, photos.length - 1);
 
-  useEffect(() => {
-    if (hasPhotos) {
-      const indexToScroll = clamp(flatListCurrentIndexRef.current, photos.length - 1);
+          onIndexChanged?.(indexClamped);
 
-      flatListCurrentIndexRef.current = indexToScroll;
-
-      flatlistRef.current?.scrollToIndex({
-        index: indexToScroll,
-        animated: false,
-      });
-    }
-  }, [hasPhotos, photos.length, currentPhotoIndex]);
+          flatlistRef.current?.scrollToIndex({
+            index: indexClamped,
+            animated: false,
+          });
+        },
+      };
+    },
+    [onIndexChanged, photos.length],
+  );
 
   const renderItem = useCallback(
     ({ item }: { item: PhotoGalleryType }) => (
@@ -72,7 +73,6 @@ export default function PhotoSliderComponent({
     ({ viewableItems }: { viewableItems: ViewToken[]; changed: ViewToken[] }) => {
       if (viewableItems.length == 1) {
         const index = viewableItems[0].index ?? 0;
-        flatListCurrentIndexRef.current = index;
         onIndexChanged?.(index);
       }
     },
@@ -101,7 +101,7 @@ export default function PhotoSliderComponent({
       getItemLayout={getItemLayout}
     />
   );
-}
+});
 
 const styles = StyleSheet.create({
   flatListStyle: { width: '100%' },

@@ -8,110 +8,106 @@ import { useTabNavigationContext } from '~/Navigation/TabNavigation/TabNavigatio
 
 import ToolBarPhotos from '../common/ToolBarPhotos';
 import { useCustomBackPress } from '../common/useCustomBackPress';
-import PhotoSliderComponent from './PhotoSliderComponent';
+import PhotoSliderComponent, { PhotoSliderComponentRefType } from './PhotoSliderComponent';
 import StatusBarComponent from './PhotoSliderHeader';
 
 const { MainModule } = NativeModules;
 
 type PropsType = {
   photos: Array<PhotoGalleryType>;
-  currentPhotoIndex: number;
   isSlidingPhotos: boolean;
   onSwitchMode: (isPhotoSelected: boolean, index: number) => void;
 };
 
-function PhotoSliderController({
-  photos,
-  onSwitchMode,
-  isSlidingPhotos,
-  currentPhotoIndex,
-}: PropsType) {
-  //console.log('render slider');
+const PhotoSliderController = React.forwardRef<PhotoSliderComponentRefType, PropsType>(
+  ({ photos, onSwitchMode, isSlidingPhotos }: PropsType, ref) => {
+    console.log('render slider');
 
-  const [flatListCurrentIndex, setFlatListCurrentIndex] = useState(currentPhotoIndex);
-  const flatListCurrentIndexRef = useRef<number>(flatListCurrentIndex);
+    const [flatListCurrentIndex, setFlatListCurrentIndex] = useState(0);
+    const flatListCurrentIndexRef = useRef<number>(0);
 
-  const [isFullScreen, setIsFullScreen] = useState(false);
+    const [isFullScreen, setIsFullScreen] = useState(false);
 
-  const { hideTab } = useTabNavigationContext();
+    const { hideTab } = useTabNavigationContext();
 
-  const currentPhoto = photos[flatListCurrentIndex] as PhotoGalleryType | undefined;
+    const currentPhoto = photos[flatListCurrentIndex] as PhotoGalleryType | undefined;
 
-  useEffect(() => {
-    if (isSlidingPhotos && photos.length == 0) {
-      onSwitchMode(false, 0);
-    }
-  }, [isSlidingPhotos, photos.length, onSwitchMode]);
-
-  const backPressAction = useCallback(() => {
-    onSwitchMode(false, flatListCurrentIndexRef.current);
-  }, [onSwitchMode]);
-
-  useCustomBackPress(backPressAction, isSlidingPhotos);
-
-  useEffect(() => {
-    const emitter = new NativeEventEmitter();
-    const subscription = emitter.addListener(
-      NativeEventsNames.FullScreenChanged,
-      (param: { isFullScreen: boolean }) => {
-        console.log('fullscreenChanged');
-        setIsFullScreen(param.isFullScreen);
-      },
-    );
-
-    return () => {
-      subscription.remove();
-    };
-  }, []);
-
-  useEffect(() => {
-    if (isSlidingPhotos) {
-      hideTab();
-    }
-  }, [hideTab, isSlidingPhotos]);
-
-  const onCurrentIndexChanged = useCallback((index: number) => {
-    flatListCurrentIndexRef.current = index;
-    setFlatListCurrentIndex(index);
-  }, []);
-
-  const onPressPhoto = useCallback(() => {
-    const onPressAsync = async () => {
-      if (isFullScreen) {
-        await MainModule.disableFullScreen();
-      } else {
-        await MainModule.enableFullScreen();
+    useEffect(() => {
+      if (isSlidingPhotos && photos.length == 0) {
+        onSwitchMode(false, 0);
       }
-      setIsFullScreen(f => !f);
-    };
+    }, [isSlidingPhotos, photos.length, onSwitchMode]);
 
-    onPressAsync().catch(console.log);
-  }, [isFullScreen]);
+    useEffect(() => {
+      const emitter = new NativeEventEmitter();
+      const subscription = emitter.addListener(
+        NativeEventsNames.FullScreenChanged,
+        (param: { isFullScreen: boolean }) => {
+          console.log('fullscreenChanged');
+          setIsFullScreen(param.isFullScreen);
+        },
+      );
 
-  const onStatusBarBackButton = useCallback(() => {
-    onSwitchMode(false, flatListCurrentIndexRef.current);
-  }, [onSwitchMode]);
+      return () => {
+        subscription.remove();
+      };
+    }, []);
 
-  return (
-    <View style={[styles.mainViewStyle]}>
-      <PhotoSliderComponent
-        photos={photos}
-        currentPhotoIndex={currentPhotoIndex}
-        onIndexChanged={onCurrentIndexChanged}
-        onPhotoClick={onPressPhoto}
-        isFullScreen={isFullScreen}
-      />
+    useEffect(() => {
+      if (isSlidingPhotos) {
+        hideTab();
+      }
+    }, [hideTab, isSlidingPhotos]);
 
-      {!isFullScreen && currentPhoto && (
-        <StatusBarComponent photo={currentPhoto} onBackButton={onStatusBarBackButton} />
-      )}
+    const onCurrentIndexChanged = useCallback((index: number) => {
+      flatListCurrentIndexRef.current = index;
+      setFlatListCurrentIndex(index);
+    }, []);
 
-      {!isFullScreen && (
-        <ToolBarPhotos seletedGalleryPhotos={currentPhoto ? [currentPhoto] : []} />
-      )}
-    </View>
-  );
-}
+    const onPressPhoto = useCallback(() => {
+      const onPressAsync = async () => {
+        if (isFullScreen) {
+          await MainModule.disableFullScreen();
+        } else {
+          await MainModule.enableFullScreen();
+        }
+        setIsFullScreen(f => !f);
+      };
+
+      onPressAsync().catch(console.log);
+    }, [isFullScreen]);
+
+    const backPressAction = useCallback(() => {
+      onSwitchMode(false, flatListCurrentIndexRef.current);
+    }, [onSwitchMode]);
+
+    useCustomBackPress(backPressAction, isSlidingPhotos);
+
+    const onStatusBarBackButton = useCallback(() => {
+      onSwitchMode(false, flatListCurrentIndexRef.current);
+    }, [onSwitchMode]);
+
+    return (
+      <View style={[styles.mainViewStyle]}>
+        <PhotoSliderComponent
+          ref={ref}
+          photos={photos}
+          onIndexChanged={onCurrentIndexChanged}
+          onPhotoClick={onPressPhoto}
+          isFullScreen={isFullScreen}
+        />
+
+        {!isFullScreen && currentPhoto && (
+          <StatusBarComponent photo={currentPhoto} onBackButton={onStatusBarBackButton} />
+        )}
+
+        {!isFullScreen && (
+          <ToolBarPhotos seletedGalleryPhotos={currentPhoto ? [currentPhoto] : []} />
+        )}
+      </View>
+    );
+  },
+);
 
 const styles = StyleSheet.create({
   mainViewStyle: {
@@ -119,5 +115,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
 });
+
+PhotoSliderController.displayName = 'PhotoSliderController';
 
 export default React.memo(PhotoSliderController);
