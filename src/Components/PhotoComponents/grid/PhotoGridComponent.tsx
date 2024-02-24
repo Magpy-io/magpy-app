@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { forwardRef, useCallback, useImperativeHandle, useRef } from 'react';
 import { StyleSheet, TouchableHighlight, View } from 'react-native';
 
 import { Text } from 'react-native-elements';
@@ -25,28 +25,32 @@ function keyExtractor(item: PhotoGalleryType) {
   return `grid_${item.key}`;
 }
 
+export type PhotoGridComponentRefType = {
+  scrollToIndex: (params: { index: number; animated?: boolean }) => void;
+};
+
 type PhotoGridComponentProps = {
   photos: Array<PhotoGalleryType>;
   onPressPhoto: (item: PhotoGalleryType) => void;
   onLongPressPhoto: (item: PhotoGalleryType) => void;
-  currentPhotoIndex: number;
   onRefresh: () => void;
   isSelecting: boolean;
   photosSelection: KeysSelection;
+  ref: React.MutableRefObject<PhotoGridComponentRefType | null>;
 };
 
-export default function PhotoGridComponent({
-  photos,
-  onLongPressPhoto,
-  onPressPhoto,
-  currentPhotoIndex,
-  onRefresh,
-  isSelecting,
-  photosSelection,
-}: PhotoGridComponentProps) {
+export default forwardRef(function PhotoGridComponent(
+  {
+    photos,
+    onLongPressPhoto,
+    onPressPhoto,
+    onRefresh,
+    isSelecting,
+    photosSelection,
+  }: PhotoGridComponentProps,
+  ref: React.ForwardedRef<PhotoGridComponentRefType>,
+) {
   const sectionlistRef = useRef<SectionListWithColumnsRefType>(null);
-  const photosLenRef = useRef<number>(photos.length);
-  photosLenRef.current = photos.length;
 
   const { colors } = useTheme();
   const styles = useStyles(makeStyles);
@@ -56,20 +60,26 @@ export default function PhotoGridComponent({
   const numberOfColumns = getGridNumberOfColumns(groupType);
   const { sections, indexToSectionLocation } = usePhotosGrouped(photos, groupType);
 
-  const currentPhotoIndexClamped = clamp(currentPhotoIndex, photos.length - 1);
-  const currentPhoto = photos[currentPhotoIndexClamped];
+  useImperativeHandle(
+    ref,
+    () => {
+      return {
+        scrollToIndex(params) {
+          const indexClamped = clamp(params.index, photos.length - 1);
+          const currentPhoto = photos[indexClamped];
 
-  const { sectionIndex, itemIndex } = indexToSectionLocation(currentPhoto);
+          const { sectionIndex, itemIndex } = indexToSectionLocation(currentPhoto);
 
-  useEffect(() => {
-    if (photosLenRef.current > 0 && sectionIndex >= 0 && itemIndex >= 0) {
-      sectionlistRef.current?.scrollToLocation({
-        sectionIndex: sectionIndex,
-        itemIndex: itemIndex,
-        animated: true,
-      });
-    }
-  }, [sectionlistRef, sectionIndex, itemIndex]);
+          sectionlistRef.current?.scrollToLocation({
+            sectionIndex: sectionIndex,
+            itemIndex: itemIndex,
+            animated: params.animated,
+          });
+        },
+      };
+    },
+    [indexToSectionLocation, photos],
+  );
 
   const renderItem = useCallback(
     ({ item }: { item: PhotoGalleryType }) => {
@@ -123,7 +133,7 @@ export default function PhotoGridComponent({
       />
     </View>
   );
-}
+});
 
 const SECTION_HEADER_HEIGHT = 60;
 const SPACE_BETWEEN_PHOTOS = 1;
