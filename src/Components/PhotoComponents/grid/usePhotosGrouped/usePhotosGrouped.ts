@@ -5,7 +5,7 @@ import { GroupType } from '~/Context/ReduxStore/Slices/GalleryOptions/GalleryOpt
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
 
 import { getIndexInSectionList, getSectionsFromPhotos } from './Helpers';
-import { SectionDate } from './SectionDate';
+import { SectionDate } from './SectionDate/SectionDate';
 
 export type SectionDataType = SectionDate;
 export type SectionTypePhotoGrid = SectionType<PhotoGalleryType, SectionDataType>;

@@ -1,7 +1,7 @@
 import { GroupType } from '~/Context/ReduxStore/Slices/GalleryOptions/GalleryOptions';
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
 
-import { SectionDate } from './SectionDate';
+import { SectionDateFactory } from './SectionDate/SectionDateFactory';
 import { SectionTypePhotoGrid } from './usePhotosGrouped';
 
 export function getSectionIndex(
@@ -41,8 +41,9 @@ export function getSectionsFromPhotos(
 ): SectionTypePhotoGrid[] {
   if (photos && photos.length > 0) {
     const sections: SectionTypePhotoGrid[] = [];
+    const sectionDateFactory = new SectionDateFactory();
 
-    const sectionDateInitial = new SectionDate(photos[0].date, groupType);
+    const sectionDateInitial = sectionDateFactory.createSectionDate(photos[0].date, groupType);
 
     let currentBasket: SectionTypePhotoGrid = {
       sectionData: sectionDateInitial,
@@ -54,7 +55,7 @@ export function getSectionsFromPhotos(
         currentBasket.data.push(photo);
       } else {
         sections.push(currentBasket);
-        const newSectionDate = new SectionDate(photo.date, groupType);
+        const newSectionDate = sectionDateFactory.createSectionDate(photo.date, groupType);
         currentBasket = {
           sectionData: newSectionDate,
           data: [photo],
