@@ -1,5 +1,9 @@
+import {
+  makeGalleryPhoto,
+  makeNGalleryPhotosWithDifferentDates,
+} from '~/Context/ReduxStore/Slices/Photos/__tests__/MockValues';
+
 import { getIndexInSectionList, getSectionsFromPhotos } from '../Helpers';
-import { makeGalleryPhoto, makeNGalleryPhotosWithDifferentDates } from './MockValues';
 
 describe('Tests for function getIndexInSectionList', () => {
   it('Should return section 0 and itemIndex 0 when passing first photo', () => {

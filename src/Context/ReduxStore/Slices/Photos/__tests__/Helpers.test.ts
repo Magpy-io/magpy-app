@@ -1,5 +1,8 @@
 import { compareDates, insertPhotoKeyWithOrder } from '../Helpers';
-import * as MockValues from './MockValues';
+import {
+  makeNLocalPhotosWithDifferentDates,
+  makePhotosLocalFromPhotosArray,
+} from './MockValues';
 
 const dateRecent = '2024-02-03T11:30:40.000Z';
 const dateOld = '2024-02-03T11:30:30.000Z';
@@ -39,54 +42,48 @@ describe('Tests for compareDates function', () => {
 
 describe('Tests for insertPhotoKeyWithOrder function', () => {
   it('Should insert photo key in between an older photo and a more recent photo', () => {
-    const photosLocalIdsOrdered = [MockValues.mediaId1, MockValues.mediaId3];
+    const photos = makeNLocalPhotosWithDifferentDates(3);
+    const photosLocal = makePhotosLocalFromPhotosArray(photos);
 
-    insertPhotoKeyWithOrder(
-      MockValues.photosLocal,
-      photosLocalIdsOrdered,
-      MockValues.photoLocal2,
-    );
+    const photosLocalIdsOrdered = [photos[0].id, photos[2].id];
 
-    expect(photosLocalIdsOrdered).toEqual(MockValues.photosLocalIdsOrdered);
+    insertPhotoKeyWithOrder(photosLocal, photosLocalIdsOrdered, photos[1]);
+
+    expect(photosLocalIdsOrdered).toEqual(photos.map(photo => photo.id));
   });
 
   it('Should insert photo key in the begining if it is more recent', () => {
-    const photosLocalIdsOrdered = [MockValues.mediaId2, MockValues.mediaId3];
+    const photos = makeNLocalPhotosWithDifferentDates(3);
+    const photosLocal = makePhotosLocalFromPhotosArray(photos);
 
-    insertPhotoKeyWithOrder(
-      MockValues.photosLocal,
-      photosLocalIdsOrdered,
-      MockValues.photoLocal1,
-    );
+    const photosLocalIdsOrdered = [photos[1].id, photos[2].id];
 
-    expect(photosLocalIdsOrdered).toEqual(MockValues.photosLocalIdsOrdered);
+    insertPhotoKeyWithOrder(photosLocal, photosLocalIdsOrdered, photos[0]);
+
+    expect(photosLocalIdsOrdered).toEqual(photos.map(photo => photo.id));
   });
 
   it('Should insert photo key at the end if it is older', () => {
-    const photosLocalIdsOrdered = [MockValues.mediaId1, MockValues.mediaId2];
+    const photos = makeNLocalPhotosWithDifferentDates(3);
+    const photosLocal = makePhotosLocalFromPhotosArray(photos);
 
-    insertPhotoKeyWithOrder(
-      MockValues.photosLocal,
-      photosLocalIdsOrdered,
-      MockValues.photoLocal3,
-    );
-    expect(photosLocalIdsOrdered).toEqual(MockValues.photosLocalIdsOrdered);
+    const photosLocalIdsOrdered = [photos[0].id, photos[1].id];
+
+    insertPhotoKeyWithOrder(photosLocal, photosLocalIdsOrdered, photos[2]);
+
+    expect(photosLocalIdsOrdered).toEqual(photos.map(photo => photo.id));
   });
 
   it('Should insert photo key just before last if same date as last one', () => {
-    const photosLocalIdsOrdered = [MockValues.mediaId1, MockValues.mediaId2];
+    const photos = makeNLocalPhotosWithDifferentDates(3);
+    photos[2].date = photos[1].date;
 
-    const photosLocal = MockValues.DeepCopy(
-      MockValues.photosLocal,
-    ) as typeof MockValues.photosLocal;
+    const photosLocal = makePhotosLocalFromPhotosArray(photos);
 
-    photosLocal['mediaId3'].date = MockValues.photoLocal2.date;
+    const photosLocalIdsOrdered = [photos[0].id, photos[1].id];
 
-    insertPhotoKeyWithOrder(photosLocal, photosLocalIdsOrdered, photosLocal['mediaId3']);
-    expect(photosLocalIdsOrdered).toEqual([
-      MockValues.mediaId1,
-      MockValues.mediaId3,
-      MockValues.mediaId2,
-    ]);
+    insertPhotoKeyWithOrder(photosLocal, photosLocalIdsOrdered, photos[2]);
+
+    expect(photosLocalIdsOrdered).toEqual([photos[0].id, photos[2].id, photos[1].id]);
   });
 });
