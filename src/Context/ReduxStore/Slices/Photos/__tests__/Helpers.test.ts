@@ -1,12 +1,9 @@
 import { insertPhotoKeyWithOrder } from '../Helpers';
-import {
-  makeNLocalPhotosWithDifferentDates,
-  makePhotosLocalFromPhotosArray,
-} from './MockValues';
+import { makeNLocalPhotos, makePhotosLocalFromPhotosArray } from './MockValues';
 
 describe('Tests for insertPhotoKeyWithOrder function', () => {
   it('Should insert photo key in between an older photo and a more recent photo', () => {
-    const photos = makeNLocalPhotosWithDifferentDates(3);
+    const photos = makeNLocalPhotos(3, { differentDates: true });
     const photosLocal = makePhotosLocalFromPhotosArray(photos);
 
     const photosLocalIdsOrdered = [photos[0].id, photos[2].id];
@@ -17,7 +14,7 @@ describe('Tests for insertPhotoKeyWithOrder function', () => {
   });
 
   it('Should insert photo key in the begining if it is more recent', () => {
-    const photos = makeNLocalPhotosWithDifferentDates(3);
+    const photos = makeNLocalPhotos(3, { differentDates: true });
     const photosLocal = makePhotosLocalFromPhotosArray(photos);
 
     const photosLocalIdsOrdered = [photos[1].id, photos[2].id];
@@ -28,7 +25,7 @@ describe('Tests for insertPhotoKeyWithOrder function', () => {
   });
 
   it('Should insert photo key at the end if it is older', () => {
-    const photos = makeNLocalPhotosWithDifferentDates(3);
+    const photos = makeNLocalPhotos(3, { differentDates: true });
     const photosLocal = makePhotosLocalFromPhotosArray(photos);
 
     const photosLocalIdsOrdered = [photos[0].id, photos[1].id];
@@ -39,7 +36,7 @@ describe('Tests for insertPhotoKeyWithOrder function', () => {
   });
 
   it('Should insert photo key just before last if same date as last one', () => {
-    const photos = makeNLocalPhotosWithDifferentDates(3);
+    const photos = makeNLocalPhotos(3, { differentDates: true });
     photos[2].date = photos[1].date;
 
     const photosLocal = makePhotosLocalFromPhotosArray(photos);
@@ -51,3 +48,5 @@ describe('Tests for insertPhotoKeyWithOrder function', () => {
     expect(photosLocalIdsOrdered).toEqual([photos[0].id, photos[2].id, photos[1].id]);
   });
 });
+
+describe('Tests for mergePhotos function', () => {});

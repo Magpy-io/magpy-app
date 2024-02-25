@@ -1,7 +1,9 @@
 import {
   PhotoGalleryType,
   PhotoLocalType,
+  PhotoServerType,
   PhotosLocalType,
+  PhotosServerType,
 } from '~/Context/ReduxStore/Slices/Photos/Photos';
 
 const fileSize = 3415968;
@@ -21,15 +23,18 @@ export function makeGalleryPhoto(options?: {
   };
 }
 
-export function makeNGalleryPhotosWithDifferentDates(
+export function makeNGalleryPhotos(
   numberPhotos: number,
-  options?: { mediaId?: string },
+  options?: { mediaId?: string; differentDates?: boolean },
 ): PhotoGalleryType[] {
   const photos = new Array(numberPhotos).fill(undefined);
 
   return photos.map((_, index) => {
     const newDate = new Date(defaultDate);
-    newDate.setDate(newDate.getDate() - index);
+
+    if (options?.differentDates) {
+      newDate.setDate(newDate.getDate() - index);
+    }
 
     return makeGalleryPhoto({
       mediaId: (options?.mediaId ?? 'mediaId') + index.toString(),
@@ -52,15 +57,17 @@ export function makeLocalPhoto(options?: { date?: string; mediaId?: string }): P
   };
 }
 
-export function makeNLocalPhotosWithDifferentDates(
+export function makeNLocalPhotos(
   numberPhotos: number,
-  options?: { mediaId?: string },
+  options?: { mediaId?: string; differentDates?: boolean },
 ): PhotoLocalType[] {
   const photos = new Array(numberPhotos).fill(undefined);
 
   return photos.map((_, index) => {
     const newDate = new Date(defaultDate);
-    newDate.setDate(newDate.getDate() - index);
+    if (options?.differentDates) {
+      newDate.setDate(newDate.getDate() - index);
+    }
 
     return makeLocalPhoto({
       mediaId: (options?.mediaId ?? 'mediaId') + index.toString(),
@@ -71,6 +78,51 @@ export function makeNLocalPhotosWithDifferentDates(
 
 export function makePhotosLocalFromPhotosArray(photos: PhotoLocalType[]): PhotosLocalType {
   return photos.reduce((a: PhotosLocalType, b) => {
+    a[b.id] = b;
+    return a;
+  }, {});
+}
+
+export function makeServerPhoto(options?: {
+  date?: string;
+  serverId?: string;
+  mediaId?: string;
+}): PhotoServerType {
+  return {
+    id: options?.serverId ?? 'serverId',
+    fileName: 'photo.jpg',
+    fileSize,
+    height,
+    width,
+    date: options?.date ?? defaultDate,
+    syncDate: defaultDate,
+    mediaId: options?.mediaId ?? 'mediaIdForServerPhoto',
+    uriThumbnail: '',
+    uriCompressed: '',
+  };
+}
+
+export function makeNServerPhotos(
+  numberPhotos: number,
+  options?: { serverId?: string; differentDates?: boolean },
+): PhotoServerType[] {
+  const photos = new Array(numberPhotos).fill(undefined);
+
+  return photos.map((_, index) => {
+    const newDate = new Date(defaultDate);
+    if (options?.differentDates) {
+      newDate.setDate(newDate.getDate() - index);
+    }
+
+    return makeServerPhoto({
+      serverId: (options?.serverId ?? 'serverId') + index.toString(),
+      date: newDate.toISOString(),
+    });
+  });
+}
+
+export function makePhotosServerFromPhotosArray(photos: PhotoServerType[]): PhotosServerType {
+  return photos.reduce((a: PhotosServerType, b) => {
     a[b.id] = b;
     return a;
   }, {});

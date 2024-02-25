@@ -1,13 +1,13 @@
 import {
   makeGalleryPhoto,
-  makeNGalleryPhotosWithDifferentDates,
+  makeNGalleryPhotos,
 } from '~/Context/ReduxStore/Slices/Photos/__tests__/MockValues';
 
 import { getIndexInSectionList, getSectionsFromPhotos } from '../Helpers';
 
 describe('Tests for function getIndexInSectionList', () => {
   it('Should return section 0 and itemIndex 0 when passing first photo', () => {
-    const photos = makeNGalleryPhotosWithDifferentDates(2);
+    const photos = makeNGalleryPhotos(2);
     const sections = getSectionsFromPhotos(photos, 'Day');
 
     const { sectionIndex, itemIndex } = getIndexInSectionList(photos[0], sections);
@@ -16,8 +16,8 @@ describe('Tests for function getIndexInSectionList', () => {
   });
 
   it('Should return sectionIndex 0 and itemIndex 1 when passing second photo', () => {
-    const photos = makeNGalleryPhotosWithDifferentDates(2);
-    const sections = getSectionsFromPhotos(photos, 'Month');
+    const photos = makeNGalleryPhotos(2);
+    const sections = getSectionsFromPhotos(photos, 'Day');
 
     const { sectionIndex, itemIndex } = getIndexInSectionList(photos[1], sections);
     expect(sectionIndex).toBe(0);
@@ -25,7 +25,7 @@ describe('Tests for function getIndexInSectionList', () => {
   });
 
   it('Should return sectionIndex 1 and itemIndex 0 when passing first photo in second section', () => {
-    const photos = makeNGalleryPhotosWithDifferentDates(2);
+    const photos = makeNGalleryPhotos(2, { differentDates: true });
     const sections = getSectionsFromPhotos(photos, 'Day');
 
     const { sectionIndex, itemIndex } = getIndexInSectionList(photos[1], sections);
@@ -34,7 +34,7 @@ describe('Tests for function getIndexInSectionList', () => {
   });
 
   it('Should return sectionIndex -1 when photo section not found', () => {
-    const [extraPhoto, ...photos] = makeNGalleryPhotosWithDifferentDates(3);
+    const [extraPhoto, ...photos] = makeNGalleryPhotos(3, { differentDates: true });
     const sections = getSectionsFromPhotos(photos, 'Day');
 
     const { sectionIndex } = getIndexInSectionList(extraPhoto, sections);
@@ -42,11 +42,11 @@ describe('Tests for function getIndexInSectionList', () => {
   });
 
   it('Should return sectionIndex 0 and itemIndex -1 when photo section is found but does not exist in the section', () => {
-    const photos = makeNGalleryPhotosWithDifferentDates(2);
-    const sections = getSectionsFromPhotos(photos, 'Day');
+    const photo = makeGalleryPhoto();
+    const sections = getSectionsFromPhotos([photo], 'Day');
 
-    const photo = makeGalleryPhoto({ mediaId: 'newPhotoId', date: photos[0].date });
-    const { sectionIndex, itemIndex } = getIndexInSectionList(photo, sections);
+    const newPhoto = makeGalleryPhoto({ mediaId: 'newPhotoId', date: photo.date });
+    const { sectionIndex, itemIndex } = getIndexInSectionList(newPhoto, sections);
 
     expect(sectionIndex).toBe(0);
     expect(itemIndex).toBe(-1);
