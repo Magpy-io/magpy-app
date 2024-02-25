@@ -90,10 +90,10 @@ export function compareDates(date1: string, date2: string) {
   }
 }
 
-export function insertPhotoKeyWithOrder<T extends { id: string; date: string }>(
-  photos: { [key: string]: T },
+export function insertPhotoKeyWithOrder(
+  photos: { [key: string]: { id: string; date: string } },
   photosIdsOrdered: string[],
-  photo: T,
+  photo: { id: string; date: string },
 ) {
   const insertIndex = photosIdsOrdered.findIndex(
     p => compareDates(photos[p].date, photo.date) <= 0,

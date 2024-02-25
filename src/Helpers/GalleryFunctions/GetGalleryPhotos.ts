@@ -70,8 +70,6 @@ export function parsePhotoIdentifierToPhotoLocalType(edge: PhotoIdentifier) {
 // the image file will be moved and a new DATE_ADDED will be set but DATE_MODIFIED
 // wont change and it will be older than DATE_ADDED
 
-function getCorrectDate<T extends { timestamp: number; modificationTimestamp: number }>(
-  photo: T,
-): number {
+function getCorrectDate(photo: { timestamp: number; modificationTimestamp: number }): number {
   return Math.min(photo.timestamp, photo.modificationTimestamp);
 }
