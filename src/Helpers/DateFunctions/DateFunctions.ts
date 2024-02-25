@@ -19,3 +19,24 @@ export function makeUTCDateFrom(options: { day?: number; month?: number; year?: 
   date.setUTCFullYear(options.year ?? 0);
   return date.toISOString();
 }
+
+export function compareDates(date1: string, date2: string) {
+  const d1 = Date.parse(date1);
+  const d2 = Date.parse(date2);
+
+  if (!d2) {
+    return 1;
+  }
+
+  if (!d1) {
+    return -1;
+  }
+
+  if (d1 > d2) {
+    return 1;
+  } else if (d1 < d2) {
+    return -1;
+  } else {
+    return 0;
+  }
+}
