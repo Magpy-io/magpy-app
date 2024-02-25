@@ -33,7 +33,7 @@ type SectionListWithColumnsProps<ItemType, SectionData> = {
   refreshing?: boolean;
   itemSpacing?: number;
   sectionHeaderHeight: number;
-  mref: React.RefObject<SectionListWithColumnsRefType>;
+  mref: React.MutableRefObject<SectionListWithColumnsRefType | null>;
 };
 
 function SectionListWithColumns<ItemType, SectionData>({

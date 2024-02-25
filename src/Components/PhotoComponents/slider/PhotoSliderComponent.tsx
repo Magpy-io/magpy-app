@@ -1,7 +1,8 @@
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useImperativeHandle, useRef } from 'react';
 import { Dimensions, FlatList, StyleSheet, ViewToken } from 'react-native';
 
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
+import { clamp } from '~/Helpers/Utilities';
 
 import PhotoComponentForSlider from './PhotoComponentForSlider';
 
@@ -19,49 +20,47 @@ function getItemLayout(data: ArrayLike<PhotoGalleryType> | null | undefined, ind
   };
 }
 
+export type PhotoSliderComponentRefType = {
+  scrollToIndex: (params: { index: number; animated?: boolean }) => void;
+};
+
 type PropsType = {
   photos: PhotoGalleryType[];
-  currentPhotoIndex: number;
   isFullScreen: boolean;
   onIndexChanged?: (index: number) => void;
   onPhotoClick?: (item: PhotoGalleryType) => void;
   onPhotoLongClick?: (item: PhotoGalleryType) => void;
 };
 
-export default function PhotoSliderComponent({
-  onIndexChanged,
-  onPhotoClick,
-  onPhotoLongClick,
-  photos,
-  currentPhotoIndex,
-  isFullScreen,
-}: PropsType) {
+export default React.forwardRef(function PhotoSliderComponent(
+  { onIndexChanged, onPhotoClick, onPhotoLongClick, photos, isFullScreen }: PropsType,
+  ref: React.ForwardedRef<PhotoSliderComponentRefType>,
+) {
   const flatlistRef = useRef<FlatList>(null);
 
-  const flatListCurrentIndexRef = useRef<number>(currentPhotoIndex);
-  flatListCurrentIndexRef.current = currentPhotoIndex;
-  const hasPhotos = photos && photos.length > 0;
+  const photosLen = photos.length;
 
-  useEffect(() => {
-    if (hasPhotos) {
-      let indexToScroll = flatListCurrentIndexRef.current;
+  useImperativeHandle(
+    ref,
+    () => {
+      return {
+        scrollToIndex(params) {
+          if (photosLen <= 0) {
+            return;
+          }
+          const indexClamped = clamp(params.index, photosLen - 1);
 
-      if (indexToScroll < 0) {
-        indexToScroll = 0;
-      }
+          onIndexChanged?.(indexClamped);
 
-      if (indexToScroll >= photos.length) {
-        indexToScroll = photos.length - 1;
-      }
-
-      flatListCurrentIndexRef.current = indexToScroll;
-
-      flatlistRef.current?.scrollToIndex({
-        index: indexToScroll,
-        animated: false,
-      });
-    }
-  }, [hasPhotos, photos.length, currentPhotoIndex]);
+          flatlistRef.current?.scrollToIndex({
+            index: indexClamped,
+            animated: false,
+          });
+        },
+      };
+    },
+    [onIndexChanged, photosLen],
+  );
 
   const renderItem = useCallback(
     ({ item }: { item: PhotoGalleryType }) => (
@@ -79,7 +78,6 @@ export default function PhotoSliderComponent({
     ({ viewableItems }: { viewableItems: ViewToken[]; changed: ViewToken[] }) => {
       if (viewableItems.length == 1) {
         const index = viewableItems[0].index ?? 0;
-        flatListCurrentIndexRef.current = index;
         onIndexChanged?.(index);
       }
     },
@@ -108,7 +106,7 @@ export default function PhotoSliderComponent({
       getItemLayout={getItemLayout}
     />
   );
-}
+});
 
 const styles = StyleSheet.create({
   flatListStyle: { width: '100%' },

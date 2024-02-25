@@ -1,4 +1,4 @@
-const locale: string | undefined = undefined;
+const locale: string = 'en';
 
 // Converts a string (2023-06-22T14:43:51.880Z) to a Date object
 function StringToDate(date: string) {
@@ -6,33 +6,33 @@ function StringToDate(date: string) {
 }
 
 // Converts a string to the form : Oct 14, 2022, 1:30:23 PM
-export function formatDateTime(date: string) {
+export function formatDateTime(date: string, localeOverride?: string) {
   const dt = StringToDate(date);
-  return new Intl.DateTimeFormat(locale, {
+  return new Intl.DateTimeFormat(localeOverride ?? locale, {
     dateStyle: 'medium',
     timeStyle: 'medium',
   }).format(dt);
 }
 
 // Converts a string to the form : Oct 14, 2022
-export function formatDate(date: string) {
+export function formatDate(date: string, localeOverride?: string) {
   const dt = StringToDate(date);
-  return new Intl.DateTimeFormat(locale, { dateStyle: 'medium' }).format(dt);
+  return new Intl.DateTimeFormat(localeOverride ?? locale, { dateStyle: 'medium' }).format(dt);
 }
 
 // Converts a string to the form : October 2022
-export function formatMonth(date: string) {
+export function formatMonth(date: string, localeOverride?: string) {
   const dt = StringToDate(date);
-  return new Intl.DateTimeFormat(locale, {
+  return new Intl.DateTimeFormat(localeOverride ?? locale, {
     year: 'numeric',
     month: 'long',
   }).format(dt);
 }
 
 // Converts a string to the form : 2022
-export function formatYear(date: string) {
+export function formatYear(date: string, localeOverride?: string) {
   const dt = StringToDate(date);
-  return new Intl.DateTimeFormat(locale, {
+  return new Intl.DateTimeFormat(localeOverride ?? locale, {
     year: 'numeric',
   }).format(dt);
 }

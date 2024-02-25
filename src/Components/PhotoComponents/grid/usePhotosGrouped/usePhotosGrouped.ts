@@ -5,7 +5,7 @@ import { GroupType } from '~/Context/ReduxStore/Slices/GalleryOptions/GalleryOpt
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
 
 import { getIndexInSectionList, getSectionsFromPhotos } from './Helpers';
-import { SectionDate } from './SectionDate';
+import { SectionDate } from './SectionDate/SectionDate';
 
 export type SectionDataType = SectionDate;
 export type SectionTypePhotoGrid = SectionType<PhotoGalleryType, SectionDataType>;
@@ -17,7 +17,7 @@ export function usePhotosGrouped(photos: Array<PhotoGalleryType>, groupBy: Group
 
   const indexToSectionLocation = useCallback(
     (currentPhoto: PhotoGalleryType) => {
-      if (sections && sections.length > 0) {
+      if (sections.length > 0) {
         return getIndexInSectionList(currentPhoto, sections);
       }
       return { sectionIndex: 0, itemIndex: 0 };
