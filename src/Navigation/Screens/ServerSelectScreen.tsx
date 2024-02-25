@@ -4,7 +4,7 @@ import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import ServersList from '~/Components/SelectServerComponents/ServersList';
-import { Server } from '~/Context/ContextSlices/LocalServersContext';
+import { Server } from '~/Context/Contexts/LocalServersContext';
 import { useTheme } from '~/Context/ThemeContext';
 import { useServerClaimFunctions } from '~/Context/UseContexts/useClaimServerContext';
 import {

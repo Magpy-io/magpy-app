@@ -1,11 +1,11 @@
 import React, { ReactNode } from 'react';
 
-import { useAuthDataEffect } from './ContextSlices/AuthContext';
-import { useBackgroundServiceEffects } from './ContextSlices/BackgroundServiceContext';
-import { useLocalServersEffect } from './ContextSlices/LocalServersContext';
-import { usePhotosDownloadingEffect } from './ContextSlices/PhotosDownloadingContext/PhotosDownloadingEffect';
-import { useServerClaimEffects } from './ContextSlices/ServerClaimContext';
-import { useServerEffect } from './ContextSlices/ServerContext';
+import { useAuthDataEffect } from './Contexts/AuthContext';
+import { useBackgroundServiceEffects } from './Contexts/BackgroundServiceContext';
+import { useLocalServersEffect } from './Contexts/LocalServersContext';
+import { usePhotosDownloadingEffect } from './Contexts/PhotosDownloadingContext/PhotosDownloadingEffect';
+import { useServerClaimEffects } from './Contexts/ServerClaimContext';
+import { useServerEffect } from './Contexts/ServerContext';
 import { usePhotosStoreEffect } from './ReduxStore/Slices/Photos/PhotosFunctions';
 
 type PropsType = {
