@@ -9,7 +9,9 @@ import { useAppSelector } from '~/Context/ReduxStore/Store';
 import { useStyles } from '~/Hooks/useStyles';
 import { colorsType } from '~/Styles/colors';
 
-import { StatusFilter, TypeFilter } from './grid/Filter';
+import { DateFilter } from './filters/DateFilter';
+import { StatusFilter } from './filters/StatusFilter';
+import { TypeFilter } from './filters/TypeFilter';
 import PhotoGridController from './grid/PhotoGridController';
 import PhotoSliderController from './slider/PhotoSliderController';
 
@@ -35,6 +37,9 @@ export default function PhotoGallery({ photos, ...props }: PhotoGalleryPropsType
         newPhotos = filter.filter(photos);
       } else if (f.type === 'Status') {
         const filter = new StatusFilter(f.params.value);
+        newPhotos = filter.filter(newPhotos);
+      } else if (f.type === 'Date') {
+        const filter = new DateFilter(f.params.fromDate, f.params.toDate, f.params.label);
         newPhotos = filter.filter(newPhotos);
       }
     });

@@ -23,6 +23,6 @@ export const borderRadius = {
   button: 12,
   small: 8,
   input: 12,
-  image: 4,
+  image: 2,
   avatar: 12,
 };

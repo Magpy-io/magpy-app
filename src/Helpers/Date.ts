@@ -53,3 +53,21 @@ export function makeDateFrom(options: { day?: number; month?: number; year?: num
   date.setFullYear(options.year ?? 0);
   return date.toISOString();
 }
+
+// should return this year. example: 2024
+export function getThisYear() {
+  const today = new Date();
+  return today.getFullYear();
+}
+
+// should return last year. example: 2023
+export function getLastYear() {
+  return getThisYear() - 1;
+}
+
+// should return two dates : January 1st and December 31 of the year
+export function getYearDateRange(year: number) {
+  const dateStart = new Date(Date.UTC(year, 0, 1)).toISOString();
+  const dateEnd = new Date(Date.UTC(year, 11, 31)).toISOString();
+  return { dateStart, dateEnd };
+}

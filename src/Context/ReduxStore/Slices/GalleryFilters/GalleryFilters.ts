@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-import { FilterObjectType } from '~/Components/PhotoComponents/grid/Filter';
+import { FilterObjectType } from '~/Components/PhotoComponents/filters/Filter';
 
 type FiltersState = {
   filters: FilterObjectType[];

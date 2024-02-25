@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { produce } from 'immer';
 import { Text } from 'react-native-elements';
@@ -13,16 +13,13 @@ import { useAppDispatch, useAppSelector } from '~/Context/ReduxStore/Store';
 import useEffectOnChange from '~/Hooks/useEffectOnChange';
 import { useStyles } from '~/Hooks/useStyles';
 import { colorsType } from '~/Styles/colors';
-import { borderRadius, spacing } from '~/Styles/spacing';
+import { spacing } from '~/Styles/spacing';
 import { typography } from '~/Styles/typography';
 
-import {
-  FilterObjectType,
-  StatusFilterObjectType,
-  StatusFilterValue,
-  TypeFilterObjectType,
-  TypeFilterValue,
-} from './Filter';
+import DateFilterComponent, { DateFilterObjectType } from '../filters/DateFilter';
+import { FilterNameType, FilterObjectType } from '../filters/Filter';
+import { StatusFilterComponent, StatusFilterObjectType } from '../filters/StatusFilter';
+import { TypeFilterComponent, TypeFilterObjectType } from '../filters/TypeFilter';
 
 type FilterModalProps = {
   visible: boolean;
@@ -47,9 +44,16 @@ export default function FilterModal({ visible, onRequestClose }: FilterModalProp
     dispatch(addFilters({ filters }));
   };
 
-  const TypeFilter = filters?.find(f => f.type === 'Type') as TypeFilterObjectType | undefined;
-  const StatusFilter = filters?.find(f => f.type === 'Status') as
+  const TypeFilterObject = filters?.find(f => f.type === 'Type') as
+    | TypeFilterObjectType
+    | undefined;
+
+  const StatusFilterObject = filters?.find(f => f.type === 'Status') as
     | StatusFilterObjectType
+    | undefined;
+
+  const DateFilterObject = filters?.find(f => f.type === 'Date') as
+    | DateFilterObjectType
     | undefined;
 
   const addOrEditFilter = useCallback((filter: FilterObjectType) => {
@@ -65,10 +69,10 @@ export default function FilterModal({ visible, onRequestClose }: FilterModalProp
     );
   }, []);
 
-  const removeFilter = useCallback((filter: FilterObjectType) => {
+  const removeFilter = useCallback((type: FilterNameType) => {
     setFilters(
       produce(draftFilters => {
-        return draftFilters.filter(f => f.type != filter.type);
+        return draftFilters.filter(f => f.type != type);
       }),
     );
   }, []);
@@ -77,17 +81,21 @@ export default function FilterModal({ visible, onRequestClose }: FilterModalProp
     <BottomModal modalVisible={visible} onRequestClose={onRequestClose}>
       <View style={styles.viewStyle}>
         <Header onClose={onRequestClose} />
-        <Type
-          filter={TypeFilter}
+        <TypeFilterComponent
+          filter={TypeFilterObject}
           addOrEditFilter={addOrEditFilter}
           removeFilter={removeFilter}
         />
-        <Status
-          filter={StatusFilter}
+        <StatusFilterComponent
+          filter={StatusFilterObject}
           addOrEditFilter={addOrEditFilter}
           removeFilter={removeFilter}
         />
-        <Date />
+        <DateFilterComponent
+          filter={DateFilterObject}
+          addOrEditFilter={addOrEditFilter}
+          removeFilter={removeFilter}
+        />
         <Submit onSubmit={onSubmit} />
       </View>
     </BottomModal>
@@ -101,127 +109,6 @@ function Submit({ onSubmit }: { onSubmit: () => void }) {
       containerStyle={{ alignSelf: 'flex-end' }}
       onPress={onSubmit}
     />
-  );
-}
-
-type StatusProps = {
-  filter: StatusFilterObjectType | undefined;
-  addOrEditFilter: (filter: FilterObjectType) => void;
-  removeFilter: (filter: FilterObjectType) => void;
-};
-
-function Status({ filter, addOrEditFilter, removeFilter }: StatusProps) {
-  const styles = useStyles(makeStyles);
-  const addStatusFilter = (value: StatusFilterValue) => {
-    addOrEditFilter({ type: 'Status', params: { value: value } });
-  };
-
-  const removeStatusFilter = () => {
-    removeFilter({ type: 'Status', params: { value: 'inDevice' } });
-  };
-
-  return (
-    <View style={styles.section}>
-      <Text style={styles.title}>Status</Text>
-      <View style={styles.elementListView}>
-        <Element
-          title="All"
-          selected={filter?.params?.value == null}
-          onPress={removeStatusFilter}
-        />
-        <Element
-          title="In device"
-          selected={filter?.params?.value === 'inDevice'}
-          onPress={() => {
-            addStatusFilter('inDevice');
-          }}
-        />
-        <Element
-          title="In server"
-          selected={filter?.params?.value === 'inServer'}
-          onPress={() => {
-            addStatusFilter('inServer');
-          }}
-        />
-      </View>
-    </View>
-  );
-}
-
-type TypeProps = {
-  filter: TypeFilterObjectType | undefined;
-  addOrEditFilter: (filter: FilterObjectType) => void;
-  removeFilter: (filter: FilterObjectType) => void;
-};
-
-function Type({ filter, addOrEditFilter, removeFilter }: TypeProps) {
-  const styles = useStyles(makeStyles);
-
-  const addTypeFilter = (value: TypeFilterValue) => {
-    addOrEditFilter({ type: 'Type', params: { value: value } });
-  };
-
-  const removeTypeFilter = () => {
-    removeFilter({ type: 'Type', params: { value: 'photos' } });
-  };
-  return (
-    <View style={styles.section}>
-      <Text style={styles.title}>Type</Text>
-      <View style={styles.elementListView}>
-        <Element
-          title="All"
-          selected={filter?.params?.value == null}
-          onPress={removeTypeFilter}
-        />
-        <Element
-          title="Photos"
-          selected={filter?.params?.value === 'photos'}
-          onPress={() => {
-            addTypeFilter('photos');
-          }}
-        />
-        <Element
-          title="Videos"
-          selected={filter?.params?.value === 'videos'}
-          onPress={() => {
-            addTypeFilter('videos');
-          }}
-        />
-      </View>
-    </View>
-  );
-}
-
-function Date() {
-  const styles = useStyles(makeStyles);
-  return (
-    <View style={styles.section}>
-      <Text style={styles.title}>Date</Text>
-      <View style={styles.elementListView}>
-        <Element title="All time" selected onPress={() => {}} />
-        <Element title="This year" onPress={() => {}} />
-        <Element title="Last year" onPress={() => {}} />
-      </View>
-    </View>
-  );
-}
-
-type ElementProps = {
-  title: string;
-  selected?: boolean;
-  onPress: () => void;
-};
-
-function Element({ title, selected, onPress }: ElementProps) {
-  const styles = useStyles(makeStyles);
-  return (
-    <Pressable
-      style={[styles.elementView, selected ? styles.selectedElementView : {}]}
-      onPress={onPress}>
-      <Text style={[styles.elementTitle, selected ? styles.selectedElementTitle : {}]}>
-        {title}
-      </Text>
-    </Pressable>
   );
 }
 
@@ -242,21 +129,6 @@ const makeStyles = (colors: colorsType) =>
       flexDirection: 'row',
       flexWrap: 'wrap',
     },
-    elementView: {
-      paddingVertical: spacing.spacing_s,
-      paddingHorizontal: spacing.spacing_l,
-      backgroundColor: colors.BACKGROUND_LIGHT,
-      borderRadius: borderRadius.small,
-    },
-    elementTitle: {
-      ...typography(colors).mediumTextBold,
-    },
-    selectedElementView: {
-      backgroundColor: colors.PRIMARY,
-    },
-    selectedElementTitle: {
-      color: colors.TEXT_INVERSE,
-    },
     section: {
       gap: spacing.spacing_m,
     },
@@ -269,7 +141,7 @@ const makeStyles = (colors: colorsType) =>
       gap: spacing.spacing_xs,
     },
     viewStyle: {
-      gap: spacing.spacing_xxl,
+      gap: spacing.spacing_xl,
     },
     headerTitle: {
       ...typography(colors).mediumTextBold,
