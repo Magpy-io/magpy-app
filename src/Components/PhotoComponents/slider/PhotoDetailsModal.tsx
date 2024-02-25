@@ -12,7 +12,7 @@ import {
   TimeIcon,
 } from '~/Components/CommonComponents/Icons';
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
-import { formatDate } from '~/Helpers/Date';
+import { formatDate } from '~/Helpers/DateFunctions/DateFormatting';
 import { getReadableFileSizeString } from '~/Helpers/FileSizeFormat';
 import usePhotoData from '~/Hooks/usePhotoData';
 import { useStyles } from '~/Hooks/useStyles';
