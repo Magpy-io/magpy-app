@@ -2,10 +2,14 @@
 // See https://trello.com/c/wH97h64t/44-get-date-from-exif-data-for-local-photos
 import { compareDates } from '~/Helpers/DateFunctions/DateFunctions';
 
-import { PhotoGalleryType } from './Photos';
-import { PhotosState } from './Photos';
+import { PhotoGalleryType, PhotosLocalType, PhotosServerType } from './Photos';
 
-export function mergePhotos(photosState: PhotosState): PhotoGalleryType[] {
+export function mergePhotos(photosState: {
+  photosServer: PhotosServerType;
+  photosServerIdsOrdered: string[];
+  photosLocal: PhotosLocalType;
+  photosLocalIdsOrdered: string[];
+}): PhotoGalleryType[] {
   const { photosLocal, photosLocalIdsOrdered, photosServer, photosServerIdsOrdered } =
     photosState;
 

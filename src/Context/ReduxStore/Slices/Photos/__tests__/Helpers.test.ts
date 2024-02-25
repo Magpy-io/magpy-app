@@ -48,5 +48,3 @@ describe('Tests for insertPhotoKeyWithOrder function', () => {
     expect(photosLocalIdsOrdered).toEqual([photos[0].id, photos[2].id, photos[1].id]);
   });
 });
-
-describe('Tests for mergePhotos function', () => {});
