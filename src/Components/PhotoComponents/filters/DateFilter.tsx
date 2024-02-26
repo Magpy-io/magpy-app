@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View } from 'react-native';
 
 import { Text } from 'react-native-elements';
@@ -6,13 +6,15 @@ import { Text } from 'react-native-elements';
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { getLastYear, getThisYear, getYearDateRange } from '~/Helpers/Date';
 import { useStyles } from '~/Hooks/useStyles';
+import { spacing } from '~/Styles/spacing';
 
+import DateFilterInput from './DateFilterInput';
 import Element from './Element';
 import { Filter, FilterNameType, FilterObjectType } from './Filter';
 import { makeFilterStyles } from './FilterStyle';
 
 export type DateFilterName = 'Date';
-export type DateFilterLabel = 'thisYear' | 'lastYear';
+export type DateFilterLabel = 'thisYear' | 'lastYear' | 'custom';
 export type DateFilterParams = { fromDate: string; toDate: string; label?: DateFilterLabel };
 export type DateFilterObjectType = { type: DateFilterName; params: DateFilterParams };
 
@@ -62,8 +64,14 @@ export default function DateFilterComponent({
   removeFilter,
 }: DateProps) {
   const styles = useStyles(makeFilterStyles);
+  const thisYearDateRange = getYearDateRange(getThisYear());
+  const lastYearDateRange = getYearDateRange(getLastYear());
+  const [customDateStart, setCustomDateStart] = useState(
+    new Date(thisYearDateRange.dateStart),
+  );
+  const [customDateEnd, setCustomDateEnd] = useState(new Date(thisYearDateRange.dateEnd));
 
-  const addFilter = (fromDate: string, toDate: string, label?: DateFilterLabel) => {
+  const addOrEditDateFilter = (fromDate: string, toDate: string, label?: DateFilterLabel) => {
     addOrEditFilter({
       type: 'Date',
       params: { fromDate: fromDate, toDate: toDate, label: label },
@@ -74,8 +82,11 @@ export default function DateFilterComponent({
     removeFilter('Date');
   };
 
-  const thisYearDateRange = getYearDateRange(getThisYear());
-  const lastYearDateRange = getYearDateRange(getLastYear());
+  const isCustom = filter?.params?.label === 'custom';
+
+  const editCustomDateFilter = (startDate: Date, endDate: Date) => {
+    addOrEditDateFilter(startDate.toISOString(), endDate.toISOString(), 'custom');
+  };
 
   return (
     <View style={styles.section}>
@@ -90,16 +101,40 @@ export default function DateFilterComponent({
           title="This year"
           selected={filter?.params?.label === 'thisYear'}
           onPress={() => {
-            addFilter(thisYearDateRange.dateStart, thisYearDateRange.dateEnd, 'thisYear');
+            addOrEditDateFilter(
+              thisYearDateRange.dateStart,
+              thisYearDateRange.dateEnd,
+              'thisYear',
+            );
           }}
         />
         <Element
           title="Last year"
           selected={filter?.params?.label === 'lastYear'}
           onPress={() => {
-            addFilter(lastYearDateRange.dateStart, lastYearDateRange.dateEnd, 'lastYear');
+            addOrEditDateFilter(
+              lastYearDateRange.dateStart,
+              lastYearDateRange.dateEnd,
+              'lastYear',
+            );
           }}
         />
+        <View style={{ gap: spacing.spacing_xs, alignItems: 'flex-start' }}>
+          <Element
+            title="Custom"
+            selected={isCustom}
+            onPress={() => editCustomDateFilter(customDateStart, customDateEnd)}
+          />
+          {isCustom && (
+            <DateFilterInput
+              dateStart={customDateStart}
+              dateEnd={customDateEnd}
+              setDateStart={setCustomDateStart}
+              setDateEnd={setCustomDateEnd}
+              onChange={editCustomDateFilter}
+            />
+          )}
+        </View>
       </View>
     </View>
   );
