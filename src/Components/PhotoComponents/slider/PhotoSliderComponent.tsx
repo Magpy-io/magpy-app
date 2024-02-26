@@ -8,10 +8,6 @@ import PhotoComponentForSlider from './PhotoComponentForSlider';
 
 const ITEM_WIDTH = Dimensions.get('window').width;
 
-function keyExtractor(item: PhotoGalleryType) {
-  return `Photo_${item.key}`;
-}
-
 function getItemLayout(data: ArrayLike<PhotoGalleryType> | null | undefined, index: number) {
   return {
     length: ITEM_WIDTH,
@@ -101,7 +97,6 @@ export default React.forwardRef(function PhotoSliderComponent(
       decelerationRate={'normal'}
       showsHorizontalScrollIndicator={false}
       snapToInterval={ITEM_WIDTH}
-      keyExtractor={keyExtractor}
       onEndReachedThreshold={5}
       getItemLayout={getItemLayout}
     />
