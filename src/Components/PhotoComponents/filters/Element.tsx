@@ -32,14 +32,14 @@ const makeStyles = (colors: colorsType) =>
     elementView: {
       paddingVertical: spacing.spacing_s,
       paddingHorizontal: spacing.spacing_l,
-      backgroundColor: colors.BACKGROUND_LIGHT,
+      backgroundColor: colors.FILTER_ELEMENT,
       borderRadius: borderRadius.small,
     },
     elementTitle: {
       ...typography(colors).mediumTextBold,
     },
     selectedElementView: {
-      backgroundColor: colors.PRIMARY,
+      backgroundColor: colors.BACKGROUND_INVERSE,
     },
     selectedElementTitle: {
       color: colors.TEXT_INVERSE,
