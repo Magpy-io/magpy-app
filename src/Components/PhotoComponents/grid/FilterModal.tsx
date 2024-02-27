@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { produce } from 'immer';
@@ -9,6 +9,7 @@ import { PrimaryButton } from '~/Components/CommonComponents/Buttons';
 import { CloseIcon } from '~/Components/CommonComponents/Icons';
 import { addFilters } from '~/Context/ReduxStore/Slices/GalleryFilters/GalleryFilters';
 import { FiltersSelector } from '~/Context/ReduxStore/Slices/GalleryFilters/Selectors';
+import { photosGallerySelector } from '~/Context/ReduxStore/Slices/Photos/Selectors';
 import { useAppDispatch, useAppSelector } from '~/Context/ReduxStore/Store';
 import useEffectOnChange from '~/Hooks/useEffectOnChange';
 import { useStyles } from '~/Hooks/useStyles';
@@ -20,6 +21,7 @@ import DateFilterComponent, { DateFilterObjectType } from '../filters/DateFilter
 import { FilterNameType, FilterObjectType } from '../filters/Filter';
 import { StatusFilterComponent, StatusFilterObjectType } from '../filters/StatusFilter';
 import { TypeFilterComponent, TypeFilterObjectType } from '../filters/TypeFilter';
+import { filterPhotos } from '../filters/functions';
 
 type FilterModalProps = {
   visible: boolean;
@@ -30,6 +32,7 @@ export default function FilterModal({ visible, onRequestClose }: FilterModalProp
   const styles = useStyles(makeStyles);
   const [filters, setFilters] = useState<FilterObjectType[]>([]);
 
+  const photos = useAppSelector(photosGallerySelector);
   const { filters: storeFilters } = useAppSelector(FiltersSelector);
   const dispatch = useAppDispatch();
 
@@ -77,6 +80,9 @@ export default function FilterModal({ visible, onRequestClose }: FilterModalProp
     );
   }, []);
 
+  const filteredPhotos = useMemo(() => filterPhotos(photos, filters), [filters, photos]);
+  const filteredPhotosNumber = filteredPhotos.length;
+
   return (
     <BottomModal modalVisible={visible} onRequestClose={onRequestClose}>
       <View style={styles.viewStyle}>
@@ -96,16 +102,22 @@ export default function FilterModal({ visible, onRequestClose }: FilterModalProp
           addOrEditFilter={addOrEditFilter}
           removeFilter={removeFilter}
         />
-        <Submit onSubmit={onSubmit} />
+        <Submit onSubmit={onSubmit} filteredPhotosNumber={filteredPhotosNumber} />
       </View>
     </BottomModal>
   );
 }
 
-function Submit({ onSubmit }: { onSubmit: () => void }) {
+function Submit({
+  onSubmit,
+  filteredPhotosNumber,
+}: {
+  onSubmit: () => void;
+  filteredPhotosNumber: number;
+}) {
   return (
     <PrimaryButton
-      title={'Show items'}
+      title={`Show ${filteredPhotosNumber} items`}
       containerStyle={{ alignSelf: 'flex-end' }}
       onPress={onSubmit}
     />
