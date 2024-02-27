@@ -30,7 +30,7 @@ export default function Element({ title, selected, onPress }: ElementProps) {
 const makeStyles = (colors: colorsType) =>
   StyleSheet.create({
     elementView: {
-      paddingVertical: spacing.spacing_s,
+      paddingVertical: spacing.spacing_xs,
       paddingHorizontal: spacing.spacing_l,
       backgroundColor: colors.FILTER_ELEMENT,
       borderRadius: borderRadius.small,

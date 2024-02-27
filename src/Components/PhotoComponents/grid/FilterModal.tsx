@@ -118,7 +118,7 @@ function Submit({
   return (
     <PrimaryButton
       title={`Show ${filteredPhotosNumber} items`}
-      containerStyle={{ alignSelf: 'flex-end' }}
+      containerStyle={{ alignSelf: 'flex-end', marginTop: spacing.spacing_xl }}
       onPress={onSubmit}
     />
   );

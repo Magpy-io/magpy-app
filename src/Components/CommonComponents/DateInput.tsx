@@ -52,7 +52,7 @@ const makeStyles = (colors: colorsType) =>
       ...typography(colors).mediumText,
     },
     inputContainer: {
-      paddingVertical: spacing.spacing_s,
+      paddingVertical: spacing.spacing_xs,
       paddingHorizontal: spacing.spacing_l,
       borderColor: colors.FORM_BORDER,
       borderRadius: borderRadius.small,
