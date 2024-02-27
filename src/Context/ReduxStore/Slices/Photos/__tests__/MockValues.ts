@@ -14,23 +14,24 @@ const defaultDate = '2024-02-03T12:30:00.000Z';
 export function makeGalleryPhoto(options?: {
   date?: string;
   mediaId?: string;
+  serverId?: string;
 }): PhotoGalleryType {
   return {
     key: options?.mediaId ?? 'mediaId',
     date: options?.date ?? defaultDate,
     mediaId: options?.mediaId ?? 'mediaId',
-    serverId: undefined,
+    serverId: options?.serverId,
   };
 }
 
 export function makeNGalleryPhotos(
   numberPhotos: number,
-  options?: { mediaId?: string; differentDates?: boolean },
+  options?: { mediaId?: string; differentDates?: boolean; startingDate?: string },
 ): PhotoGalleryType[] {
   const photos = new Array(numberPhotos).fill(undefined);
 
   return photos.map((_, index) => {
-    const newDate = new Date(defaultDate);
+    const newDate = new Date(options?.startingDate ?? defaultDate);
 
     if (options?.differentDates) {
       newDate.setDate(newDate.getDate() - index);
@@ -59,12 +60,12 @@ export function makeLocalPhoto(options?: { date?: string; mediaId?: string }): P
 
 export function makeNLocalPhotos(
   numberPhotos: number,
-  options?: { mediaId?: string; differentDates?: boolean },
+  options?: { mediaId?: string; differentDates?: boolean; startingDate?: string },
 ): PhotoLocalType[] {
   const photos = new Array(numberPhotos).fill(undefined);
 
   return photos.map((_, index) => {
-    const newDate = new Date(defaultDate);
+    const newDate = new Date(options?.startingDate ?? defaultDate);
     if (options?.differentDates) {
       newDate.setDate(newDate.getDate() - index);
     }
@@ -104,12 +105,12 @@ export function makeServerPhoto(options?: {
 
 export function makeNServerPhotos(
   numberPhotos: number,
-  options?: { serverId?: string; differentDates?: boolean },
+  options?: { serverId?: string; differentDates?: boolean; startingDate?: string },
 ): PhotoServerType[] {
   const photos = new Array(numberPhotos).fill(undefined);
 
   return photos.map((_, index) => {
-    const newDate = new Date(defaultDate);
+    const newDate = new Date(options?.startingDate ?? defaultDate);
     if (options?.differentDates) {
       newDate.setDate(newDate.getDate() - index);
     }

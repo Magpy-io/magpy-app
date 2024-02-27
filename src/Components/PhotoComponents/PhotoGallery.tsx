@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -9,8 +9,8 @@ import { useAppSelector } from '~/Context/ReduxStore/Store';
 import { useStyles } from '~/Hooks/useStyles';
 import { colorsType } from '~/Styles/colors';
 
+import { filterPhotos } from './filters/functions';
 import { PhotoGridComponentRefType } from './grid/PhotoGridComponent';
-import { FilterFactory } from './filters/FilterFactory';
 import PhotoGridController from './grid/PhotoGridController';
 import { PhotoSliderComponentRefType } from './slider/PhotoSliderComponent';
 import PhotoSliderController from './slider/PhotoSliderController';
@@ -29,15 +29,10 @@ export default function PhotoGallery({ photos, ...props }: PhotoGalleryPropsType
   const gridRef = useRef<PhotoGridComponentRefType>(null);
   const sliderRef = useRef<PhotoSliderComponentRefType>(null);
 
-  }, [photos, storeFilters]);
-    return newPhotos;
-    });
-      newPhotos = filter.filter(newPhotos);
-      const filter = Factory.createFilter(f);
-    storeFilters.forEach(f => {
-    let newPhotos = [...photos];
-    const Factory = new FilterFactory();
   const filteredPhotos = useMemo(() => {
+    return filterPhotos(photos, storeFilters);
+  }, [photos, storeFilters]);
+
   const [isSlidingPhotos, setIsSlidingPhotos] = useState(false);
 
   const onSwitchMode = useCallback((isSlidingPhotos: boolean, index: number) => {

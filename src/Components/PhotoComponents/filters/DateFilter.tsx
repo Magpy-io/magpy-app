@@ -4,7 +4,11 @@ import { View } from 'react-native';
 import { Text } from 'react-native-elements';
 
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
-import { getLastYear, getThisYear, getYearDateRange } from '~/Helpers/Date';
+import {
+  getLastYear,
+  getThisYear,
+  getYearDateRange,
+} from '~/Helpers/DateFunctions/DateFunctions';
 import { useStyles } from '~/Hooks/useStyles';
 import { spacing } from '~/Styles/spacing';
 

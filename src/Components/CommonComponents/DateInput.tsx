@@ -5,7 +5,7 @@ import { StyleSheet, TouchableOpacity } from 'react-native';
 import DatePicker from 'react-native-date-picker';
 import { Text } from 'react-native-elements';
 
-import { formatDate } from '~/Helpers/Date';
+import { formatDate } from '~/Helpers/DateFunctions/DateFormatting';
 import { useStyles } from '~/Hooks/useStyles';
 import { colorsType } from '~/Styles/colors';
 import { borderRadius, spacing } from '~/Styles/spacing';

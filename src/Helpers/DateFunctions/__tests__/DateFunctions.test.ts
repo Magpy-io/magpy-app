@@ -1,4 +1,11 @@
-import { compareDates, makeUTCDateFrom, splitUTCDateComponents } from '../DateFunctions';
+import {
+  compareDates,
+  getLastYear,
+  getThisYear,
+  getYearDateRange,
+  makeUTCDateFrom,
+  splitUTCDateComponents,
+} from '../DateFunctions';
 
 describe('Tests for splitDateComponents function ', () => {
   const test1Date = '2023-06-22T16:43:51.880Z';
@@ -78,4 +85,25 @@ describe('Tests for compareDates function', () => {
       expect(r).toBeLessThan(0);
     },
   );
+});
+
+describe('Tests for getThisYear & getLastYear functions', () => {
+  it('Should return current year', () => {
+    const r = getThisYear();
+    expect(r).toBe(2024);
+  });
+
+  it('Should return last year', () => {
+    const r = getLastYear();
+    expect(r).toBe(2023);
+  });
+});
+
+describe('Tests for getYearDateRange function', () => {
+  it('Should return two dates : January 1st and December 31 of the year', () => {
+    const year = 2023;
+    const { dateStart, dateEnd } = getYearDateRange(year);
+    expect(dateStart).toBe('2023-01-01T00:00:00.000Z');
+    expect(dateEnd).toBe('2023-12-31T00:00:00.000Z');
+  });
 });
