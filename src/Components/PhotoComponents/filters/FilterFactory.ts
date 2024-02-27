@@ -12,6 +12,8 @@ export class FilterFactory {
         return new StatusFilter(filter.params);
       case 'Date':
         return new DateFilter(filter.params);
+      default:
+        throw new Error('FilterFactory: in createFilter, type not found');
     }
   }
 }
