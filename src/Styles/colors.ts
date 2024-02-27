@@ -1,94 +1,134 @@
 const colors = {
-  CYAN: '#2CA7AF',
-  BLUE: '#1B8699',
-  DARK: '#020D17',
-  LESS_DARK: '#121A22',
-  LIGHT_GREEN: '#454C53',
-  WHITE: 'white',
-  LIGHT_GREY: '#F5F5F6',
-  SOFT_GREY: '#E8E8E8',
   TRANSPARENT: `rgba(0,0,0,0)`,
-  COLOR_SUCCESS_500: '#5aa97e',
-  COLOR_SUCCESS_400: '#acd3be',
-  COLOR_SUCCESS_300: '#d5e8de',
-  COLOR_SUCCESS_200: '#e9f3ee',
-  COLOR_SUCCESS_100: '#f3f8f6',
-  COLOR_ERROR_100: '#fbf3f2',
-  COLOR_ERROR_200: '#f8e9e6',
-  COLOR_ERROR_300: '#f2d5cf',
-  COLOR_ERROR_400: '#e7aca0',
-  COLOR_ERROR_500: '#d15b43',
-  COLOR_WARNING_100: '#FFF9E5',
-  COLOR_WARNING_200: '#FFF4CC',
-  COLOR_WARNING_300: '#FFEA99',
-  COLOR_WARNING_400: '#FFE066',
-  COLOR_WARNING_500: '#E5B700',
-  GREY: '#C8C8C8',
-  DARKER_GREY: '#9B9B9B',
+  WHITE: 'white',
+  MAGPY_500: '#2CA7AF',
+  MAGPY_600: '#1B8699',
+  GREY_800: '#020D17',
+  GREY_700: '#121A22',
+  GREY_600: '#1a242e',
+  GREY_500: '#454C53',
+  GREY_400: '#9B9B9B',
+  GREY_300: '#C8C8C8',
+  GREY_200: '#E8E8E8',
+  GREY_100: '#F5F5F6',
+  SUCCESS_500: '#5aa97e',
+  SUCCESS_400: '#acd3be',
+  SUCCESS_300: '#d5e8de',
+  SUCCESS_200: '#e9f3ee',
+  SUCCESS_100: '#f3f8f6',
+  ERROR_100: '#fbf3f2',
+  ERROR_200: '#f8e9e6',
+  ERROR_300: '#f2d5cf',
+  ERROR_400: '#e7aca0',
+  ERROR_500: '#d15b43',
+  WARNING_100: '#FFF9E5',
+  WARNING_200: '#FFF4CC',
+  WARNING_300: '#FFEA99',
+  WARNING_400: '#FFE066',
+  WARNING_500: '#E5B700',
 };
 
 export type colorsType = {
+  // Background
   BACKGROUND_LIGHT: string;
+  BACKGROUND_INVERSE: string;
   BACKGROUND: string;
+  MODAL_BACKGROUND: string;
+
+  // Text
   TEXT: string;
   TEXT_LIGHT: string;
   TEXT_INVERSE: string;
+
+  // App colors
   PRIMARY: string;
   SECONDARY: string;
   ACCENT: string;
+
+  // Specific
   FORM_BORDER: string;
-  UNDERLAY: string;
+  SELECT_PHOTO: string;
   OUTLINE_BORDER: string;
-  TRANSPARENT: string;
-  SELECT: string;
+  FILTER_ELEMENT: string;
+
+  //Status
   SUCCESS: string;
   ERROR: string;
   WARNING: string;
-  MODAL_BACKGROUND: string;
+
+  //Misc
+  UNDERLAY: string;
+  TRANSPARENT: string;
 };
 
-export const LightTheme = {
+export const LightTheme: { dark: boolean; colors: colorsType } = {
   dark: false,
   colors: {
-    BACKGROUND_LIGHT: colors.LIGHT_GREY,
+    // Background
     BACKGROUND: colors.WHITE,
-    TEXT: colors.DARK,
-    TEXT_LIGHT: colors.LIGHT_GREEN,
-    TEXT_INVERSE: colors.WHITE,
-    PRIMARY: colors.DARK,
-    SECONDARY: colors.BLUE,
-    ACCENT: colors.CYAN,
-    FORM_BORDER: colors.LIGHT_GREEN,
-    UNDERLAY: colors.LIGHT_GREY,
-    OUTLINE_BORDER: colors.SOFT_GREY,
-    TRANSPARENT: colors.TRANSPARENT,
-    SELECT: colors.WHITE,
-    SUCCESS: colors.COLOR_SUCCESS_500,
-    ERROR: colors.COLOR_ERROR_500,
-    WARNING: colors.COLOR_WARNING_500,
+    BACKGROUND_INVERSE: colors.GREY_800,
+    BACKGROUND_LIGHT: colors.GREY_100,
     MODAL_BACKGROUND: colors.WHITE,
+
+    // Text
+    TEXT: colors.GREY_800,
+    TEXT_LIGHT: colors.GREY_500,
+    TEXT_INVERSE: colors.WHITE,
+
+    // App colors
+    PRIMARY: colors.GREY_800,
+    SECONDARY: colors.MAGPY_600,
+    ACCENT: colors.MAGPY_500,
+
+    // Specific
+    FORM_BORDER: colors.GREY_500,
+    OUTLINE_BORDER: colors.GREY_200,
+    SELECT_PHOTO: colors.WHITE,
+    FILTER_ELEMENT: colors.GREY_100,
+
+    // Status
+    SUCCESS: colors.SUCCESS_500,
+    ERROR: colors.ERROR_500,
+    WARNING: colors.WARNING_500,
+
+    // Misc
+    UNDERLAY: colors.GREY_100,
+    TRANSPARENT: colors.TRANSPARENT,
   },
 };
 
-export const DarkTheme = {
+export const DarkTheme: { dark: boolean; colors: colorsType } = {
   dark: true,
   colors: {
-    BACKGROUND_LIGHT: colors.LESS_DARK,
-    BACKGROUND: colors.DARK,
-    TEXT: colors.GREY,
-    TEXT_LIGHT: colors.DARKER_GREY,
-    TEXT_INVERSE: colors.DARK,
-    PRIMARY: colors.CYAN,
-    SECONDARY: colors.CYAN,
-    ACCENT: colors.BLUE,
-    FORM_BORDER: colors.LIGHT_GREEN,
-    UNDERLAY: colors.LESS_DARK,
-    OUTLINE_BORDER: colors.LESS_DARK,
+    // Background
+    BACKGROUND: colors.GREY_800,
+    BACKGROUND_INVERSE: colors.GREY_300,
+    BACKGROUND_LIGHT: colors.GREY_700,
+    MODAL_BACKGROUND: colors.GREY_700,
+
+    // Text
+    TEXT: colors.GREY_300,
+    TEXT_LIGHT: colors.GREY_400,
+    TEXT_INVERSE: colors.GREY_800,
+
+    // App colors
+    PRIMARY: colors.MAGPY_500,
+    SECONDARY: colors.MAGPY_500,
+    ACCENT: colors.MAGPY_500,
+
+    // Specific
+    FORM_BORDER: colors.GREY_500,
+    OUTLINE_BORDER: colors.GREY_700,
+    SELECT_PHOTO: colors.WHITE,
+    FILTER_ELEMENT: colors.GREY_600,
+
+    // Status
+    SUCCESS: colors.SUCCESS_500,
+    ERROR: colors.ERROR_500,
+    WARNING: colors.WARNING_400,
+
+    // Misc
     TRANSPARENT: colors.TRANSPARENT,
-    SELECT: colors.WHITE,
-    SUCCESS: colors.COLOR_SUCCESS_500,
-    ERROR: colors.COLOR_ERROR_500,
-    WARNING: colors.COLOR_WARNING_400,
-    MODAL_BACKGROUND: colors.LESS_DARK,
+    UNDERLAY: colors.GREY_700,
   },
 };

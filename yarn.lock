@@ -3355,6 +3355,7 @@ __metadata:
     prettier: "npm:^3.2.4"
     react: "npm:18.2.0"
     react-native: "npm:0.73.2"
+    react-native-date-picker: "npm:^4.3.6"
     react-native-delete-media: "npm:^1.0.7"
     react-native-elements: "npm:^3.4.3"
     react-native-fast-image: "npm:^8.6.3"
@@ -9441,6 +9442,16 @@ __metadata:
   version: 17.0.2
   resolution: "react-is@npm:17.0.2"
   checksum: 2bdb6b93fbb1820b024b496042cce405c57e2f85e777c9aabd55f9b26d145408f9f74f5934676ffdc46f3dcff656d78413a6e43968e7b3f92eea35b3052e9053
+  languageName: node
+  linkType: hard
+
+"react-native-date-picker@npm:^4.3.6":
+  version: 4.3.6
+  resolution: "react-native-date-picker@npm:4.3.6"
+  peerDependencies:
+    react: ">= 17.0.1"
+    react-native: ">= 0.64.3"
+  checksum: 4c48e1c6ac3120a449146b580ae4520ef5578792a906d8cb61a48091d5f8027909a8d821da6a46c0dd1c0adb6bbe3d94d436c5dd47c76201a8cad468ff5097bf
   languageName: node
   linkType: hard
 

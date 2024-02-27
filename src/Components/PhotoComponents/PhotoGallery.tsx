@@ -3,11 +3,14 @@ import { StyleSheet, View } from 'react-native';
 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { FiltersSelector } from '~/Context/ReduxStore/Slices/GalleryFilters/Selectors';
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
+import { useAppSelector } from '~/Context/ReduxStore/Store';
 import { useStyles } from '~/Hooks/useStyles';
 import { colorsType } from '~/Styles/colors';
 
 import { PhotoGridComponentRefType } from './grid/PhotoGridComponent';
+import { FilterFactory } from './filters/FilterFactory';
 import PhotoGridController from './grid/PhotoGridController';
 import { PhotoSliderComponentRefType } from './slider/PhotoSliderComponent';
 import PhotoSliderController from './slider/PhotoSliderController';
@@ -20,11 +23,21 @@ type PhotoGalleryPropsType = {
   isInTabScreen?: boolean;
 };
 
-export default function PhotoGallery(props: PhotoGalleryPropsType) {
+export default function PhotoGallery({ photos, ...props }: PhotoGalleryPropsType) {
   const styles = useStyles(makeStyles);
+  const { filters: storeFilters } = useAppSelector(FiltersSelector);
   const gridRef = useRef<PhotoGridComponentRefType>(null);
   const sliderRef = useRef<PhotoSliderComponentRefType>(null);
 
+  }, [photos, storeFilters]);
+    return newPhotos;
+    });
+      newPhotos = filter.filter(newPhotos);
+      const filter = Factory.createFilter(f);
+    storeFilters.forEach(f => {
+    let newPhotos = [...photos];
+    const Factory = new FilterFactory();
+  const filteredPhotos = useMemo(() => {
   const [isSlidingPhotos, setIsSlidingPhotos] = useState(false);
 
   const onSwitchMode = useCallback((isSlidingPhotos: boolean, index: number) => {
@@ -54,7 +67,7 @@ export default function PhotoGallery(props: PhotoGalleryPropsType) {
           title={props.title}
           showBackButton={props.showBackButton}
           onPressBack={props.onPressBack}
-          photos={props.photos}
+          photos={filteredPhotos}
           isSlidingPhotos={isSlidingPhotos}
           onSwitchMode={onSwitchMode}
           isInTabScreen={props.isInTabScreen}
@@ -67,8 +80,8 @@ export default function PhotoGallery(props: PhotoGalleryPropsType) {
           { paddingBottom: insets.bottom },
         ]}>
         <PhotoSliderController
+          photos={filteredPhotos}
           ref={sliderRef}
-          photos={props.photos}
           isSlidingPhotos={isSlidingPhotos}
           onSwitchMode={onSwitchMode}
         />

@@ -14,14 +14,14 @@ function SelectionIconForGrid({ isSelected }: { isSelected: boolean }) {
           style={styles.iconStyle}
           name="check-circle"
           size={SELECT_SIZE}
-          color={colors.SELECT}
+          color={colors.SELECT_PHOTO}
         />
       ) : (
         <Icon
           style={styles.iconStyle}
           name="radio-button-unchecked"
           size={SELECT_SIZE}
-          color={colors.SELECT}
+          color={colors.SELECT_PHOTO}
         />
       )}
     </View>
