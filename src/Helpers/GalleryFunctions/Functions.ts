@@ -42,9 +42,11 @@ export async function getFirstPossibleFileName(imageName: string) {
   return currentPathSplit.pop() as string;
 }
 
-export async function addPhotoToDevice<
-  T extends { fileName: string; id: string; image64: string },
->(photo: T): Promise<PhotoLocalType> {
+export async function addPhotoToDevice(photo: {
+  fileName: string;
+  id: string;
+  image64: string;
+}): Promise<PhotoLocalType> {
   const imageName = await getFirstPossibleFileName(photo.fileName);
 
   const cachePhotoPath = RNFS.ExternalCachesDirectoryPath + `/${imageName}`;

@@ -1,4 +1,8 @@
-import { formatYear, makeDateFrom, splitDateComponents } from '~/Helpers/Date';
+import { formatYear } from '~/Helpers/DateFunctions/DateFormatting';
+import {
+  makeUTCDateFrom,
+  splitUTCDateComponents,
+} from '~/Helpers/DateFunctions/DateFunctions';
 
 import { SectionDate, SectionDateType } from './SectionDate';
 
@@ -8,17 +12,17 @@ export class SectionDateYear implements SectionDate {
 
   constructor(date: string) {
     this.type = 'Year';
-    const { year } = splitDateComponents(date);
+    const { year } = splitUTCDateComponents(date);
     this.year = year;
   }
 
   includesDate(date: string) {
-    const { year } = splitDateComponents(date);
+    const { year } = splitUTCDateComponents(date);
     return this.year == year;
   }
 
   getTitle() {
-    const date = makeDateFrom({ year: this.year });
+    const date = makeUTCDateFrom({ year: this.year });
     return formatYear(date);
   }
 }

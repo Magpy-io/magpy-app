@@ -14,7 +14,7 @@ import {
 } from '~/Components/CommonComponents/Icons';
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { useTheme } from '~/Context/ThemeContext';
-import { formatDate } from '~/Helpers/Date';
+import { formatDate } from '~/Helpers/DateFunctions/DateFormatting';
 import { useStyles } from '~/Hooks/useStyles';
 import { colorsType } from '~/Styles/colors';
 import { typography } from '~/Styles/typography';

@@ -1,13 +1,10 @@
 import React, { ReactNode, createContext, useContext } from 'react';
 
-import { AuthDataType, useAuthData } from './ContextSlices/AuthContext';
-import {
-  LocalServersDataType,
-  useLocalServersData,
-} from './ContextSlices/LocalServersContext';
-import PhotosDownloadingProvider from './ContextSlices/PhotosDownloadingContext/PhotosDownloadingContext';
-import { ServerClaimDataType, useServerClaimData } from './ContextSlices/ServerClaimContext';
-import { ServerDataType, useServerData } from './ContextSlices/ServerContext';
+import { AuthDataType, useAuthData } from './Contexts/AuthContext';
+import { LocalServersDataType, useLocalServersData } from './Contexts/LocalServersContext';
+import PhotosDownloadingProvider from './Contexts/PhotosDownloadingContext/PhotosDownloadingContext';
+import { ServerClaimDataType, useServerClaimData } from './Contexts/ServerClaimContext';
+import { ServerDataType, useServerData } from './Contexts/ServerContext';
 
 export type PhotosContextType = {
   serverClaimData: ServerClaimDataType;

@@ -66,25 +66,19 @@ const photosServerSlice = createSlice({
   initialState,
   reducers: {
     setPhotosServer: (state, action: { payload: PhotoServerType[] }) => {
-      state.photosServer = action.payload.reduce(
-        (accumulator: { [key: string]: PhotoServerType }, photo) => {
-          accumulator[photo.id] = photo;
-          return accumulator;
-        },
-        {},
-      );
+      state.photosServer = action.payload.reduce((accumulator: PhotosServerType, photo) => {
+        accumulator[photo.id] = photo;
+        return accumulator;
+      }, {});
       state.photosServerIdsOrdered = action.payload.map(photo => photo.id);
       state.photosGallery = mergePhotos(state);
     },
 
     setPhotosLocal: (state, action: { payload: PhotoLocalType[] }) => {
-      state.photosLocal = action.payload.reduce(
-        (accumulator: { [key: string]: PhotoLocalType }, photo) => {
-          accumulator[photo.id] = photo;
-          return accumulator;
-        },
-        {},
-      );
+      state.photosLocal = action.payload.reduce((accumulator: PhotosLocalType, photo) => {
+        accumulator[photo.id] = photo;
+        return accumulator;
+      }, {});
       state.photosLocalIdsOrdered = action.payload.map(photo => photo.id);
       state.photosGallery = mergePhotos(state);
     },
@@ -114,6 +108,7 @@ const photosServerSlice = createSlice({
       );
 
       const galleryPhoto = state.photosGallery.find(p => p.mediaId == action.payload.mediaId);
+
       if (galleryPhoto) {
         galleryPhoto.serverId = action.payload.photoServer.id;
       }
@@ -134,6 +129,7 @@ const photosServerSlice = createSlice({
       const galleryPhoto = state.photosGallery.find(
         p => p.serverId == action.payload.serverId,
       );
+
       if (galleryPhoto) {
         galleryPhoto.mediaId = action.payload.photoLocal.id;
       }

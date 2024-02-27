@@ -21,10 +21,6 @@ import { KeysSelection } from './useKeysSelection';
 import { getGridNumberOfColumns } from './usePhotosGrouped/Helpers';
 import { SectionTypePhotoGrid, usePhotosGrouped } from './usePhotosGrouped/usePhotosGrouped';
 
-function keyExtractor(item: PhotoGalleryType) {
-  return `grid_${item.key}`;
-}
-
 export type PhotoGridComponentRefType = {
   scrollToIndex: (params: { index: number; animated?: boolean }) => void;
 };
@@ -128,7 +124,6 @@ export default forwardRef(function PhotoGridComponent(
         sections={sections}
         renderItem={renderItem}
         renderSectionHeader={renderSectionHeader}
-        keyExtractor={keyExtractor}
         numberColumns={numberOfColumns}
         itemSpacing={SPACE_BETWEEN_PHOTOS}
         sectionHeaderHeight={SECTION_HEADER_HEIGHT}

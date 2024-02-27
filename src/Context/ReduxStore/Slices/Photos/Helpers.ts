@@ -1,9 +1,15 @@
 // The same photo can have different dates in photosLocal and photosServer
 // See https://trello.com/c/wH97h64t/44-get-date-from-exif-data-for-local-photos
-import { PhotoGalleryType } from './Photos';
-import { PhotosState } from './Photos';
+import { compareDates } from '~/Helpers/DateFunctions/DateFunctions';
 
-export function mergePhotos(photosState: PhotosState): PhotoGalleryType[] {
+import { PhotoGalleryType, PhotosLocalType, PhotosServerType } from './Photos';
+
+export function mergePhotos(photosState: {
+  photosServer: PhotosServerType;
+  photosServerIdsOrdered: string[];
+  photosLocal: PhotosLocalType;
+  photosLocalIdsOrdered: string[];
+}): PhotoGalleryType[] {
   const { photosLocal, photosLocalIdsOrdered, photosServer, photosServerIdsOrdered } =
     photosState;
 
@@ -69,31 +75,10 @@ export function mergePhotos(photosState: PhotosState): PhotoGalleryType[] {
   return galleryPhotos;
 }
 
-export function compareDates(date1: string, date2: string) {
-  const d1 = Date.parse(date1);
-  const d2 = Date.parse(date2);
-
-  if (!d2) {
-    return 1;
-  }
-
-  if (!d1) {
-    return -1;
-  }
-
-  if (d1 > d2) {
-    return 1;
-  } else if (d1 < d2) {
-    return -1;
-  } else {
-    return 0;
-  }
-}
-
-export function insertPhotoKeyWithOrder<T extends { id: string; date: string }>(
-  photos: { [key: string]: T },
+export function insertPhotoKeyWithOrder(
+  photos: { [key: string]: { id: string; date: string } },
   photosIdsOrdered: string[],
-  photo: T,
+  photo: { id: string; date: string },
 ) {
   const insertIndex = photosIdsOrdered.findIndex(
     p => compareDates(photos[p].date, photo.date) <= 0,

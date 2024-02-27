@@ -1,6 +1,6 @@
 import { useCallback, useRef } from 'react';
 
-import { Server, zeroconf } from '~/Context/ContextSlices/LocalServersContext';
+import { Server, zeroconf } from '~/Context/Contexts/LocalServersContext';
 import { useMainContext } from '~/Context/MainContextProvider';
 
 export function useLocalServersFunctions() {

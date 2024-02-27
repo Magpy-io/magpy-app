@@ -21,11 +21,14 @@ export type SectionListWithColumnsRefType = {
   }) => void;
 };
 
-type SectionListWithColumnsProps<ItemType, SectionData> = {
+function rowKeyExtractor<ItemType extends { key: string }>(item: RowType<ItemType>) {
+  return item[0].key;
+}
+
+type SectionListWithColumnsProps<ItemType extends { key: string }, SectionData> = {
   sections: SectionType<ItemType, SectionData>[];
   numberColumns: number;
   renderItem: ({ item }: { item: ItemType }) => React.ReactElement | null;
-  keyExtractor: (item: ItemType) => string;
   renderSectionHeader: (info: {
     section: SectionType<ItemType, SectionData>;
   }) => React.JSX.Element;
@@ -36,11 +39,10 @@ type SectionListWithColumnsProps<ItemType, SectionData> = {
   mref: React.MutableRefObject<SectionListWithColumnsRefType | null>;
 };
 
-function SectionListWithColumns<ItemType, SectionData>({
+function SectionListWithColumns<ItemType extends { key: string }, SectionData>({
   sections,
   renderItem,
   renderSectionHeader,
-  keyExtractor,
   numberColumns,
   itemSpacing = 0,
   onRefresh,
@@ -93,7 +95,7 @@ function SectionListWithColumns<ItemType, SectionData>({
             return (
               <View
                 style={[{ width: itemSize, height: itemSize }, { marginLeft: marginLeft }]}
-                key={keyExtractor(rowItem)}>
+                key={rowItem.key}>
                 {renderItem({ item: rowItem })}
               </View>
             );
@@ -101,14 +103,7 @@ function SectionListWithColumns<ItemType, SectionData>({
         </View>
       );
     },
-    [itemSize, keyExtractor, renderItem, itemSpacing],
-  );
-
-  const rowKeyExtractor = useCallback(
-    (item: RowType<ItemType>) => {
-      return keyExtractor(item[0]);
-    },
-    [keyExtractor],
+    [itemSize, renderItem, itemSpacing],
   );
 
   const getItemLayout: (
