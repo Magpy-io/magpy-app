@@ -17,6 +17,7 @@ import SectionListWithColumns, {
   SectionListWithColumnsRefType,
 } from '../../CommonComponents/SectionListWithColumns/SectionListWithColumns';
 import PhotoComponentForGrid from './PhotoComponentForGrid';
+import SelectedFilters from './SelectedFilters';
 import { KeysSelection } from './useKeysSelection';
 import { getGridNumberOfColumns } from './usePhotosGrouped/Helpers';
 import { SectionTypePhotoGrid, usePhotosGrouped } from './usePhotosGrouped/usePhotosGrouped';
@@ -123,6 +124,7 @@ export default forwardRef(function PhotoGridComponent(
         mref={sectionlistRef}
         sections={sections}
         renderItem={renderItem}
+        ListHeaderComponent={SelectedFilters}
         renderSectionHeader={renderSectionHeader}
         numberColumns={numberOfColumns}
         itemSpacing={SPACE_BETWEEN_PHOTOS}

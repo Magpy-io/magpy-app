@@ -37,6 +37,7 @@ type SectionListWithColumnsProps<ItemType extends { key: string }, SectionData> 
   itemSpacing?: number;
   sectionHeaderHeight: number;
   mref: React.MutableRefObject<SectionListWithColumnsRefType | null>;
+  ListHeaderComponent?: JSX.Element | (() => JSX.Element);
 };
 
 function SectionListWithColumns<ItemType extends { key: string }, SectionData>({
@@ -49,6 +50,7 @@ function SectionListWithColumns<ItemType extends { key: string }, SectionData>({
   refreshing,
   sectionHeaderHeight,
   mref,
+  ListHeaderComponent,
 }: SectionListWithColumnsProps<ItemType, SectionData>) {
   const { width } = useOrientation();
 
@@ -144,6 +146,7 @@ function SectionListWithColumns<ItemType extends { key: string }, SectionData>({
     <SectionList
       sections={sectionsWithRows}
       renderItem={renderRow}
+      ListHeaderComponent={ListHeaderComponent}
       renderSectionHeader={renderSectionHeaderInner}
       keyExtractor={rowKeyExtractor}
       getItemLayout={getItemLayout}
