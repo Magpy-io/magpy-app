@@ -12,18 +12,20 @@ import { makeFilterStyles } from './FilterStyle';
 
 export type StatusFilterName = 'Status';
 export type StatusFilterValue = 'inDevice' | 'inServer';
+export type StatusFilterParams = { value: StatusFilterValue };
+
 export type StatusFilterObjectType = {
   type: StatusFilterName;
-  params: { value: StatusFilterValue };
+  params: StatusFilterParams;
 };
 
 export class StatusFilter implements Filter {
   type: StatusFilterName;
   value: StatusFilterValue;
 
-  constructor(value: StatusFilterValue) {
+  constructor(params: StatusFilterParams) {
     this.type = 'Status';
-    this.value = value;
+    this.value = params.value;
   }
 
   filter(photos: PhotoGalleryType[]) {

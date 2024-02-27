@@ -1,8 +1,4 @@
-import {
-  PhotoGalleryType,
-  PhotosLocalType,
-  PhotosServerType,
-} from '~/Context/ReduxStore/Slices/Photos/Photos';
+import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
 
 import { DateFilterName, DateFilterObjectType } from './DateFilter';
 import { StatusFilterName, StatusFilterObjectType } from './StatusFilter';
@@ -16,10 +12,6 @@ export type FilterObjectType =
 export type FilterNameType = TypeFilterName | DateFilterName | StatusFilterName;
 
 export interface Filter {
-  filter(
-    photos: PhotoGalleryType[],
-    photosServer: PhotosServerType,
-    photosLocal: PhotosLocalType,
-  ): void;
+  filter(photos: PhotoGalleryType[]): PhotoGalleryType[];
   toObject(): FilterObjectType;
 }

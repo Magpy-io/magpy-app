@@ -12,18 +12,20 @@ import { makeFilterStyles } from './FilterStyle';
 
 export type TypeFilterName = 'Type';
 export type TypeFilterValue = 'photos' | 'videos';
+export type TypeFilterParams = { value: TypeFilterValue };
+
 export type TypeFilterObjectType = {
   type: TypeFilterName;
-  params: { value: TypeFilterValue };
+  params: TypeFilterParams;
 };
 
 export class TypeFilter implements Filter {
   type: TypeFilterName;
   value: TypeFilterValue;
 
-  constructor(value: TypeFilterValue) {
+  constructor(params: TypeFilterParams) {
     this.type = 'Type';
-    this.value = value;
+    this.value = params.value;
   }
 
   filter(photos: PhotoGalleryType[]) {

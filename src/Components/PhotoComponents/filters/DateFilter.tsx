@@ -24,11 +24,11 @@ export class DateFilter implements Filter {
   toDate: string;
   label?: DateFilterLabel;
 
-  constructor(fromDate: string, toDate: string, label?: DateFilterLabel) {
+  constructor(params: DateFilterParams) {
     this.type = 'Date';
-    this.fromDate = fromDate;
-    this.toDate = toDate;
-    this.label = label;
+    this.fromDate = params.fromDate;
+    this.toDate = params.toDate;
+    this.label = params.label;
   }
 
   filter(photos: PhotoGalleryType[]) {

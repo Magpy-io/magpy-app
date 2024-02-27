@@ -9,9 +9,7 @@ import { useAppSelector } from '~/Context/ReduxStore/Store';
 import { useStyles } from '~/Hooks/useStyles';
 import { colorsType } from '~/Styles/colors';
 
-import { DateFilter } from './filters/DateFilter';
-import { StatusFilter } from './filters/StatusFilter';
-import { TypeFilter } from './filters/TypeFilter';
+import { FilterFactory } from './filters/FilterFactory';
 import PhotoGridController from './grid/PhotoGridController';
 import PhotoSliderController from './slider/PhotoSliderController';
 
@@ -30,18 +28,11 @@ export default function PhotoGallery({ photos, ...props }: PhotoGalleryPropsType
   console.log('storeFilters', storeFilters);
 
   const filteredPhotos = useMemo(() => {
+    const Factory = new FilterFactory();
     let newPhotos = [...photos];
     storeFilters.forEach(f => {
-      if (f.type === 'Type') {
-        const filter = new TypeFilter(f.params.value);
-        newPhotos = filter.filter(photos);
-      } else if (f.type === 'Status') {
-        const filter = new StatusFilter(f.params.value);
-        newPhotos = filter.filter(newPhotos);
-      } else if (f.type === 'Date') {
-        const filter = new DateFilter(f.params.fromDate, f.params.toDate, f.params.label);
-        newPhotos = filter.filter(newPhotos);
-      }
+      const filter = Factory.createFilter(f);
+      newPhotos = filter.filter(newPhotos);
     });
     return newPhotos;
   }, [photos, storeFilters]);
