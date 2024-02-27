@@ -9,7 +9,7 @@ import { useTabNavigationContext } from '~/Navigation/TabNavigation/TabNavigatio
 import ToolBarPhotos from '../common/ToolBarPhotos';
 import { useCustomBackPress } from '../common/useCustomBackPress';
 import PhotoSliderComponent, { PhotoSliderComponentRefType } from './PhotoSliderComponent';
-import StatusBarComponent from './PhotoSliderHeader';
+import PhotoSliderHeader from './PhotoSliderHeader';
 
 const { MainModule } = NativeModules;
 
@@ -95,11 +95,11 @@ const PhotoSliderController = React.forwardRef<PhotoSliderComponentRefType, Prop
         />
 
         {!isFullScreen && currentPhoto && (
-          <StatusBarComponent photo={currentPhoto} onBackButton={onStatusBarBackButton} />
+          <PhotoSliderHeader photo={currentPhoto} onBackButton={onStatusBarBackButton} />
         )}
 
         {!isFullScreen && (
-          <ToolBarPhotos seletedGalleryPhotos={currentPhoto ? [currentPhoto] : []} />
+          <ToolBarPhotos selectedGalleryPhotos={currentPhoto ? [currentPhoto] : []} />
         )}
       </View>
     );

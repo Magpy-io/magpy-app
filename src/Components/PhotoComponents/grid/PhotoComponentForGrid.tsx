@@ -53,7 +53,7 @@ function PhotoComponentForGrid(props: PropsType) {
       underlayColor={colors.UNDERLAY}
       onPress={onPressPhoto}
       onLongPress={onLongPressPhoto}
-      delayLongPress={1000}>
+      delayLongPress={300}>
       <View style={styles.itemStyle}>
         <ImageForGrid uri={uriSource} />
         {isSelecting && <SelectionIconForGrid isSelected={isSelected} />}

@@ -147,7 +147,7 @@ const PhotoGridController = forwardRef<PhotoGridComponentRefType, PropsType>(
           ref={ref}
         />
 
-        {isSelecting && <ToolBarPhotos seletedGalleryPhotos={selectedPhotos} />}
+        {isSelecting && <ToolBarPhotos selectedGalleryPhotos={selectedPhotos} />}
 
         {isSelecting && (
           <SelectionBar

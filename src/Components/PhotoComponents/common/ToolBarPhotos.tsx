@@ -16,26 +16,25 @@ import PhotoDetailsModal from '../slider/PhotoDetailsModal';
 import ToolBarPhotosComponent from './ToolBarPhotosComponent';
 
 type ToolBarProps = {
-  seletedGalleryPhotos: PhotoGalleryType[];
+  selectedGalleryPhotos: PhotoGalleryType[];
 };
 
-function ToolBarPhotos({ seletedGalleryPhotos }: ToolBarProps) {
+function ToolBarPhotos({ selectedGalleryPhotos }: ToolBarProps) {
   const styles = useStyles(makeStyles);
   const [modalVisible, setModalVisible] = useState(false);
   const onRequestClose = () => setModalVisible(false);
   const showModal = () => setModalVisible(true);
-  const isOnePhoto = seletedGalleryPhotos.length == 1;
+  const isOnePhoto = selectedGalleryPhotos.length == 1;
 
   const localPhotos = useAppSelector(photosLocalSelector);
   const serverPhotos = useAppSelector(photosServerSelector);
 
   const { UploadPhotos } = usePhotosFunctionsStore();
-
   const { DownloadPhotos } = usePhotosDownloadingFunctions();
 
   const selectedLocalPhotos: PhotoLocalType[] = [];
 
-  for (const photo of seletedGalleryPhotos) {
+  for (const photo of selectedGalleryPhotos) {
     if (photo.serverId) {
       continue;
     }
@@ -47,7 +46,7 @@ function ToolBarPhotos({ seletedGalleryPhotos }: ToolBarProps) {
 
   const selectedServerPhotosIds: string[] = [];
 
-  for (const photo of seletedGalleryPhotos) {
+  for (const photo of selectedGalleryPhotos) {
     if (photo.mediaId) {
       continue;
     }
@@ -75,7 +74,7 @@ function ToolBarPhotos({ seletedGalleryPhotos }: ToolBarProps) {
         <PhotoDetailsModal
           modalVisible={modalVisible}
           onRequestClose={onRequestClose}
-          photo={seletedGalleryPhotos[0]}
+          photo={selectedGalleryPhotos[0]}
         />
       )}
     </View>
@@ -90,6 +89,7 @@ const makeStyles = (colors: colorsType) =>
       position: 'absolute',
       backgroundColor: colors.BACKGROUND,
       bottom: 0,
+      elevation: 8,
     },
   });
 
