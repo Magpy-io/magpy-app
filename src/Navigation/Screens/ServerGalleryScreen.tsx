@@ -1,23 +1,22 @@
 import React from 'react';
 
 import PhotoGallery from '~/Components/PhotoComponents/PhotoGallery';
-import { serverGalleryPhotosSelector } from '~/Context/ReduxStore/Slices/Photos/Selectors';
-import { useAppSelector } from '~/Context/ReduxStore/Store';
+import { PhotoGalleryContextProvider } from '~/Context/Contexts/PhotoGalleryContext';
 
 import { useMainNavigation } from '../Navigation';
 
 export default function ServerGalleryScreen() {
   console.log('render server gallery screen');
-  const photosGalleryServer = useAppSelector(serverGalleryPhotosSelector);
   const navigation = useMainNavigation();
 
   return (
-    <PhotoGallery
-      key={'ServerPhotos'}
-      photos={photosGalleryServer}
-      title="Server photos"
-      showBackButton
-      onPressBack={() => navigation.goBack()}
-    />
+    <PhotoGalleryContextProvider isServer>
+      <PhotoGallery
+        key={'ServerPhotos'}
+        title="Server photos"
+        showBackButton
+        onPressBack={() => navigation.goBack()}
+      />
+    </PhotoGalleryContextProvider>
   );
 }

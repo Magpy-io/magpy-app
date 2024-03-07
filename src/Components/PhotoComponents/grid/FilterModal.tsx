@@ -7,10 +7,7 @@ import { Text } from 'react-native-elements';
 import BottomModal from '~/Components/CommonComponents/BottomModal';
 import { PrimaryButton } from '~/Components/CommonComponents/Buttons';
 import { CloseIcon } from '~/Components/CommonComponents/Icons';
-import { addFilters } from '~/Context/ReduxStore/Slices/GalleryFilters/GalleryFilters';
-import { FiltersSelector } from '~/Context/ReduxStore/Slices/GalleryFilters/Selectors';
-import { photosGallerySelector } from '~/Context/ReduxStore/Slices/Photos/Selectors';
-import { useAppDispatch, useAppSelector } from '~/Context/ReduxStore/Store';
+import { usePhotoGalleryContext } from '~/Context/Contexts/PhotoGalleryContext';
 import useEffectOnChange from '~/Hooks/useEffectOnChange';
 import { useStyles } from '~/Hooks/useStyles';
 import { colorsType } from '~/Styles/colors';
@@ -29,12 +26,10 @@ type FilterModalProps = {
 };
 
 export default function FilterModal({ visible, onRequestClose }: FilterModalProps) {
+  const { isServer, filters: storeFilters, addFilters, photos } = usePhotoGalleryContext();
+
   const styles = useStyles(makeStyles);
   const [filters, setFilters] = useState<FilterObjectType[]>([]);
-
-  const photos = useAppSelector(photosGallerySelector);
-  const { filters: storeFilters } = useAppSelector(FiltersSelector);
-  const dispatch = useAppDispatch();
 
   useEffectOnChange(visible, () => {
     setFilters(storeFilters);
@@ -44,7 +39,7 @@ export default function FilterModal({ visible, onRequestClose }: FilterModalProp
 
   const onSubmit = () => {
     onRequestClose();
-    dispatch(addFilters({ filters }));
+    addFilters(filters);
   };
 
   const TypeFilterObject = filters?.find(f => f.type === 'Type') as
@@ -92,11 +87,13 @@ export default function FilterModal({ visible, onRequestClose }: FilterModalProp
           addOrEditFilter={addOrEditFilter}
           removeFilter={removeFilter}
         />
-        <StatusFilterComponent
-          filter={StatusFilterObject}
-          addOrEditFilter={addOrEditFilter}
-          removeFilter={removeFilter}
-        />
+        {!isServer && (
+          <StatusFilterComponent
+            filter={StatusFilterObject}
+            addOrEditFilter={addOrEditFilter}
+            removeFilter={removeFilter}
+          />
+        )}
         <DateFilterComponent
           filter={DateFilterObject}
           addOrEditFilter={addOrEditFilter}

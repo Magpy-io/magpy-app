@@ -1,12 +1,10 @@
 import React from 'react';
-import { LayoutChangeEvent, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
 import { Text } from 'react-native-elements';
 
 import { CloseIcon } from '~/Components/CommonComponents/Icons';
-import { removeFilter } from '~/Context/ReduxStore/Slices/GalleryFilters/GalleryFilters';
-import { FiltersSelector } from '~/Context/ReduxStore/Slices/GalleryFilters/Selectors';
-import { useAppDispatch, useAppSelector } from '~/Context/ReduxStore/Store';
+import { usePhotoGalleryContext } from '~/Context/Contexts/PhotoGalleryContext';
 import { formatDate } from '~/Helpers/DateFunctions/DateFormatting';
 import { useStyles } from '~/Hooks/useStyles';
 import { colorsType } from '~/Styles/colors';
@@ -19,11 +17,11 @@ import { StatusFilterObjectType } from '../filters/StatusFilter';
 import { TypeFilterObjectType } from '../filters/TypeFilter';
 
 export default function SelectedFilters() {
-  const { filters } = useAppSelector(FiltersSelector);
+  const { filters } = usePhotoGalleryContext();
   const styles = useStyles(makeStyles);
 
   return (
-    <View style={styles.viewStyle} >
+    <View style={styles.viewStyle}>
       {filters?.map((filter, index) => {
         return <SelectedFilter key={`selected_filter_${index}`} filter={filter} />;
       })}
@@ -32,9 +30,9 @@ export default function SelectedFilters() {
 }
 
 function SelectedFilter({ filter }: { filter: FilterObjectType }) {
-  const dispatch = useAppDispatch();
+  const { removeFilter } = usePhotoGalleryContext();
   const onPress = () => {
-    dispatch(removeFilter({ filter }));
+    removeFilter(filter);
   };
 
   switch (filter.type) {

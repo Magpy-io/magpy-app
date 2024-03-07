@@ -3,9 +3,7 @@ import { StyleSheet, View } from 'react-native';
 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { FiltersSelector } from '~/Context/ReduxStore/Slices/GalleryFilters/Selectors';
-import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
-import { useAppSelector } from '~/Context/ReduxStore/Store';
+import { usePhotoGalleryContext } from '~/Context/Contexts/PhotoGalleryContext';
 import { useStyles } from '~/Hooks/useStyles';
 import { colorsType } from '~/Styles/colors';
 
@@ -16,16 +14,16 @@ import { PhotoSliderComponentRefType } from './slider/PhotoSliderComponent';
 import PhotoSliderController from './slider/PhotoSliderController';
 
 type PhotoGalleryPropsType = {
-  photos: Array<PhotoGalleryType>;
   title?: string;
   showBackButton?: boolean;
   onPressBack?: () => void;
   isInTabScreen?: boolean;
 };
 
-export default function PhotoGallery({ photos, ...props }: PhotoGalleryPropsType) {
+export default function PhotoGallery({ ...props }: PhotoGalleryPropsType) {
+  const { filters: storeFilters, photos } = usePhotoGalleryContext();
+
   const styles = useStyles(makeStyles);
-  const { filters: storeFilters } = useAppSelector(FiltersSelector);
   const gridRef = useRef<PhotoGridComponentRefType>(null);
   const sliderRef = useRef<PhotoSliderComponentRefType>(null);
 

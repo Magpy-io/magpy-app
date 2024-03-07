@@ -37,7 +37,7 @@ type SectionListWithColumnsProps<ItemType extends { key: string }, SectionData> 
   itemSpacing?: number;
   sectionHeaderHeight: number;
   mref: React.MutableRefObject<SectionListWithColumnsRefType | null>;
-  ListHeaderComponent?:  (() => JSX.Element);
+  ListHeaderComponent?: () => JSX.Element;
 };
 
 function SectionListWithColumns<ItemType extends { key: string }, SectionData>({
@@ -56,7 +56,6 @@ function SectionListWithColumns<ItemType extends { key: string }, SectionData>({
 
   const sectionListRef = useRef<SectionListWithColumnsType<ItemType, SectionData>>(null);
   const [headerHeight, setHeaderHeight] = useState(0);
-  console.log("headerHeight",headerHeight)
   const totalSpacingHorizontal = itemSpacing * (numberColumns - 1);
   const itemSize = (width - totalSpacingHorizontal) / numberColumns;
 
@@ -121,11 +120,11 @@ function SectionListWithColumns<ItemType extends { key: string }, SectionData>({
       getItemHeight: () => itemSize,
       getSectionHeaderHeight: () => sectionHeaderHeight,
       getSeparatorHeight: () => itemSpacing,
-      listHeaderHeight:headerHeight
+      listHeaderHeight: headerHeight,
     });
 
     return getItemLayoutFunction;
-  }, [itemSize, sectionHeaderHeight, itemSpacing,headerHeight]);
+  }, [itemSize, sectionHeaderHeight, itemSpacing, headerHeight]);
 
   const renderSectionHeaderInner = useCallback(
     (info: { section: SectionWithRowsType<ItemType, SectionData> }) => {
@@ -146,7 +145,7 @@ function SectionListWithColumns<ItemType extends { key: string }, SectionData>({
 
   const NewListHeaderComponent = () => {
     return (
-      <View onLayout={(event)=>setHeaderHeight(event.nativeEvent.layout.height)}>
+      <View onLayout={event => setHeaderHeight(event.nativeEvent.layout.height)}>
         {ListHeaderComponent && <ListHeaderComponent />}
       </View>
     );

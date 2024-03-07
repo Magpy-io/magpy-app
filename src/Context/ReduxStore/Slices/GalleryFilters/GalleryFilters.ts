@@ -4,42 +4,37 @@ import { FilterObjectType } from '~/Components/PhotoComponents/filters/Filter';
 
 type FiltersState = {
   filters: FilterObjectType[];
+  serverFilters: FilterObjectType[];
 };
 
 const initialState: FiltersState = {
   filters: [],
+  serverFilters: [],
 };
 
 const galleryFiltersSlice = createSlice({
   name: 'galleryFilters',
   initialState,
   reducers: {
-    addOrEditFilter: (state, action: { payload: { filter: FilterObjectType } }) => {
-      const foundFilter = state.filters.find(
-        filter => filter.type === action.payload.filter.type,
-      );
-      if (foundFilter) {
-        foundFilter.params = action.payload.filter.params;
-      } else {
-        state.filters.push(action.payload.filter);
-      }
+    addGalleryFilters: (state, action: { payload: { filters: FilterObjectType[] } }) => {
+      state.filters = action.payload.filters;
     },
-
-    removeFilter: (state, action: { payload: { filter: FilterObjectType } }) => {
+    removeGalleryFilter: (state, action: { payload: { filter: FilterObjectType } }) => {
       state.filters = state.filters.filter(f => f.type != action.payload.filter.type);
     },
 
-    clearFilters: state => {
-      state.filters = [];
+    addServerFilters: (state, action: { payload: { filters: FilterObjectType[] } }) => {
+      state.serverFilters = action.payload.filters;
     },
-
-    addFilters: (state, action: { payload: { filters: FilterObjectType[] } }) => {
-      state.filters = action.payload.filters;
+    removeServerFilter: (state, action: { payload: { filter: FilterObjectType } }) => {
+      state.serverFilters = state.serverFilters.filter(
+        f => f.type != action.payload.filter.type,
+      );
     },
   },
 });
 
-export const { addOrEditFilter, removeFilter, clearFilters, addFilters } =
+export const { removeGalleryFilter, addGalleryFilters, addServerFilters, removeServerFilter } =
   galleryFiltersSlice.actions;
 
 export default galleryFiltersSlice.reducer;
