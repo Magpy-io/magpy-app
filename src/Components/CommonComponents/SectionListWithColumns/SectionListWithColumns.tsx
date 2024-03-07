@@ -1,4 +1,4 @@
-import React, { useCallback, useImperativeHandle, useMemo, useRef } from 'react';
+import React, { useCallback, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import { SectionList, View } from 'react-native';
 
 import sectionListGetItemLayout from 'react-native-section-list-get-item-layout';
@@ -37,7 +37,7 @@ type SectionListWithColumnsProps<ItemType extends { key: string }, SectionData> 
   itemSpacing?: number;
   sectionHeaderHeight: number;
   mref: React.MutableRefObject<SectionListWithColumnsRefType | null>;
-  ListHeaderComponent?: JSX.Element | (() => JSX.Element);
+  ListHeaderComponent?:  (() => JSX.Element);
 };
 
 function SectionListWithColumns<ItemType extends { key: string }, SectionData>({
@@ -55,7 +55,8 @@ function SectionListWithColumns<ItemType extends { key: string }, SectionData>({
   const { width } = useOrientation();
 
   const sectionListRef = useRef<SectionListWithColumnsType<ItemType, SectionData>>(null);
-
+  const [headerHeight, setHeaderHeight] = useState(0);
+  console.log("headerHeight",headerHeight)
   const totalSpacingHorizontal = itemSpacing * (numberColumns - 1);
   const itemSize = (width - totalSpacingHorizontal) / numberColumns;
 
@@ -120,10 +121,11 @@ function SectionListWithColumns<ItemType extends { key: string }, SectionData>({
       getItemHeight: () => itemSize,
       getSectionHeaderHeight: () => sectionHeaderHeight,
       getSeparatorHeight: () => itemSpacing,
+      listHeaderHeight:headerHeight
     });
 
     return getItemLayoutFunction;
-  }, [itemSize, sectionHeaderHeight, itemSpacing]);
+  }, [itemSize, sectionHeaderHeight, itemSpacing,headerHeight]);
 
   const renderSectionHeaderInner = useCallback(
     (info: { section: SectionWithRowsType<ItemType, SectionData> }) => {
@@ -142,11 +144,19 @@ function SectionListWithColumns<ItemType extends { key: string }, SectionData>({
     [itemSpacing],
   );
 
+  const NewListHeaderComponent = () => {
+    return (
+      <View onLayout={(event)=>setHeaderHeight(event.nativeEvent.layout.height)}>
+        {ListHeaderComponent && <ListHeaderComponent />}
+      </View>
+    );
+  };
+
   return (
     <SectionList
       sections={sectionsWithRows}
       renderItem={renderRow}
-      ListHeaderComponent={ListHeaderComponent}
+      ListHeaderComponent={NewListHeaderComponent}
       renderSectionHeader={renderSectionHeaderInner}
       keyExtractor={rowKeyExtractor}
       getItemLayout={getItemLayout}

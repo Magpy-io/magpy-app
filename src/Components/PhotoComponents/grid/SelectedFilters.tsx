@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { LayoutChangeEvent, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 import { Text } from 'react-native-elements';
 
@@ -23,7 +23,7 @@ export default function SelectedFilters() {
   const styles = useStyles(makeStyles);
 
   return (
-    <View style={styles.viewStyle}>
+    <View style={styles.viewStyle} >
       {filters?.map((filter, index) => {
         return <SelectedFilter key={`selected_filter_${index}`} filter={filter} />;
       })}
