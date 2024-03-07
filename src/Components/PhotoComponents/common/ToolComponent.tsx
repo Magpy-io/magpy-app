@@ -13,6 +13,8 @@ type ToolComponentProps = {
   icon: (props: CustomIconProps) => JSX.Element;
   text?: string;
   onPress: () => void;
+  showNumber?: boolean;
+  number?: number;
 };
 
 //last one is partially visible
@@ -38,6 +40,9 @@ const ToolComponent = React.memo(function ToolComponent({
       <View style={styles.iconTextView}>
         <Icon containerStyle={styles.iconContainerStyle} />
         {props.text ? <Text style={styles.textStyle}>{props.text}</Text> : null}
+        {props.showNumber ? (
+          <Text style={styles.numberStyle}>{`(${props.number})`}</Text>
+        ) : null}
       </View>
     </TouchableHighlight>
   );
@@ -46,11 +51,18 @@ const ToolComponent = React.memo(function ToolComponent({
 const makeStyles = (colors: colorsType) =>
   StyleSheet.create({
     textStyle: {
+      ...typography(colors).smallText,
       color: colors.TEXT,
       textAlign: 'center',
       maxWidth: 100,
       paddingTop: 4,
-      ...typography(colors).smallText,
+    },
+    numberStyle: {
+      ...typography(colors).smallTextBold,
+      color: colors.ACCENT,
+      textAlign: 'center',
+      maxWidth: 100,
+      paddingTop: 2,
     },
     iconTextView: {
       flex: 1,

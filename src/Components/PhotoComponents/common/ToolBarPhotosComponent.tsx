@@ -24,42 +24,98 @@ type ToolBarPhotosComponentProps = {
   onShare: () => void;
   onInfo: () => void;
   showInfo: boolean;
+
+  nbPhotos: number;
+  nbPhotosToBackUp: number;
+  nbPhotosToDownload: number;
+  nbPhotosToDeleteEverywhere: number;
+  nbPhotosToDeleteFromServer: number;
+  nbPhotosToDeleteFromDevice: number;
 };
 
-export default function ToolBarPhotosComponent({
-  onBackUp,
-  onDelete,
-  onDeleteFromDevice,
-  onDownload,
-  onInfo,
-  onShare,
-  showInfo,
-  onDeleteFromServer,
-}: ToolBarPhotosComponentProps) {
+export default function ToolBarPhotosComponent(props: ToolBarPhotosComponentProps) {
+  const {
+    nbPhotos,
+    nbPhotosToBackUp,
+    nbPhotosToDownload,
+    nbPhotosToDeleteEverywhere,
+    nbPhotosToDeleteFromServer,
+    nbPhotosToDeleteFromDevice,
+    onBackUp,
+    onDelete,
+    onDeleteFromDevice,
+    onDownload,
+    onInfo,
+    onShare,
+    showInfo,
+    onDeleteFromServer,
+  } = props;
+
+  const showNumber = nbPhotos > 1;
   const styles = useStyles(makeStyles);
 
   return (
     <ScrollView horizontal contentContainerStyle={styles.scrollviewContent}>
-      <ToolComponent icon={UploadIcon} text="Back up" onPress={onBackUp} />
+      {onShare && (
+        <ToolComponent
+          icon={ShareIcon}
+          text="Share"
+          onPress={onShare}
+          showNumber={showNumber}
+          number={nbPhotos}
+        />
+      )}
 
-      <ToolComponent icon={DownloadIcon} text="Download" onPress={onDownload} />
+      {nbPhotosToBackUp > 0 && (
+        <ToolComponent
+          icon={UploadIcon}
+          text="Back up"
+          onPress={onBackUp}
+          showNumber={showNumber}
+          number={nbPhotosToBackUp}
+        />
+      )}
 
-      <ToolComponent
-        icon={DeleteFromDeviceIcon}
-        text="Delete from device"
-        onPress={onDeleteFromDevice}
-      />
-      <ToolComponent icon={DeleteIcon} text="Delete everywhere" onPress={onDelete} />
+      {nbPhotosToDownload > 0 && (
+        <ToolComponent
+          icon={DownloadIcon}
+          text="Download"
+          onPress={onDownload}
+          showNumber={showNumber}
+          number={nbPhotosToDownload}
+        />
+      )}
 
-      <ToolComponent
-        icon={DeleteFromServerIcon}
-        text="Delete from server"
-        onPress={onDeleteFromServer}
-      />
+      {nbPhotosToDeleteEverywhere > 0 && (
+        <ToolComponent
+          icon={DeleteIcon}
+          text="Delete everywhere"
+          onPress={onDelete}
+          showNumber={showNumber}
+          number={nbPhotosToDeleteEverywhere}
+        />
+      )}
+      {nbPhotosToDeleteFromDevice > 0 && (
+        <ToolComponent
+          icon={DeleteFromDeviceIcon}
+          text="Delete from device"
+          onPress={onDeleteFromDevice}
+          showNumber={showNumber}
+          number={nbPhotosToDeleteFromDevice}
+        />
+      )}
 
-      <ToolComponent icon={ShareIcon} text="Share" onPress={onShare} />
+      {nbPhotosToDeleteFromServer > 0 && (
+        <ToolComponent
+          icon={DeleteFromServerIcon}
+          text="Delete from server"
+          onPress={onDeleteFromServer}
+          showNumber={showNumber}
+          number={nbPhotosToDeleteFromServer}
+        />
+      )}
 
-      {showInfo && <ToolComponent icon={InfoIcon} text="Details" onPress={onInfo} />}
+      {showInfo && onInfo && <ToolComponent icon={InfoIcon} text="Details" onPress={onInfo} />}
     </ScrollView>
   );
 }

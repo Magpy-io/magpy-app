@@ -19,6 +19,29 @@ type ToolBarProps = {
   selectedGalleryPhotos: PhotoGalleryType[];
 };
 
+function getPhotosStatus(selectedGalleryPhotos: PhotoGalleryType[]) {
+  const nbLocalPhotos = selectedGalleryPhotos.filter(photo => photo.mediaId).length;
+  const nbServerPhotos = selectedGalleryPhotos.filter(photo => photo.serverId).length;
+
+  const nbLocalOnlyPhotos = selectedGalleryPhotos.filter(
+    photo => photo.mediaId && !photo.serverId,
+  ).length;
+  const nbServerOnlyPhotos = selectedGalleryPhotos.filter(
+    photo => photo.serverId && !photo.mediaId,
+  ).length;
+  const nbLocalAndServerPhotos = selectedGalleryPhotos.filter(
+    photo => photo.mediaId && photo.serverId,
+  ).length;
+
+  return {
+    nbLocalPhotos,
+    nbServerPhotos,
+    nbLocalAndServerPhotos,
+    nbLocalOnlyPhotos,
+    nbServerOnlyPhotos,
+  };
+}
+
 function ToolBarPhotos({ selectedGalleryPhotos }: ToolBarProps) {
   const styles = useStyles(makeStyles);
   const [modalVisible, setModalVisible] = useState(false);
@@ -56,9 +79,23 @@ function ToolBarPhotos({ selectedGalleryPhotos }: ToolBarProps) {
     }
   }
 
+  const {
+    nbLocalPhotos,
+    nbServerPhotos,
+    nbLocalAndServerPhotos,
+    nbLocalOnlyPhotos,
+    nbServerOnlyPhotos,
+  } = getPhotosStatus(selectedGalleryPhotos);
+
   return (
     <View style={[styles.toolBarView]}>
       <ToolBarPhotosComponent
+        nbPhotos={selectedGalleryPhotos.length}
+        nbPhotosToBackUp={nbLocalOnlyPhotos}
+        nbPhotosToDownload={nbServerOnlyPhotos}
+        nbPhotosToDeleteEverywhere={nbLocalAndServerPhotos}
+        nbPhotosToDeleteFromServer={nbServerPhotos}
+        nbPhotosToDeleteFromDevice={nbLocalPhotos}
         onBackUp={() => {
           UploadPhotos(selectedLocalPhotos).catch(console.log);
         }}
