@@ -24,7 +24,7 @@ export interface MainModuleType {
     isFullScreen: boolean;
   }>;
   getPhotoExifDate: (uri: string) => Promise<number>;
-  deleteMedia: (uris: string[]) => Promise<void>;
+  deleteMedia: (ids: string[]) => Promise<void>;
 }
 
 declare module 'react-native' {

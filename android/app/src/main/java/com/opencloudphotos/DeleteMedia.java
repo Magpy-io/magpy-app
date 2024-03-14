@@ -20,7 +20,6 @@ import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableType;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 public class DeleteMedia {
 
@@ -32,35 +31,44 @@ public class DeleteMedia {
     private static final String ERROR_UNEXPECTED = "ERROR_UNEXPECTED";
 
 
-    private static String[] checkAndParseParams(ReadableArray urisString) throws IllegalArgumentException, NullPointerException{
+    private static long[] checkAndParseParams(ReadableArray ids) throws IllegalArgumentException, NullPointerException{
 
-        if(urisString == null){
+        if(ids == null){
             throw new NullPointerException();
         }
 
-        String[] uris = new String[urisString.size()];
+        long[] idsParsed = new long[ids.size()];
 
-        for (int i=0; i<urisString.size(); i++){
-            if(urisString.getType(i) != ReadableType.String){
+        for (int i=0; i<ids.size(); i++){
+            if(ids.getType(i) != ReadableType.String){
                 throw new IllegalArgumentException("Element " + Integer.toString(i) + " is not a string.");
             }
-            uris[i] = urisString.getString(i);
+
+            long parsed = 0;
+
+            try{
+                parsed = Long.parseLong(ids.getString(i));
+            }catch (Exception e){
+                throw new IllegalArgumentException("Element " + Integer.toString(i) + " is not a valid id number.");
+            }
+
+            idsParsed[i] = parsed;
         }
-        return uris;
+        return idsParsed;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.R)
-    public static void deletePhotos(ReadableArray urisString, Context context, Promise promise){
+    public static void deletePhotos(ReadableArray ids, Context context, Promise promise){
 
-        if(urisString.size() == 0){
+        if(ids.size() == 0){
             promise.resolve(null);
             return;
         }
 
-        String[] urisParsed;
+        long[] idsParsed;
 
         try{
-            urisParsed = checkAndParseParams(urisString);
+            idsParsed = checkAndParseParams(ids);
         }catch(IllegalArgumentException e){
             promise.reject(ERROR_URIS_PARAMETER_INVALID, "Error: uris parameter should be an array of valid uri strings");
             return;
@@ -69,43 +77,16 @@ public class DeleteMedia {
             return;
         }
 
+
         ContentResolver resolver = context.getContentResolver();
-        // Set up the projection (we only need the ID)
-        String[] projection = { MediaStore.Images.Media._ID };
-
-        // Match on the file path
-        String innerWhere = "?";
-        for(int i=1; i<urisParsed.length; i++){
-            innerWhere += ", ?";
-        }
-
-        String selection = MediaStore.Images.Media.DATA + " IN (" + innerWhere + ")";
-        // Query for the ID of the media matching the file path
-        Uri queryUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-
-        
-        String[] selectionArgs = new String[urisParsed.length];
-
-        for(int i=0; i<urisParsed.length; i++){
-            Uri uri = Uri.parse(urisParsed[i]);
-            selectionArgs[i] = uri.getPath();
-        }
-
-        Cursor cursor = resolver.query(queryUri, projection, selection, selectionArgs, null);
+        Uri external_images_uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
 
         ArrayList<Uri> arrayList = new ArrayList<>();
-        while(cursor.moveToNext()){
-            long id = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID));
-            Uri deleteUri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id);
-            arrayList.add(deleteUri);
+        for (int i=0; i<ids.size(); i++){
+            Uri uri = ContentUris.withAppendedId(external_images_uri, idsParsed[i]);
+            arrayList.add(uri);
         }
 
-        if(arrayList.size() != urisParsed.length){
-            promise.reject(ERROR_URIS_NOT_FOUND, "Error: some uris were not found on device");
-            return;
-        }
-
-        Collections.addAll(arrayList);
         IntentSender intentSender = MediaStore.createDeleteRequest(resolver, arrayList).getIntentSender();
         IntentSenderRequest senderRequest = new IntentSenderRequest.Builder(intentSender)
                 .setFillInIntent(null)
