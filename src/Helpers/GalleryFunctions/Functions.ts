@@ -1,7 +1,6 @@
 import { NativeModules } from 'react-native';
 
 import { CameraRoll } from '@react-native-camera-roll/camera-roll';
-import { DeleteMedia } from 'react-native-delete-media';
 import RNFS from 'react-native-fs';
 
 import { PhotoLocalType } from '~/Context/ReduxStore/Slices/Photos/Photos';
@@ -56,25 +55,6 @@ export async function addPhotoToDevice(photo: {
 
   await RNFS.unlink(cachePhotoPath);
   return parsePhotoIdentifierToPhotoLocalType(imageData);
-}
-
-export async function DeletePhotosFromDevice(uris: Array<string | undefined>) {
-  const urisThatExist = [];
-  for (let i = 0; i < uris.length; i++) {
-    const uri = uris[i];
-    if (!uri) {
-      continue;
-    }
-    if (await RNFS.exists(uri)) {
-      urisThatExist.push(uri);
-    }
-  }
-
-  if (urisThatExist.length == 0) {
-    return;
-  }
-
-  return DeleteMedia.deletePhotos(urisThatExist);
 }
 
 export async function addPhotoThumbnailToCache(id: string, image: string) {

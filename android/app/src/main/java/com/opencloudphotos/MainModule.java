@@ -427,4 +427,10 @@ public class MainModule extends ReactContextBaseJavaModule{
 
         promise.resolve(insets);
     }
+
+    @RequiresApi(api = Build.VERSION_CODES.R)
+    @ReactMethod
+    public void deleteMedia(ReadableArray urisString, Promise mPromise) {
+        DeleteMedia.deletePhotos(urisString, getReactApplicationContext(), mPromise);
+    }
 }

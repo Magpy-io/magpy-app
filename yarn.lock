@@ -3356,7 +3356,6 @@ __metadata:
     react: "npm:18.2.0"
     react-native: "npm:0.73.2"
     react-native-date-picker: "npm:^4.3.6"
-    react-native-delete-media: "npm:^1.0.7"
     react-native-elements: "npm:^3.4.3"
     react-native-fast-image: "npm:^8.6.3"
     react-native-fs: "npm:^2.20.0"
@@ -9452,16 +9451,6 @@ __metadata:
     react: ">= 17.0.1"
     react-native: ">= 0.64.3"
   checksum: 4c48e1c6ac3120a449146b580ae4520ef5578792a906d8cb61a48091d5f8027909a8d821da6a46c0dd1c0adb6bbe3d94d436c5dd47c76201a8cad468ff5097bf
-  languageName: node
-  linkType: hard
-
-"react-native-delete-media@npm:^1.0.7":
-  version: 1.0.7
-  resolution: "react-native-delete-media@npm:1.0.7"
-  peerDependencies:
-    react: "*"
-    react-native: "*"
-  checksum: 9e36efdbeac2aeac41840f14f658ab2cb6009f8892c0619f8510b0c0f40917bb0d8bf0bbc0cc0f1aedfad86d96ad407096c5a6253c05a40331e34a6560edc804
   languageName: node
   linkType: hard
 

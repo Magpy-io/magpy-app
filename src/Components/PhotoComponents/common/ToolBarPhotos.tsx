@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
+import { NativeModules } from 'react-native';
 
 import { usePhotosDownloadingFunctions } from '~/Context/Contexts/PhotosDownloadingContext/usePhotosDownloadingContext';
 import { PhotoGalleryType, PhotoLocalType } from '~/Context/ReduxStore/Slices/Photos/Photos';
@@ -14,6 +15,8 @@ import { colorsType } from '~/Styles/colors';
 
 import PhotoDetailsModal from '../slider/PhotoDetailsModal';
 import ToolBarPhotosComponent from './ToolBarPhotosComponent';
+
+const { MainModule } = NativeModules;
 
 type ToolBarProps = {
   selectedGalleryPhotos: PhotoGalleryType[];
@@ -79,6 +82,8 @@ function ToolBarPhotos({ selectedGalleryPhotos }: ToolBarProps) {
     }
   }
 
+  const localPhoto = localPhotos[selectedGalleryPhotos?.[0]?.mediaId ?? ''];
+
   const {
     nbLocalPhotos,
     nbServerPhotos,
@@ -102,7 +107,9 @@ function ToolBarPhotos({ selectedGalleryPhotos }: ToolBarProps) {
         onDownload={() => DownloadPhotos(selectedServerPhotosIds)}
         onDelete={() => {}}
         onDeleteFromServer={() => {}}
-        onDeleteFromDevice={() => {}}
+        onDeleteFromDevice={() => {
+          MainModule.deleteMedia([localPhoto.uri]).catch(console.log);
+        }}
         onShare={() => {}}
         showInfo={isOnePhoto}
         onInfo={showModal}
