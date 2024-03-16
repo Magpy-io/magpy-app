@@ -7,6 +7,7 @@ import { useServerContext } from '~/Context/UseContexts/useServerContext';
 import {
   addPhotoCompressedToCache,
   addPhotoThumbnailToCache,
+  deletePhotoFromDevice,
   photoCompressedExistsInCache,
 } from '~/Helpers/GalleryFunctions/Functions';
 import { GalleryGetPhotos } from '~/Helpers/GalleryFunctions/GetGalleryPhotos';
@@ -19,6 +20,7 @@ import {
   PhotoServerType,
   addCompressedPhotoById,
   addThumbnailPhotoById,
+  deletePhotosFromLocal,
   setPhotosLocal,
   setPhotosServer,
 } from './Photos';
@@ -163,6 +165,14 @@ export function usePhotosFunctionsStore() {
     [SendPhotoToBackgroundServiceForUpload],
   );
 
+  const DeletePhotosLocal = useCallback(
+    async (mediaIds: string[]) => {
+      await deletePhotoFromDevice(mediaIds);
+      dispatch(deletePhotosFromLocal({ mediaIds }));
+    },
+    [dispatch],
+  );
+
   return {
     RefreshLocalPhotos,
     RefreshServerPhotos,
@@ -170,6 +180,7 @@ export function usePhotosFunctionsStore() {
     AddPhotoThumbnailIfMissing,
     AddPhotoCompressedIfMissing,
     UploadPhotos,
+    DeletePhotosLocal,
   };
 }
 
@@ -178,13 +189,6 @@ export function usePhotosStoreEffect() {
   const { isServerReachable } = useServerContext();
 
   useEffect(() => {
-    RefreshAllPhotos(3000, 3000)
-      // .then(() => {
-      //   return RefreshAllPhotos(300, 300);
-      // })
-      // .then(() => {
-      //   return RefreshAllPhotos(3000, 3000);
-      // })
-      .catch(console.log);
+    RefreshAllPhotos(3000, 3000).catch(console.log);
   }, [RefreshAllPhotos, isServerReachable]);
 }

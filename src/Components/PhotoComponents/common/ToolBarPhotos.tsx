@@ -6,7 +6,6 @@ import { PhotoGalleryType, PhotoLocalType } from '~/Context/ReduxStore/Slices/Ph
 import { usePhotosFunctionsStore } from '~/Context/ReduxStore/Slices/Photos/PhotosFunctions';
 import { photosLocalSelector } from '~/Context/ReduxStore/Slices/Photos/Selectors';
 import { useAppSelector } from '~/Context/ReduxStore/Store';
-import { deletePhotoFromDevice } from '~/Helpers/GalleryFunctions/Functions';
 import { useStyles } from '~/Hooks/useStyles';
 import { colorsType } from '~/Styles/colors';
 
@@ -45,7 +44,7 @@ function ToolBarPhotos({ selectedGalleryPhotos }: ToolBarProps) {
 
   const localPhotos = useAppSelector(photosLocalSelector);
 
-  const { UploadPhotos } = usePhotosFunctionsStore();
+  const { UploadPhotos, DeletePhotosLocal } = usePhotosFunctionsStore();
   const { StartPhotosDownload } = usePhotosDownloadingFunctions();
 
   const selectedLocalOnlyPhotos: PhotoLocalType[] = [];
@@ -100,7 +99,7 @@ function ToolBarPhotos({ selectedGalleryPhotos }: ToolBarProps) {
         onDelete={() => {}}
         onDeleteFromServer={() => {}}
         onDeleteFromDevice={() => {
-          deletePhotoFromDevice(selectedLocalPhotosIds).catch(console.log);
+          DeletePhotosLocal(selectedLocalPhotosIds).catch(console.log);
         }}
         onShare={() => {}}
         showInfo={isOnePhoto}

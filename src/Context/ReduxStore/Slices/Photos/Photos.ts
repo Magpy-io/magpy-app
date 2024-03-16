@@ -134,6 +134,18 @@ const photosServerSlice = createSlice({
         galleryPhoto.mediaId = action.payload.photoLocal.id;
       }
     },
+
+    deletePhotosFromLocal: (state, action: { payload: { mediaIds: string[] } }) => {
+      action.payload.mediaIds.forEach(mediaId => {
+        delete state.photosLocal[mediaId];
+      });
+
+      state.photosLocalIdsOrdered = state.photosLocalIdsOrdered.filter(mediaId => {
+        return !action.payload.mediaIds.includes(mediaId);
+      });
+
+      state.photosGallery = mergePhotos(state);
+    },
   },
 });
 
@@ -145,6 +157,7 @@ export const {
   addMediaIdToServerPhoto,
   addPhotoFromLocalToServer,
   addPhotoFromServerToLocal,
+  deletePhotosFromLocal,
 } = photosServerSlice.actions;
 
 export default photosServerSlice.reducer;
