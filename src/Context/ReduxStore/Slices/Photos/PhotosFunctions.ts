@@ -173,6 +173,21 @@ export function usePhotosFunctionsStore() {
     [dispatch],
   );
 
+  const DeletePhotosServer = useCallback(
+    async (serverIds: string[]) => {
+      const ret = await DeletePhotosById.Post({
+        ids: serverIds,
+      });
+
+      if (!ret.ok) {
+        throw new Error(ret.errorCode);
+      }
+
+      dispatch(deletePhotosFromServer({ serverIds }));
+    },
+    [dispatch],
+  );
+
   return {
     RefreshLocalPhotos,
     RefreshServerPhotos,
@@ -181,6 +196,7 @@ export function usePhotosFunctionsStore() {
     AddPhotoCompressedIfMissing,
     UploadPhotos,
     DeletePhotosLocal,
+    DeletePhotosServer,
   };
 }
 

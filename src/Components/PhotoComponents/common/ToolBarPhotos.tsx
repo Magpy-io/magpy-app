@@ -45,7 +45,7 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
 
   const localPhotos = useAppSelector(photosLocalSelector);
 
-  const { UploadPhotos, DeletePhotosLocal } = usePhotosFunctionsStore();
+  const { UploadPhotos, DeletePhotosLocal, DeletePhotosServer } = usePhotosFunctionsStore();
   const { StartPhotosDownload } = usePhotosDownloadingFunctions();
 
   const selectedLocalOnlyPhotos: PhotoLocalType[] = [];
@@ -82,6 +82,15 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
     selectedLocalPhotosIds.push(photo.mediaId);
   }
 
+  const selectedServerPhotosIds: string[] = [];
+
+  for (const photo of selectedGalleryPhotos) {
+    if (!photo.serverId) {
+      continue;
+    }
+    selectedServerPhotosIds.push(photo.serverId);
+  }
+
   const { nbServerPhotos, nbLocalAndServerPhotos } = getPhotosStatus(selectedGalleryPhotos);
 
   return (
@@ -91,7 +100,7 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
         nbPhotosToBackUp={selectedLocalOnlyPhotos.length}
         nbPhotosToDownload={selectedServerOnlyPhotosIds.length}
         nbPhotosToDeleteEverywhere={nbLocalAndServerPhotos}
-        nbPhotosToDeleteFromServer={nbServerPhotos}
+        nbPhotosToDeleteFromServer={selectedServerPhotosIds.length}
         nbPhotosToDeleteFromDevice={selectedLocalPhotosIds.length}
         onBackUp={() => {
           UploadPhotos(selectedLocalOnlyPhotos).catch(console.log);
@@ -99,9 +108,15 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
         onDownload={() => StartPhotosDownload(selectedServerOnlyPhotosIds)}
         onDelete={() => {}}
         onDeleteFromServer={() => {}}
+        onDeleteFromServer={() => {
+          DeletePhotosServer(selectedServerPhotosIds)
+            .then(() => clearSelection?.())
+            .catch(console.log);
+        }}
         onDeleteFromDevice={() => {
-          DeletePhotosLocal(selectedLocalPhotosIds).catch(console.log);
-          clearSelection?.();
+          DeletePhotosLocal(selectedLocalPhotosIds)
+            .then(() => clearSelection?.())
+            .catch(console.log);
         }}
         onShare={() => {}}
         showInfo={isOnePhoto}
