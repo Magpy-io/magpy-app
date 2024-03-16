@@ -116,6 +116,10 @@ const PhotoGridController = forwardRef<PhotoGridComponentRefType, PropsType>(
       selectAll(photos);
     }, [photos, selectAll]);
 
+    const clearSelection = useCallback(() => {
+      resetSelection();
+    }, [resetSelection]);
+
     const onRefresh = useCallback(() => {
       RefreshAllPhotos(3000, 3000).catch(console.log);
     }, [RefreshAllPhotos]);
@@ -147,7 +151,12 @@ const PhotoGridController = forwardRef<PhotoGridComponentRefType, PropsType>(
           ref={ref}
         />
 
-        {isSelecting && <ToolBarPhotos selectedGalleryPhotos={selectedPhotos} />}
+        {isSelecting && (
+          <ToolBarPhotos
+            selectedGalleryPhotos={selectedPhotos}
+            clearSelection={clearSelection}
+          />
+        )}
 
         {isSelecting && (
           <SelectionBar

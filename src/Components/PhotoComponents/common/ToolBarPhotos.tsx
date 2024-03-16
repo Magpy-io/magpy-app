@@ -14,6 +14,7 @@ import ToolBarPhotosComponent from './ToolBarPhotosComponent';
 
 type ToolBarProps = {
   selectedGalleryPhotos: PhotoGalleryType[];
+  clearSelection?: () => void;
 };
 
 function getPhotosStatus(selectedGalleryPhotos: PhotoGalleryType[]) {
@@ -35,7 +36,7 @@ function getPhotosStatus(selectedGalleryPhotos: PhotoGalleryType[]) {
   };
 }
 
-function ToolBarPhotos({ selectedGalleryPhotos }: ToolBarProps) {
+function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) {
   const styles = useStyles(makeStyles);
   const [modalVisible, setModalVisible] = useState(false);
   const onRequestClose = () => setModalVisible(false);
@@ -100,6 +101,7 @@ function ToolBarPhotos({ selectedGalleryPhotos }: ToolBarProps) {
         onDeleteFromServer={() => {}}
         onDeleteFromDevice={() => {
           DeletePhotosLocal(selectedLocalPhotosIds).catch(console.log);
+          clearSelection?.();
         }}
         onShare={() => {}}
         showInfo={isOnePhoto}
