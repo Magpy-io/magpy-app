@@ -56,7 +56,7 @@ export default function ToolBarPhotosComponent(props: ToolBarPhotosComponentProp
 
   return (
     <ScrollView horizontal contentContainerStyle={styles.scrollviewContent}>
-      {onShare && (
+      {nbPhotos > 0 && (
         <ToolComponent
           icon={ShareIcon}
           text="Share"

@@ -9,6 +9,10 @@ import { parsePhotoIdentifierToPhotoLocalType } from './GetGalleryPhotos';
 
 const { MainModule } = NativeModules;
 
+export async function deletePhotoFromDevice(mediaIds: string[]) {
+  await MainModule.deleteMedia(mediaIds);
+}
+
 export async function getFirstPossibleFileName(imageName: string) {
   const path = (await MainModule.getRestoredMediaAbsolutePath()) + '/' + imageName;
 

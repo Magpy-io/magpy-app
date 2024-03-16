@@ -66,9 +66,9 @@ export function parsePhotoIdentifierToPhotoLocalType(edge: PhotoIdentifier) {
 //
 // We get the minimum of the two so that if we got the date from DATE_TAKEN we use it,
 // if not DATE_MODIFIED will be a better choice than DATE_ADDED
-// because in case of moving the photo from one path to another or from albums
+// because in case of moving the photo from one path to another or between albums
 // the image file will be moved and a new DATE_ADDED will be set but DATE_MODIFIED
-// wont change and it will be older than DATE_ADDED
+// won't change and it will be older than DATE_ADDED
 
 function getCorrectDate(photo: { timestamp: number; modificationTimestamp: number }): number {
   return Math.min(photo.timestamp, photo.modificationTimestamp);
