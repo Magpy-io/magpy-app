@@ -11,16 +11,19 @@ import {
   photoCompressedExistsInCache,
 } from '~/Helpers/GalleryFunctions/Functions';
 import { GalleryGetPhotos } from '~/Helpers/GalleryFunctions/GetGalleryPhotos';
-import { GetPhotos, GetPhotosById } from '~/Helpers/ServerQueries';
+import { DeletePhotosById, GetPhotos, GetPhotosById } from '~/Helpers/ServerQueries';
 
 import { useAppDispatch } from '../../Store';
 import { ParseApiPhoto } from './Functions';
 import {
+  PhotoGalleryType,
   PhotoLocalType,
   PhotoServerType,
   addCompressedPhotoById,
   addThumbnailPhotoById,
+  deletePhotos,
   deletePhotosFromLocal,
+  deletePhotosFromServer,
   setPhotosLocal,
   setPhotosServer,
 } from './Photos';
@@ -188,6 +191,36 @@ export function usePhotosFunctionsStore() {
     [dispatch],
   );
 
+  const DeletePhotosEverywhere = useCallback(
+    async (photos: PhotoGalleryType[]) => {
+      const mediaIds: string[] = [];
+      const serverIds: string[] = [];
+
+      photos.forEach(p => {
+        if (p.mediaId) {
+          mediaIds.push(p.mediaId);
+        }
+
+        if (p.serverId) {
+          serverIds.push(p.serverId);
+        }
+      });
+
+      await deletePhotoFromDevice(mediaIds);
+
+      const ret = await DeletePhotosById.Post({
+        ids: serverIds,
+      });
+
+      if (!ret.ok) {
+        throw new Error(ret.errorCode);
+      }
+
+      dispatch(deletePhotos({ photos }));
+    },
+    [dispatch],
+  );
+
   return {
     RefreshLocalPhotos,
     RefreshServerPhotos,
@@ -197,6 +230,7 @@ export function usePhotosFunctionsStore() {
     UploadPhotos,
     DeletePhotosLocal,
     DeletePhotosServer,
+    DeletePhotosEverywhere,
   };
 }
 

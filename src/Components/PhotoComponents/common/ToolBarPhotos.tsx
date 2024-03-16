@@ -17,25 +17,6 @@ type ToolBarProps = {
   clearSelection?: () => void;
 };
 
-function getPhotosStatus(selectedGalleryPhotos: PhotoGalleryType[]) {
-  const nbLocalPhotos = selectedGalleryPhotos.filter(photo => photo.mediaId).length;
-  const nbServerPhotos = selectedGalleryPhotos.filter(photo => photo.serverId).length;
-
-  const nbLocalOnlyPhotos = selectedGalleryPhotos.filter(photo => !photo.serverId).length;
-  const nbServerOnlyPhotos = selectedGalleryPhotos.filter(photo => !photo.mediaId).length;
-  const nbLocalAndServerPhotos = selectedGalleryPhotos.filter(
-    photo => photo.mediaId && photo.serverId,
-  ).length;
-
-  return {
-    nbLocalPhotos,
-    nbServerPhotos,
-    nbLocalAndServerPhotos,
-    nbLocalOnlyPhotos,
-    nbServerOnlyPhotos,
-  };
-}
-
 function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) {
   const styles = useStyles(makeStyles);
   const [modalVisible, setModalVisible] = useState(false);
@@ -45,10 +26,14 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
 
   const localPhotos = useAppSelector(photosLocalSelector);
 
-  const { UploadPhotos, DeletePhotosLocal, DeletePhotosServer } = usePhotosFunctionsStore();
+  const { UploadPhotos, DeletePhotosLocal, DeletePhotosServer, DeletePhotosEverywhere } =
+    usePhotosFunctionsStore();
   const { StartPhotosDownload } = usePhotosDownloadingFunctions();
 
   const selectedLocalOnlyPhotos: PhotoLocalType[] = [];
+  const selectedServerOnlyPhotosIds: string[] = [];
+  const selectedLocalPhotosIds: string[] = [];
+  const selectedServerPhotosIds: string[] = [];
 
   for (const photo of selectedGalleryPhotos) {
     if (photo.serverId) {
@@ -59,8 +44,6 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
       selectedLocalOnlyPhotos.push(localPhoto);
     }
   }
-
-  const selectedServerOnlyPhotosIds: string[] = [];
 
   for (const photo of selectedGalleryPhotos) {
     if (photo.mediaId) {
@@ -73,16 +56,12 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
     selectedServerOnlyPhotosIds.push(photo.serverId);
   }
 
-  const selectedLocalPhotosIds: string[] = [];
-
   for (const photo of selectedGalleryPhotos) {
     if (!photo.mediaId) {
       continue;
     }
     selectedLocalPhotosIds.push(photo.mediaId);
   }
-
-  const selectedServerPhotosIds: string[] = [];
 
   for (const photo of selectedGalleryPhotos) {
     if (!photo.serverId) {
@@ -91,7 +70,10 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
     selectedServerPhotosIds.push(photo.serverId);
   }
 
-  const { nbServerPhotos, nbLocalAndServerPhotos } = getPhotosStatus(selectedGalleryPhotos);
+  const atleastOneLocal = selectedGalleryPhotos.find(p => p.mediaId);
+  const atleastOneServer = selectedGalleryPhotos.find(p => p.serverId);
+
+  const atleastOneServerAndOneLocal = atleastOneLocal && atleastOneServer;
 
   return (
     <View style={[styles.toolBarView]}>
@@ -99,15 +81,20 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
         nbPhotos={selectedGalleryPhotos.length}
         nbPhotosToBackUp={selectedLocalOnlyPhotos.length}
         nbPhotosToDownload={selectedServerOnlyPhotosIds.length}
-        nbPhotosToDeleteEverywhere={nbLocalAndServerPhotos}
+        nbPhotosToDeleteEverywhere={
+          atleastOneServerAndOneLocal ? selectedGalleryPhotos.length : 0
+        }
         nbPhotosToDeleteFromServer={selectedServerPhotosIds.length}
         nbPhotosToDeleteFromDevice={selectedLocalPhotosIds.length}
         onBackUp={() => {
           UploadPhotos(selectedLocalOnlyPhotos).catch(console.log);
         }}
         onDownload={() => StartPhotosDownload(selectedServerOnlyPhotosIds)}
-        onDelete={() => {}}
-        onDeleteFromServer={() => {}}
+        onDelete={() => {
+          DeletePhotosEverywhere(selectedGalleryPhotos)
+            .then(() => clearSelection?.())
+            .catch(console.log);
+        }}
         onDeleteFromServer={() => {
           DeletePhotosServer(selectedServerPhotosIds)
             .then(() => clearSelection?.())
