@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { NativeEventEmitter, NativeModules } from 'react-native';
+import { NativeEventEmitter } from 'react-native';
 
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
+import { FullScreenModule } from '~/NativeModules/FullScreenModule';
 import { NativeEventsNames } from '~/NativeModules/NativeModulesEventNames';
 import { useTabNavigationContext } from '~/Navigation/TabNavigation/TabNavigationContext';
 
@@ -10,8 +11,6 @@ import ToolBarPhotos from '../common/ToolBarPhotos';
 import { useCustomBackPress } from '../common/useCustomBackPress';
 import PhotoSliderComponent, { PhotoSliderComponentRefType } from './PhotoSliderComponent';
 import PhotoSliderHeader from './PhotoSliderHeader';
-
-const { MainModule } = NativeModules;
 
 type PropsType = {
   photos: Array<PhotoGalleryType>;
@@ -64,9 +63,9 @@ const PhotoSliderController = React.forwardRef<PhotoSliderComponentRefType, Prop
     const onPressPhoto = useCallback(() => {
       const onPressAsync = async () => {
         if (isFullScreen) {
-          await MainModule.disableFullScreen();
+          await FullScreenModule.disableFullScreen();
         } else {
-          await MainModule.enableFullScreen();
+          await FullScreenModule.enableFullScreen();
         }
         setIsFullScreen(f => !f);
       };

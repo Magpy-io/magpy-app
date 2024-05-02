@@ -1,11 +1,8 @@
-import { NativeModules } from 'react-native';
-
 import RNFS from 'react-native-fs';
 
 import { getPhotoFromDevice } from '~/Helpers/GalleryFunctions/GetGalleryPhotos';
 import * as Queries from '~/Helpers/Queries';
-
-const { MainModule } = NativeModules;
+import { SendingMediaServiceModule } from '~/NativeModules/SendingMediaServiceModule';
 
 export async function UploadPhotoTask(photo: { mediaId: string }) {
   try {
@@ -24,10 +21,13 @@ export async function UploadPhotoTask(photo: { mediaId: string }) {
     });
 
     if (result.ok && result.data.done) {
-      MainModule.onJsTaskFinished({ code: 'SUCCESS', id: result.data.photo.id });
+      SendingMediaServiceModule.onJsTaskFinished({
+        code: 'SUCCESS',
+        id: result.data.photo.id,
+      });
       console.log('UploadPhotoTask: photo uploaded');
     } else {
-      MainModule.onJsTaskFinished({ code: 'ERROR', id: '' });
+      SendingMediaServiceModule.onJsTaskFinished({ code: 'ERROR', id: '' });
       console.log('UploadPhotoTask: photo upload error');
       console.log((result as typeof result & { ok: false }).errorCode);
     }

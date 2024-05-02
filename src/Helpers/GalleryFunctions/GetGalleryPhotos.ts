@@ -1,10 +1,7 @@
-import { NativeModules } from 'react-native';
-
 import { CameraRoll, PhotoIdentifier } from '@react-native-camera-roll/camera-roll';
 
 import { PhotoLocalType } from '~/Context/ReduxStore/Slices/Photos/Photos';
-
-const { MainModule } = NativeModules;
+import { MediaManagementModule } from '~/NativeModules/MediaManagementModule';
 
 export async function GalleryGetPhotos(
   n: number,
@@ -28,7 +25,7 @@ export async function GalleryGetPhotos(
 }
 
 export async function getPhotoFromDevice(mediaId: string): Promise<PhotoLocalType> {
-  const photo = await MainModule.getPhotoById(mediaId);
+  const photo = await MediaManagementModule.getPhotoById(mediaId);
 
   const timestamp = getCorrectDate(photo) * 1000;
 
