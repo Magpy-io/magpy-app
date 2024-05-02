@@ -224,10 +224,10 @@ async function TryServer(ip: string, port: string, token: string) {
     }
     return false;
   } catch (e) {
+    console.log('Error: TryServer', e);
     if (e instanceof ErrorServerUnreachable) {
       return false;
     }
-    console.log('Error: TryServer', e);
     throw e;
   }
 }

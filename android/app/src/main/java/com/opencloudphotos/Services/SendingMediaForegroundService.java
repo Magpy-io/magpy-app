@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
+import com.opencloudphotos.Utils.BridgeFunctions;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
@@ -22,7 +23,6 @@ import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.jstasks.HeadlessJsTaskConfig;
 import com.facebook.react.bridge.Arguments;
-import com.opencloudphotos.NativeModules.MainModule;
 import com.opencloudphotos.R;
 
 import java.util.Objects;
@@ -179,7 +179,7 @@ public class SendingMediaForegroundService extends HeadlessJsTaskService {
             return;
         }
 
-        MainModule.sendEvent(reactContext, eventName, params);
+        BridgeFunctions.sendEvent(reactContext, eventName, params);
         Log.d("Service", "service sendEvent: finished");
     }
 
