@@ -20,7 +20,7 @@ class MainActivity : ReactActivity() {
 
     override fun onResume() {
         super.onResume()
-        MyStaticClasses.GetWindowInsets.initGetWindowInsets(this)
+        GetWindowInsets.initGetWindowInsets(this)
     }
 
 

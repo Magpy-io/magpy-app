@@ -411,18 +411,18 @@ public class MainModule extends ReactContextBaseJavaModule{
     @ReactMethod
     public void getWindowInsets(Promise promise){
         WritableMap insets = new WritableNativeMap();
-        boolean valid = MyStaticClasses.GetWindowInsets.getTop() != null &&
-                MyStaticClasses.GetWindowInsets.getBottom() != null &&
-                MyStaticClasses.GetWindowInsets.getRight() != null &&
-                MyStaticClasses.GetWindowInsets.getLeft() != null;
+        boolean valid = GetWindowInsets.getTop() != null &&
+                GetWindowInsets.getBottom() != null &&
+                GetWindowInsets.getRight() != null &&
+                GetWindowInsets.getLeft() != null;
 
         insets.putBoolean("valid", valid);
         if(valid){
-            insets.putInt("top", MyStaticClasses.GetWindowInsets.getTop());
-            insets.putInt("bottom", MyStaticClasses.GetWindowInsets.getBottom());
-            insets.putInt("right", MyStaticClasses.GetWindowInsets.getRight());
-            insets.putInt("left", MyStaticClasses.GetWindowInsets.getLeft());
-            insets.putBoolean("isFullScreen", MyStaticClasses.GetWindowInsets.IsFullScreen());
+            insets.putInt("top", GetWindowInsets.getTop());
+            insets.putInt("bottom", GetWindowInsets.getBottom());
+            insets.putInt("right", GetWindowInsets.getRight());
+            insets.putInt("left", GetWindowInsets.getLeft());
+            insets.putBoolean("isFullScreen", GetWindowInsets.IsFullScreen());
         }
 
         promise.resolve(insets);
