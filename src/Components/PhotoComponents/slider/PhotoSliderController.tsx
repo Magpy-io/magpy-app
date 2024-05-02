@@ -1,10 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { NativeEventEmitter } from 'react-native';
 
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { FullScreenModule } from '~/NativeModules/FullScreenModule';
-import { NativeEventsNames } from '~/NativeModules/NativeModulesEventNames';
+import { NativeEventEmitterWrapper } from '~/NativeModules/NativeModulesEventNames';
 import { useTabNavigationContext } from '~/Navigation/TabNavigation/TabNavigationContext';
 
 import ToolBarPhotos from '../common/ToolBarPhotos';
@@ -36,13 +35,10 @@ const PhotoSliderController = React.forwardRef<PhotoSliderComponentRefType, Prop
     }, [isSlidingPhotos, photos.length, onSwitchMode]);
 
     useEffect(() => {
-      const emitter = new NativeEventEmitter();
-      const subscription = emitter.addListener(
-        NativeEventsNames.FullScreenChanged,
-        (param: { isFullScreen: boolean }) => {
-          setIsFullScreen(param.isFullScreen);
-        },
-      );
+      const emitter = new NativeEventEmitterWrapper();
+      const subscription = emitter.subscribeOnFullScreenChanged(({ isFullScreen }) => {
+        setIsFullScreen(isFullScreen);
+      });
 
       return () => {
         subscription.remove();

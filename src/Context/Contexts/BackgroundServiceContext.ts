@@ -1,8 +1,7 @@
 import { useEffect } from 'react';
-import { NativeEventEmitter } from 'react-native';
 
 import { GetPhotosById } from '~/Helpers/ServerQueries';
-import { NativeEventsNames } from '~/NativeModules/NativeModulesEventNames';
+import { NativeEventEmitterWrapper } from '~/NativeModules/NativeModulesEventNames';
 
 import { ParseApiPhoto } from '../ReduxStore/Slices/Photos/Functions';
 import { addPhotoFromLocalToServer } from '../ReduxStore/Slices/Photos/Photos';
@@ -35,32 +34,29 @@ export function useBackgroundServiceEffects() {
   // }, [manageBackgroundService]);
 
   useEffect(() => {
-    const emitter = new NativeEventEmitter();
-    const subscription = emitter.addListener(
-      NativeEventsNames.PhotoUploaded,
-      ({ serverId, mediaId }: { serverId: string; mediaId: string; state: string }) => {
-        async function core() {
-          const ret = await GetPhotosById.Post({
-            ids: [serverId],
-            photoType: 'data',
-          });
+    const emitter = new NativeEventEmitterWrapper();
+    const subscription = emitter.subscribeOnPhotoUploaded(({ serverId, mediaId }) => {
+      async function core() {
+        const ret = await GetPhotosById.Post({
+          ids: [serverId],
+          photoType: 'data',
+        });
 
-          if (!ret.ok || !ret.data.photos[0].exists) {
-            console.log('photo just added but not found on server,', serverId);
-            return;
-          }
-
-          dispatch(
-            addPhotoFromLocalToServer({
-              photoServer: ParseApiPhoto(ret.data.photos[0].photo),
-              mediaId,
-            }),
-          );
+        if (!ret.ok || !ret.data.photos[0].exists) {
+          console.log('photo just added but not found on server,', serverId);
+          return;
         }
 
-        core().catch(console.log);
-      },
-    );
+        dispatch(
+          addPhotoFromLocalToServer({
+            photoServer: ParseApiPhoto(ret.data.photos[0].photo),
+            mediaId,
+          }),
+        );
+      }
+
+      core().catch(console.log);
+    });
 
     return () => {
       subscription.remove();
