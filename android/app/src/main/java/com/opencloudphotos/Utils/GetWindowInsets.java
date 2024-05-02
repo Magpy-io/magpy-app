@@ -13,7 +13,6 @@ import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeMap;
 import com.opencloudphotos.MainApplication;
-import com.opencloudphotos.NativeModules.MainModule;
 
 import javax.annotation.Nullable;
 
@@ -79,7 +78,7 @@ public class GetWindowInsets{
             if (reactContext != null) {
                 WritableMap params = new WritableNativeMap();
                 params.putBoolean("isFullScreen", isFullScreen);
-                MainModule.sendEvent(reactContext, "FullScreenChanged", params);
+                BridgeFunctions.sendEvent(reactContext, "FullScreenChanged", params);
             }else{
                 Log.e("GetWindowInsets", "React context is null.");
             }

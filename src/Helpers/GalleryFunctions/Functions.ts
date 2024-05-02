@@ -1,20 +1,17 @@
-import { NativeModules } from 'react-native';
-
 import { CameraRoll } from '@react-native-camera-roll/camera-roll';
 import RNFS from 'react-native-fs';
 
 import { PhotoLocalType } from '~/Context/ReduxStore/Slices/Photos/Photos';
+import { MediaManagementModule } from '~/NativeModules/MediaManagementModule';
 
 import { parsePhotoIdentifierToPhotoLocalType } from './GetGalleryPhotos';
 
-const { MainModule } = NativeModules;
-
 export async function deletePhotoFromDevice(mediaIds: string[]) {
-  await MainModule.deleteMedia(mediaIds);
+  await MediaManagementModule.deleteMedia(mediaIds);
 }
 
 export async function getFirstPossibleFileName(imageName: string) {
-  const path = (await MainModule.getRestoredMediaAbsolutePath()) + '/' + imageName;
+  const path = (await MediaManagementModule.getRestoredMediaAbsolutePath()) + '/' + imageName;
 
   if (!(await RNFS.exists(path))) {
     const pathSplit = path.split('/');

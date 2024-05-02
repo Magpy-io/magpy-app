@@ -3,7 +3,10 @@ import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.uimanager.ViewManager;
-import com.opencloudphotos.NativeModules.MainModule;
+import com.opencloudphotos.NativeModules.FullScreenModule;
+import com.opencloudphotos.NativeModules.PhotoExifDataModule;
+import com.opencloudphotos.NativeModules.SendingMediaServiceModule;
+import com.opencloudphotos.NativeModules.MediaManagement.MediaManagementModule;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,7 +23,10 @@ public class MyAppPackage implements ReactPackage{
             ReactApplicationContext reactContext) {
         List<NativeModule> modules = new ArrayList<>();
 
-        modules.add(new MainModule(reactContext));
+        modules.add(new SendingMediaServiceModule(reactContext));
+        modules.add(new MediaManagementModule(reactContext));
+        modules.add(new PhotoExifDataModule(reactContext));
+        modules.add(new FullScreenModule(reactContext));
 
         return modules;
     }

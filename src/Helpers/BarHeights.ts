@@ -1,7 +1,6 @@
 import { Dimensions, PixelRatio, StatusBar } from 'react-native';
-import { NativeModules } from 'react-native';
 
-const { MainModule } = NativeModules;
+import { FullScreenModule } from '~/NativeModules/FullScreenModule';
 
 export function GetScreenHeight() {
   return Dimensions.get('screen').height;
@@ -12,7 +11,7 @@ export function GetWindowHeight() {
 }
 
 export async function GetStatusBarHeight() {
-  const insets = await MainModule.getWindowInsets();
+  const insets = await FullScreenModule.getWindowInsets();
   if (insets.valid) {
     return PixelRatio.roundToNearestPixel(insets.top / PixelRatio.get());
   } else {
@@ -21,7 +20,7 @@ export async function GetStatusBarHeight() {
 }
 
 export async function GetNavigatorBarHeight() {
-  const insets = await MainModule.getWindowInsets();
+  const insets = await FullScreenModule.getWindowInsets();
   if (insets.valid) {
     return PixelRatio.roundToNearestPixel(insets.bottom / PixelRatio.get());
   } else {
@@ -30,7 +29,7 @@ export async function GetNavigatorBarHeight() {
 }
 
 export async function GetIsFullScreen() {
-  const insets = await MainModule.getWindowInsets();
+  const insets = await FullScreenModule.getWindowInsets();
   if (insets.valid) {
     return insets.isFullScreen;
   } else {
