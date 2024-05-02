@@ -1,4 +1,4 @@
-package com.opencloudphotos;
+package com.opencloudphotos.Utils;
 
 import static android.app.Activity.RESULT_OK;
 

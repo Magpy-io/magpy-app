@@ -1,9 +1,8 @@
-package com.opencloudphotos;
+package com.opencloudphotos.Services;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -23,8 +22,8 @@ import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.jstasks.HeadlessJsTaskConfig;
 import com.facebook.react.bridge.Arguments;
-import com.facebook.react.jstasks.HeadlessJsTaskContext;
-import com.facebook.react.modules.core.DeviceEventManagerModule;
+import com.opencloudphotos.NativeModules.MainModule;
+import com.opencloudphotos.R;
 
 import java.util.Objects;
 

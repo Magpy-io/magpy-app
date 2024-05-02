@@ -1,4 +1,4 @@
-package com.opencloudphotos;
+package com.opencloudphotos.Utils;
 
 import android.app.Activity;
 import android.util.Log;
@@ -12,6 +12,8 @@ import com.facebook.react.ReactNativeHost;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeMap;
+import com.opencloudphotos.MainApplication;
+import com.opencloudphotos.NativeModules.MainModule;
 
 import javax.annotation.Nullable;
 

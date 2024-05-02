@@ -1,7 +1,5 @@
-package com.opencloudphotos;
+package com.opencloudphotos.NativeModules;
 
-import com.facebook.common.logging.FLog;
-import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContext;
@@ -10,42 +8,34 @@ import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReactMethod;
-import com.facebook.react.bridge.ReadableType;
 import com.facebook.react.bridge.UiThreadUtil;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeMap;
-import com.facebook.react.common.ReactConstants;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
-import com.reactnativecommunity.cameraroll.Utils;
+import com.opencloudphotos.Services.SendingMediaForegroundService;
+import com.opencloudphotos.Utils.DeleteMedia;
+import com.opencloudphotos.Utils.GetWindowInsets;
 
 import android.app.ActivityManager;
 import android.content.ContentResolver;
-import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.media.ExifInterface;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.FileUtils;
 import android.provider.MediaStore.Images;
 
-import android.content.ContentValues;
 import android.net.Uri;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -56,10 +46,9 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 
 public class MainModule extends ReactContextBaseJavaModule{
-    MainModule(ReactApplicationContext context) {
+    public MainModule(ReactApplicationContext context) {
         super(context);
     }
-
 
     @NonNull
     @Override

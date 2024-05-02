@@ -1,4 +1,4 @@
-package com.opencloudphotos;
+package com.opencloudphotos.Utils;
 
 import static android.app.Activity.RESULT_CANCELED;
 
@@ -7,7 +7,6 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
