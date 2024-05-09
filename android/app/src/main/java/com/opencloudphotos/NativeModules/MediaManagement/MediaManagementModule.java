@@ -3,6 +3,7 @@ package com.opencloudphotos.NativeModules.MediaManagement;
 import android.content.ContentResolver;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -17,10 +18,14 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeMap;
-import com.opencloudphotos.Utils.DeleteMedia;
+import com.opencloudphotos.NativeModules.MediaManagement.Utils.Definitions;
+import com.opencloudphotos.NativeModules.MediaManagement.Utils.DeleteMedia;
+import com.opencloudphotos.NativeModules.MediaManagement.Utils.GetMediaTask;
+import com.opencloudphotos.NativeModules.MediaManagement.Utils.SaveToCameraRoll;
 
 import java.io.File;
 
@@ -138,6 +143,39 @@ public class MediaManagementModule extends ReactContextBaseJavaModule {
         }else{
             mPromise.reject("GetPhotoByIdError", "Could not get cursor from ContentProvider query.");
         }
+    }
+
+    @ReactMethod
+    public void getPhotos(final ReadableMap params, final Promise promise) {
+        int first = params.getInt("first");
+        String after = params.hasKey("after") ? params.getString("after") : null;
+        String groupName = params.hasKey("groupName") ? params.getString("groupName") : null;
+        String assetType = params.hasKey("assetType") ? params.getString("assetType") : Definitions.ASSET_TYPE_PHOTOS;
+        long fromTime = params.hasKey("fromTime") ? (long) params.getDouble("fromTime") : 0;
+        long toTime = params.hasKey("toTime") ? (long) params.getDouble("toTime") : 0;
+        ReadableArray mimeTypes = params.hasKey("mimeTypes")
+                ? params.getArray("mimeTypes")
+                : null;
+        ReadableArray include = params.hasKey("include") ? params.getArray("include") : null;
+
+        new GetMediaTask(
+                getReactApplicationContext(),
+                first,
+                after,
+                groupName,
+                mimeTypes,
+                assetType,
+                fromTime,
+                toTime,
+                include,
+                promise)
+                .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
+
+    @ReactMethod
+    public void saveToCameraRoll(String uri, ReadableMap options, Promise promise) {
+        new SaveToCameraRoll(getReactApplicationContext(), Uri.parse(uri), options, promise)
+                .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.R)
