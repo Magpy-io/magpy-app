@@ -6,8 +6,8 @@ import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.fabricEnabled
 import com.facebook.react.defaults.DefaultReactActivityDelegate
-import com.opencloudphotos.Utils.ActivityResultLauncherWrapper
-import com.opencloudphotos.Utils.GetWindowInsets
+import com.opencloudphotos.NativeModules.MediaManagement.Utils.ActivityResultLauncherWrapper
+import com.opencloudphotos.NativeModules.FullScreen.GetWindowInsets
 
 class MainActivity : ReactActivity() {
 

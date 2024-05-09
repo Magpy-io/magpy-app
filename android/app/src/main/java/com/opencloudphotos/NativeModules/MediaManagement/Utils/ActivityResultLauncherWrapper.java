@@ -1,4 +1,4 @@
-package com.opencloudphotos.Utils;
+package com.opencloudphotos.NativeModules.MediaManagement.Utils;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -15,7 +15,7 @@ public class ActivityResultLauncherWrapper {
         void onResult(boolean success, int error_code);
     }
 
-    private ActivityResultLauncher<IntentSenderRequest> deleteResultLauncher;
+    private ActivityResultLauncher<IntentSenderRequest> resultLauncher;
     private ResultCallback onResultCallback;
     private static final ActivityResultLauncherWrapper ourInstance = new ActivityResultLauncherWrapper();
     public static ActivityResultLauncherWrapper getInstance() {
@@ -28,11 +28,11 @@ public class ActivityResultLauncherWrapper {
     }
 
     public static boolean isInitialized(){
-        return getInstance().deleteResultLauncher != null;
+        return getInstance().resultLauncher != null;
     }
 
     public static void init(ReactActivity activity) {
-        getInstance().deleteResultLauncher = activity.registerForActivityResult(
+        getInstance().resultLauncher = activity.registerForActivityResult(
                 new ActivityResultContracts.StartIntentSenderForResult(),
                 new ActivityResultCallback<ActivityResult>() {
                     @Override
@@ -58,6 +58,6 @@ public class ActivityResultLauncherWrapper {
     }
 
     public static ActivityResultLauncher<IntentSenderRequest> getActivityResultLauncher() {
-        return getInstance().deleteResultLauncher;
+        return getInstance().resultLauncher;
     }
 }

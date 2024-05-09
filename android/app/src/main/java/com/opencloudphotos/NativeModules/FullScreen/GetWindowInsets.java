@@ -1,4 +1,4 @@
-package com.opencloudphotos.Utils;
+package com.opencloudphotos.NativeModules.FullScreen;
 
 import android.app.Activity;
 import android.util.Log;
@@ -13,6 +13,7 @@ import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeMap;
 import com.opencloudphotos.MainApplication;
+import com.opencloudphotos.Utils.BridgeFunctions;
 
 import javax.annotation.Nullable;
 

@@ -3,7 +3,7 @@ import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.uimanager.ViewManager;
-import com.opencloudphotos.NativeModules.FullScreenModule;
+import com.opencloudphotos.NativeModules.FullScreen.FullScreenModule;
 import com.opencloudphotos.NativeModules.PhotoExifDataModule;
 import com.opencloudphotos.NativeModules.SendingMediaServiceModule;
 import com.opencloudphotos.NativeModules.MediaManagement.MediaManagementModule;

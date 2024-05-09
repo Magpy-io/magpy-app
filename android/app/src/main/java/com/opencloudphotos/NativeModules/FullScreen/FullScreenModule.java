@@ -1,4 +1,4 @@
-package com.opencloudphotos.NativeModules;
+package com.opencloudphotos.NativeModules.FullScreen;
 
 import androidx.annotation.NonNull;
 import androidx.core.view.WindowCompat;
@@ -12,7 +12,6 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.UiThreadUtil;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeMap;
-import com.opencloudphotos.Utils.GetWindowInsets;
 
 
 public class FullScreenModule extends ReactContextBaseJavaModule {

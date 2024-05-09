@@ -1,4 +1,3 @@
-import { CameraRoll } from '@react-native-camera-roll/camera-roll';
 import RNFS from 'react-native-fs';
 
 import { PhotoLocalType } from '~/Context/ReduxStore/Slices/Photos/Photos';
@@ -52,7 +51,10 @@ export async function addPhotoToDevice(photo: {
   const cachePhotoPath = RNFS.ExternalCachesDirectoryPath + `/${imageName}`;
   await RNFS.writeFile(cachePhotoPath, photo.image64, 'base64');
 
-  const imageData = await CameraRoll.saveAsset(cachePhotoPath, { album: 'Restored' });
+  const imageData = await MediaManagementModule.saveToCameraRoll(cachePhotoPath, {
+    type: 'photo',
+    album: 'Restored',
+  });
 
   await RNFS.unlink(cachePhotoPath);
   return parsePhotoIdentifierToPhotoLocalType(imageData);

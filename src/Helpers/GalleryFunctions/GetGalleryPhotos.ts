@@ -1,4 +1,4 @@
-import { CameraRoll, PhotoIdentifier } from '@react-native-camera-roll/camera-roll';
+import { PhotoIdentifier } from '@react-native-camera-roll/camera-roll';
 
 import { PhotoLocalType } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { MediaManagementModule } from '~/NativeModules/MediaManagementModule';
@@ -7,7 +7,7 @@ export async function GalleryGetPhotos(
   n: number,
   offset: number = 0,
 ): Promise<PhotoLocalType[]> {
-  const result = await CameraRoll.getPhotos({
+  const result = await MediaManagementModule.getPhotos({
     first: n,
     after: String(offset),
     assetType: 'Photos',

@@ -1,4 +1,4 @@
-package com.opencloudphotos.Utils;
+package com.opencloudphotos.NativeModules.MediaManagement.Utils;
 
 import static android.app.Activity.RESULT_CANCELED;
 
