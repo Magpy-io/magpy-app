@@ -158,6 +158,19 @@ public class MediaManagementModule extends ReactContextBaseJavaModule {
                 : null;
         ReadableArray include = params.hasKey("include") ? params.getArray("include") : null;
 
+        GetMediaTask.ResultCallback resultCallback = new GetMediaTask.ResultCallback(){
+
+            @Override
+            public void reject(String s, String s1) {
+                promise.reject(s,s1);
+            }
+
+            @Override
+            public void resolve(WritableMap result) {
+                promise.resolve(result);
+            }
+        };
+
         new GetMediaTask(
                 getReactApplicationContext(),
                 first,
@@ -168,7 +181,7 @@ public class MediaManagementModule extends ReactContextBaseJavaModule {
                 fromTime,
                 toTime,
                 include,
-                promise)
+                resultCallback)
                 .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 

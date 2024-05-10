@@ -45,11 +45,17 @@ public class GetMediaTask extends GuardedAsyncTask<Void, Void> {
     String mGroupName;
     private final @Nullable
     ReadableArray mMimeTypes;
-    private final Promise mPromise;
+    private final ResultCallback mPromise;
     private final String mAssetType;
     private final long mFromTime;
     private final long mToTime;
     private final Set<String> mInclude;
+
+    public interface ResultCallback{
+        public void reject(String s, String s1);
+
+        public void resolve(WritableMap result);
+    }
 
     public GetMediaTask(
             ReactContext context,
@@ -61,7 +67,7 @@ public class GetMediaTask extends GuardedAsyncTask<Void, Void> {
             long fromTime,
             long toTime,
             @Nullable ReadableArray include,
-            Promise promise) {
+            ResultCallback promise) {
         super(context);
         mContext = context;
         mFirst = first;
@@ -193,8 +199,7 @@ public class GetMediaTask extends GuardedAsyncTask<Void, Void> {
         } catch (SecurityException e) {
             mPromise.reject(
                     Definitions.ERROR_UNABLE_TO_LOAD_PERMISSION,
-                    "Could not get media: need READ_EXTERNAL_STORAGE permission",
-                    e);
+                    "Could not get media: need READ_EXTERNAL_STORAGE permission, " + e.toString());
         }
     }
 
