@@ -18,6 +18,7 @@ import LogoutComponent from '~/Components/SettingsComponents/LogoutComponent';
 import ProfileHeader from '~/Components/SettingsComponents/ProfileHeader';
 import SettingComponent from '~/Components/SettingsComponents/SettingComponent';
 import { useStyles } from '~/Hooks/useStyles';
+import { MediaManagementModule } from '~/NativeModules/MediaManagementModule';
 import { useMainNavigation } from '~/Navigation/Navigation';
 import { TabBarPadding } from '~/Navigation/TabNavigation/TabBar';
 import { colorsType } from '~/Styles/colors';
@@ -40,7 +41,9 @@ export default function SettingsScreenTab() {
       data: [
         {
           title: 'Back up settings',
-          onPress: () => {},
+          onPress: () => {
+            MediaManagementModule.testFunction();
+          },
           icon: <UploadIcon />,
         },
         {
