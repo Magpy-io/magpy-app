@@ -300,6 +300,7 @@ public class MediaManagementModule extends ReactContextBaseJavaModule {
                     throw new RuntimeException(e);
                 }
 
+                final int MAX_MISSING_PHOTOS_TO_UPLOAD = 10;
                 List<PhotoData> missingPhotos = new ArrayList<PhotoData>();
 
                 try {
@@ -314,12 +315,12 @@ public class MediaManagementModule extends ReactContextBaseJavaModule {
                             PhotoData photoData = new PhotoData();
 
 
-                            Double timestamp = node.getDouble("timestamp");
-                            Double modificationTimestamp = node.getDouble("modificationTimestamp");
+                            double timestamp = node.getDouble("timestamp");
+                            double modificationTimestamp = node.getDouble("modificationTimestamp");
 
-                            Double correctTimestamp = Math.min(timestamp, modificationTimestamp);
+                            double correctTimestamp = Math.min(timestamp, modificationTimestamp);
 
-                            Instant instant = Instant.ofEpochSecond(correctTimestamp.longValue());
+                            Instant instant = Instant.ofEpochSecond((long)correctTimestamp);
                             String timestampAsIso = instant.toString();
 
                             photoData.mediaId = id;
@@ -344,15 +345,92 @@ public class MediaManagementModule extends ReactContextBaseJavaModule {
 
                             byte[] b = byteBuffer.toByteArray();
 
-                            photoData.image64  = Base64.encodeToString(b, 0);
+                            photoData.image64 = Base64.encodeToString(b, 0);
 
                             missingPhotos.add(photoData);
+
+                            if(missingPhotos.size() >= MAX_MISSING_PHOTOS_TO_UPLOAD){
+                                break;
+                            }
+
                         }
                     }
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
 
+
+                for (PhotoData photoData: missingPhotos) {
+
+                    String transferId;
+                    jsonRequest = new JSONObject();
+                    try {
+                        jsonRequest.put("name", photoData.name);
+                        jsonRequest.put("fileSize", photoData.fileSize);
+                        jsonRequest.put("width", photoData.width);
+                        jsonRequest.put("height", photoData.height);
+                        jsonRequest.put("mediaId", photoData.mediaId);
+                        jsonRequest.put("date", photoData.date);
+                        jsonRequest.put("image64Len", photoData.image64.length());
+                        jsonRequest.put("deviceUniqueId", "7a83660e-9509-4e94-9dc8-7c5ef3dbef83");
+                    } catch (Exception e) {
+                        Log.d("main", e.getMessage());
+                    }
+
+                    body = RequestBody.create(jsonRequest.toString(), JSON);
+                    request = new Request.Builder()
+                            .url("http://192.168.0.15:8000/addPhotoInit")
+                            .post(body)
+                            .addHeader("x-authorization","Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ODg0OGM0ZDE0ODUxMTIxMzMwZWMzZSIsImlhdCI6MTcxNTI5NDkwNywiZXhwIjoxNzE1MzgxMzA3fQ.2ym3CzGYG83puxzCTqkoAxYx7iid4uSKDqC1UCf9_xc")
+                            .build();
+
+                    ret = null;
+                    response = null;
+                    try {
+                        response = client.newCall(request).execute();
+                        ret = response.body().string();
+
+                        JSONObject jsonResponse = new JSONObject(ret);
+                        JSONObject data = jsonResponse.getJSONObject("data");
+                        transferId = data.getString("id");
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+
+
+                    List<String> parts = splitString(photoData.image64);
+
+                    for(int i = 0; i<parts.size(); i++){
+
+                        String part = parts.get(i);
+                        jsonRequest = new JSONObject();
+                        try {
+                            jsonRequest.put("id", transferId);
+                            jsonRequest.put("partNumber", i);
+                            jsonRequest.put("partSize", part.length());
+                            jsonRequest.put("photoPart", part);
+                        } catch (Exception e) {
+                            Log.d("main", e.getMessage());
+                        }
+
+                        body = RequestBody.create(jsonRequest.toString(), JSON);
+                        request = new Request.Builder()
+                                .url("http://192.168.0.15:8000/addPhotoPart")
+                                .post(body)
+                                .addHeader("x-authorization","Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ODg0OGM0ZDE0ODUxMTIxMzMwZWMzZSIsImlhdCI6MTcxNTI5NDkwNywiZXhwIjoxNzE1MzgxMzA3fQ.2ym3CzGYG83puxzCTqkoAxYx7iid4uSKDqC1UCf9_xc")
+                                .build();
+
+                        ret = null;
+                        response = null;
+                        try {
+                            response = client.newCall(request).execute();
+                            ret = response.body().string();
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+
+                }
 
                 Log.d("main", ret);
 
@@ -368,7 +446,7 @@ public class MediaManagementModule extends ReactContextBaseJavaModule {
 
         new GetMediaTask(
                 getReactApplicationContext(),
-                10,
+                3000,
                 null,
                 null,
                 null,
@@ -378,6 +456,23 @@ public class MediaManagementModule extends ReactContextBaseJavaModule {
                 include,
                 resultCallback)
                 .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
+
+    public List<String> splitString(String str){
+        int partSize = 100000;
+        int numberOfParts = (int)(str.length() / partSize);
+
+        List<String> parts = new ArrayList<>();
+
+        for(int i = 0; i<numberOfParts; i++){
+            parts.add(str.substring(i * partSize, (i+1) * partSize));
+        }
+
+        if(str.length() % partSize != 0){
+            parts.add(str.substring(numberOfParts * partSize));
+        }
+
+        return parts;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.R)
