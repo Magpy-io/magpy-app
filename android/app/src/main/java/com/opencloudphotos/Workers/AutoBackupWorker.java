@@ -22,11 +22,14 @@ public class AutoBackupWorker extends Worker {
     final String CHANNEL_ID = "AUTO BACKUP CHANNEL";
 
     public static final String WORKER_NAME = "AUTO_BACKUP_WORKER_NAME";
-
     public static final String DATA_KEY_URL = "URL";
     public static final String DATA_KEY_SERVER_TOKEN = "SERVER_TOKEN";
     public static final String DATA_KEY_DEVICE_UNIQUE_ID = "DEVICE_UNIQUE_ID";
 
+
+    protected String url;
+    protected String serverToken;
+    protected String deviceId;
 
     public AutoBackupWorker(
             @NonNull Context context,
@@ -34,11 +37,24 @@ public class AutoBackupWorker extends Worker {
         super(context, params);
     }
 
+    protected boolean parseInputData(){
+        url = getInputData().getString(DATA_KEY_URL);
+        serverToken = getInputData().getString(DATA_KEY_SERVER_TOKEN);
+        deviceId = getInputData().getString(DATA_KEY_DEVICE_UNIQUE_ID);
+
+        return url != null && serverToken != null && deviceId != null;
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.O)
     @NonNull
     @Override
     public Result doWork() {
         Log.d("AutoBackupWorker", "Work started.");
+
+        boolean dataParsed = parseInputData();
+        if(!dataParsed) {
+            return Result.failure();
+        }
 
         Context context = getApplicationContext();
 

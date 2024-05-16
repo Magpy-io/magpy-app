@@ -11,7 +11,6 @@ import android.util.Base64;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 
 import com.facebook.react.bridge.Arguments;
@@ -23,12 +22,14 @@ import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
-import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.bridge.WritableNativeMap;
+import com.opencloudphotos.GlobalManagers.ServerQueriesManager.GetPhotos;
+import com.opencloudphotos.GlobalManagers.ServerQueriesManager.PhotoUploader;
 import com.opencloudphotos.NativeModules.MediaManagement.Utils.Definitions;
 import com.opencloudphotos.NativeModules.MediaManagement.Utils.DeleteMedia;
 import com.opencloudphotos.NativeModules.MediaManagement.Utils.GetMediaTask;
 import com.opencloudphotos.NativeModules.MediaManagement.Utils.SaveToCameraRoll;
+import com.opencloudphotos.GlobalManagers.ServerQueriesManager.Common.PhotoData;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -39,14 +40,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -216,21 +212,88 @@ public class MediaManagementModule extends ReactContextBaseJavaModule {
                 .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
+    public String[] getIdsFromGetMedia(WritableMap result){
+        ReadableArray edges = result.getArray("edges");
+
+        String[] ids = new String[edges.size()];
+
+        for(int i = 0; i< edges.size(); i++){
+            ReadableMap item = edges.getMap(i);
+            ReadableMap node = item.getMap("node");
+            String id = node.getString("id");
+            ids[i] = id;
+        }
+        return ids;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public List<PhotoData> getPhotosDataFromGetMediaIfNotInServer(WritableMap result, boolean[] photosExist, int numberOfPhotosToReturn){
+        ReadableArray edges = result.getArray("edges");
+
+        List<PhotoData> missingPhotos = new ArrayList<>();
+
+        for(int i = 0; i< photosExist.length; i++) {
+            boolean exists = photosExist[i];
+            if(!exists){
+                ReadableMap item = edges.getMap(i);
+                ReadableMap node = item.getMap("node");
+                ReadableMap image = node.getMap("image");
+                PhotoData photoData = new PhotoData();
+
+                double timestamp = node.getDouble("timestamp");
+                double modificationTimestamp = node.getDouble("modificationTimestamp");
+
+                double correctTimestamp = Math.min(timestamp, modificationTimestamp);
+
+                Instant instant = Instant.ofEpochSecond((long)correctTimestamp);
+                String timestampAsIso = instant.toString();
+
+                photoData.mediaId = node.getString("id");
+                photoData.uri = image.getString("uri");
+                photoData.fileSize = image.getDouble("fileSize");
+                photoData.height = image.getDouble("height");
+                photoData.width = image.getDouble("width");
+                photoData.name = image.getString("filename");
+                photoData.date = timestampAsIso;
+
+
+                InputStream inputStream = null;
+                try {
+                    inputStream = getReactApplicationContext().getContentResolver().openInputStream(Uri.parse(photoData.uri));
+                } catch (FileNotFoundException e) {
+                    throw new RuntimeException("Media file not found.", e);
+                }
+                ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
+
+                int bufferSize = 1024;
+                byte[] buffer = new byte[bufferSize];
+
+                int len = 0;
+
+                try{
+                    while ((len = inputStream.read(buffer)) != -1) {
+                        byteBuffer.write(buffer, 0, len);
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException("Error while reading media file.", e);
+                }
+
+                byte[] b = byteBuffer.toByteArray();
+
+                photoData.image64 = Base64.encodeToString(b, 0);
+
+                missingPhotos.add(photoData);
+
+                if(missingPhotos.size() >= numberOfPhotosToReturn){
+                    break;
+                }
+            }
+        }
+        return missingPhotos;
+    }
+
     @ReactMethod
     public void testFunction(){
-
-        class PhotoData{
-            public String name;
-            public double fileSize;
-            public double width;
-            public double height;
-            public String mediaId;
-            public String date;
-            public String image64;
-            public String uri;
-
-        }
-
         GetMediaTask.ResultCallback resultCallback = new GetMediaTask.ResultCallback(){
 
             @Override
@@ -241,200 +304,37 @@ public class MediaManagementModule extends ReactContextBaseJavaModule {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void resolve(WritableMap result) {
-                ReadableArray edges = result.getArray("edges");
 
-                String[] ids = new String[edges.size()];
+                String[] ids = getIdsFromGetMedia(result);
 
-                for(int i = 0; i< edges.size(); i++){
-                    ReadableMap item = edges.getMap(i);
-                    ReadableMap node = item.getMap("node");
-                    String id = node.getString("id");
-                    ids[i] = id;
-                }
+                GetPhotos getPhotos = new GetPhotos(
+                        "http://192.168.0.15:8000",
+                        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ODg0OGM0ZDE0ODUxMTIxMzMwZWMzZSIsImlhdCI6MTcxNTg4MzY5MCwiZXhwIjoxNzE4NDc1NjkwfQ.9octfxmAhZMgxTDp0xcT0oDuOf0BWzdCEADpy1X-zNI",
+                        "7a83660e-9509-4e94-9dc8-7c5ef3dbef83");
 
-                MediaType JSON = MediaType.get("application/json");
-                OkHttpClient client = new OkHttpClient();
+                boolean[] photosExist;
 
-                JSONObject jsonRequest = new JSONObject();
                 try {
-                    jsonRequest.put("photoType", "data");
-                    jsonRequest.put("deviceUniqueId", "7a83660e-9509-4e94-9dc8-7c5ef3dbef83");
-
-                    JSONArray photosData = new JSONArray();
-
-                    for (String id : ids) {
-                        JSONObject photosDataElement = new JSONObject();
-                        photosDataElement.put("mediaId", id);
-
-                        photosData.put(photosDataElement);
-                    }
-
-                    jsonRequest.put("photosData", photosData);
-
-                } catch (Exception e) {
-                    Log.d("main", e.getMessage());
-                }
-
-                RequestBody body = RequestBody.create(jsonRequest.toString(), JSON);
-                Request request = new Request.Builder()
-                        .url("http://192.168.0.15:8000/getPhotosByMediaId")
-                        .post(body)
-                        .addHeader("x-authorization","Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ODg0OGM0ZDE0ODUxMTIxMzMwZWMzZSIsImlhdCI6MTcxNTI5NDkwNywiZXhwIjoxNzE1MzgxMzA3fQ.2ym3CzGYG83puxzCTqkoAxYx7iid4uSKDqC1UCf9_xc")
-                        .build();
-
-                String ret = null;
-                Response response = null;
-                try {
-                    response = client.newCall(request).execute();
-                    ret = response.body().string();
+                    photosExist = getPhotos.getPhotosExistById(ids);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
 
-                JSONArray photos;
-                try {
-                    JSONObject jsonResponse = new JSONObject(ret);
-                    JSONObject data = jsonResponse.getJSONObject("data");
-                    photos = data.getJSONArray("photos");
-                } catch (JSONException e) {
-                    throw new RuntimeException(e);
-                }
-
                 final int MAX_MISSING_PHOTOS_TO_UPLOAD = 10;
-                List<PhotoData> missingPhotos = new ArrayList<PhotoData>();
+                List<PhotoData> missingPhotos = getPhotosDataFromGetMediaIfNotInServer(result, photosExist, MAX_MISSING_PHOTOS_TO_UPLOAD);
 
-                try {
-                    for(int i = 0; i< photos.length(); i++) {
-                        JSONObject photo = photos.getJSONObject(i);
-                        boolean exists = photo.getBoolean("exists");
-                        String id = photo.getString("mediaId");
-                        if(!exists){
-                            ReadableMap item = edges.getMap(i);
-                            ReadableMap node = item.getMap("node");
-                            ReadableMap image = node.getMap("image");
-                            PhotoData photoData = new PhotoData();
-
-
-                            double timestamp = node.getDouble("timestamp");
-                            double modificationTimestamp = node.getDouble("modificationTimestamp");
-
-                            double correctTimestamp = Math.min(timestamp, modificationTimestamp);
-
-                            Instant instant = Instant.ofEpochSecond((long)correctTimestamp);
-                            String timestampAsIso = instant.toString();
-
-                            photoData.mediaId = id;
-                            photoData.uri = image.getString("uri");
-                            photoData.fileSize = image.getDouble("fileSize");
-                            photoData.height = image.getDouble("height");
-                            photoData.width = image.getDouble("width");
-                            photoData.name = image.getString("filename");
-                            photoData.date = timestampAsIso;
-
-
-                            InputStream inputStream = getReactApplicationContext().getContentResolver().openInputStream(Uri.parse(photoData.uri));
-                            ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
-
-                            int bufferSize = 1024;
-                            byte[] buffer = new byte[bufferSize];
-
-                            int len = 0;
-                            while ((len = inputStream.read(buffer)) != -1) {
-                                byteBuffer.write(buffer, 0, len);
-                            }
-
-                            byte[] b = byteBuffer.toByteArray();
-
-                            photoData.image64 = Base64.encodeToString(b, 0);
-
-                            missingPhotos.add(photoData);
-
-                            if(missingPhotos.size() >= MAX_MISSING_PHOTOS_TO_UPLOAD){
-                                break;
-                            }
-
-                        }
-                    }
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-
+                PhotoUploader photoUploader = new PhotoUploader(
+                        "http://192.168.0.15:8000",
+                        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ODg0OGM0ZDE0ODUxMTIxMzMwZWMzZSIsImlhdCI6MTcxNTg4MzY5MCwiZXhwIjoxNzE4NDc1NjkwfQ.9octfxmAhZMgxTDp0xcT0oDuOf0BWzdCEADpy1X-zNI",
+                        "7a83660e-9509-4e94-9dc8-7c5ef3dbef83");
 
                 for (PhotoData photoData: missingPhotos) {
-
-                    String transferId;
-                    jsonRequest = new JSONObject();
                     try {
-                        jsonRequest.put("name", photoData.name);
-                        jsonRequest.put("fileSize", photoData.fileSize);
-                        jsonRequest.put("width", photoData.width);
-                        jsonRequest.put("height", photoData.height);
-                        jsonRequest.put("mediaId", photoData.mediaId);
-                        jsonRequest.put("date", photoData.date);
-                        jsonRequest.put("image64Len", photoData.image64.length());
-                        jsonRequest.put("deviceUniqueId", "7a83660e-9509-4e94-9dc8-7c5ef3dbef83");
-                    } catch (Exception e) {
-                        Log.d("main", e.getMessage());
-                    }
-
-                    body = RequestBody.create(jsonRequest.toString(), JSON);
-                    request = new Request.Builder()
-                            .url("http://192.168.0.15:8000/addPhotoInit")
-                            .post(body)
-                            .addHeader("x-authorization","Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ODg0OGM0ZDE0ODUxMTIxMzMwZWMzZSIsImlhdCI6MTcxNTI5NDkwNywiZXhwIjoxNzE1MzgxMzA3fQ.2ym3CzGYG83puxzCTqkoAxYx7iid4uSKDqC1UCf9_xc")
-                            .build();
-
-                    ret = null;
-                    response = null;
-                    try {
-                        response = client.newCall(request).execute();
-                        ret = response.body().string();
-
-                        JSONObject jsonResponse = new JSONObject(ret);
-                        JSONObject data = jsonResponse.getJSONObject("data");
-                        transferId = data.getString("id");
-                    } catch (Exception e) {
+                        photoUploader.uploadPhoto(photoData);
+                    } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
-
-
-                    List<String> parts = splitString(photoData.image64);
-
-                    for(int i = 0; i<parts.size(); i++){
-
-                        String part = parts.get(i);
-                        jsonRequest = new JSONObject();
-                        try {
-                            jsonRequest.put("id", transferId);
-                            jsonRequest.put("partNumber", i);
-                            jsonRequest.put("partSize", part.length());
-                            jsonRequest.put("photoPart", part);
-                        } catch (Exception e) {
-                            Log.d("main", e.getMessage());
-                        }
-
-                        body = RequestBody.create(jsonRequest.toString(), JSON);
-                        request = new Request.Builder()
-                                .url("http://192.168.0.15:8000/addPhotoPart")
-                                .post(body)
-                                .addHeader("x-authorization","Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ODg0OGM0ZDE0ODUxMTIxMzMwZWMzZSIsImlhdCI6MTcxNTI5NDkwNywiZXhwIjoxNzE1MzgxMzA3fQ.2ym3CzGYG83puxzCTqkoAxYx7iid4uSKDqC1UCf9_xc")
-                                .build();
-
-                        ret = null;
-                        response = null;
-                        try {
-                            response = client.newCall(request).execute();
-                            ret = response.body().string();
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-
                 }
-
-                Log.d("main", ret);
-
-
             }
         };
 
@@ -446,7 +346,7 @@ public class MediaManagementModule extends ReactContextBaseJavaModule {
 
         new GetMediaTask(
                 getReactApplicationContext(),
-                3000,
+                100,
                 null,
                 null,
                 null,
@@ -456,23 +356,6 @@ public class MediaManagementModule extends ReactContextBaseJavaModule {
                 include,
                 resultCallback)
                 .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-    }
-
-    public List<String> splitString(String str){
-        int partSize = 100000;
-        int numberOfParts = (int)(str.length() / partSize);
-
-        List<String> parts = new ArrayList<>();
-
-        for(int i = 0; i<numberOfParts; i++){
-            parts.add(str.substring(i * partSize, (i+1) * partSize));
-        }
-
-        if(str.length() % partSize != 0){
-            parts.add(str.substring(numberOfParts * partSize));
-        }
-
-        return parts;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.R)
