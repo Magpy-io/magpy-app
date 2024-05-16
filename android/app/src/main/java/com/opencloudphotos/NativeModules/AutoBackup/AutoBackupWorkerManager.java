@@ -2,6 +2,8 @@ package com.opencloudphotos.NativeModules.AutoBackup;
 
 import android.content.Context;
 
+import androidx.work.Data;
+import androidx.work.ExistingPeriodicWorkPolicy;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
@@ -30,20 +32,25 @@ public class AutoBackupWorkerManager {
         this.mPromise = promise;
     }
 
-    public void RestartWorker(){
+    public void StartWorker(String url, String serverToken, String deviceId){
 
         Context context = this.context;
         Promise promise = this.mPromise;
 
         PeriodicWorkRequest uploadRequest =
                 new PeriodicWorkRequest.Builder(AutoBackupWorker.class, 15, TimeUnit.MINUTES)
-                        .addTag(AutoBackupWorker.WORKER_TAG)
+                        .setInputData(
+                                new Data.Builder()
+                                        .putString(AutoBackupWorker.DATA_KEY_URL, url)
+                                        .putString(AutoBackupWorker.DATA_KEY_SERVER_TOKEN, serverToken)
+                                        .putString(AutoBackupWorker.DATA_KEY_DEVICE_UNIQUE_ID, deviceId)
+                                        .build()
+                        )
                         .build();
 
         ExecutorsManager.executorService.execute(() -> {
             try {
-                WorkManager.getInstance(context).cancelAllWorkByTag(AutoBackupWorker.WORKER_TAG).getResult().get();
-                WorkManager.getInstance(context).enqueue(uploadRequest);
+                WorkManager.getInstance(context).enqueueUniquePeriodicWork(AutoBackupWorker.WORKER_NAME, ExistingPeriodicWorkPolicy.UPDATE, uploadRequest).getResult().get();
                 promise.resolve(null);
             } catch (ExecutionException | InterruptedException e) {
                 promise.reject("Error", e.toString());
@@ -60,7 +67,7 @@ public class AutoBackupWorkerManager {
             try {
                 result = WorkManager
                         .getInstance(context)
-                        .getWorkInfosByTag(AutoBackupWorker.WORKER_TAG)
+                        .getWorkInfosForUniqueWork(AutoBackupWorker.WORKER_NAME)
                         .get();
             } catch (ExecutionException | InterruptedException e) {
                 promise.reject("Error", e.toString());
@@ -68,7 +75,7 @@ public class AutoBackupWorkerManager {
             }
 
             for (WorkInfo workinfo:result) {
-                if(workinfo.getState() == WorkInfo.State.RUNNING || workinfo.getState() == WorkInfo.State.ENQUEUED){
+                if(!workinfo.getState().isFinished()){
                     promise.resolve(true);
                     return;
                 }
@@ -84,7 +91,7 @@ public class AutoBackupWorkerManager {
 
         ExecutorsManager.executorService.execute(() -> {
             try {
-                WorkManager.getInstance(context).cancelAllWorkByTag(AutoBackupWorker.WORKER_TAG).getResult().get();
+                WorkManager.getInstance(context).cancelUniqueWork(AutoBackupWorker.WORKER_NAME).getResult().get();
             } catch (ExecutionException | InterruptedException e) {
                 promise.reject("Error", e.toString());
             }

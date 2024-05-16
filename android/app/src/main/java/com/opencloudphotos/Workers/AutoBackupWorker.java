@@ -21,7 +21,12 @@ public class AutoBackupWorker extends Worker {
     final int NOTIFICATION_ID = 1002;
     final String CHANNEL_ID = "AUTO BACKUP CHANNEL";
 
-    public static final String WORKER_TAG = "AUTO_BACKUP_WORKER_TAG";
+    public static final String WORKER_NAME = "AUTO_BACKUP_WORKER_NAME";
+
+    public static final String DATA_KEY_URL = "URL";
+    public static final String DATA_KEY_SERVER_TOKEN = "SERVER_TOKEN";
+    public static final String DATA_KEY_DEVICE_UNIQUE_ID = "DEVICE_UNIQUE_ID";
+
 
     public AutoBackupWorker(
             @NonNull Context context,
