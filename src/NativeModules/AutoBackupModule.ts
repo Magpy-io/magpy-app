@@ -3,7 +3,11 @@ import { NativeModules } from 'react-native';
 const { AutoBackupModule } = NativeModules;
 
 export interface AutoBackupModuleType {
-  StartBackupWorker: () => Promise<void>;
+  StartBackupWorker: (data: {
+    url: string;
+    serverToken: string;
+    deviceId: string;
+  }) => Promise<void>;
   IsWorkerAlive: () => Promise<boolean>;
   StopWorker: () => Promise<void>;
 }
