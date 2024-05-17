@@ -50,7 +50,7 @@ public class AutoBackupWorkerManager {
 
         ExecutorsManager.executorService.execute(() -> {
             try {
-                WorkManager.getInstance(context).enqueueUniquePeriodicWork(AutoBackupWorker.WORKER_NAME, ExistingPeriodicWorkPolicy.UPDATE, uploadRequest).getResult().get();
+                WorkManager.getInstance(context).enqueueUniquePeriodicWork(AutoBackupWorker.WORKER_NAME, ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE, uploadRequest).getResult().get();
                 promise.resolve(null);
             } catch (ExecutionException | InterruptedException e) {
                 promise.reject("Error", e.toString());
