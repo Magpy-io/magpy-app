@@ -23,6 +23,7 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeMap;
+import com.opencloudphotos.GlobalManagers.ExecutorsManager;
 import com.opencloudphotos.GlobalManagers.ServerQueriesManager.GetPhotos;
 import com.opencloudphotos.GlobalManagers.ServerQueriesManager.PhotoUploader;
 import com.opencloudphotos.NativeModules.MediaManagement.Utils.Definitions;
@@ -192,18 +193,25 @@ public class MediaManagementModule extends ReactContextBaseJavaModule {
             }
         };
 
-        new GetMediaTask(
-                getReactApplicationContext(),
-                first,
-                after,
-                groupName,
-                mimeTypes,
-                assetType,
-                fromTime,
-                toTime,
-                include,
-                resultCallback)
-                .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        ExecutorsManager.executorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                new GetMediaTask(
+                        getReactApplicationContext(),
+                        first,
+                        after,
+                        groupName,
+                        mimeTypes,
+                        assetType,
+                        fromTime,
+                        toTime,
+                        include,
+                        resultCallback)
+                        .execute();
+            }
+        });
+
+
     }
 
     @ReactMethod

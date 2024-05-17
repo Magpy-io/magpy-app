@@ -36,7 +36,7 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
-public class GetMediaTask extends GuardedAsyncTask<Void, Void> {
+public class GetMediaTask{
     private final Context mContext;
     private final int mFirst;
     private final @Nullable
@@ -58,7 +58,7 @@ public class GetMediaTask extends GuardedAsyncTask<Void, Void> {
     }
 
     public GetMediaTask(
-            ReactContext context,
+            Context context,
             int first,
             @Nullable String after,
             @Nullable String groupName,
@@ -68,7 +68,6 @@ public class GetMediaTask extends GuardedAsyncTask<Void, Void> {
             long toTime,
             @Nullable ReadableArray include,
             ResultCallback promise) {
-        super(context);
         mContext = context;
         mFirst = first;
         mAfter = after;
@@ -98,8 +97,7 @@ public class GetMediaTask extends GuardedAsyncTask<Void, Void> {
         return includeSet;
     }
 
-    @Override
-    protected void doInBackgroundGuarded(Void... params) {
+    public void execute() {
         StringBuilder selection = new StringBuilder("1");
         List<String> selectionArgs = new ArrayList<>();
         if (!TextUtils.isEmpty(mGroupName)) {
