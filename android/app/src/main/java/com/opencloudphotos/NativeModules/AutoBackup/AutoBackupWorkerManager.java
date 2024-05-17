@@ -92,6 +92,7 @@ public class AutoBackupWorkerManager {
         ExecutorsManager.executorService.execute(() -> {
             try {
                 WorkManager.getInstance(context).cancelUniqueWork(AutoBackupWorker.WORKER_NAME).getResult().get();
+                promise.resolve(null);
             } catch (ExecutionException | InterruptedException e) {
                 promise.reject("Error", e.toString());
             }
