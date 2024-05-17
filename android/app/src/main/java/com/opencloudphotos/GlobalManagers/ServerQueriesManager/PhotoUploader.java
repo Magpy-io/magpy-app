@@ -42,7 +42,7 @@ public class PhotoUploader {
             throw new RuntimeException("Error creating JSON request object.");
         }
 
-        jsonResponse = HttpManager.SendRequest(url + "/addPhotoInit", jsonRequest, serverToken);
+        jsonResponse = HttpManager.SendRequest(url + "addPhotoInit", jsonRequest, serverToken);
 
         try {
             boolean ok = jsonResponse.getBoolean("ok");
@@ -71,7 +71,7 @@ public class PhotoUploader {
                 throw new RuntimeException("Error creating JSON request object.");
             }
 
-            jsonResponse = HttpManager.SendRequest(url + "/addPhotoPart", jsonRequest, serverToken);
+            jsonResponse = HttpManager.SendRequest(url + "addPhotoPart", jsonRequest, serverToken);
 
             try {
                 boolean ok = jsonResponse.getBoolean("ok");
