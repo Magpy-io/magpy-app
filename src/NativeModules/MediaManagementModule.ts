@@ -143,7 +143,6 @@ export interface MediaManagementModuleType {
     path: string,
     options: SaveToCameraRollOptions,
   ) => Promise<PhotoIdentifier>;
-  testFunction: () => void;
 }
 
 export type LocalPhotoById = {

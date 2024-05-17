@@ -17,8 +17,11 @@ import AutoBackupCard from '~/Components/SettingsComponents/AutoBackupCard';
 import LogoutComponent from '~/Components/SettingsComponents/LogoutComponent';
 import ProfileHeader from '~/Components/SettingsComponents/ProfileHeader';
 import SettingComponent from '~/Components/SettingsComponents/SettingComponent';
+import { uniqueDeviceId } from '~/Config/config';
+import { GetPath } from '~/Helpers/ServerQueries/PathManager';
+import { GetUserToken } from '~/Helpers/ServerQueries/TokenManager';
 import { useStyles } from '~/Hooks/useStyles';
-import { MediaManagementModule } from '~/NativeModules/MediaManagementModule';
+import { AutoBackupModule } from '~/NativeModules/AutoBackupModule';
 import { useMainNavigation } from '~/Navigation/Navigation';
 import { TabBarPadding } from '~/Navigation/TabNavigation/TabBar';
 import { colorsType } from '~/Styles/colors';
@@ -35,6 +38,10 @@ export default function SettingsScreenTab() {
   const insets = useSafeAreaInsets();
   const navigation = useMainNavigation();
   const styles = useStyles(makeStyles);
+
+  const path = GetPath();
+  const token = GetUserToken();
+
   const data = [
     {
       title: 'Storage settings',
@@ -42,7 +49,14 @@ export default function SettingsScreenTab() {
         {
           title: 'Back up settings',
           onPress: () => {
-            MediaManagementModule.testFunction();
+            AutoBackupModule.StartBackupWorker({
+              url: path,
+              deviceId: uniqueDeviceId,
+              serverToken: token,
+            })
+
+              .then(b => console.log('worker started' + b))
+              .catch(console.log);
           },
           icon: <UploadIcon />,
         },
