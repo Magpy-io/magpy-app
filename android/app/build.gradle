@@ -91,7 +91,39 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+
+        release {
+            if(project.file('release.properties').exists()){
+                Properties properties = new Properties()
+                properties.load(project.file('release.properties').newDataInputStream())
+                
+
+                if(properties.getProperty('storeFile') == null){
+                    throw new GradleException("storeFile property not found inf release.properties file.");
+                }
+
+                if(properties.getProperty('keyAlias') == null){
+                    throw new GradleException("keyAlias property not found inf release.properties file.");
+                }
+
+                if(properties.getProperty('keyPassword') == null){
+                    throw new GradleException("keyPassword property not found inf release.properties file.");
+                }
+
+                if(properties.getProperty('storePassword') == null){
+                    throw new GradleException("storePassword property not found inf release.properties file.");
+                }
+
+                storeFile file(properties.getProperty('storeFile'))
+                keyAlias properties.getProperty('keyAlias')
+                storePassword properties.getProperty('storePassword')
+                keyPassword properties.getProperty('keyPassword')
+            }else{
+                throw new GradleException('File release.properties not found in android/app')
+            }
+        }
     }
+    
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
@@ -99,10 +131,12 @@ android {
         release {
             // Caution! In production, you need to generate your own keystore file.
             // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.debug
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             proguardFile "${rootProject.projectDir}/../node_modules/detox/android/detox/proguard-rules-app.pro"
+            
+            signingConfig signingConfigs.release
+            
         }
     }
 }
