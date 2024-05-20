@@ -143,7 +143,7 @@ android {
                 storePassword properties.getProperty('storePassword')
                 keyPassword properties.getProperty('keyPassword')
             }else{
-                throw new GradleException('File release.properties not found in android/app.\nIf building for testing performance, copy and paste debug.properties to build the app using debug key.\nIf building for release, you need to fill out the file using the Playstore upload key information.')
+                throw new GradleException('File release.properties not found in android/app.\nIf building for testing performance, copy and paste debug.properties, and rename it to release.properties to build the app using debug key.\nIf building for release, you need to fill out the file using the Playstore upload key information.')
             }
         }
     }
