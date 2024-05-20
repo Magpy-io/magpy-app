@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { SectionList, StyleSheet, View } from 'react-native';
 
 import { Text } from 'react-native-elements';
@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import {
   AccountIcon,
+  CloseIcon,
   HelpIcon,
   InfoIcon,
   NotificationIcon,
@@ -17,7 +18,11 @@ import AutoBackupCard from '~/Components/SettingsComponents/AutoBackupCard';
 import LogoutComponent from '~/Components/SettingsComponents/LogoutComponent';
 import ProfileHeader from '~/Components/SettingsComponents/ProfileHeader';
 import SettingComponent from '~/Components/SettingsComponents/SettingComponent';
+import { uniqueDeviceId } from '~/Config/config';
+import { GetPath } from '~/Helpers/ServerQueries/PathManager';
+import { GetUserToken } from '~/Helpers/ServerQueries/TokenManager';
 import { useStyles } from '~/Hooks/useStyles';
+import { AutoBackupModule } from '~/NativeModules/AutoBackupModule';
 import { useMainNavigation } from '~/Navigation/Navigation';
 import { TabBarPadding } from '~/Navigation/TabNavigation/TabBar';
 import { colorsType } from '~/Styles/colors';
@@ -34,14 +39,49 @@ export default function SettingsScreenTab() {
   const insets = useSafeAreaInsets();
   const navigation = useMainNavigation();
   const styles = useStyles(makeStyles);
+
+  const path = GetPath();
+  const token = GetUserToken();
+
+  const [backupOn, setBackupOn] = useState(false);
+  console.log('backupOn', backupOn);
+
+  useEffect(() => {
+    AutoBackupModule.IsWorkerAlive()
+      .then(s => setBackupOn(s))
+      .catch(console.log);
+  }, []);
+
   const data = [
     {
       title: 'Storage settings',
       data: [
         {
-          title: 'Back up settings',
-          onPress: () => {},
+          title: 'Activate auto-backup',
+          onPress: async () => {
+            await AutoBackupModule.StartBackupWorker({
+              url: path,
+              deviceId: uniqueDeviceId,
+              serverToken: token,
+            });
+            console.log('worker started');
+
+            const s = await AutoBackupModule.IsWorkerAlive();
+            setBackupOn(s);
+          },
           icon: <UploadIcon />,
+        },
+        {
+          title: 'Disable auto-backup',
+          onPress: async () => {
+            console.log('stop button');
+            await AutoBackupModule.StopWorker();
+            console.log('worker stopped');
+
+            const s = await AutoBackupModule.IsWorkerAlive();
+            setBackupOn(s);
+          },
+          icon: <CloseIcon />,
         },
         {
           title: 'Free up space from this device',
@@ -100,7 +140,7 @@ export default function SettingsScreenTab() {
   return (
     <View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
       <SectionList
-        ListHeaderComponent={Header}
+        ListHeaderComponent={<Header backupOn={backupOn} />}
         sections={data}
         renderSectionHeader={renderSectionHeader}
         renderItem={renderItem}
@@ -112,12 +152,13 @@ export default function SettingsScreenTab() {
   );
 }
 
-function Header() {
+function Header(props: { backupOn: boolean }) {
   const styles = useStyles(makeStyles);
   return (
     <View style={styles.header}>
       <ProfileHeader />
       <AutoBackupCard />
+      {props.backupOn ? <Text>Backup On</Text> : <Text>Backup Off</Text>}
     </View>
   );
 }

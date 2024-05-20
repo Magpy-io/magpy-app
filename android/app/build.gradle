@@ -108,9 +108,15 @@ android {
 }
 
 dependencies {
+
+    implementation 'com.google.guava:guava:33.2.0-jre'
+    def work_version = "2.9.0"
+    implementation "androidx.work:work-runtime:$work_version"
+
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
     implementation("com.facebook.react:flipper-integration")
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
 
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")

@@ -36,7 +36,7 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
-public class GetMediaTask extends GuardedAsyncTask<Void, Void> {
+public class GetMediaTask{
     private final Context mContext;
     private final int mFirst;
     private final @Nullable
@@ -45,14 +45,20 @@ public class GetMediaTask extends GuardedAsyncTask<Void, Void> {
     String mGroupName;
     private final @Nullable
     ReadableArray mMimeTypes;
-    private final Promise mPromise;
+    private final ResultCallback mPromise;
     private final String mAssetType;
     private final long mFromTime;
     private final long mToTime;
     private final Set<String> mInclude;
 
+    public interface ResultCallback{
+        public void reject(String s, String s1);
+
+        public void resolve(WritableMap result);
+    }
+
     public GetMediaTask(
-            ReactContext context,
+            Context context,
             int first,
             @Nullable String after,
             @Nullable String groupName,
@@ -61,8 +67,7 @@ public class GetMediaTask extends GuardedAsyncTask<Void, Void> {
             long fromTime,
             long toTime,
             @Nullable ReadableArray include,
-            Promise promise) {
-        super(context);
+            ResultCallback promise) {
         mContext = context;
         mFirst = first;
         mAfter = after;
@@ -92,8 +97,7 @@ public class GetMediaTask extends GuardedAsyncTask<Void, Void> {
         return includeSet;
     }
 
-    @Override
-    protected void doInBackgroundGuarded(Void... params) {
+    public void execute() {
         StringBuilder selection = new StringBuilder("1");
         List<String> selectionArgs = new ArrayList<>();
         if (!TextUtils.isEmpty(mGroupName)) {
@@ -193,8 +197,7 @@ public class GetMediaTask extends GuardedAsyncTask<Void, Void> {
         } catch (SecurityException e) {
             mPromise.reject(
                     Definitions.ERROR_UNABLE_TO_LOAD_PERMISSION,
-                    "Could not get media: need READ_EXTERNAL_STORAGE permission",
-                    e);
+                    "Could not get media: need READ_EXTERNAL_STORAGE permission, " + e.toString());
         }
     }
 
