@@ -86,12 +86,68 @@ android {
     }
     signingConfigs {
         debug {
-            storeFile file('debug.keystore')
-            storePassword 'android'
-            keyAlias 'androiddebugkey'
-            keyPassword 'android'
+            if(project.file('debug.properties').exists()){
+                Properties properties = new Properties()
+                properties.load(project.file('debug.properties').newDataInputStream())
+                
+
+                if(properties.getProperty('storeFile') == null){
+                    throw new GradleException("storeFile property not found inf debug.properties file.");
+                }
+
+                if(properties.getProperty('keyAlias') == null){
+                    throw new GradleException("keyAlias property not found inf debug.properties file.");
+                }
+
+                if(properties.getProperty('keyPassword') == null){
+                    throw new GradleException("keyPassword property not found inf debug.properties file.");
+                }
+
+                if(properties.getProperty('storePassword') == null){
+                    throw new GradleException("storePassword property not found inf debug.properties file.");
+                }
+
+                storeFile file(properties.getProperty('storeFile'))
+                keyAlias properties.getProperty('keyAlias')
+                storePassword properties.getProperty('storePassword')
+                keyPassword properties.getProperty('keyPassword')
+            }else{
+                throw new GradleException('File debug.properties not found in android/app')
+            }
+        }
+
+        release {
+            if(project.file('release.properties').exists()){
+                Properties properties = new Properties()
+                properties.load(project.file('release.properties').newDataInputStream())
+                
+
+                if(properties.getProperty('storeFile') == null){
+                    throw new GradleException("storeFile property not found inf release.properties file.");
+                }
+
+                if(properties.getProperty('keyAlias') == null){
+                    throw new GradleException("keyAlias property not found inf release.properties file.");
+                }
+
+                if(properties.getProperty('keyPassword') == null){
+                    throw new GradleException("keyPassword property not found inf release.properties file.");
+                }
+
+                if(properties.getProperty('storePassword') == null){
+                    throw new GradleException("storePassword property not found inf release.properties file.");
+                }
+
+                storeFile file(properties.getProperty('storeFile'))
+                keyAlias properties.getProperty('keyAlias')
+                storePassword properties.getProperty('storePassword')
+                keyPassword properties.getProperty('keyPassword')
+            }else{
+                throw new GradleException('File release.properties not found in android/app.\nIf building for testing performance, copy and paste debug.properties, and rename it to release.properties to build the app using debug key.\nIf building for release, you need to fill out the file using the Playstore upload key information.')
+            }
         }
     }
+
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
@@ -99,10 +155,12 @@ android {
         release {
             // Caution! In production, you need to generate your own keystore file.
             // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.debug
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             proguardFile "${rootProject.projectDir}/../node_modules/detox/android/detox/proguard-rules-app.pro"
+            
+            signingConfig signingConfigs.release
+            
         }
     }
 }

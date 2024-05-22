@@ -154,3 +154,5 @@ android/.idea/
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+android/app/prod.properties
+android/app/release.properties
