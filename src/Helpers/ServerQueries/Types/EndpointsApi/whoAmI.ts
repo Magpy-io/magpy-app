@@ -1,9 +1,13 @@
+
+
 import { ErrorServerNotClaimed, ErrorsAuthorization } from '../ErrorTypes';
 import { TokenAuthentification } from '../Types';
 
 export type ResponseData = {
   user: { id: string };
 };
+
+
 
 export type ResponseErrorTypes = ErrorServerNotClaimed | ErrorsAuthorization;
 

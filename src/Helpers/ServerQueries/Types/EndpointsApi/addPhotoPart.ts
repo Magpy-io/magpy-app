@@ -1,3 +1,5 @@
+
+
 import {
   ErrorMissingParts,
   ErrorPhotoSizeExceeded,
@@ -19,6 +21,8 @@ export type ResponseData =
       done: true;
       photo: APIPhoto;
     };
+
+
 
 export type ResponseErrorTypes =
   | ErrorPhotoSizeExceeded

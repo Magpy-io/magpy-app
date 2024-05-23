@@ -1,3 +1,5 @@
+
+
 import { ErrorBackendServerUnreachable, ErrorsNotFromLocal } from '../ErrorTypes';
 import { TokenAuthentification } from '../Types';
 
@@ -5,7 +7,10 @@ export type ResponseData = {
   storagePath: string;
   serverName: string;
   owner: { name: string; email: string } | null;
+  ownerLocal: { name: string } | null;
 };
+
+
 
 export type ResponseErrorTypes = ErrorsNotFromLocal | ErrorBackendServerUnreachable;
 
