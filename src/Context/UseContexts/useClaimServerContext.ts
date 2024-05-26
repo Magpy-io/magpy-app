@@ -1,11 +1,12 @@
+import { useAuthContext } from '~/Context/Contexts/AuthContext';
 import { useMainContext } from '~/Context/MainContextProvider';
 import { GetMyServerInfo } from '~/Helpers/BackendQueries';
 import { ClaimServer } from '~/Helpers/ServerQueries';
 
 export function useServerClaimFunctions() {
-  const { serverClaimData, authData } = useMainContext();
+  const { serverClaimData } = useMainContext();
   const { setServer, setHasServer } = serverClaimData;
-  const { token } = authData;
+  const { token } = useAuthContext();
 
   const claimServer = async (path: string) => {
     if (!token) {

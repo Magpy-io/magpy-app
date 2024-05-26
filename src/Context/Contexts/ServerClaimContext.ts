@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
+import { useAuthContext } from '~/Context/Contexts/AuthContext';
 import { GetMyServerInfo, Types } from '~/Helpers/BackendQueries';
 
 import { useMainContext } from '../MainContextProvider';
@@ -21,9 +22,9 @@ export function useServerClaimData(): ServerClaimDataType {
 }
 
 export function useServerClaimEffects() {
-  const { serverClaimData, authData } = useMainContext();
+  const { serverClaimData } = useMainContext();
+  const { token } = useAuthContext();
   const { setServer, setHasServer } = serverClaimData;
-  const { token } = authData;
 
   useEffect(() => {
     async function GetServer() {

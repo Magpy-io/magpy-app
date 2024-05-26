@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { useAuthContext } from '~/Context/UseContexts/useAuthContext';
+import { useAuthContext } from '~/Context/Contexts/AuthContext';
 import { useServerClaimContext } from '~/Context/UseContexts/useClaimServerContext';
 
 import { LoginStackNavigator } from './Navigators/LoginStackNavigator';

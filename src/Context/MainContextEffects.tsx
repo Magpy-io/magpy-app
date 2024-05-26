@@ -1,6 +1,5 @@
 import React, { ReactNode } from 'react';
 
-import { useAuthDataEffect } from './Contexts/AuthContext';
 import { useBackgroundServiceEffects } from './Contexts/BackgroundServiceContext';
 import { useLocalServersEffect } from './Contexts/LocalServersContext';
 import { usePhotosDownloadingEffect } from './Contexts/PhotosDownloadingContext/PhotosDownloadingEffect';
@@ -13,7 +12,6 @@ type PropsType = {
 };
 
 const MainContextEffects: React.FC<PropsType> = props => {
-  useAuthDataEffect();
   useLocalServersEffect();
   useBackgroundServiceEffects();
   useServerClaimEffects();

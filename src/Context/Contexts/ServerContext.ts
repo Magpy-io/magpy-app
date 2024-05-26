@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 
+import { useAuthContext } from '~/Context/Contexts/AuthContext';
 import * as AsyncStorageFunctions from '~/Helpers/AsyncStorage';
 import { ServerType } from '~/Helpers/BackendQueries/Types';
 import { GetToken, SetPath } from '~/Helpers/ServerQueries';
@@ -53,7 +54,7 @@ export function useServerEffect() {
 
   const { setServerNetwork, setIsServerReachable, setServerSearchFailed } =
     mainContext.serverData;
-  const { token } = mainContext.authData;
+  const { token } = useAuthContext();
 
   const claimedServer = mainContext.serverClaimData.server;
 

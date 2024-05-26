@@ -10,7 +10,7 @@ import { PrimaryButtonExtraWide } from '~/Components/CommonComponents/Buttons';
 import ViewWithGap from '~/Components/CommonComponents/ViewWithGap';
 import LoginTextInput from '~/Components/LoginComponents/LoginTextInput';
 import { PasswordInput } from '~/Components/LoginComponents/PasswordInput';
-import { useAuthFunctions } from '~/Context/UseContexts/useAuthContext';
+import { useAuthFunctions } from '~/Context/Contexts/AuthContext';
 import { Login } from '~/Helpers/BackendQueries';
 import { useStyles } from '~/Hooks/useStyles';
 import { colorsType } from '~/Styles/colors';

@@ -6,6 +6,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Provider } from 'react-redux';
 
 import { ConfigModules } from '~/Config/configModules';
+import { AuthContextProvider } from '~/Context/Contexts/AuthContext';
 import MainContextEffects from '~/Context/MainContextEffects';
 import { ContextProvider } from '~/Context/MainContextProvider';
 import { store } from '~/Context/ReduxStore/Store';
@@ -16,18 +17,20 @@ function App(): React.JSX.Element {
   ConfigModules();
   return (
     <Provider store={store}>
-      <ContextProvider>
-        <MainContextEffects>
-          <GestureHandlerRootView style={{ flex: 1 }}>
-            <SafeAreaProvider>
-              <ThemeContextProvider>
-                <StatusBar backgroundColor={'transparent'} translucent />
-                <Navigation />
-              </ThemeContextProvider>
-            </SafeAreaProvider>
-          </GestureHandlerRootView>
-        </MainContextEffects>
-      </ContextProvider>
+      <AuthContextProvider>
+        <ContextProvider>
+          <MainContextEffects>
+            <GestureHandlerRootView style={{ flex: 1 }}>
+              <SafeAreaProvider>
+                <ThemeContextProvider>
+                  <StatusBar backgroundColor={'transparent'} translucent />
+                  <Navigation />
+                </ThemeContextProvider>
+              </SafeAreaProvider>
+            </GestureHandlerRootView>
+          </MainContextEffects>
+        </ContextProvider>
+      </AuthContextProvider>
     </Provider>
   );
 }
