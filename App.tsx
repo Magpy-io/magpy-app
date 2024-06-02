@@ -9,6 +9,7 @@ import { ConfigModules } from '~/Config/configModules';
 import { AuthContextProvider } from '~/Context/Contexts/AuthContext';
 import { BackgroundServiceContextProvider } from '~/Context/Contexts/BackgroundServiceContext';
 import { LocalServersContextProvider } from '~/Context/Contexts/LocalServersContext';
+import { ServerClaimContextProvider } from '~/Context/Contexts/ServerClaimContext';
 import { ThemeContextProvider } from '~/Context/Contexts/ThemeContext';
 import MainContextEffects from '~/Context/MainContextEffects';
 import { ContextProvider } from '~/Context/MainContextProvider';
@@ -22,18 +23,20 @@ function App(): React.JSX.Element {
       <AuthContextProvider>
         <LocalServersContextProvider>
           <BackgroundServiceContextProvider>
-            <ContextProvider>
-              <MainContextEffects>
-                <GestureHandlerRootView style={{ flex: 1 }}>
-                  <SafeAreaProvider>
-                    <ThemeContextProvider>
-                      <StatusBar backgroundColor={'transparent'} translucent />
-                      <Navigation />
-                    </ThemeContextProvider>
-                  </SafeAreaProvider>
-                </GestureHandlerRootView>
-              </MainContextEffects>
-            </ContextProvider>
+            <ServerClaimContextProvider>
+              <ContextProvider>
+                <MainContextEffects>
+                  <GestureHandlerRootView style={{ flex: 1 }}>
+                    <SafeAreaProvider>
+                      <ThemeContextProvider>
+                        <StatusBar backgroundColor={'transparent'} translucent />
+                        <Navigation />
+                      </ThemeContextProvider>
+                    </SafeAreaProvider>
+                  </GestureHandlerRootView>
+                </MainContextEffects>
+              </ContextProvider>
+            </ServerClaimContextProvider>
           </BackgroundServiceContextProvider>
         </LocalServersContextProvider>
       </AuthContextProvider>

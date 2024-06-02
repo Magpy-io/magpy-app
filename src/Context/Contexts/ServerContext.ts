@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 
 import { useAuthContext } from '~/Context/Contexts/AuthContext';
 import { useLocalServersFunctions } from '~/Context/Contexts/LocalServersContext';
+import { useServerClaimContext } from '~/Context/Contexts/ServerClaimContext';
 import * as AsyncStorageFunctions from '~/Helpers/AsyncStorage';
 import { ServerType } from '~/Helpers/BackendQueries/Types';
 import { GetToken, SetPath } from '~/Helpers/ServerQueries';
@@ -56,7 +57,8 @@ export function useServerEffect() {
     mainContext.serverData;
   const { token } = useAuthContext();
 
-  const claimedServer = mainContext.serverClaimData.server;
+  const serverClaimContext = useServerClaimContext();
+  const claimedServer = serverClaimContext.server;
 
   const setReachableServer = useCallback(
     async (server: { ipLocal?: string; ipPublic?: string; port: string }) => {

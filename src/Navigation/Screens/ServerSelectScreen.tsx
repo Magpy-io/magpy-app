@@ -9,8 +9,8 @@ import {
   useLocalServersContext,
   useLocalServersFunctions,
 } from '~/Context/Contexts/LocalServersContext';
+import { useServerClaimFunctions } from '~/Context/Contexts/ServerClaimContext';
 import { useTheme } from '~/Context/Contexts/ThemeContext';
-import { useServerClaimFunctions } from '~/Context/UseContexts/useClaimServerContext';
 import { useStyles } from '~/Hooks/useStyles';
 import { colorsType } from '~/Styles/colors';
 import { spacing } from '~/Styles/spacing';

@@ -1,11 +1,9 @@
 import React, { ReactNode, createContext, useContext } from 'react';
 
 import PhotosDownloadingProvider from './Contexts/PhotosDownloadingContext/PhotosDownloadingContext';
-import { ServerClaimDataType, useServerClaimData } from './Contexts/ServerClaimContext';
 import { ServerDataType, useServerData } from './Contexts/ServerContext';
 
 export type PhotosContextType = {
-  serverClaimData: ServerClaimDataType;
   serverData: ServerDataType;
 };
 
@@ -16,11 +14,9 @@ type PropsType = {
 };
 
 const ContextProvider: React.FC<PropsType> = props => {
-  const serverClaimData = useServerClaimData();
   const serverData = useServerData();
 
   const value = {
-    serverClaimData,
     serverData,
   };
 
