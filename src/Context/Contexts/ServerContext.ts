@@ -1,13 +1,13 @@
 import React, { useCallback, useEffect, useState } from 'react';
 
 import { useAuthContext } from '~/Context/Contexts/AuthContext';
+import { useLocalServersFunctions } from '~/Context/Contexts/LocalServersContext';
 import * as AsyncStorageFunctions from '~/Helpers/AsyncStorage';
 import { ServerType } from '~/Helpers/BackendQueries/Types';
 import { GetToken, SetPath } from '~/Helpers/ServerQueries';
 import { ErrorServerUnreachable } from '~/Helpers/ServerQueries/ExceptionsManager';
 
 import { useMainContext } from '../MainContextProvider';
-import { useLocalServersFunctions } from '../UseContexts/useLocalServersContext';
 import { Server } from './LocalServersContext';
 
 type SetStateType<T> = React.Dispatch<React.SetStateAction<T>>;

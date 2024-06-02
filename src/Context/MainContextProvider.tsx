@@ -1,6 +1,5 @@
 import React, { ReactNode, createContext, useContext } from 'react';
 
-import { LocalServersDataType, useLocalServersData } from './Contexts/LocalServersContext';
 import PhotosDownloadingProvider from './Contexts/PhotosDownloadingContext/PhotosDownloadingContext';
 import { ServerClaimDataType, useServerClaimData } from './Contexts/ServerClaimContext';
 import { ServerDataType, useServerData } from './Contexts/ServerContext';
@@ -8,7 +7,6 @@ import { ServerDataType, useServerData } from './Contexts/ServerContext';
 export type PhotosContextType = {
   serverClaimData: ServerClaimDataType;
   serverData: ServerDataType;
-  localServersData: LocalServersDataType;
 };
 
 const AppContext = createContext<PhotosContextType | undefined>(undefined);
@@ -20,12 +18,10 @@ type PropsType = {
 const ContextProvider: React.FC<PropsType> = props => {
   const serverClaimData = useServerClaimData();
   const serverData = useServerData();
-  const localServersData = useLocalServersData();
 
   const value = {
     serverClaimData,
     serverData,
-    localServersData,
   };
 
   return (

@@ -1,11 +1,18 @@
 import { useCallback, useRef } from 'react';
 
-import { Server, zeroconf } from '~/Context/Contexts/LocalServersContext';
-import { useMainContext } from '~/Context/MainContextProvider';
+import {
+  Server,
+  useLocalServersContext,
+  useLocalServersContextSetters,
+  zeroconf,
+} from './LocalServersContext';
 
 export function useLocalServersFunctions() {
-  const { localServersData } = useMainContext();
-  const { isScanning, setLocalServers, localServers } = localServersData;
+  const localServersContextSetters = useLocalServersContextSetters();
+  const localServersContext = useLocalServersContext();
+
+  const { isScanning, localServers } = localServersContext;
+  const { setLocalServers } = localServersContextSetters;
 
   const isScanningRef = useRef(isScanning);
   isScanningRef.current = isScanning;
@@ -48,10 +55,4 @@ export function useLocalServersFunctions() {
     stopSearch,
     searchAsync,
   };
-}
-
-export function useLocalServersContext() {
-  const { localServersData } = useMainContext();
-
-  return localServersData;
 }

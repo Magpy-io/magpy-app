@@ -7,6 +7,7 @@ import { Provider } from 'react-redux';
 
 import { ConfigModules } from '~/Config/configModules';
 import { AuthContextProvider } from '~/Context/Contexts/AuthContext';
+import { LocalServersContextProvider } from '~/Context/Contexts/LocalServersContext';
 import { ThemeContextProvider } from '~/Context/Contexts/ThemeContext';
 import MainContextEffects from '~/Context/MainContextEffects';
 import { ContextProvider } from '~/Context/MainContextProvider';
@@ -18,18 +19,20 @@ function App(): React.JSX.Element {
   return (
     <Provider store={store}>
       <AuthContextProvider>
-        <ContextProvider>
-          <MainContextEffects>
-            <GestureHandlerRootView style={{ flex: 1 }}>
-              <SafeAreaProvider>
-                <ThemeContextProvider>
-                  <StatusBar backgroundColor={'transparent'} translucent />
-                  <Navigation />
-                </ThemeContextProvider>
-              </SafeAreaProvider>
-            </GestureHandlerRootView>
-          </MainContextEffects>
-        </ContextProvider>
+        <LocalServersContextProvider>
+          <ContextProvider>
+            <MainContextEffects>
+              <GestureHandlerRootView style={{ flex: 1 }}>
+                <SafeAreaProvider>
+                  <ThemeContextProvider>
+                    <StatusBar backgroundColor={'transparent'} translucent />
+                    <Navigation />
+                  </ThemeContextProvider>
+                </SafeAreaProvider>
+              </GestureHandlerRootView>
+            </MainContextEffects>
+          </ContextProvider>
+        </LocalServersContextProvider>
       </AuthContextProvider>
     </Provider>
   );

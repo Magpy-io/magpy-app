@@ -4,6 +4,8 @@ import { Types } from '~/Helpers/BackendQueries';
 
 import { AuthEffects } from './AuthEffects';
 
+type SetStateType<T> = React.Dispatch<React.SetStateAction<T>>;
+
 export type AuthDataType = {
   user: Types.UserType | null;
   loading: boolean;
@@ -17,9 +19,9 @@ const initialState: AuthDataType = {
 };
 
 export type AuthDataSettersType = {
-  setUser: (user: Types.UserType | null) => void;
-  setLoading: (loading: boolean) => void;
-  setToken: (token: string | null) => void;
+  setUser: SetStateType<Types.UserType | null>;
+  setLoading: SetStateType<boolean>;
+  setToken: SetStateType<string | null>;
 };
 
 const initialStateSetters: AuthDataSettersType = {
@@ -35,7 +37,7 @@ type PropsType = {
   children: ReactNode;
 };
 
-const AuthContextProvider: React.FC<PropsType> = props => {
+export const AuthContextProvider: React.FC<PropsType> = props => {
   const [user, setUser] = useState<Types.UserType | null>(null);
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState<string | null>(null);
@@ -68,5 +70,3 @@ export function useAuthContextSetters(): AuthDataSettersType {
 
   return context;
 }
-
-export { AuthContextProvider };

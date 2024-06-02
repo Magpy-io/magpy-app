@@ -9,7 +9,7 @@ type PropsType = {
   children: ReactNode;
 };
 
-const AuthEffects: React.FC<PropsType> = props => {
+export const AuthEffects: React.FC<PropsType> = props => {
   const authContextSetters = useAuthContextSetters();
 
   const { setUser, setToken, setLoading } = authContextSetters;
@@ -38,5 +38,3 @@ const AuthEffects: React.FC<PropsType> = props => {
 
   return props.children;
 };
-
-export { AuthEffects };
