@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef } from 'react';
 
 import { Promise as BluebirdPromise } from 'bluebird';
 
-import { useBackgroundServiceFunctions } from '~/Context/UseContexts/useBackgroundServiceContext';
+import { useBackgroundServiceFunctions } from '~/Context/Contexts/BackgroundServiceContext';
 import { useServerContext } from '~/Context/UseContexts/useServerContext';
 import {
   addPhotoCompressedToCache,

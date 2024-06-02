@@ -1,6 +1,5 @@
 import React, { ReactNode } from 'react';
 
-import { useBackgroundServiceEffects } from './Contexts/BackgroundServiceContext';
 import { usePhotosDownloadingEffect } from './Contexts/PhotosDownloadingContext/PhotosDownloadingEffect';
 import { useServerClaimEffects } from './Contexts/ServerClaimContext';
 import { useServerEffect } from './Contexts/ServerContext';
@@ -11,7 +10,6 @@ type PropsType = {
 };
 
 const MainContextEffects: React.FC<PropsType> = props => {
-  useBackgroundServiceEffects();
   useServerClaimEffects();
   useServerEffect();
   usePhotosStoreEffect();

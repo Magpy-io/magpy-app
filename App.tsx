@@ -7,6 +7,7 @@ import { Provider } from 'react-redux';
 
 import { ConfigModules } from '~/Config/configModules';
 import { AuthContextProvider } from '~/Context/Contexts/AuthContext';
+import { BackgroundServiceContextProvider } from '~/Context/Contexts/BackgroundServiceContext';
 import { LocalServersContextProvider } from '~/Context/Contexts/LocalServersContext';
 import { ThemeContextProvider } from '~/Context/Contexts/ThemeContext';
 import MainContextEffects from '~/Context/MainContextEffects';
@@ -20,18 +21,20 @@ function App(): React.JSX.Element {
     <Provider store={store}>
       <AuthContextProvider>
         <LocalServersContextProvider>
-          <ContextProvider>
-            <MainContextEffects>
-              <GestureHandlerRootView style={{ flex: 1 }}>
-                <SafeAreaProvider>
-                  <ThemeContextProvider>
-                    <StatusBar backgroundColor={'transparent'} translucent />
-                    <Navigation />
-                  </ThemeContextProvider>
-                </SafeAreaProvider>
-              </GestureHandlerRootView>
-            </MainContextEffects>
-          </ContextProvider>
+          <BackgroundServiceContextProvider>
+            <ContextProvider>
+              <MainContextEffects>
+                <GestureHandlerRootView style={{ flex: 1 }}>
+                  <SafeAreaProvider>
+                    <ThemeContextProvider>
+                      <StatusBar backgroundColor={'transparent'} translucent />
+                      <Navigation />
+                    </ThemeContextProvider>
+                  </SafeAreaProvider>
+                </GestureHandlerRootView>
+              </MainContextEffects>
+            </ContextProvider>
+          </BackgroundServiceContextProvider>
         </LocalServersContextProvider>
       </AuthContextProvider>
     </Provider>
