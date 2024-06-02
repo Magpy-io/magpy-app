@@ -3,7 +3,7 @@ import { StyleSheet, View } from 'react-native';
 
 import { Icon } from 'react-native-elements';
 
-import { useTheme } from '~/Context/ThemeContext';
+import { useTheme } from '~/Context/Contexts/ThemeContext';
 
 function SelectionIconForGrid({ isSelected }: { isSelected: boolean }) {
   const { colors } = useTheme();

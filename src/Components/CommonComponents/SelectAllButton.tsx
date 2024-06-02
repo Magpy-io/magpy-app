@@ -3,7 +3,7 @@ import { StyleSheet, TouchableHighlight, View, ViewStyle } from 'react-native';
 
 import { Icon } from '@rneui/themed';
 
-import { useTheme } from '~/Context/ThemeContext';
+import { useTheme } from '~/Context/Contexts/ThemeContext';
 
 type PropsType = {
   style?: ViewStyle;

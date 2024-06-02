@@ -4,7 +4,7 @@ import { Modal, StyleProp, StyleSheet, TouchableOpacity, ViewStyle } from 'react
 import Animated, { AnimatedStyle } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { useTheme } from '~/Context/ThemeContext';
+import { useTheme } from '~/Context/Contexts/ThemeContext';
 import { useOrientation } from '~/Hooks/useOrientation';
 import { useStyles } from '~/Hooks/useStyles';
 import { colorsType } from '~/Styles/colors';

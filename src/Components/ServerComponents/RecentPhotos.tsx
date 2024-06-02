@@ -3,10 +3,10 @@ import { FlatList, StyleSheet, TouchableHighlight, View } from 'react-native';
 
 import { Text } from 'react-native-elements';
 
+import { useTheme } from '~/Context/Contexts/ThemeContext';
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { recentServerGalleryPhotos } from '~/Context/ReduxStore/Slices/Photos/Selectors';
 import { useAppSelector } from '~/Context/ReduxStore/Store';
-import { useTheme } from '~/Context/ThemeContext';
 import { useStyles } from '~/Hooks/useStyles';
 import { useMainNavigation } from '~/Navigation/Navigation';
 import { colorsType } from '~/Styles/colors';

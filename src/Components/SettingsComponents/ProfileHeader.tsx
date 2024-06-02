@@ -4,7 +4,7 @@ import { Image, StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-elements';
 
 import { useAuthContext } from '~/Context/Contexts/AuthContext';
-import { useTheme } from '~/Context/ThemeContext';
+import { useTheme } from '~/Context/Contexts/ThemeContext';
 import { useStyles } from '~/Hooks/useStyles';
 import { colorsType } from '~/Styles/colors';
 import { borderRadius, spacing } from '~/Styles/spacing';

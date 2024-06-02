@@ -10,7 +10,7 @@ import KeyboardDismissingView from '~/Components/CommonComponents/KeyboardDismis
 import ScreenTitle from '~/Components/CommonComponents/ScreenTitle';
 import GoogleSignIn from '~/Components/LoginComponents/GoogleSignIn';
 import RegisterForm from '~/Components/LoginComponents/RegisterForm';
-import { useTheme } from '~/Context/ThemeContext';
+import { useTheme } from '~/Context/Contexts/ThemeContext';
 import { useStyles } from '~/Hooks/useStyles';
 import { colorsType } from '~/Styles/colors';
 import { spacing } from '~/Styles/spacing';

@@ -5,7 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import ServersList from '~/Components/SelectServerComponents/ServersList';
 import { Server } from '~/Context/Contexts/LocalServersContext';
-import { useTheme } from '~/Context/ThemeContext';
+import { useTheme } from '~/Context/Contexts/ThemeContext';
 import { useServerClaimFunctions } from '~/Context/UseContexts/useClaimServerContext';
 import {
   useLocalServersContext,

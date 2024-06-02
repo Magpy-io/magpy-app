@@ -7,10 +7,10 @@ import { Provider } from 'react-redux';
 
 import { ConfigModules } from '~/Config/configModules';
 import { AuthContextProvider } from '~/Context/Contexts/AuthContext';
+import { ThemeContextProvider } from '~/Context/Contexts/ThemeContext';
 import MainContextEffects from '~/Context/MainContextEffects';
 import { ContextProvider } from '~/Context/MainContextProvider';
 import { store } from '~/Context/ReduxStore/Store';
-import { ThemeContextProvider } from '~/Context/ThemeContext';
 import Navigation from '~/Navigation/Navigation';
 
 function App(): React.JSX.Element {

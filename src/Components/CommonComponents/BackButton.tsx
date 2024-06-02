@@ -5,7 +5,7 @@ import { TouchableHighlight } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Icon } from '@rneui/themed';
 
-import { useTheme } from '~/Context/ThemeContext';
+import { useTheme } from '~/Context/Contexts/ThemeContext';
 
 type PropsType = {
   style?: ViewStyle;

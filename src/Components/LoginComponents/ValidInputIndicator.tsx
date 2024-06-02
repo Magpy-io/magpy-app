@@ -2,7 +2,7 @@ import React, { StyleSheet, View } from 'react-native';
 
 import { Icon } from 'react-native-elements';
 
-import { useTheme } from '~/Context/ThemeContext';
+import { useTheme } from '~/Context/Contexts/ThemeContext';
 import { spacing } from '~/Styles/spacing';
 
 export default function ValidInputIndicator() {
