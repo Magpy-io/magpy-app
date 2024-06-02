@@ -3,10 +3,10 @@ import { StyleSheet, View } from 'react-native';
 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { usePhotoGalleryContext } from '~/Context/Contexts/PhotoGalleryContext';
 import { useStyles } from '~/Hooks/useStyles';
 import { colorsType } from '~/Styles/colors';
 
+import { usePhotoGalleryContext } from './PhotoGalleryContext';
 import { filterPhotos } from './filters/functions';
 import { PhotoGridComponentRefType } from './grid/PhotoGridComponent';
 import PhotoGridController from './grid/PhotoGridController';

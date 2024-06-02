@@ -4,7 +4,7 @@ import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Text } from 'react-native-elements';
 
 import { CloseIcon } from '~/Components/CommonComponents/Icons';
-import { usePhotoGalleryContext } from '~/Context/Contexts/PhotoGalleryContext';
+import { usePhotoGalleryContext } from '~/Components/PhotoComponents/PhotoGalleryContext';
 import { formatDate } from '~/Helpers/DateFunctions/DateFormatting';
 import { useStyles } from '~/Hooks/useStyles';
 import { colorsType } from '~/Styles/colors';

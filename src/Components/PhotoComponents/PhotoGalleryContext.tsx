@@ -7,14 +7,14 @@ import {
   addServerFilters,
   removeGalleryFilter,
   removeServerFilter,
-} from '../ReduxStore/Slices/GalleryFilters/GalleryFilters';
-import { FiltersSelector } from '../ReduxStore/Slices/GalleryFilters/Selectors';
-import { PhotoGalleryType } from '../ReduxStore/Slices/Photos/Photos';
+} from '../../Context/ReduxStore/Slices/GalleryFilters/GalleryFilters';
+import { FiltersSelector } from '../../Context/ReduxStore/Slices/GalleryFilters/Selectors';
+import { PhotoGalleryType } from '../../Context/ReduxStore/Slices/Photos/Photos';
 import {
   photosGallerySelector,
   serverGalleryPhotosSelector,
-} from '../ReduxStore/Slices/Photos/Selectors';
-import { useAppDispatch, useAppSelector } from '../ReduxStore/Store';
+} from '../../Context/ReduxStore/Slices/Photos/Selectors';
+import { useAppDispatch, useAppSelector } from '../../Context/ReduxStore/Store';
 
 export type PhotoGalleryContextType = {
   isServer: boolean;
