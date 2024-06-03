@@ -10,7 +10,6 @@ import RegisterScreen from '../Screens/LoginStackNavigation/RegisterScreen';
 export type LoginStackParamList = {
   Login: undefined;
   Register: undefined;
-  ServerSelect: undefined;
 };
 
 const LoginStack = createNativeStackNavigator<LoginStackParamList>();
