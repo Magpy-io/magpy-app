@@ -6,10 +6,8 @@ type PropsType = {
   children: ReactNode;
 };
 
-const MainContextEffects: React.FC<PropsType> = props => {
+export const GlobalEffects: React.FC<PropsType> = props => {
   usePhotosStoreEffect();
 
   return <>{props.children}</>;
 };
-
-export default MainContextEffects;

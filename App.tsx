@@ -6,14 +6,9 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Provider } from 'react-redux';
 
 import { ConfigModules } from '~/Config/configModules';
-import { AuthContextProvider } from '~/Context/Contexts/AuthContext';
-import { BackgroundServiceContextProvider } from '~/Context/Contexts/BackgroundServiceContext';
-import { LocalServersContextProvider } from '~/Context/Contexts/LocalServersContext';
-import { PhotosDownloadingContextProvider } from '~/Context/Contexts/PhotosDownloadingContext/PhotosDownloadingContext';
-import { ServerClaimContextProvider } from '~/Context/Contexts/ServerClaimContext';
-import { ServerContextProvider } from '~/Context/Contexts/ServerContext';
 import { ThemeContextProvider } from '~/Context/Contexts/ThemeContext';
-import MainContextEffects from '~/Context/MainContextEffects';
+import { GlobalContexts } from '~/Context/GlobalContexts';
+import { GlobalEffects } from '~/Context/GlobalEffects';
 import { store } from '~/Context/ReduxStore/Store';
 import Navigation from '~/Navigation/Navigation';
 
@@ -21,28 +16,18 @@ function App(): React.JSX.Element {
   ConfigModules();
   return (
     <Provider store={store}>
-      <AuthContextProvider>
-        <LocalServersContextProvider>
-          <BackgroundServiceContextProvider>
-            <ServerClaimContextProvider>
-              <ServerContextProvider>
-                <PhotosDownloadingContextProvider>
-                  <MainContextEffects>
-                    <GestureHandlerRootView style={{ flex: 1 }}>
-                      <SafeAreaProvider>
-                        <ThemeContextProvider>
-                          <StatusBar backgroundColor={'transparent'} translucent />
-                          <Navigation />
-                        </ThemeContextProvider>
-                      </SafeAreaProvider>
-                    </GestureHandlerRootView>
-                  </MainContextEffects>
-                </PhotosDownloadingContextProvider>
-              </ServerContextProvider>
-            </ServerClaimContextProvider>
-          </BackgroundServiceContextProvider>
-        </LocalServersContextProvider>
-      </AuthContextProvider>
+      <GlobalContexts>
+        <GlobalEffects>
+          <GestureHandlerRootView style={{ flex: 1 }}>
+            <SafeAreaProvider>
+              <ThemeContextProvider>
+                <StatusBar backgroundColor={'transparent'} translucent />
+                <Navigation />
+              </ThemeContextProvider>
+            </SafeAreaProvider>
+          </GestureHandlerRootView>
+        </GlobalEffects>
+      </GlobalContexts>
     </Provider>
   );
 }
