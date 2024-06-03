@@ -6,7 +6,8 @@ import { SetPath } from '~/Helpers/ServerQueries';
 import { useServerContextSetters } from './ServerContext';
 
 export function useServerContextFunctions() {
-  const { setServerNetwork, setIsServerReachable } = useServerContextSetters();
+  const { setServerNetwork, setIsServerReachable, setServerSearchFailed } =
+    useServerContextSetters();
 
   const setReachableServer = useCallback(
     async (server: { ipLocal?: string; ipPublic?: string; port: string }) => {
@@ -20,13 +21,14 @@ export function useServerContextFunctions() {
       });
       setIsServerReachable(true);
       setAddressForServerApi(server.ipLocal ?? server.ipPublic ?? '', server.port);
+      setServerSearchFailed(false);
       await AsyncStorageFunctions.storeAddressInfo({
         ipLocal: server.ipLocal,
         ipPublic: server.ipPublic,
         port: server.port,
       });
     },
-    [setIsServerReachable, setServerNetwork],
+    [setIsServerReachable, setServerNetwork, setServerSearchFailed],
   );
 
   return { setReachableServer };
