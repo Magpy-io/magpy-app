@@ -9,11 +9,11 @@ import { ConfigModules } from '~/Config/configModules';
 import { AuthContextProvider } from '~/Context/Contexts/AuthContext';
 import { BackgroundServiceContextProvider } from '~/Context/Contexts/BackgroundServiceContext';
 import { LocalServersContextProvider } from '~/Context/Contexts/LocalServersContext';
+import { PhotosDownloadingContextProvider } from '~/Context/Contexts/PhotosDownloadingContext/PhotosDownloadingContext';
 import { ServerClaimContextProvider } from '~/Context/Contexts/ServerClaimContext';
 import { ServerContextProvider } from '~/Context/Contexts/ServerContext';
 import { ThemeContextProvider } from '~/Context/Contexts/ThemeContext';
 import MainContextEffects from '~/Context/MainContextEffects';
-import { ContextProvider } from '~/Context/MainContextProvider';
 import { store } from '~/Context/ReduxStore/Store';
 import Navigation from '~/Navigation/Navigation';
 
@@ -26,7 +26,7 @@ function App(): React.JSX.Element {
           <BackgroundServiceContextProvider>
             <ServerClaimContextProvider>
               <ServerContextProvider>
-                <ContextProvider>
+                <PhotosDownloadingContextProvider>
                   <MainContextEffects>
                     <GestureHandlerRootView style={{ flex: 1 }}>
                       <SafeAreaProvider>
@@ -37,7 +37,7 @@ function App(): React.JSX.Element {
                       </SafeAreaProvider>
                     </GestureHandlerRootView>
                   </MainContextEffects>
-                </ContextProvider>
+                </PhotosDownloadingContextProvider>
               </ServerContextProvider>
             </ServerClaimContextProvider>
           </BackgroundServiceContextProvider>

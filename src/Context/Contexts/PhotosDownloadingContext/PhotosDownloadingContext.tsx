@@ -1,6 +1,7 @@
 import React, { ReactNode, createContext, useContext, useReducer } from 'react';
 
 import { Actions } from './PhotosDownloadingActions';
+import { PhotosDownloadingEffects } from './PhotosDownloadingEffects';
 import { PhotosDownloadingStateType, Reducer, initialState } from './PhotosDownloadingReducer';
 
 export type PhotosDownloadingDispatchType = React.Dispatch<Actions>;
@@ -13,7 +14,7 @@ type PropsType = {
   children: ReactNode;
 };
 
-const PhotosDownloadingProvider: React.FC<PropsType> = props => {
+export const PhotosDownloadingContextProvider: React.FC<PropsType> = props => {
   const [photosDownloadingState, photosDownloadingDispatch] = useReducer(
     Reducer,
     initialState,
@@ -22,7 +23,7 @@ const PhotosDownloadingProvider: React.FC<PropsType> = props => {
   return (
     <PhotosDownloadingContext.Provider value={photosDownloadingState}>
       <PhotosDownloadingDispatch.Provider value={photosDownloadingDispatch}>
-        {props.children}
+        <PhotosDownloadingEffects>{props.children}</PhotosDownloadingEffects>
       </PhotosDownloadingDispatch.Provider>
     </PhotosDownloadingContext.Provider>
   );
@@ -47,5 +48,3 @@ export function usePhotosDownloadingDispatch(): PhotosDownloadingDispatchType {
 
   return context;
 }
-
-export default PhotosDownloadingProvider;

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import React, { ReactNode, useEffect, useRef } from 'react';
 
 import { uniqueDeviceId } from '~/Config/config';
 import {
@@ -20,7 +20,11 @@ import {
   usePhotosDownloadingDispatch,
 } from './PhotosDownloadingContext';
 
-export function usePhotosDownloadingEffect() {
+type PropsType = {
+  children: ReactNode;
+};
+
+export const PhotosDownloadingEffects: React.FC<PropsType> = props => {
   const photosDownloadingDispatch = usePhotosDownloadingDispatch();
   const photosDownloadingContext = usePhotosDownloadingContext();
   const { photosDownloading } = photosDownloadingContext;
@@ -110,4 +114,6 @@ export function usePhotosDownloadingEffect() {
 
     innerAsync().catch(console.log);
   }, [photosDownloadingDispatch, AppDisptach, photosDownloading, photosServer, photosLocal]);
-}
+
+  return props.children;
+};
