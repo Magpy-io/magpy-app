@@ -3,7 +3,7 @@ import { StyleSheet, View } from 'react-native';
 
 import { Icon, Text } from 'react-native-elements';
 
-import { useTheme } from '~/Context/ThemeContext';
+import { useTheme } from '~/Context/Contexts/ThemeContext';
 import { useStyles } from '~/Hooks/useStyles';
 import { colorsType } from '~/Styles/colors';
 import { spacing } from '~/Styles/spacing';

@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, Text, TouchableHighlight, View } from 'react-native';
 
 import { CustomIconProps } from '~/Components/CommonComponents/Icons';
-import { useTheme } from '~/Context/ThemeContext';
+import { useTheme } from '~/Context/Contexts/ThemeContext';
 import { useOrientation } from '~/Hooks/useOrientation';
 import { useStyles } from '~/Hooks/useStyles';
 import { colorsType } from '~/Styles/colors';

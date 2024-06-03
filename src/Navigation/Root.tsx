@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { useAuthContext } from '~/Context/UseContexts/useAuthContext';
-import { useServerClaimContext } from '~/Context/UseContexts/useClaimServerContext';
+import { useAuthContext } from '~/Context/Contexts/AuthContext';
+import { useServerClaimContext } from '~/Context/Contexts/ServerClaimContext';
 
 import { LoginStackNavigator } from './Navigators/LoginStackNavigator';
 import { MainStackNavigator } from './Navigators/MainStackNavigator';

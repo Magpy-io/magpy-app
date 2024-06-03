@@ -1,8 +1,7 @@
 import { useCallback } from 'react';
 
+import { PhotoLocalType } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { SendingMediaServiceModule } from '~/NativeModules/SendingMediaServiceModule';
-
-import { PhotoLocalType } from '../ReduxStore/Slices/Photos/Photos';
 
 export function useBackgroundServiceFunctions() {
   const SendPhotoToBackgroundServiceForUpload = useCallback(
@@ -18,5 +17,3 @@ export function useBackgroundServiceFunctions() {
 
   return { SendPhotoToBackgroundServiceForUpload };
 }
-
-export function useBackgroundServiceContext() {}

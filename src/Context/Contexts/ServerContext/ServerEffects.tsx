@@ -1,82 +1,30 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { ReactNode, useEffect } from 'react';
 
 import * as AsyncStorageFunctions from '~/Helpers/AsyncStorage';
 import { ServerType } from '~/Helpers/BackendQueries/Types';
-import { GetToken, SetPath } from '~/Helpers/ServerQueries';
+import { GetToken } from '~/Helpers/ServerQueries';
 import { ErrorServerUnreachable } from '~/Helpers/ServerQueries/ExceptionsManager';
 
-import { useMainContext } from '../MainContextProvider';
-import { useLocalServersFunctions } from '../UseContexts/useLocalServersContext';
-import { Server } from './LocalServersContext';
+import { useAuthContext } from '../AuthContext';
+import { Server, useLocalServersFunctions } from '../LocalServersContext';
+import { useServerClaimContext } from '../ServerClaimContext';
+import { useServerContextSetters } from './ServerContext';
+import { useServerContextFunctions } from './useServerContext';
 
-type SetStateType<T> = React.Dispatch<React.SetStateAction<T>>;
-
-export type ServerDataType = {
-  isServerReachable: boolean;
-  setIsServerReachable: SetStateType<boolean>;
-  serverNetwork: ServerNetworkType;
-  setServerNetwork: SetStateType<ServerNetworkType>;
-  serverSearchFailed: boolean;
-  setServerSearchFailed: SetStateType<boolean>;
+type PropsType = {
+  children: ReactNode;
 };
 
-export type ServerNetworkType = {
-  ipLocal: string | null;
-  ipPublic: string | null;
-  port: string | null;
-  currentIp: string | null;
-};
+export const ServerEffects: React.FC<PropsType> = props => {
+  const { setServerSearchFailed } = useServerContextSetters();
 
-export function useServerData(): ServerDataType {
-  const [isServerReachable, setIsServerReachable] = useState(false);
-  const [serverSearchFailed, setServerSearchFailed] = useState(false);
-  const [serverNetwork, setServerNetwork] = useState<ServerNetworkType>({
-    ipLocal: null,
-    ipPublic: null,
-    port: null,
-    currentIp: null,
-  });
-  return {
-    isServerReachable,
-    setIsServerReachable,
-    serverNetwork,
-    setServerNetwork,
-    serverSearchFailed,
-    setServerSearchFailed,
-  };
-}
-
-export function useServerEffect() {
-  const mainContext = useMainContext();
+  const { setReachableServer } = useServerContextFunctions();
 
   const { searchAsync } = useLocalServersFunctions();
 
-  const { setServerNetwork, setIsServerReachable, setServerSearchFailed } =
-    mainContext.serverData;
-  const { token } = mainContext.authData;
+  const { server: claimedServer } = useServerClaimContext();
 
-  const claimedServer = mainContext.serverClaimData.server;
-
-  const setReachableServer = useCallback(
-    async (server: { ipLocal?: string; ipPublic?: string; port: string }) => {
-      setServerNetwork(s => {
-        return {
-          ipLocal: server.ipLocal ?? s.ipLocal,
-          ipPublic: server.ipPublic ?? s.ipPublic,
-          port: server.port,
-          currentIp: server.ipLocal ?? server.ipPublic ?? '',
-        };
-      });
-      setIsServerReachable(true);
-      setAddressForServerApi(server.ipLocal ?? server.ipPublic ?? '', server.port);
-      await AsyncStorageFunctions.storeAddressInfo({
-        ipLocal: server.ipLocal,
-        ipPublic: server.ipPublic,
-        port: server.port,
-      });
-    },
-    [setIsServerReachable, setServerNetwork],
-  );
+  const { token } = useAuthContext();
 
   useEffect(() => {
     async function FindServer(backendToken: string, claimedServer: ServerType) {
@@ -198,20 +146,10 @@ export function useServerEffect() {
     if (token && claimedServer) {
       FindServer(token, claimedServer).catch(console.log);
     }
-  }, [
-    searchAsync,
-    setIsServerReachable,
-    setServerNetwork,
-    token,
-    claimedServer,
-    setReachableServer,
-    setServerSearchFailed,
-  ]);
-}
+  }, [searchAsync, token, claimedServer, setReachableServer, setServerSearchFailed]);
 
-function setAddressForServerApi(ip: string, port: string) {
-  SetPath(`http://${ip}:${port}`);
-}
+  return props.children;
+};
 
 async function TryServer(ip: string, port: string, token: string) {
   try {

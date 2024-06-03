@@ -3,8 +3,8 @@ import { StyleSheet, View } from 'react-native';
 
 import { Text } from 'react-native-elements';
 
-import { useServerClaimContext } from '~/Context/UseContexts/useClaimServerContext';
-import { useServerContext } from '~/Context/UseContexts/useServerContext';
+import { useServerClaimContext } from '~/Context/Contexts/ServerClaimContext';
+import { useServerContext } from '~/Context/Contexts/ServerContext';
 import { useStyles } from '~/Hooks/useStyles';
 import { colorsType } from '~/Styles/colors';
 import { spacing } from '~/Styles/spacing';

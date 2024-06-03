@@ -6,18 +6,18 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Provider } from 'react-redux';
 
 import { ConfigModules } from '~/Config/configModules';
-import MainContextEffects from '~/Context/MainContextEffects';
-import { ContextProvider } from '~/Context/MainContextProvider';
+import { ThemeContextProvider } from '~/Context/Contexts/ThemeContext';
+import { GlobalContexts } from '~/Context/GlobalContexts';
+import { GlobalEffects } from '~/Context/GlobalEffects';
 import { store } from '~/Context/ReduxStore/Store';
-import { ThemeContextProvider } from '~/Context/ThemeContext';
 import Navigation from '~/Navigation/Navigation';
 
 function App(): React.JSX.Element {
   ConfigModules();
   return (
     <Provider store={store}>
-      <ContextProvider>
-        <MainContextEffects>
+      <GlobalContexts>
+        <GlobalEffects>
           <GestureHandlerRootView style={{ flex: 1 }}>
             <SafeAreaProvider>
               <ThemeContextProvider>
@@ -26,8 +26,8 @@ function App(): React.JSX.Element {
               </ThemeContextProvider>
             </SafeAreaProvider>
           </GestureHandlerRootView>
-        </MainContextEffects>
-      </ContextProvider>
+        </GlobalEffects>
+      </GlobalContexts>
     </Provider>
   );
 }

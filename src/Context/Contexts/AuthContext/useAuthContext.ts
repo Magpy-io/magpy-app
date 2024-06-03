@@ -1,10 +1,12 @@
-import { useMainContext } from '~/Context/MainContextProvider';
 import { removeStoredToken, storeToken } from '~/Helpers/AsyncStorage';
 import { TokenManager, WhoAmI } from '~/Helpers/BackendQueries';
 
+import { useAuthContextSetters } from './AuthContext';
+
 export function useAuthFunctions() {
-  const { authData } = useMainContext();
-  const { setUser, setToken } = authData;
+  const authContextSetters = useAuthContextSetters();
+
+  const { setUser, setToken } = authContextSetters;
 
   const authenticate = async function () {
     const token = TokenManager.GetUserToken();
@@ -25,11 +27,5 @@ export function useAuthFunctions() {
     TokenManager.SetUserToken('');
   };
 
-  return { authData, authenticate, logout };
-}
-
-export function useAuthContext() {
-  const { authData } = useMainContext();
-
-  return authData;
+  return { authenticate, logout };
 }

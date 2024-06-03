@@ -4,8 +4,8 @@ import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Badge, Icon, Text } from 'react-native-elements';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { useTheme } from '~/Context/ThemeContext';
-import { useServerContext } from '~/Context/UseContexts/useServerContext';
+import { useServerContext } from '~/Context/Contexts/ServerContext';
+import { useTheme } from '~/Context/Contexts/ThemeContext';
 import { useStyles } from '~/Hooks/useStyles';
 import {
   TabName,

@@ -1,11 +1,15 @@
-import { useMainContext } from '~/Context/MainContextProvider';
 import { GetMyServerInfo } from '~/Helpers/BackendQueries';
 import { ClaimServer } from '~/Helpers/ServerQueries';
 
+import { useAuthContext } from '../AuthContext';
+import { useServerClaimContextSetters } from './ServerClaimContext';
+
 export function useServerClaimFunctions() {
-  const { serverClaimData, authData } = useMainContext();
-  const { setServer, setHasServer } = serverClaimData;
-  const { token } = authData;
+  const { token } = useAuthContext();
+
+  const serverClaimContextSetters = useServerClaimContextSetters();
+
+  const { setServer, setHasServer } = serverClaimContextSetters;
 
   const claimServer = async (path: string) => {
     if (!token) {
@@ -29,10 +33,4 @@ export function useServerClaimFunctions() {
   };
 
   return { claimServer };
-}
-
-export function useServerClaimContext() {
-  const { serverClaimData } = useMainContext();
-
-  return serverClaimData;
 }

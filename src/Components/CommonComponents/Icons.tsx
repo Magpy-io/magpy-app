@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Icon, IconProps } from 'react-native-elements';
 
-import { useTheme } from '~/Context/ThemeContext';
+import { useTheme } from '~/Context/Contexts/ThemeContext';
 
 export type CustomIconProps = Omit<IconProps, 'name'>;
 

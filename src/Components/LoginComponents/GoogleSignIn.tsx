@@ -3,7 +3,7 @@ import { StyleSheet, Text, TouchableOpacity } from 'react-native';
 
 import { Icon } from 'react-native-elements';
 
-import { useTheme } from '~/Context/ThemeContext';
+import { useTheme } from '~/Context/Contexts/ThemeContext';
 import { useStyles } from '~/Hooks/useStyles';
 import { colorsType } from '~/Styles/colors';
 import { borderRadius, spacing } from '~/Styles/spacing';

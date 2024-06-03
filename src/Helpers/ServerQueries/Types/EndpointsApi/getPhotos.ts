@@ -1,3 +1,5 @@
+
+
 import { ErrorServerNotClaimed, ErrorsAuthorization } from '../ErrorTypes';
 import { APIPhoto, PhotoTypesArray, TokenAuthentification } from '../Types';
 
@@ -6,6 +8,8 @@ export type ResponseData = {
   number: number;
   photos: APIPhoto[];
 };
+
+
 
 export type ResponseErrorTypes = ErrorServerNotClaimed | ErrorsAuthorization;
 

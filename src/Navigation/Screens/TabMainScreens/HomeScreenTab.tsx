@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Text } from 'react-native';
 
 import PhotoGallery from '~/Components/PhotoComponents/PhotoGallery';
-import { PhotoGalleryContextProvider } from '~/Context/Contexts/PhotoGalleryContext';
+import { PhotoGalleryContextProvider } from '~/Components/PhotoComponents/PhotoGalleryContext';
 import * as AndroidPermissions from '~/Helpers/GetPermissionsAndroid';
 
 export default function HomeScreenTab() {

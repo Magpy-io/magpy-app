@@ -5,12 +5,12 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import ServersList from '~/Components/SelectServerComponents/ServersList';
 import { Server } from '~/Context/Contexts/LocalServersContext';
-import { useTheme } from '~/Context/ThemeContext';
-import { useServerClaimFunctions } from '~/Context/UseContexts/useClaimServerContext';
 import {
   useLocalServersContext,
   useLocalServersFunctions,
-} from '~/Context/UseContexts/useLocalServersContext';
+} from '~/Context/Contexts/LocalServersContext';
+import { useServerClaimFunctions } from '~/Context/Contexts/ServerClaimContext';
+import { useTheme } from '~/Context/Contexts/ThemeContext';
 import { useStyles } from '~/Hooks/useStyles';
 import { colorsType } from '~/Styles/colors';
 import { spacing } from '~/Styles/spacing';

@@ -3,10 +3,10 @@ import { StyleSheet, TouchableHighlight, View } from 'react-native';
 
 import { Text } from 'react-native-elements';
 
+import { useTheme } from '~/Context/Contexts/ThemeContext';
 import { GroupOptionSelector } from '~/Context/ReduxStore/Slices/GalleryOptions/Selectors';
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { useAppSelector } from '~/Context/ReduxStore/Store';
-import { useTheme } from '~/Context/ThemeContext';
 import { clamp } from '~/Helpers/Utilities';
 import { useStyles } from '~/Hooks/useStyles';
 import { colorsType } from '~/Styles/colors';

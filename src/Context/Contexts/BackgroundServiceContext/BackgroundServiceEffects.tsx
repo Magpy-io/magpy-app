@@ -1,37 +1,17 @@
-import { useEffect } from 'react';
+import React, { ReactNode, useEffect } from 'react';
 
+import { ParseApiPhoto } from '~/Context/ReduxStore/Slices/Photos/Functions';
+import { addPhotoFromLocalToServer } from '~/Context/ReduxStore/Slices/Photos/Photos';
+import { useAppDispatch } from '~/Context/ReduxStore/Store';
 import { GetPhotosById } from '~/Helpers/ServerQueries';
 import { NativeEventEmitterWrapper } from '~/NativeModules/NativeModulesEventNames';
 
-import { ParseApiPhoto } from '../ReduxStore/Slices/Photos/Functions';
-import { addPhotoFromLocalToServer } from '../ReduxStore/Slices/Photos/Photos';
-import { useAppDispatch } from '../ReduxStore/Store';
+type PropsType = {
+  children: ReactNode;
+};
 
-//const { MainModule } = NativeModules;
-
-//const intervalTimer = 100;
-
-export function useBackgroundServiceEffects() {
+export const BackgroundServiceEffects: React.FC<PropsType> = props => {
   const dispatch = useAppDispatch();
-
-  // const manageBackgroundService = useCallback(async () => {
-  //   const serviceState = await MainModule.getServiceState();
-
-  //   if (serviceState == 'FAILED') {
-  //     //TODO display toast message
-  //     await MainModule.stopSendingMediaService();
-  //   }
-  // }, []);
-
-  // useEffect(() => {
-  //   const intervalId = setInterval(() => {
-  //     manageBackgroundService().catch(console.log);
-  //   }, intervalTimer);
-
-  //   return () => {
-  //     clearInterval(intervalId);
-  //   };
-  // }, [manageBackgroundService]);
 
   useEffect(() => {
     const emitter = new NativeEventEmitterWrapper();
@@ -62,4 +42,6 @@ export function useBackgroundServiceEffects() {
       subscription.remove();
     };
   }, [dispatch]);
-}
+
+  return props.children;
+};

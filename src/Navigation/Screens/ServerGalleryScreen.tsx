@@ -1,7 +1,7 @@
 import React from 'react';
 
 import PhotoGallery from '~/Components/PhotoComponents/PhotoGallery';
-import { PhotoGalleryContextProvider } from '~/Context/Contexts/PhotoGalleryContext';
+import { PhotoGalleryContextProvider } from '~/Components/PhotoComponents/PhotoGalleryContext';
 
 import { useMainNavigation } from '../Navigation';
 

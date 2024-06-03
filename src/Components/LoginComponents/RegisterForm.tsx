@@ -9,7 +9,7 @@ import { PrimaryButtonExtraWide } from '~/Components/CommonComponents/Buttons';
 import ViewWithGap from '~/Components/CommonComponents/ViewWithGap';
 import LoginTextInput from '~/Components/LoginComponents/LoginTextInput';
 import { PasswordInput } from '~/Components/LoginComponents/PasswordInput';
-import { useAuthFunctions } from '~/Context/UseContexts/useAuthContext';
+import { useAuthFunctions } from '~/Context/Contexts/AuthContext';
 import { Login, Register } from '~/Helpers/BackendQueries';
 import { ErrorBackendUnreachable } from '~/Helpers/BackendQueries/ExceptionsManager';
 import { spacing } from '~/Styles/spacing';

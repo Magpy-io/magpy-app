@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { useTheme } from '~/Context/ThemeContext';
+import { useTheme } from '~/Context/Contexts/ThemeContext';
 import { colorsType } from '~/Styles/colors';
 
 export function useStyles<T>(makeStyles: (colors: colorsType, dark: boolean) => T) {

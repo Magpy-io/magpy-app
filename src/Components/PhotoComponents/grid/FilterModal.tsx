@@ -7,7 +7,7 @@ import { Text } from 'react-native-elements';
 import BottomModal from '~/Components/CommonComponents/BottomModal';
 import { PrimaryButton } from '~/Components/CommonComponents/Buttons';
 import { CloseIcon } from '~/Components/CommonComponents/Icons';
-import { usePhotoGalleryContext } from '~/Context/Contexts/PhotoGalleryContext';
+import { usePhotoGalleryContext } from '~/Components/PhotoComponents/PhotoGalleryContext';
 import useEffectOnChange from '~/Hooks/useEffectOnChange';
 import { useStyles } from '~/Hooks/useStyles';
 import { colorsType } from '~/Styles/colors';

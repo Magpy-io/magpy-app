@@ -3,7 +3,7 @@ import { StyleSheet, TouchableOpacity } from 'react-native';
 
 import { Text } from 'react-native-elements';
 
-import { useAuthFunctions } from '~/Context/UseContexts/useAuthContext';
+import { useAuthFunctions } from '~/Context/Contexts/AuthContext';
 import { useStyles } from '~/Hooks/useStyles';
 import { useTabNavigationContext } from '~/Navigation/TabNavigation/TabNavigationContext';
 import { colorsType } from '~/Styles/colors';

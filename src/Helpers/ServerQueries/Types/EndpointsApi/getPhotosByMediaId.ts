@@ -1,3 +1,5 @@
+
+
 import { ErrorServerNotClaimed, ErrorsAuthorization } from '../ErrorTypes';
 import { APIPhoto, PhotoTypesArray, TokenAuthentification } from '../Types';
 
@@ -7,6 +9,8 @@ export type ResponseData = {
     { mediaId: string; exists: false } | { mediaId: string; exists: true; photo: APIPhoto }
   >;
 };
+
+
 
 export type ResponseErrorTypes = ErrorServerNotClaimed | ErrorsAuthorization;
 

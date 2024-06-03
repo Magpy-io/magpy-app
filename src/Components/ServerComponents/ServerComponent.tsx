@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { Badge } from 'react-native-elements';
 
-import { useTheme } from '~/Context/ThemeContext';
+import { useTheme } from '~/Context/Contexts/ThemeContext';
 import { useStyles } from '~/Hooks/useStyles';
 import Logo from '~/Images/logoWhite.svg';
 import { colorsType } from '~/Styles/colors';

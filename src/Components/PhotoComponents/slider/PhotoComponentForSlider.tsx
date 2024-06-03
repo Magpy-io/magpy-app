@@ -9,6 +9,7 @@ import {
 } from 'react-native-gesture-handler';
 import Animated, { runOnJS, useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 
+import { useTheme } from '~/Context/Contexts/ThemeContext';
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { usePhotosFunctionsStore } from '~/Context/ReduxStore/Slices/Photos/PhotosFunctions';
 import {
@@ -16,7 +17,6 @@ import {
   photoServerSelector,
 } from '~/Context/ReduxStore/Slices/Photos/Selectors';
 import { useAppSelector } from '~/Context/ReduxStore/Store';
-import { useTheme } from '~/Context/ThemeContext';
 
 const H = Dimensions.get('screen').height;
 const W = Dimensions.get('screen').width;

@@ -2,7 +2,7 @@ import React from 'react';
 
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-import { useTheme } from '~/Context/ThemeContext';
+import { useTheme } from '~/Context/Contexts/ThemeContext';
 
 import LoginScreen from '../Screens/LoginStackNavigation/LoginScreen';
 import RegisterScreen from '../Screens/LoginStackNavigation/RegisterScreen';
