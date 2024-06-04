@@ -3,15 +3,15 @@ import React, { ReactNode, createContext, useContext, useState } from 'react';
 type SetStateType<T> = React.Dispatch<React.SetStateAction<T>>;
 
 export type LocalAccountDataType = {
-  isLocalAccount: boolean;
+  isLocalAccount: boolean | null;
 };
 
 const initialState: LocalAccountDataType = {
-  isLocalAccount: false,
+  isLocalAccount: null,
 };
 
 export type LocalAccountDataSettersType = {
-  setIsLocalAccount: SetStateType<boolean>;
+  setIsLocalAccount: SetStateType<boolean | null>;
 };
 
 const initialStateSetters: LocalAccountDataSettersType = {
@@ -27,7 +27,7 @@ type PropsType = {
 };
 
 export const LocalAccountContextProvider: React.FC<PropsType> = props => {
-  const [isLocalAccount, setIsLocalAccount] = useState<boolean>(false);
+  const [isLocalAccount, setIsLocalAccount] = useState<boolean | null>(null);
 
   return (
     <LocalAccountContext.Provider value={{ isLocalAccount }}>
