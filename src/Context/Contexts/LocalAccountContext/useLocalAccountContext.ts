@@ -21,7 +21,7 @@ export function useLocalAccountContext() {
     useLocalAccountContextInternal();
 
   return {
-    isLocalAccountLoaded: isLocalAccount == null,
+    isLocalAccountLoaded: isLocalAccount != null,
     isLocalAccount,
     serverIp,
     serverPort,

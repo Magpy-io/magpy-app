@@ -3,7 +3,7 @@ import React, { ReactNode, useEffect } from 'react';
 import { getStoredToken } from '~/Helpers/AsyncStorage';
 import { TokenManager, WhoAmI } from '~/Helpers/BackendQueries';
 
-import { useLocalAccountFunctions } from '../LocalAccountContext';
+import { useLocalAccountContext } from '../LocalAccountContext';
 import { useAuthContextSetters } from './AuthContext';
 
 type PropsType = {
@@ -13,8 +13,7 @@ type PropsType = {
 export const AuthEffects: React.FC<PropsType> = props => {
   const authContextSetters = useAuthContextSetters();
 
-  const { getUsingLocalAccount } = useLocalAccountFunctions();
-  const isLocalAccount = getUsingLocalAccount();
+  const { isLocalAccount } = useLocalAccountContext();
 
   const { setUser, setToken, setLoading } = authContextSetters;
 
