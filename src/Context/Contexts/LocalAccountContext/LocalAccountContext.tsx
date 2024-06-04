@@ -1,5 +1,7 @@
 import React, { ReactNode, createContext, useContext, useState } from 'react';
 
+import { LocalAccountEffects } from './LocalAccountEffects';
+
 type SetStateType<T> = React.Dispatch<React.SetStateAction<T>>;
 
 export type LocalAccountDataType = {
@@ -32,7 +34,7 @@ export const LocalAccountContextProvider: React.FC<PropsType> = props => {
   return (
     <LocalAccountContext.Provider value={{ isLocalAccount }}>
       <LocalAccountContextSetters.Provider value={{ setIsLocalAccount }}>
-        {props.children}
+        <LocalAccountEffects>{props.children}</LocalAccountEffects>
       </LocalAccountContextSetters.Provider>
     </LocalAccountContext.Provider>
   );
