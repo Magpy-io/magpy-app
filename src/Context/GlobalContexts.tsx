@@ -7,24 +7,28 @@ import { PhotosDownloadingContextProvider } from '~/Context/Contexts/PhotosDownl
 import { ServerClaimContextProvider } from '~/Context/Contexts/ServerClaimContext';
 import { ServerContextProvider } from '~/Context/Contexts/ServerContext';
 
+import { LocalAccountContextProvider } from './Contexts/LocalAccountContext';
+
 type PropsType = {
   children: ReactNode;
 };
 
 export const GlobalContexts: React.FC<PropsType> = props => {
   return (
-    <AuthContextProvider>
-      <LocalServersContextProvider>
-        <BackgroundServiceContextProvider>
-          <ServerClaimContextProvider>
-            <ServerContextProvider>
-              <PhotosDownloadingContextProvider>
-                {props.children}
-              </PhotosDownloadingContextProvider>
-            </ServerContextProvider>
-          </ServerClaimContextProvider>
-        </BackgroundServiceContextProvider>
-      </LocalServersContextProvider>
-    </AuthContextProvider>
+    <LocalAccountContextProvider>
+      <AuthContextProvider>
+        <LocalServersContextProvider>
+          <BackgroundServiceContextProvider>
+            <ServerClaimContextProvider>
+              <ServerContextProvider>
+                <PhotosDownloadingContextProvider>
+                  {props.children}
+                </PhotosDownloadingContextProvider>
+              </ServerContextProvider>
+            </ServerClaimContextProvider>
+          </BackgroundServiceContextProvider>
+        </LocalServersContextProvider>
+      </AuthContextProvider>
+    </LocalAccountContextProvider>
   );
 };
