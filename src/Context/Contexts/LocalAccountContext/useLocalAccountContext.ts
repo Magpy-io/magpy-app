@@ -22,6 +22,7 @@ export function useLocalAccountContext() {
 
   return {
     isLocalAccountLoaded: isLocalAccount != null,
+    hasSavedClaimedServer: serverIp != null,
     isLocalAccount,
     serverIp,
     serverPort,
