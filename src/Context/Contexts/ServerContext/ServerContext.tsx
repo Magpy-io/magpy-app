@@ -9,6 +9,7 @@ export type ServerNetworkType = {
   ipPublic: string | null;
   port: string | null;
   currentIp: string | null;
+  token: string | null;
 };
 
 export type ServerContextDataType = {
@@ -24,6 +25,7 @@ const initialState: ServerContextDataType = {
     ipPublic: null,
     port: null,
     currentIp: null,
+    token: null,
   },
   serverSearchFailed: false,
 };
@@ -55,6 +57,7 @@ export const ServerContextProvider: React.FC<PropsType> = props => {
     ipPublic: null,
     port: null,
     currentIp: null,
+    token: null,
   });
 
   return (

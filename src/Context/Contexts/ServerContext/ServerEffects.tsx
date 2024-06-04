@@ -2,7 +2,7 @@ import React, { ReactNode, useEffect } from 'react';
 
 import * as AsyncStorageFunctions from '~/Helpers/AsyncStorage';
 import { ServerType } from '~/Helpers/BackendQueries/Types';
-import { GetToken } from '~/Helpers/ServerQueries';
+import { GetToken, TokenManager } from '~/Helpers/ServerQueries';
 import { ErrorServerUnreachable } from '~/Helpers/ServerQueries/ExceptionsManager';
 
 import { useAuthContext } from '../AuthContext';
@@ -28,27 +28,28 @@ export const ServerEffects: React.FC<PropsType> = props => {
 
   useEffect(() => {
     async function FindServer(backendToken: string, claimedServer: ServerType) {
-      let serverResponded = false;
+      let serverResponded: { responded: boolean; token: string } | null = null;
 
       // Start search for local mdns servers
       const serversPromise = searchAsync();
 
       // Try async storage local address
-      const AsyncStorageNetwork = await AsyncStorageFunctions.getAddressInfo();
+      const AsyncStorageNetwork = await AsyncStorageFunctions.getServerInfo();
       if (AsyncStorageNetwork.ipLocal && AsyncStorageNetwork.port) {
         serverResponded = await TryServer(
           AsyncStorageNetwork.ipLocal,
           AsyncStorageNetwork.port,
           backendToken,
         );
-        if (serverResponded) {
+        if (serverResponded.responded) {
           await setReachableServer({
             ipLocal: AsyncStorageNetwork.ipLocal,
             port: AsyncStorageNetwork.port,
+            token: serverResponded.token,
           });
           return;
         } else {
-          await AsyncStorageFunctions.storeAddressInfo({ ipLocal: '' });
+          await AsyncStorageFunctions.storeServerInfo({ ipLocal: '' });
         }
       }
 
@@ -59,10 +60,11 @@ export const ServerEffects: React.FC<PropsType> = props => {
         backendToken,
       );
 
-      if (serverResponded) {
+      if (serverResponded.responded) {
         await setReachableServer({
           ipLocal: claimedServer.ipPrivate,
           port: claimedServer.port,
+          token: serverResponded.token,
         });
         return;
       }
@@ -71,16 +73,24 @@ export const ServerEffects: React.FC<PropsType> = props => {
       const servers = await serversPromise;
 
       const serversTriedPromises = servers.map(server => {
-        return TryServer(server.ip, server.port, backendToken).then(responded => {
-          if (responded) {
-            return server;
+        return TryServer(server.ip, server.port, backendToken).then(response => {
+          if (response.responded) {
+            return { server, response };
           } else {
             throw 'NO_RESPONSE';
           }
         });
       });
 
-      let anyServerResponded: Server | undefined;
+      let anyServerResponded:
+        | {
+            server: Server;
+            response: {
+              responded: boolean;
+              token: string;
+            };
+          }
+        | undefined;
 
       try {
         anyServerResponded = await Promise.any(serversTriedPromises);
@@ -98,10 +108,11 @@ export const ServerEffects: React.FC<PropsType> = props => {
         }
       }
 
-      if (anyServerResponded) {
+      if (anyServerResponded?.response.responded) {
         await setReachableServer({
-          ipLocal: anyServerResponded.ip,
-          port: anyServerResponded.port,
+          ipLocal: anyServerResponded.server.ip,
+          port: anyServerResponded.server.port,
+          token: anyServerResponded.response.token,
         });
 
         return;
@@ -114,14 +125,15 @@ export const ServerEffects: React.FC<PropsType> = props => {
           AsyncStorageNetwork.port,
           backendToken,
         );
-        if (serverResponded) {
+        if (serverResponded.responded) {
           await setReachableServer({
             ipPublic: AsyncStorageNetwork.ipPublic,
             port: AsyncStorageNetwork.port,
+            token: serverResponded.token,
           });
           return;
         } else {
-          await AsyncStorageFunctions.storeAddressInfo({ ipPublic: '' });
+          await AsyncStorageFunctions.storeServerInfo({ ipPublic: '' });
         }
       }
 
@@ -132,10 +144,11 @@ export const ServerEffects: React.FC<PropsType> = props => {
         backendToken,
       );
 
-      if (serverResponded) {
+      if (serverResponded.responded) {
         await setReachableServer({
           ipPublic: claimedServer.ipPublic,
           port: claimedServer.port,
+          token: serverResponded.token,
         });
         return;
       }
@@ -151,20 +164,24 @@ export const ServerEffects: React.FC<PropsType> = props => {
   return props.children;
 };
 
-async function TryServer(ip: string, port: string, token: string) {
+async function TryServer(
+  ip: string,
+  port: string,
+  token: string,
+): Promise<{ responded: boolean; token: string }> {
   try {
     console.log('trying ', ip, port);
     const res = await GetToken.Post({ userToken: token }, { path: `http://${ip}:${port}` });
     console.log(res);
     if (res.ok) {
       console.log('Server found');
-      return true;
+      return { responded: true, token: TokenManager.GetUserToken() };
     }
-    return false;
+    return { responded: false, token: '' };
   } catch (e) {
     console.log('Error: TryServer', e);
     if (e instanceof ErrorServerUnreachable) {
-      return false;
+      return { responded: false, token: '' };
     }
     throw e;
   }

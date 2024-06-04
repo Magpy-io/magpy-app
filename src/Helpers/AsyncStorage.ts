@@ -12,21 +12,24 @@ export const removeStoredToken = async () => {
   await AsyncStorage.removeItem('authToken');
 };
 
-export const getAddressInfo = async () => {
+export const getServerInfo = async () => {
   const ipLocal = await AsyncStorage.getItem('ipLocal');
   const ipPublic = await AsyncStorage.getItem('ipPublic');
   const port = await AsyncStorage.getItem('port');
-  return { ipLocal: ipLocal, ipPublic: ipPublic, port: port };
+  const token = await AsyncStorage.getItem('token');
+  return { ipLocal: ipLocal, ipPublic: ipPublic, port: port, token: token };
 };
 
-export const storeAddressInfo = async ({
+export const storeServerInfo = async ({
   ipLocal,
   ipPublic,
   port,
+  token,
 }: {
   ipLocal?: string | null;
   ipPublic?: string | null;
   port?: string | null;
+  token?: string | null;
 }) => {
   if (ipLocal != null) {
     await AsyncStorage.setItem('ipLocal', ipLocal);
@@ -36,5 +39,8 @@ export const storeAddressInfo = async ({
   }
   if (port != null) {
     await AsyncStorage.setItem('port', port);
+  }
+  if (token != null) {
+    await AsyncStorage.setItem('token', token);
   }
 };

@@ -19,8 +19,8 @@ import LogoutComponent from '~/Components/SettingsComponents/LogoutComponent';
 import ProfileHeader from '~/Components/SettingsComponents/ProfileHeader';
 import SettingComponent from '~/Components/SettingsComponents/SettingComponent';
 import { uniqueDeviceId } from '~/Config/config';
+import { TokenManager } from '~/Helpers/ServerQueries';
 import { GetPath } from '~/Helpers/ServerQueries/PathManager';
-import { GetUserToken } from '~/Helpers/ServerQueries/TokenManager';
 import { useStyles } from '~/Hooks/useStyles';
 import { AutoBackupModule } from '~/NativeModules/AutoBackupModule';
 import { useMainNavigation } from '~/Navigation/Navigation';
@@ -41,7 +41,7 @@ export default function SettingsScreenTab() {
   const styles = useStyles(makeStyles);
 
   const path = GetPath();
-  const token = GetUserToken();
+  const token = TokenManager.GetUserToken();
 
   const [backupOn, setBackupOn] = useState(false);
   console.log('backupOn', backupOn);
