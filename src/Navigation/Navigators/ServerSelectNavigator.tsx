@@ -4,9 +4,15 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import { useTheme } from '~/Context/Contexts/ThemeContext';
 
-import ServerSelectScreen from '../Screens/ServerSelectScreen';
+import ServerClaimScreen from '../Screens/ServerSelectNavigation/ServerClaimScreen';
+import ServerSelectScreen from '../Screens/ServerSelectNavigation/ServerSelectScreen';
 
-const Stack = createNativeStackNavigator();
+export type ServerSelectStackParamList = {
+  ServerSelect: undefined;
+  ServerRegister: undefined;
+};
+
+const Stack = createNativeStackNavigator<ServerSelectStackParamList>();
 
 export function ServerSelectNavigator() {
   const { colors } = useTheme();
@@ -19,6 +25,7 @@ export function ServerSelectNavigator() {
         navigationBarColor: colors.BACKGROUND,
       }}>
       <Stack.Screen name="ServerSelect" component={ServerSelectScreen} />
+      <Stack.Screen name="ServerRegister" component={ServerClaimScreen} />
     </Stack.Navigator>
   );
 }
