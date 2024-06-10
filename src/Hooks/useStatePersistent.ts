@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -6,12 +6,15 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 export function useStatePersistent<T>(initialValue: T, name: string) {
   const [value, setValue] = useState<T | null>(null);
 
-  const setValuePersistent = async (newValue: T) => {
-    await AsyncStorage.setItem(name, JSON.stringify(newValue));
-    setValue(newValue);
-  };
+  const setValuePersistent = useCallback(
+    async (newValue: T) => {
+      await AsyncStorage.setItem(name, JSON.stringify(newValue));
+      setValue(newValue);
+    },
+    [name],
+  );
 
-  const loadValue = async () => {
+  const loadValue = useCallback(async () => {
     const objectSerialized = await AsyncStorage.getItem(name);
 
     if (objectSerialized == null) {
@@ -21,7 +24,7 @@ export function useStatePersistent<T>(initialValue: T, name: string) {
 
     const objectStored = JSON.parse(objectSerialized) as T;
     setValue(objectStored);
-  };
+  }, [initialValue, name]);
 
   const isLoaded = value != null;
 
