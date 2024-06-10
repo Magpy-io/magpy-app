@@ -8,6 +8,7 @@ import { ServerClaimContextProvider } from '~/Context/Contexts/ServerClaimContex
 import { ServerContextProvider } from '~/Context/Contexts/ServerContext';
 
 import { LocalAccountContextProvider } from './Contexts/LocalAccountContext';
+import { MainContextProvider } from './Contexts/MainContext';
 
 type PropsType = {
   children: ReactNode;
@@ -15,20 +16,22 @@ type PropsType = {
 
 export const GlobalContexts: React.FC<PropsType> = props => {
   return (
-    <LocalAccountContextProvider>
-      <AuthContextProvider>
-        <LocalServersContextProvider>
-          <BackgroundServiceContextProvider>
-            <ServerClaimContextProvider>
-              <ServerContextProvider>
-                <PhotosDownloadingContextProvider>
-                  {props.children}
-                </PhotosDownloadingContextProvider>
-              </ServerContextProvider>
-            </ServerClaimContextProvider>
-          </BackgroundServiceContextProvider>
-        </LocalServersContextProvider>
-      </AuthContextProvider>
-    </LocalAccountContextProvider>
+    <MainContextProvider>
+      <LocalAccountContextProvider>
+        <AuthContextProvider>
+          <LocalServersContextProvider>
+            <BackgroundServiceContextProvider>
+              <ServerClaimContextProvider>
+                <ServerContextProvider>
+                  <PhotosDownloadingContextProvider>
+                    {props.children}
+                  </PhotosDownloadingContextProvider>
+                </ServerContextProvider>
+              </ServerClaimContextProvider>
+            </BackgroundServiceContextProvider>
+          </LocalServersContextProvider>
+        </AuthContextProvider>
+      </LocalAccountContextProvider>
+    </MainContextProvider>
   );
 };
