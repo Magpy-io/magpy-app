@@ -6,6 +6,8 @@ import {
   useStatePersistent,
 } from '~/Hooks/useStatePersistent';
 
+import { MainContextEffect } from './MainContextEffect';
+
 export type MainContextDataType = {
   isNewUserState: StatePersistentType<boolean>;
 };
@@ -24,7 +26,9 @@ export const MainContextProvider: React.FC<PropsType> = props => {
   const isNewUserState = useStatePersistent(true, 'ASYNC_STORAGE_KEY_IS_NEW_USER');
 
   return (
-    <MainContext.Provider value={{ isNewUserState }}>{props.children}</MainContext.Provider>
+    <MainContext.Provider value={{ isNewUserState }}>
+      <MainContextEffect>{props.children}</MainContextEffect>
+    </MainContext.Provider>
   );
 };
 
