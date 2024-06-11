@@ -8,8 +8,8 @@ import { useServerClaimContext } from '~/Context/Contexts/ServerClaimContext';
 import { LoginStackNavigator } from './Navigators/LoginStackNavigator';
 import { MainStackNavigator } from './Navigators/MainStackNavigator';
 import { ServerSelectNavigator } from './Navigators/ServerSelectNavigator';
-import { SplashScreenNavigator } from './Navigators/SplashScreenNavigator';
 import ServerLoginScreen from './Screens/ServerLoginScreen';
+import SplashScreen from './Screens/SplashScreen';
 
 export const Root = () => {
   const { token, loading } = useAuthContext();
@@ -20,7 +20,7 @@ export const Root = () => {
   const { isUsingLocalAccount, isUsingLocalAccountLoaded } = useMainContext();
 
   if (!isUsingLocalAccountLoaded) {
-    return <SplashScreenNavigator />;
+    return <SplashScreen />;
   }
 
   if (isUsingLocalAccount) {
@@ -37,7 +37,7 @@ export const Root = () => {
 
   if (!isUsingLocalAccount) {
     if (loading) {
-      return <SplashScreenNavigator />;
+      return <SplashScreen />;
     }
 
     if (!token) {
