@@ -1,51 +1,61 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-/** Only use with serializable values*/
-export function useStatePersistent<T>(initialValue: T, name: string) {
-  const [value, setValue] = useState<T | null>(null);
+type SetStateType<T> = React.Dispatch<React.SetStateAction<T>>;
 
-  const setValuePersistent = useCallback(
-    async (newValue: T) => {
-      await AsyncStorage.setItem(name, JSON.stringify(newValue));
-      setValue(newValue);
-    },
-    [name],
-  );
+/** Only use with serializable values*/
+export function useStatePersistent<T>(
+  initialValue: T,
+  keyName: string,
+): StatePersistentType<T> {
+  const [value, setValue] = useState<T>(initialValue);
+  const [isLoaded, setLoaded] = useState(false);
 
   const loadValue = useCallback(async () => {
-    const objectSerialized = await AsyncStorage.getItem(name);
+    console.log('loading ', keyName);
+    const objectSerialized = await AsyncStorage.getItem(keyName);
 
-    if (objectSerialized == null) {
-      setValue(initialValue);
-      return;
+    if (objectSerialized) {
+      const objectStored = JSON.parse(objectSerialized) as T;
+      setValue(objectStored);
     }
+  }, [keyName]);
 
-    const objectStored = JSON.parse(objectSerialized) as T;
-    setValue(objectStored);
-  }, [initialValue, name]);
+  const clearValue = useCallback(async () => {
+    await AsyncStorage.removeItem(keyName);
+    setValue(initialValue);
+  }, [keyName, initialValue]);
 
-  const isLoaded = value != null;
+  useEffect(() => {
+    AsyncStorage.setItem(keyName, JSON.stringify(value)).catch(console.log);
+  }, [keyName, value]);
 
-  return {
-    value,
-    setValuePersistent,
-    loadValue,
-    isLoaded,
-  };
+  useEffect(() => {
+    loadValue()
+      .then(() => setLoaded(true))
+      .catch(console.log);
+  }, [loadValue]);
+
+  return [value, isLoaded, setValue, clearValue];
 }
 
-export type StatePersistentType<T> = {
-  value: T | null;
-  setValuePersistent: ((newValue: T) => Promise<void>) | (() => void);
-  loadValue: (() => Promise<void>) | (() => void);
-  isLoaded: boolean;
-};
+export type StatePersistentType<T> = [
+  value: T,
+  isLoaded: boolean,
+  setValue: SetStateType<T>,
+  clearValue: () => Promise<void>,
+];
 
-export const StatePersistentDefaultValue = {
-  value: null,
-  setValuePersistent: () => {},
-  loadValue: () => {},
-  isLoaded: false,
-};
+export function StatePersistentDefaultValue<T>(
+  initialValue: T,
+): [value: T, isLoaded: boolean, setValue: () => void, clearValue: () => Promise<void>] {
+  return [
+    initialValue,
+    false,
+    () => {},
+    () => {
+      return new Promise(resolve => resolve());
+    },
+  ];
+}

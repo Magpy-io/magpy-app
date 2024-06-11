@@ -26,7 +26,7 @@ export default function ServerSelectScreen() {
   };
 
   useEffect(() => {
-    console.log('Refresh');
+    console.log('Refresh local servers');
     refreshData();
   }, [refreshData]);
 

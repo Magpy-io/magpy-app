@@ -3,21 +3,25 @@ import { useMainContextInner } from './MainContext';
 export function useMainContextFunctions() {
   const { isNewUserState, isUsingLocalAccountState } = useMainContextInner();
 
+  const [, , setIsNewUser] = isNewUserState;
+  const [, , setIsUsingLocalAccount] = isUsingLocalAccountState;
+
   return {
-    loadIsNewUser: isNewUserState.loadValue,
-    setIsNewUser: isNewUserState.setValuePersistent,
-    loadIsUsingLocalAccount: isUsingLocalAccountState.loadValue,
-    setIsUsingLocalAccount: isUsingLocalAccountState.setValuePersistent,
+    setIsNewUser,
+    setIsUsingLocalAccount,
   };
 }
 
 export function useMainContext() {
   const { isNewUserState, isUsingLocalAccountState } = useMainContextInner();
 
+  const [isNewUser, isNewUserLoaded] = isNewUserState;
+  const [isUsingLocalAccount, isUsingLocalAccountLoaded] = isUsingLocalAccountState;
+
   return {
-    isNewUserLoaded: isNewUserState.isLoaded,
-    isNewUser: isNewUserState.value,
-    isUsingLocalAccount: isUsingLocalAccountState.value,
-    isUsingLocalAccountLoaded: isUsingLocalAccountState.isLoaded,
+    isNewUserLoaded,
+    isNewUser,
+    isUsingLocalAccount,
+    isUsingLocalAccountLoaded,
   };
 }
