@@ -1,29 +1,12 @@
-import { storeIsUsingLocalAccount } from '~/Helpers/AsyncStorage';
+import { useLocalAccountContextInternal } from './LocalAccountContext';
 
-import {
-  useLocalAccountContextInternal,
-  useLocalAccountContextSettersInternal,
-} from './LocalAccountContext';
-
-export function useLocalAccountFunctions() {
-  const { setIsLocalAccount } = useLocalAccountContextSettersInternal();
-
-  const setUsingLocalAccount = async function (usingLocalAccount: boolean) {
-    setIsLocalAccount(usingLocalAccount);
-    await storeIsUsingLocalAccount(usingLocalAccount);
-  };
-
-  return { setUsingLocalAccount };
-}
+export function useLocalAccountFunctions() {}
 
 export function useLocalAccountContext() {
-  const { isLocalAccount, serverIp, serverPort, serverToken } =
-    useLocalAccountContextInternal();
+  const { serverIp, serverPort, serverToken } = useLocalAccountContextInternal();
 
   return {
-    isLocalAccountLoaded: isLocalAccount != null,
     hasSavedClaimedServer: serverIp != null,
-    isLocalAccount,
     serverIp,
     serverPort,
     serverToken,

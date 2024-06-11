@@ -1,6 +1,6 @@
 import React, { ReactNode, useEffect } from 'react';
 
-import { getIsUsingLocalAccount, getLocalAccountServerInfo } from '~/Helpers/AsyncStorage';
+import { getLocalAccountServerInfo } from '~/Helpers/AsyncStorage';
 import { TokenManager, WhoAmI } from '~/Helpers/ServerQueries';
 import { ErrorServerUnreachable } from '~/Helpers/ServerQueries/ExceptionsManager';
 
@@ -11,12 +11,11 @@ type PropsType = {
 };
 
 export const LocalAccountEffects: React.FC<PropsType> = props => {
-  const { setIsLocalAccount, setServerIp, setServerPort, setServerToken } =
+  const { setServerIp, setServerPort, setServerToken } =
     useLocalAccountContextSettersInternal();
 
   useEffect(() => {
     async function loadIsLocalAccountContext() {
-      const isLocalAccountStored = await getIsUsingLocalAccount();
       const localAccountServerInfo = await getLocalAccountServerInfo();
 
       let serverFound = false;
@@ -48,8 +47,6 @@ export const LocalAccountEffects: React.FC<PropsType> = props => {
         }
       }
 
-      setIsLocalAccount(isLocalAccountStored ?? false);
-
       setServerIp(localAccountServerInfo.serverIp);
       setServerPort(localAccountServerInfo.serverPort);
 
@@ -59,7 +56,7 @@ export const LocalAccountEffects: React.FC<PropsType> = props => {
     }
 
     loadIsLocalAccountContext().catch(console.log);
-  }, [setIsLocalAccount, setServerIp, setServerPort, setServerToken]);
+  }, [setServerIp, setServerPort, setServerToken]);
 
   return props.children;
 };

@@ -7,15 +7,16 @@ type PropsType = {
 };
 
 export const MainContextEffect: React.FC<PropsType> = props => {
-  const { loadIsNewUser } = useMainContextFunctions();
+  const { loadIsNewUser, loadIsUsingLocalAccount } = useMainContextFunctions();
 
   useEffect(() => {
     const loadContextAsync = async () => {
       await loadIsNewUser();
+      await loadIsUsingLocalAccount();
     };
 
     loadContextAsync().catch(console.log);
-  }, [loadIsNewUser]);
+  }, [loadIsNewUser, loadIsUsingLocalAccount]);
 
   return props.children;
 };

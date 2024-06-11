@@ -2,6 +2,7 @@ import React from 'react';
 
 import { useAuthContext } from '~/Context/Contexts/AuthContext';
 import { useLocalAccountContext } from '~/Context/Contexts/LocalAccountContext';
+import { useMainContext } from '~/Context/Contexts/MainContext';
 import { useServerClaimContext } from '~/Context/Contexts/ServerClaimContext';
 
 import { LoginStackNavigator } from './Navigators/LoginStackNavigator';
@@ -14,14 +15,15 @@ export const Root = () => {
   const { token, loading } = useAuthContext();
   const { hasServer } = useServerClaimContext();
 
-  const { isLocalAccountLoaded, isLocalAccount, hasSavedClaimedServer, serverToken } =
-    useLocalAccountContext();
+  const { hasSavedClaimedServer, serverToken } = useLocalAccountContext();
 
-  if (!isLocalAccountLoaded) {
+  const { isUsingLocalAccount, isUsingLocalAccountLoaded } = useMainContext();
+
+  if (!isUsingLocalAccountLoaded) {
     return <SplashScreenNavigator />;
   }
 
-  if (isLocalAccount) {
+  if (isUsingLocalAccount) {
     if (!hasSavedClaimedServer) {
       return <ServerSelectNavigator />;
     }
@@ -33,7 +35,7 @@ export const Root = () => {
     return <MainStackNavigator />;
   }
 
-  if (!isLocalAccount) {
+  if (!isUsingLocalAccount) {
     if (loading) {
       return <SplashScreenNavigator />;
     }

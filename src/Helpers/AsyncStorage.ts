@@ -45,20 +45,6 @@ export const storeServerInfo = async ({
   }
 };
 
-export const storeIsUsingLocalAccount = async function (isUsingLocalAccount: boolean) {
-  await AsyncStorage.setItem('isUsingLocalAccount', JSON.stringify(isUsingLocalAccount));
-};
-
-export const getIsUsingLocalAccount = async function () {
-  const isUsingLocalAccountString = await AsyncStorage.getItem('isUsingLocalAccount');
-
-  if (isUsingLocalAccountString == null) {
-    return null;
-  }
-
-  return JSON.parse(isUsingLocalAccountString) as boolean;
-};
-
 export const getLocalAccountServerInfo = async () => {
   const serverIp = await AsyncStorage.getItem('serverIp');
   const serverPort = await AsyncStorage.getItem('serverPort');
