@@ -18,10 +18,13 @@ export function useMainContext() {
   const [isNewUser, isNewUserLoaded] = isNewUserState;
   const [isUsingLocalAccount, isUsingLocalAccountLoaded] = isUsingLocalAccountState;
 
+  const isContextLoaded = isNewUserLoaded && isUsingLocalAccountLoaded;
+
   return {
     isNewUserLoaded,
     isNewUser,
     isUsingLocalAccount,
     isUsingLocalAccountLoaded,
+    isContextLoaded,
   };
 }

@@ -1,53 +1,43 @@
 import React from 'react';
 
 import { useAuthContext } from '~/Context/Contexts/AuthContext';
-import { useLocalAccountContext } from '~/Context/Contexts/LocalAccountContext';
 import { useMainContext } from '~/Context/Contexts/MainContext';
-import { useServerClaimContext } from '~/Context/Contexts/ServerClaimContext';
 
 import { LoginStackNavigator } from './Navigators/LoginStackNavigator';
 import { MainStackNavigator } from './Navigators/MainStackNavigator';
 import { ServerSelectNavigator } from './Navigators/ServerSelectNavigator';
-import ServerLoginScreen from './Screens/ServerSelectNavigation/ServerLoginScreen';
 import SplashScreen from './Screens/SplashScreen';
 
 export const Root = () => {
   const { token, loading } = useAuthContext();
-  const { hasServer } = useServerClaimContext();
 
-  const { hasSavedClaimedServer, serverToken } = useLocalAccountContext();
+  const { isNewUser, isUsingLocalAccount, isContextLoaded } = useMainContext();
 
-  const { isUsingLocalAccount, isUsingLocalAccountLoaded } = useMainContext();
+  // Implementation of the UX Workflow defined in miro board : https://miro.com/app/board/uXjVK_TUuTo=/
 
-  if (!isUsingLocalAccountLoaded) {
+  if (!isContextLoaded) {
     return <SplashScreen />;
   }
 
-  if (isUsingLocalAccount) {
-    if (!hasSavedClaimedServer) {
-      return <ServerSelectNavigator />;
+  if (!isNewUser) {
+    if (isUsingLocalAccount) {
+      return <MainStackNavigator />;
     }
 
-    if (!serverToken) {
-      return <ServerLoginScreen />;
-    }
-
-    return <MainStackNavigator />;
-  }
-
-  if (!isUsingLocalAccount) {
     if (loading) {
       return <SplashScreen />;
     }
 
-    if (!token) {
-      return <LoginStackNavigator />;
+    if (token) {
+      return <MainStackNavigator />;
     }
 
-    if (!hasServer) {
+    return <LoginStackNavigator />;
+  } else {
+    if (token || isUsingLocalAccount) {
       return <ServerSelectNavigator />;
     }
 
-    return <MainStackNavigator />;
+    return <LoginStackNavigator />;
   }
 };
