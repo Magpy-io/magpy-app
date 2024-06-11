@@ -8,7 +8,7 @@ import { useServerClaimContext } from '~/Context/Contexts/ServerClaimContext';
 import { LoginStackNavigator } from './Navigators/LoginStackNavigator';
 import { MainStackNavigator } from './Navigators/MainStackNavigator';
 import { ServerSelectNavigator } from './Navigators/ServerSelectNavigator';
-import ServerLoginScreen from './Screens/ServerLoginScreen';
+import ServerLoginScreen from './Screens/ServerSelectNavigation/ServerLoginScreen';
 import SplashScreen from './Screens/SplashScreen';
 
 export const Root = () => {
