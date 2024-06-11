@@ -13,8 +13,9 @@ export function useStatePersistent<T>(
   const [isLoaded, setLoaded] = useState(false);
 
   const loadValue = useCallback(async () => {
-    console.log('loading ', keyName);
     const objectSerialized = await AsyncStorage.getItem(keyName);
+
+    console.log('loading ', keyName, ': ', objectSerialized);
 
     if (objectSerialized) {
       const objectStored = JSON.parse(objectSerialized) as T;
@@ -28,14 +29,19 @@ export function useStatePersistent<T>(
   }, [keyName, initialValue]);
 
   useEffect(() => {
-    AsyncStorage.setItem(keyName, JSON.stringify(value)).catch(console.log);
-  }, [keyName, value]);
-
-  useEffect(() => {
     loadValue()
       .then(() => setLoaded(true))
       .catch(console.log);
   }, [loadValue]);
+
+  useEffect(() => {
+    if (!isLoaded) {
+      return;
+    }
+    AsyncStorage.setItem(keyName, JSON.stringify(value))
+      .then(() => console.log('saved ', keyName, ': ', JSON.stringify(value)))
+      .catch(console.log);
+  }, [keyName, value, isLoaded]);
 
   return [value, isLoaded, setValue, clearValue];
 }
