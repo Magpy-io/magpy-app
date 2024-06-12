@@ -6,6 +6,8 @@ import {
   useStatePersistent,
 } from '~/Hooks/useStatePersistent';
 
+import { MainContextEffect } from './MainContextEffect';
+
 export type MainContextDataType = {
   isNewUserState: StatePersistentType<boolean>;
   isUsingLocalAccountState: StatePersistentType<boolean>;
@@ -31,7 +33,7 @@ export const MainContextProvider: React.FC<PropsType> = props => {
 
   return (
     <MainContext.Provider value={{ isNewUserState, isUsingLocalAccountState }}>
-      {props.children}
+      <MainContextEffect>{props.children}</MainContextEffect>
     </MainContext.Provider>
   );
 };

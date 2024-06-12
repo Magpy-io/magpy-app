@@ -15,7 +15,7 @@ export function useStatePersistent<T>(
   const loadValue = useCallback(async () => {
     const objectSerialized = await AsyncStorage.getItem(keyName);
 
-    console.log('loading ', keyName, ': ', objectSerialized);
+    console.log('loading', keyName, ':', objectSerialized);
 
     if (objectSerialized) {
       const objectStored = JSON.parse(objectSerialized) as T;
@@ -23,10 +23,9 @@ export function useStatePersistent<T>(
     }
   }, [keyName]);
 
-  const clearValue = useCallback(async () => {
-    await AsyncStorage.removeItem(keyName);
+  const clearValue = useCallback(() => {
     setValue(initialValue);
-  }, [keyName, initialValue]);
+  }, [initialValue]);
 
   useEffect(() => {
     loadValue()
@@ -39,7 +38,7 @@ export function useStatePersistent<T>(
       return;
     }
     AsyncStorage.setItem(keyName, JSON.stringify(value))
-      .then(() => console.log('saved ', keyName, ': ', JSON.stringify(value)))
+      .then(() => console.log('saved', keyName, ':', JSON.stringify(value)))
       .catch(console.log);
   }, [keyName, value, isLoaded]);
 
@@ -50,18 +49,11 @@ export type StatePersistentType<T> = [
   value: T,
   isLoaded: boolean,
   setValue: SetStateType<T>,
-  clearValue: () => Promise<void>,
+  clearValue: () => void,
 ];
 
 export function StatePersistentDefaultValue<T>(
   initialValue: T,
-): [value: T, isLoaded: boolean, setValue: () => void, clearValue: () => Promise<void>] {
-  return [
-    initialValue,
-    false,
-    () => {},
-    () => {
-      return new Promise(resolve => resolve());
-    },
-  ];
+): [value: T, isLoaded: boolean, setValue: () => void, clearValue: () => void] {
+  return [initialValue, false, () => {}, () => {}];
 }
