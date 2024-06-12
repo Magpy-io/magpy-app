@@ -10,6 +10,7 @@ import KeyboardDismissingView from '~/Components/CommonComponents/KeyboardDismis
 import ScreenTitle from '~/Components/CommonComponents/ScreenTitle';
 import GoogleSignIn from '~/Components/LoginComponents/GoogleSignIn';
 import LoginForm from '~/Components/LoginComponents/LoginForm';
+import { useMainContextFunctions } from '~/Context/Contexts/MainContext';
 import { useTheme } from '~/Context/Contexts/ThemeContext';
 import { useStyles } from '~/Hooks/useStyles';
 import { colorsType } from '~/Styles/colors';
@@ -35,6 +36,9 @@ function LoginFooter() {
   const styles = useStyles(makeStyles);
   const { colors } = useTheme();
   const navigation = useNavigation<StackNavigationProp<LoginStackParamList>>();
+
+  const { setIsUsingLocalAccount } = useMainContextFunctions();
+
   return (
     <View style={styles.loginFooterStyle}>
       <GoogleSignIn />
@@ -52,6 +56,23 @@ function LoginFooter() {
           <Text style={{ color: colors.ACCENT, fontWeight: 'bold' }}>Register !</Text>
         </TouchableOpacity>
       </View>
+
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          marginTop: spacing.spacing_xxl_3,
+        }}>
+        <TouchableOpacity
+          onPress={() => {
+            setIsUsingLocalAccount(true);
+          }}
+          style={{ paddingVertical: spacing.spacing_s }}>
+          <Text style={{ color: colors.TEXT, fontWeight: 'bold' }}>
+            Continue Without Account
+          </Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -65,7 +86,7 @@ const makeStyles = (colors: colorsType) =>
       bottom: 0,
       left: 0,
       right: 0,
-      paddingBottom: spacing.spacing_xxl_5,
+      paddingBottom: spacing.spacing_xxl_2,
       paddingHorizontal: PADDING_HORIZONTAl,
       alignItems: 'center',
     },
