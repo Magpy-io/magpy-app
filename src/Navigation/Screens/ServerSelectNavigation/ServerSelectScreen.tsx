@@ -1,6 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import ServersList from '~/Components/SelectServerComponents/ServersList';
@@ -9,27 +11,62 @@ import {
   useLocalServersContext,
   useLocalServersFunctions,
 } from '~/Context/Contexts/LocalServersContext';
-import { useMainContextFunctions } from '~/Context/Contexts/MainContext';
+import { useMainContext, useMainContextFunctions } from '~/Context/Contexts/MainContext';
 import { useServerClaimFunctions } from '~/Context/Contexts/ServerClaimContext';
+import { useServerContextFunctions } from '~/Context/Contexts/ServerContext';
 import { useTheme } from '~/Context/Contexts/ThemeContext';
+import { Status } from '~/Helpers/ServerQueries';
 import { formatAddressHttp } from '~/Helpers/Utilities';
 import { useStyles } from '~/Hooks/useStyles';
+import { ServerSelectStackParamList } from '~/Navigation/Navigators/ServerSelectNavigator';
 import { colorsType } from '~/Styles/colors';
 import { spacing } from '~/Styles/spacing';
 import { typography } from '~/Styles/typography';
 
 export default function ServerSelectScreen() {
   const { localServers, isScanning } = useLocalServersContext();
-  const { claimServer } = useServerClaimFunctions();
+  const { tryClaimServer } = useServerClaimFunctions();
   const { refreshData } = useLocalServersFunctions();
+  const navigation = useNavigation<StackNavigationProp<ServerSelectStackParamList>>();
+  const { setServer } = useServerContextFunctions();
+
+  const { isUsingLocalAccount } = useMainContext();
 
   const { colors } = useTheme();
 
   const { setIsNewUser } = useMainContextFunctions();
 
-  const onSelectServer = async (server: Server) => {
-    await claimServer(formatAddressHttp(server.ip, server.port));
-  };
+  const onSelectServer = useCallback(
+    async (server: Server) => {
+      if (isUsingLocalAccount) {
+        try {
+          const ret = await Status.Post(
+            {},
+            { path: formatAddressHttp(server.ip, server.port) },
+          );
+
+          if (ret.ok) {
+            if (ret.data.claimed == 'Remotely') {
+              return;
+            }
+
+            setServer(server.ip, server.port);
+
+            if (ret.data.claimed == 'None') {
+              navigation.navigate('ServerRegister');
+            } else {
+              navigation.navigate('ServerLogin');
+            }
+          }
+        } catch (err) {
+          console.log(err);
+        }
+      } else {
+        await tryClaimServer(server.ip, server.port);
+      }
+    },
+    [isUsingLocalAccount, navigation, setServer, tryClaimServer],
+  );
 
   useEffect(() => {
     console.log('Refresh local servers');
