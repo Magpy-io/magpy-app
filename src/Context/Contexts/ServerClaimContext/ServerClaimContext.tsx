@@ -8,22 +8,18 @@ type SetStateType<T> = React.Dispatch<React.SetStateAction<T>>;
 
 export type ServerClaimDataType = {
   server: Types.ServerType | null;
-  hasServer: boolean;
 };
 
 const initialState: ServerClaimDataType = {
   server: null,
-  hasServer: false,
 };
 
 export type ServerClaimDataSettersType = {
   setServer: SetStateType<Types.ServerType | null>;
-  setHasServer: SetStateType<boolean>;
 };
 
 const initialStateSetters: ServerClaimDataSettersType = {
   setServer: () => {},
-  setHasServer: () => {},
 };
 
 const ServerClaimContext = createContext<ServerClaimDataType>(initialState);
@@ -36,11 +32,10 @@ type PropsType = {
 
 export const ServerClaimContextProvider: React.FC<PropsType> = props => {
   const [server, setServer] = useState<Types.ServerType | null>(null);
-  const [hasServer, setHasServer] = useState<boolean>(true);
 
   return (
-    <ServerClaimContext.Provider value={{ server, hasServer }}>
-      <ServerClaimContextSetters.Provider value={{ setServer, setHasServer }}>
+    <ServerClaimContext.Provider value={{ server }}>
+      <ServerClaimContextSetters.Provider value={{ setServer }}>
         <ServerClaimEffects>{props.children}</ServerClaimEffects>
       </ServerClaimContextSetters.Provider>
     </ServerClaimContext.Provider>

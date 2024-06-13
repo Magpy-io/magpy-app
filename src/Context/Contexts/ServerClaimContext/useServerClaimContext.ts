@@ -9,7 +9,7 @@ export function useServerClaimFunctions() {
 
   const serverClaimContextSetters = useServerClaimContextSetters();
 
-  const { setServer, setHasServer } = serverClaimContextSetters;
+  const { setServer } = serverClaimContextSetters;
 
   const claimServer = async (path: string) => {
     if (!token) {
@@ -24,7 +24,6 @@ export function useServerClaimFunctions() {
         console.log('Server Info', serverInfo);
         if (serverInfo.ok) {
           setServer(serverInfo.data.server);
-          setHasServer(true);
         }
       }
     } catch (err) {
