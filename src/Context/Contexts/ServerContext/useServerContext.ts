@@ -1,36 +1,27 @@
 import { useCallback } from 'react';
 
-import * as AsyncStorageFunctions from '~/Helpers/AsyncStorage';
 import { SetPath } from '~/Helpers/ServerQueries';
 
-import { useServerContextSetters } from './ServerContext';
+import { useServerContextInner, useServerContextSettersInner } from './ServerContext';
 
 export function useServerContextFunctions() {
-  const { setServerNetwork, setIsServerReachable, setServerSearchFailed } =
-    useServerContextSetters();
+  const { setIsServerReachable } = useServerContextSettersInner();
+
+  const { tokenState, serverNetworkState } = useServerContextInner();
+  const [, , setServerNetwork] = serverNetworkState;
+  const [, , setToken] = tokenState;
 
   const setReachableServer = useCallback(
-    async (server: { ipLocal?: string; ipPublic?: string; port: string; token: string }) => {
-      setServerNetwork(s => {
-        return {
-          ipLocal: server.ipLocal ?? s.ipLocal,
-          ipPublic: server.ipPublic ?? s.ipPublic,
-          port: server.port,
-          currentIp: server.ipLocal ?? server.ipPublic ?? '',
-          token: server.token,
-        };
+    (server: { ip: string; port: string; token: string }) => {
+      setServerNetwork({
+        currentPort: server.port,
+        currentIp: server.ip,
       });
+      setToken(server.token);
       setIsServerReachable(true);
-      setAddressForServerApi(server.ipLocal ?? server.ipPublic ?? '', server.port);
-      setServerSearchFailed(false);
-      await AsyncStorageFunctions.storeServerInfo({
-        ipLocal: server.ipLocal,
-        ipPublic: server.ipPublic,
-        port: server.port,
-        token: server.token,
-      });
+      setAddressForServerApi(server.port, server.port);
     },
-    [setIsServerReachable, setServerNetwork, setServerSearchFailed],
+    [setIsServerReachable, setServerNetwork, setToken],
   );
 
   return { setReachableServer };
@@ -38,4 +29,14 @@ export function useServerContextFunctions() {
 
 function setAddressForServerApi(ip: string, port: string) {
   SetPath(`http://${ip}:${port}`);
+}
+
+export function useServerContext() {
+  const { isServerReachable, findingServer, tokenState, serverNetworkState } =
+    useServerContextInner();
+
+  const [serverNetwork] = serverNetworkState;
+  const [token] = tokenState;
+
+  return { isServerReachable, findingServer, token, serverNetwork };
 }
