@@ -10,7 +10,7 @@ import { PrimaryButtonExtraWide } from '~/Components/CommonComponents/Buttons';
 import ViewWithGap from '~/Components/CommonComponents/ViewWithGap';
 import LoginTextInput from '~/Components/LoginComponents/LoginTextInput';
 import { PasswordInput } from '~/Components/LoginComponents/PasswordInput';
-import { useAuthFunctions } from '~/Context/Contexts/AuthContext';
+import { useAuthContextFunctions } from '~/Context/Contexts/AuthContext';
 import { Login } from '~/Helpers/BackendQueries';
 import { useStyles } from '~/Hooks/useStyles';
 import { colorsType } from '~/Styles/colors';
@@ -25,7 +25,7 @@ const LoginSchema = Yup.object().shape({
 });
 
 export default function LoginForm() {
-  const { authenticate } = useAuthFunctions();
+  const { authenticate } = useAuthContextFunctions();
   const styles = useStyles(makeStyles);
 
   const onSubmit = async (values: { email: string; password: string }) => {

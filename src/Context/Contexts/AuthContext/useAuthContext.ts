@@ -1,12 +1,12 @@
-import { removeStoredToken, storeToken } from '~/Helpers/AsyncStorage';
 import { TokenManager, WhoAmI } from '~/Helpers/BackendQueries';
 
-import { useAuthContextSetters } from './AuthContext';
+import { useAuthContextInner, useAuthContextSettersInner } from './AuthContext';
 
-export function useAuthFunctions() {
-  const authContextSetters = useAuthContextSetters();
+export function useAuthContextFunctions() {
+  const { setUser, setLoading } = useAuthContextSettersInner();
+  const { tokenState } = useAuthContextInner();
 
-  const { setUser, setToken } = authContextSetters;
+  const [, , setToken] = tokenState;
 
   const authenticate = async function () {
     const token = TokenManager.GetUserToken();
@@ -14,18 +14,24 @@ export function useAuthFunctions() {
     const ret = await WhoAmI.Post();
     console.log('Authenticate, whoAmI', ret);
     if (ret.ok) {
-      await storeToken(token);
       setToken(token);
       setUser(ret.data.user);
     }
   };
 
-  const logout = async function () {
+  const logout = function () {
     setUser(null);
     setToken(null);
-    await removeStoredToken();
     TokenManager.SetUserToken('');
   };
 
-  return { authenticate, logout };
+  return { authenticate, logout, setLoading };
+}
+
+export function useAuthContext() {
+  const { user, tokenState, loading } = useAuthContextInner();
+
+  const [token] = tokenState;
+
+  return { user, loading, token };
 }

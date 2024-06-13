@@ -1,17 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export const storeToken = async (value: string) => {
-  await AsyncStorage.setItem('authToken', value);
-};
-
-export const getStoredToken = async () => {
-  return await AsyncStorage.getItem('authToken');
-};
-
-export const removeStoredToken = async () => {
-  await AsyncStorage.removeItem('authToken');
-};
-
 export const getServerInfo = async () => {
   const ipLocal = await AsyncStorage.getItem('ipLocal');
   const ipPublic = await AsyncStorage.getItem('ipPublic');
