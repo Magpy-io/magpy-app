@@ -3,6 +3,7 @@ import React, { ReactNode, useEffect } from 'react';
 import { ServerType } from '~/Helpers/BackendQueries/Types';
 import { GetToken, TokenManager, WhoAmI } from '~/Helpers/ServerQueries';
 import { ErrorServerUnreachable } from '~/Helpers/ServerQueries/ExceptionsManager';
+import { formatAddressHttp } from '~/Helpers/Utilities';
 
 import { useAuthContext } from '../AuthContext';
 import { Server, useLocalServersFunctions } from '../LocalServersContext';
@@ -177,7 +178,7 @@ async function TryServerLocalAccount(
   try {
     console.log('trying ', ip, port);
     TokenManager.SetUserToken(token);
-    const res = await WhoAmI.Post({}, { path: `http://${ip}:${port}` });
+    const res = await WhoAmI.Post({}, { path: formatAddressHttp(ip, port) });
     console.log(res);
     if (res.ok) {
       console.log('Server found');
@@ -200,7 +201,10 @@ async function TryServer(
 ): Promise<{ responded: boolean; token: string }> {
   try {
     console.log('trying ', ip, port);
-    const res = await GetToken.Post({ userToken: token }, { path: `http://${ip}:${port}` });
+    const res = await GetToken.Post(
+      { userToken: token },
+      { path: formatAddressHttp(ip, port) },
+    );
     console.log(res);
     if (res.ok) {
       console.log('Server found');

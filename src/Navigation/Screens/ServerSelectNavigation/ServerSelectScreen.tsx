@@ -12,6 +12,7 @@ import {
 import { useMainContextFunctions } from '~/Context/Contexts/MainContext';
 import { useServerClaimFunctions } from '~/Context/Contexts/ServerClaimContext';
 import { useTheme } from '~/Context/Contexts/ThemeContext';
+import { formatAddressHttp } from '~/Helpers/Utilities';
 import { useStyles } from '~/Hooks/useStyles';
 import { colorsType } from '~/Styles/colors';
 import { spacing } from '~/Styles/spacing';
@@ -27,7 +28,7 @@ export default function ServerSelectScreen() {
   const { setIsNewUser } = useMainContextFunctions();
 
   const onSelectServer = async (server: Server) => {
-    await claimServer('http://' + server.ip + ':' + server.port);
+    await claimServer(formatAddressHttp(server.ip, server.port));
   };
 
   useEffect(() => {

@@ -3,6 +3,7 @@ import React, { ReactNode, useEffect } from 'react';
 import { getLocalAccountServerInfo } from '~/Helpers/AsyncStorage';
 import { TokenManager, WhoAmI } from '~/Helpers/ServerQueries';
 import { ErrorServerUnreachable } from '~/Helpers/ServerQueries/ExceptionsManager';
+import { formatAddressHttp } from '~/Helpers/Utilities';
 
 import { useLocalAccountContextSettersInternal } from './LocalAccountContext';
 
@@ -31,7 +32,10 @@ export const LocalAccountEffects: React.FC<PropsType> = props => {
           const res = await WhoAmI.Post(
             {},
             {
-              path: `http://${localAccountServerInfo.serverIp}:${localAccountServerInfo.serverPort}`,
+              path: formatAddressHttp(
+                localAccountServerInfo.serverIp,
+                localAccountServerInfo.serverPort,
+              ),
             },
           );
           console.log(res);

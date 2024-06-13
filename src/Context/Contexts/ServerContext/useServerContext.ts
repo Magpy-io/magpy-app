@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 
 import { SetPath } from '~/Helpers/ServerQueries';
+import { formatAddressHttp } from '~/Helpers/Utilities';
 
 import { useServerContextInner, useServerContextSettersInner } from './ServerContext';
 
@@ -28,7 +29,7 @@ export function useServerContextFunctions() {
 }
 
 function setAddressForServerApi(ip: string, port: string) {
-  SetPath(`http://${ip}:${port}`);
+  SetPath(formatAddressHttp(ip, port));
 }
 
 export function useServerContext() {
