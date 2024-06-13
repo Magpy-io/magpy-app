@@ -1,45 +1,42 @@
 import React, { ReactNode, createContext, useContext, useState } from 'react';
 
+import {
+  StatePersistentDefaultValue,
+  StatePersistentType,
+  useStatePersistent,
+} from '~/Hooks/useStatePersistent';
+
 import { ServerEffects } from './ServerEffects';
 
 type SetStateType<T> = React.Dispatch<React.SetStateAction<T>>;
 
 export type ServerNetworkType = {
-  ipLocal: string | null;
-  ipPublic: string | null;
-  port: string | null;
-  currentIp: string | null;
-  token: string | null;
+  currentPort: string;
+  currentIp: string;
 };
 
 export type ServerContextDataType = {
   isServerReachable: boolean;
-  serverNetwork: ServerNetworkType;
-  serverSearchFailed: boolean;
+  serverNetworkState: StatePersistentType<ServerNetworkType | null>;
+  tokenState: StatePersistentType<string | null>;
+  findingServer: boolean;
 };
 
 const initialState: ServerContextDataType = {
   isServerReachable: false,
-  serverNetwork: {
-    ipLocal: null,
-    ipPublic: null,
-    port: null,
-    currentIp: null,
-    token: null,
-  },
-  serverSearchFailed: false,
+  serverNetworkState: StatePersistentDefaultValue(null),
+  tokenState: StatePersistentDefaultValue(null),
+  findingServer: false,
 };
 
 export type ServerContextDataSettersType = {
   setIsServerReachable: SetStateType<boolean>;
-  setServerNetwork: SetStateType<ServerNetworkType>;
-  setServerSearchFailed: SetStateType<boolean>;
+  setFindingServer: SetStateType<boolean>;
 };
 
 const initialStateSetters: ServerContextDataSettersType = {
   setIsServerReachable: () => {},
-  setServerNetwork: () => {},
-  setServerSearchFailed: () => {},
+  setFindingServer: () => {},
 };
 
 const ServerContext = createContext<ServerContextDataType>(initialState);
@@ -51,26 +48,24 @@ type PropsType = {
 
 export const ServerContextProvider: React.FC<PropsType> = props => {
   const [isServerReachable, setIsServerReachable] = useState(false);
-  const [serverSearchFailed, setServerSearchFailed] = useState(false);
-  const [serverNetwork, setServerNetwork] = useState<ServerNetworkType>({
-    ipLocal: null,
-    ipPublic: null,
-    port: null,
-    currentIp: null,
-    token: null,
-  });
+  const [findingServer, setFindingServer] = useState(false);
+  const serverNetworkState = useStatePersistent<ServerNetworkType | null>(
+    null,
+    'ASYNC_STORAGE_KEY_SERVER_NETWORK_INFO',
+  );
+  const tokenState = useStatePersistent<string | null>(null, 'ASYNC_STORAGE_KEY_SERVER_TOKEN');
 
   return (
-    <ServerContext.Provider value={{ isServerReachable, serverNetwork, serverSearchFailed }}>
-      <ServerContextSetters.Provider
-        value={{ setIsServerReachable, setServerNetwork, setServerSearchFailed }}>
+    <ServerContext.Provider
+      value={{ isServerReachable, serverNetworkState, tokenState, findingServer }}>
+      <ServerContextSetters.Provider value={{ setIsServerReachable, setFindingServer }}>
         <ServerEffects>{props.children}</ServerEffects>
       </ServerContextSetters.Provider>
     </ServerContext.Provider>
   );
 };
 
-export function useServerContext(): ServerContextDataType {
+export function useServerContextInner(): ServerContextDataType {
   const context = useContext(ServerContext);
 
   if (!context) {
@@ -80,7 +75,7 @@ export function useServerContext(): ServerContextDataType {
   return context;
 }
 
-export function useServerContextSetters(): ServerContextDataSettersType {
+export function useServerContextSettersInner(): ServerContextDataSettersType {
   const context = useContext(ServerContextSetters);
 
   if (!context) {

@@ -7,24 +7,24 @@ import { ErrorServerUnreachable } from '~/Helpers/ServerQueries/ExceptionsManage
 
 import { useAuthContext } from '../AuthContext';
 import { Server, useLocalServersFunctions } from '../LocalServersContext';
+import { useMainContext } from '../MainContext';
 import { useServerClaimContext } from '../ServerClaimContext';
-import { useServerContextSetters } from './ServerContext';
-import { useServerContextFunctions } from './useServerContext';
+import { useServerContext, useServerContextFunctions } from './useServerContext';
 
 type PropsType = {
   children: ReactNode;
 };
 
 export const ServerEffects: React.FC<PropsType> = props => {
-  const { setServerSearchFailed } = useServerContextSetters();
-
   const { setReachableServer } = useServerContextFunctions();
-
+  const { serverNetwork, token: serverToken } = useServerContext();
   const { searchAsync } = useLocalServersFunctions();
 
   const { server: claimedServer } = useServerClaimContext();
 
-  const { token } = useAuthContext();
+  const { token: backendToken } = useAuthContext();
+
+  const { isUsingLocalAccount } = useMainContext();
 
   useEffect(() => {
     async function FindServer(backendToken: string, claimedServer: ServerType) {
@@ -42,8 +42,8 @@ export const ServerEffects: React.FC<PropsType> = props => {
           backendToken,
         );
         if (serverResponded.responded) {
-          await setReachableServer({
-            ipLocal: AsyncStorageNetwork.ipLocal,
+          setReachableServer({
+            ip: AsyncStorageNetwork.ipLocal,
             port: AsyncStorageNetwork.port,
             token: serverResponded.token,
           });
@@ -61,8 +61,8 @@ export const ServerEffects: React.FC<PropsType> = props => {
       );
 
       if (serverResponded.responded) {
-        await setReachableServer({
-          ipLocal: claimedServer.ipPrivate,
+        setReachableServer({
+          ip: claimedServer.ipPrivate,
           port: claimedServer.port,
           token: serverResponded.token,
         });
@@ -109,8 +109,8 @@ export const ServerEffects: React.FC<PropsType> = props => {
       }
 
       if (anyServerResponded?.response.responded) {
-        await setReachableServer({
-          ipLocal: anyServerResponded.server.ip,
+        setReachableServer({
+          ip: anyServerResponded.server.ip,
           port: anyServerResponded.server.port,
           token: anyServerResponded.response.token,
         });
@@ -126,8 +126,8 @@ export const ServerEffects: React.FC<PropsType> = props => {
           backendToken,
         );
         if (serverResponded.responded) {
-          await setReachableServer({
-            ipPublic: AsyncStorageNetwork.ipPublic,
+          setReachableServer({
+            ip: AsyncStorageNetwork.ipPublic,
             port: AsyncStorageNetwork.port,
             token: serverResponded.token,
           });
@@ -145,21 +145,27 @@ export const ServerEffects: React.FC<PropsType> = props => {
       );
 
       if (serverResponded.responded) {
-        await setReachableServer({
-          ipPublic: claimedServer.ipPublic,
+        setReachableServer({
+          ip: claimedServer.ipPublic,
           port: claimedServer.port,
           token: serverResponded.token,
         });
         return;
       }
-
-      setServerSearchFailed(true);
     }
 
-    if (token && claimedServer) {
-      FindServer(token, claimedServer).catch(console.log);
+    async function FindServerLocal() {
+      return null;
     }
-  }, [searchAsync, token, claimedServer, setReachableServer, setServerSearchFailed]);
+
+    if (isUsingLocalAccount && serverNetwork) {
+      FindServerLocal().catch(console.log);
+    } else {
+      if (backendToken && claimedServer) {
+        FindServer(backendToken, claimedServer).catch(console.log);
+      }
+    }
+  }, [searchAsync, backendToken, claimedServer, setReachableServer, isUsingLocalAccount]);
 
   return props.children;
 };
