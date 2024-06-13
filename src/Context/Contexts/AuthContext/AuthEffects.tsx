@@ -21,8 +21,8 @@ export const AuthEffects: React.FC<PropsType> = props => {
         TokenManager.SetUserToken(token);
 
         await authenticate();
-        setLoading(false);
       }
+      setLoading(false);
     }
     if (isUsingLocalAccountLoaded && isUsingLocalAccount == false) {
       retrieveToken().catch(console.log);
