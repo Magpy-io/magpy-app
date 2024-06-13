@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -9,6 +9,7 @@ import {
   useLocalServersContext,
   useLocalServersFunctions,
 } from '~/Context/Contexts/LocalServersContext';
+import { useMainContextFunctions } from '~/Context/Contexts/MainContext';
 import { useServerClaimFunctions } from '~/Context/Contexts/ServerClaimContext';
 import { useTheme } from '~/Context/Contexts/ThemeContext';
 import { useStyles } from '~/Hooks/useStyles';
@@ -20,6 +21,10 @@ export default function ServerSelectScreen() {
   const { localServers, isScanning } = useLocalServersContext();
   const { claimServer } = useServerClaimFunctions();
   const { refreshData } = useLocalServersFunctions();
+
+  const { colors } = useTheme();
+
+  const { setIsNewUser } = useMainContextFunctions();
 
   const onSelectServer = async (server: Server) => {
     await claimServer('http://' + server.ip + ':' + server.port);
@@ -42,6 +47,23 @@ export default function ServerSelectScreen() {
           onSelectServer(server).catch(e => console.log(e));
         }}
       />
+
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          marginBottom: spacing.spacing_xxl_2,
+        }}>
+        <TouchableOpacity
+          onPress={() => {
+            setIsNewUser(false);
+          }}
+          style={{ paddingVertical: spacing.spacing_s }}>
+          <Text style={{ color: colors.TEXT, fontWeight: 'bold' }}>
+            Continue Without Server
+          </Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -79,6 +101,7 @@ const makeStyles = (colors: colorsType) =>
     },
     container: {
       flex: 1,
+      alignItems: 'center',
       backgroundColor: colors.BACKGROUND,
     },
   });
