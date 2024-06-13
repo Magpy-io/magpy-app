@@ -1,14 +1,14 @@
 import React, { ReactNode, useEffect } from 'react';
 
-import * as AsyncStorageFunctions from '~/Helpers/AsyncStorage';
 import { ServerType } from '~/Helpers/BackendQueries/Types';
-import { GetToken, TokenManager } from '~/Helpers/ServerQueries';
+import { GetToken, TokenManager, WhoAmI } from '~/Helpers/ServerQueries';
 import { ErrorServerUnreachable } from '~/Helpers/ServerQueries/ExceptionsManager';
 
 import { useAuthContext } from '../AuthContext';
 import { Server, useLocalServersFunctions } from '../LocalServersContext';
 import { useMainContext } from '../MainContext';
 import { useServerClaimContext } from '../ServerClaimContext';
+import { ServerNetworkType } from './ServerContext';
 import { useServerContext, useServerContextFunctions } from './useServerContext';
 
 type PropsType = {
@@ -32,26 +32,6 @@ export const ServerEffects: React.FC<PropsType> = props => {
 
       // Start search for local mdns servers
       const serversPromise = searchAsync();
-
-      // Try async storage local address
-      const AsyncStorageNetwork = await AsyncStorageFunctions.getServerInfo();
-      if (AsyncStorageNetwork.ipLocal && AsyncStorageNetwork.port) {
-        serverResponded = await TryServer(
-          AsyncStorageNetwork.ipLocal,
-          AsyncStorageNetwork.port,
-          backendToken,
-        );
-        if (serverResponded.responded) {
-          setReachableServer({
-            ip: AsyncStorageNetwork.ipLocal,
-            port: AsyncStorageNetwork.port,
-            token: serverResponded.token,
-          });
-          return;
-        } else {
-          await AsyncStorageFunctions.storeServerInfo({ ipLocal: '' });
-        }
-      }
 
       // Try backend server local address
       serverResponded = await TryServer(
@@ -114,26 +94,23 @@ export const ServerEffects: React.FC<PropsType> = props => {
           port: anyServerResponded.server.port,
           token: anyServerResponded.response.token,
         });
-
         return;
       }
 
-      // Try async storage public address
-      if (AsyncStorageNetwork.ipPublic && AsyncStorageNetwork.port) {
+      // Try saved server if present
+      if (serverNetwork?.currentIp && serverNetwork.currentPort) {
         serverResponded = await TryServer(
-          AsyncStorageNetwork.ipPublic,
-          AsyncStorageNetwork.port,
+          serverNetwork?.currentIp,
+          serverNetwork.currentPort,
           backendToken,
         );
         if (serverResponded.responded) {
           setReachableServer({
-            ip: AsyncStorageNetwork.ipPublic,
-            port: AsyncStorageNetwork.port,
+            ip: serverNetwork?.currentIp,
+            port: serverNetwork?.currentPort,
             token: serverResponded.token,
           });
           return;
-        } else {
-          await AsyncStorageFunctions.storeServerInfo({ ipPublic: '' });
         }
       }
 
@@ -154,21 +131,67 @@ export const ServerEffects: React.FC<PropsType> = props => {
       }
     }
 
-    async function FindServerLocal() {
-      return null;
+    async function FindServerLocal(serverNetwork: ServerNetworkType, serverToken: string) {
+      const ret = await TryServerLocalAccount(
+        serverNetwork.currentIp,
+        serverNetwork.currentPort,
+        serverToken,
+      );
+
+      if (ret.tokenOk) {
+        setReachableServer({
+          ip: serverNetwork.currentIp,
+          port: serverNetwork.currentPort,
+          token: serverToken,
+        });
+      }
     }
 
-    if (isUsingLocalAccount && serverNetwork) {
-      FindServerLocal().catch(console.log);
+    if (isUsingLocalAccount) {
+      if (serverNetwork && serverToken) {
+        FindServerLocal(serverNetwork, serverToken).catch(console.log);
+      }
     } else {
       if (backendToken && claimedServer) {
         FindServer(backendToken, claimedServer).catch(console.log);
       }
     }
-  }, [searchAsync, backendToken, claimedServer, setReachableServer, isUsingLocalAccount]);
+  }, [
+    searchAsync,
+    backendToken,
+    claimedServer,
+    setReachableServer,
+    isUsingLocalAccount,
+    serverToken,
+    serverNetwork,
+  ]);
 
   return props.children;
 };
+
+async function TryServerLocalAccount(
+  ip: string,
+  port: string,
+  token: string,
+): Promise<{ responded: boolean; tokenOk: boolean }> {
+  try {
+    console.log('trying ', ip, port);
+    TokenManager.SetUserToken(token);
+    const res = await WhoAmI.Post({}, { path: `http://${ip}:${port}` });
+    console.log(res);
+    if (res.ok) {
+      console.log('Server found');
+      return { responded: true, tokenOk: true };
+    }
+    return { responded: true, tokenOk: false };
+  } catch (e) {
+    console.log('Error: TryServer', e);
+    if (e instanceof ErrorServerUnreachable) {
+      return { responded: false, tokenOk: false };
+    }
+    throw e;
+  }
+}
 
 async function TryServer(
   ip: string,

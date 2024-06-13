@@ -22,8 +22,8 @@ export default function ServerDetails() {
       <Text style={styles.titleStyle}>Details</Text>
       <ServerComponent
         name={server?.name ?? ''}
-        ip={serverNetwork.currentIp ?? ''}
-        port={serverNetwork.port ?? ''}
+        ip={serverNetwork?.currentIp ?? ''}
+        port={serverNetwork?.currentPort ?? ''}
         reachable={isServerReachable}
       />
     </View>
