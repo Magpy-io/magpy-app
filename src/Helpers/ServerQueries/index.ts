@@ -18,6 +18,7 @@ export * as UpdatePhotoMediaId from './endpoints/updatePhotoMediaId';
 export * as UpdateServerName from './endpoints/updateServerName';
 export * as UpdateServerPath from './endpoints/updateServerPath';
 export * as WhoAmI from './endpoints/whoAmI';
+export * as Status from './endpoints/status';
 
 export * as Types from './Types';
 export * as TokenManager from './TokenManager';
