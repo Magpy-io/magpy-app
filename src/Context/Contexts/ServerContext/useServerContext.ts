@@ -9,7 +9,7 @@ export function useServerContextFunctions() {
   const { setIsServerReachable } = useServerContextSettersInner();
 
   const { tokenState, serverNetworkState } = useServerContextInner();
-  const [, , setServerNetwork] = serverNetworkState;
+  const [serverNetwork, , setServerNetwork] = serverNetworkState;
   const [, , setToken] = tokenState;
 
   const setReachableServer = useCallback(
@@ -20,13 +20,14 @@ export function useServerContextFunctions() {
       });
       setToken(server.token);
       setIsServerReachable(true);
-      setAddressForServerApi(server.port, server.port);
+      setAddressForServerApi(server.ip, server.port);
     },
     [setIsServerReachable, setServerNetwork, setToken],
   );
 
   const setServer = useCallback(
     (ip: string, port: string) => {
+      setAddressForServerApi(ip, port);
       setServerNetwork({
         currentIp: ip,
         currentPort: port,
@@ -35,7 +36,22 @@ export function useServerContextFunctions() {
     [setServerNetwork],
   );
 
-  return { setReachableServer, setServer };
+  const setCurrentServerReachable = useCallback(
+    (token: string) => {
+      if (!serverNetwork) {
+        console.log('Error setCurrentServerReachable: no currentServer to set as reachable.');
+        return;
+      }
+      setReachableServer({
+        ip: serverNetwork.currentIp,
+        port: serverNetwork.currentPort,
+        token,
+      });
+    },
+    [serverNetwork, setReachableServer],
+  );
+
+  return { setReachableServer, setServer, setCurrentServerReachable };
 }
 
 function setAddressForServerApi(ip: string, port: string) {

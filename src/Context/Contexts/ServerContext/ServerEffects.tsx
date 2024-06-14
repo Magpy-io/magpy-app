@@ -18,7 +18,7 @@ type PropsType = {
 
 export const ServerEffects: React.FC<PropsType> = props => {
   const { setReachableServer } = useServerContextFunctions();
-  const { serverNetwork, token: serverToken } = useServerContext();
+  const { serverNetwork, token: serverToken, isServerReachable } = useServerContext();
   const { searchAsync } = useLocalServersFunctions();
 
   const { server: claimedServer } = useServerClaimContext();
@@ -149,11 +149,11 @@ export const ServerEffects: React.FC<PropsType> = props => {
     }
 
     if (isUsingLocalAccount) {
-      if (serverNetwork && serverToken) {
+      if (serverNetwork && serverToken && !isServerReachable) {
         FindServerLocal(serverNetwork, serverToken).catch(console.log);
       }
     } else {
-      if (backendToken && claimedServer) {
+      if (backendToken && claimedServer && !isServerReachable) {
         FindServer(backendToken, claimedServer).catch(console.log);
       }
     }
@@ -165,6 +165,7 @@ export const ServerEffects: React.FC<PropsType> = props => {
     isUsingLocalAccount,
     serverToken,
     serverNetwork,
+    isServerReachable,
   ]);
 
   return props.children;

@@ -1,14 +1,11 @@
 import React from 'react';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
-import { Text } from 'react-native-elements';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import KeyboardDismissingView from '~/Components/CommonComponents/KeyboardDismissingView';
 import ScreenTitle from '~/Components/CommonComponents/ScreenTitle';
-import GoogleSignIn from '~/Components/LoginComponents/GoogleSignIn';
-import LoginForm from '~/Components/LoginComponents/LoginForm';
-import { useTheme } from '~/Context/Contexts/ThemeContext';
+import { LoginServerForm } from '~/Components/LoginComponents/LoginServerForm';
 import { useStyles } from '~/Hooks/useStyles';
 import { colorsType } from '~/Styles/colors';
 import { spacing } from '~/Styles/spacing';
@@ -20,29 +17,8 @@ export default function ServerLoginScreen() {
     <View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
       <KeyboardDismissingView>
         <ScreenTitle title="Login to your server" />
-        <LoginForm />
-        <LoginFooter />
+        <LoginServerForm />
       </KeyboardDismissingView>
-    </View>
-  );
-}
-
-function LoginFooter() {
-  const styles = useStyles(makeStyles);
-  const { colors } = useTheme();
-  return (
-    <View style={styles.loginFooterStyle}>
-      <GoogleSignIn />
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-        }}>
-        <Text style={{ color: colors.TEXT }}>{"Don't have an account ? "}</Text>
-        <TouchableOpacity onPress={() => {}} style={{ paddingVertical: spacing.spacing_s }}>
-          <Text style={{ color: colors.ACCENT, fontWeight: 'bold' }}>Register !</Text>
-        </TouchableOpacity>
-      </View>
     </View>
   );
 }
