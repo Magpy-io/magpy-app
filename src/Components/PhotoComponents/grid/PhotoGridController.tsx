@@ -10,9 +10,9 @@ import { TabBarPadding } from '~/Navigation/TabNavigation/TabBar';
 import { useTabNavigationContext } from '~/Navigation/TabNavigation/TabNavigationContext';
 import { spacing } from '~/Styles/spacing';
 
+import { useCustomBackPress } from '../../../Hooks/useCustomBackPress';
 import { PhotoGalleryHeader } from '../PhotoGalleryHeader';
 import ToolBarPhotos from '../common/ToolBarPhotos';
-import { useCustomBackPress } from '../common/useCustomBackPress';
 import FilterModal from './FilterModal';
 import PhotoGridComponent, { PhotoGridComponentRefType } from './PhotoGridComponent';
 import PhotoMenuModal from './PhotoMenuModal';
