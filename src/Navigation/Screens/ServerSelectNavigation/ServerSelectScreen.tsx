@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect } from 'react';
 import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import { useNavigation } from '@react-navigation/native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import ServersList from '~/Components/SelectServerComponents/ServersList';
+import { useAuthContextFunctions } from '~/Context/Contexts/AuthContext';
 import { Server } from '~/Context/Contexts/LocalServersContext';
 import {
   useLocalServersContext,
@@ -17,6 +18,7 @@ import { useServerContextFunctions } from '~/Context/Contexts/ServerContext';
 import { useTheme } from '~/Context/Contexts/ThemeContext';
 import { Status } from '~/Helpers/ServerQueries';
 import { formatAddressHttp } from '~/Helpers/Utilities';
+import { useCustomBackPress } from '~/Hooks/useCustomBackPress';
 import { useStyles } from '~/Hooks/useStyles';
 import { ServerSelectStackParamList } from '~/Navigation/Navigators/ServerSelectNavigator';
 import { colorsType } from '~/Styles/colors';
@@ -30,11 +32,26 @@ export default function ServerSelectScreen() {
   const navigation = useNavigation<StackNavigationProp<ServerSelectStackParamList>>();
   const { setServer } = useServerContextFunctions();
 
+  const { logout } = useAuthContextFunctions();
+
+  const { setIsUsingLocalAccount } = useMainContextFunctions();
   const { isUsingLocalAccount } = useMainContext();
 
   const { colors } = useTheme();
 
   const { setIsNewUser } = useMainContextFunctions();
+
+  const isFocused = useIsFocused();
+
+  const onBackButton = useCallback(() => {
+    if (isUsingLocalAccount) {
+      setIsUsingLocalAccount(false);
+    } else {
+      logout();
+    }
+  }, [isUsingLocalAccount, logout, setIsUsingLocalAccount]);
+
+  useCustomBackPress(onBackButton, isFocused);
 
   const onSelectServer = useCallback(
     async (server: Server) => {
@@ -62,10 +79,14 @@ export default function ServerSelectScreen() {
           console.log(err);
         }
       } else {
-        await tryClaimServer(server.ip, server.port);
+        const serverClaimed = await tryClaimServer(server.ip, server.port);
+
+        if (serverClaimed) {
+          setIsNewUser(false);
+        }
       }
     },
-    [isUsingLocalAccount, navigation, setServer, tryClaimServer],
+    [isUsingLocalAccount, navigation, setIsNewUser, setServer, tryClaimServer],
   );
 
   useEffect(() => {
