@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 
 import { TokenManager } from '~/Helpers/BackendQueries';
 
@@ -10,6 +10,7 @@ type PropsType = {
 };
 
 export const AuthEffects: React.FC<PropsType> = props => {
+  const [firstTime, setFirstTime] = useState(true);
   const { setLoading, authenticate } = useAuthContextFunctions();
   const { token } = useAuthContext();
 
@@ -18,16 +19,25 @@ export const AuthEffects: React.FC<PropsType> = props => {
   useEffect(() => {
     async function retrieveToken() {
       if (token) {
+        setFirstTime(false);
+        setLoading(true);
         TokenManager.SetUserToken(token);
 
         await authenticate();
       }
       setLoading(false);
     }
-    if (isUsingLocalAccountLoaded && isUsingLocalAccount == false) {
+    if (isUsingLocalAccountLoaded && isUsingLocalAccount == false && firstTime) {
       retrieveToken().catch(console.log);
     }
-  }, [setLoading, isUsingLocalAccount, isUsingLocalAccountLoaded, token, authenticate]);
+  }, [
+    setLoading,
+    isUsingLocalAccount,
+    isUsingLocalAccountLoaded,
+    token,
+    authenticate,
+    firstTime,
+  ]);
 
   return props.children;
 };
