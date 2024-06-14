@@ -7,7 +7,7 @@ import { formatAddressHttp } from '~/Helpers/Utilities';
 
 import { useAuthContext } from '../AuthContext';
 import { Server, useLocalServersFunctions } from '../LocalServersContext';
-import { useMainContext } from '../MainContext';
+import { useMainContext, useMainContextFunctions } from '../MainContext';
 import { useServerClaimContext } from '../ServerClaimContext';
 import { ServerNetworkType } from './ServerContext';
 import { useServerContext, useServerContextFunctions } from './useServerContext';
@@ -26,6 +26,14 @@ export const ServerEffects: React.FC<PropsType> = props => {
   const { token: backendToken } = useAuthContext();
 
   const { isUsingLocalAccount } = useMainContext();
+
+  const { setIsNewUser } = useMainContextFunctions();
+
+  useEffect(() => {
+    if (isServerReachable) {
+      setIsNewUser(false);
+    }
+  }, [isServerReachable, setIsNewUser]);
 
   useEffect(() => {
     async function FindServer(backendToken: string, claimedServer: ServerType) {
