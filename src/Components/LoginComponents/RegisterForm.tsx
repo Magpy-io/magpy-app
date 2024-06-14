@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Keyboard, StyleSheet, View } from 'react-native';
+import React from 'react';
+import { StyleSheet, View } from 'react-native';
 
 import { Formik } from 'formik';
 import validator from 'validator';
@@ -32,22 +32,7 @@ const RegisterSchema = Yup.object().shape({
 });
 
 export default function RegisterForm() {
-  const [, setShowErrors] = useState(false);
   const { authenticate } = useAuthContextFunctions();
-
-  useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
-      setShowErrors(false);
-    });
-    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
-      setShowErrors(true);
-    });
-
-    return () => {
-      keyboardDidHideListener.remove();
-      keyboardDidShowListener.remove();
-    };
-  }, []);
 
   const onSubmit = async (values: { name: string; email: string; password: string }) => {
     try {
