@@ -59,11 +59,11 @@ function setAddressForServerApi(ip: string, port: string) {
 }
 
 export function useServerContext() {
-  const { isServerReachable, findingServer, tokenState, serverNetworkState } =
+  const { isServerReachable, findingServer, tokenState, serverNetworkState, error } =
     useServerContextInner();
 
   const [serverNetwork] = serverNetworkState;
   const [token] = tokenState;
 
-  return { isServerReachable, findingServer, token, serverNetwork };
+  return { isServerReachable, findingServer, token, serverNetwork, error };
 }

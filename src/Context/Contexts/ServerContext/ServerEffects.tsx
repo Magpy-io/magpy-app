@@ -9,7 +9,11 @@ import { useAuthContext } from '../AuthContext';
 import { Server, useLocalServersFunctions } from '../LocalServersContext';
 import { useMainContext, useMainContextFunctions } from '../MainContext';
 import { useServerClaimContext } from '../ServerClaimContext';
-import { ServerNetworkType } from './ServerContext';
+import {
+  ConnectingToServerError,
+  ServerNetworkType,
+  useServerContextSettersInner,
+} from './ServerContext';
 import { useServerContext, useServerContextFunctions } from './useServerContext';
 
 type PropsType = {
@@ -20,6 +24,7 @@ export const ServerEffects: React.FC<PropsType> = props => {
   const { setReachableServer } = useServerContextFunctions();
   const { serverNetwork, token: serverToken, isServerReachable } = useServerContext();
   const { searchAsync } = useLocalServersFunctions();
+  const { setError, setFindingServer } = useServerContextSettersInner();
 
   const { server: claimedServer } = useServerClaimContext();
 
@@ -37,10 +42,33 @@ export const ServerEffects: React.FC<PropsType> = props => {
 
   useEffect(() => {
     async function FindServer(backendToken: string, claimedServer: ServerType) {
-      let serverResponded: { responded: boolean; token: string } | null = null;
+      setFindingServer(true);
 
+      let serverResponded: { responded: boolean; token: string } | null = null;
+      let serverErrorToSet: ConnectingToServerError = 'SERVER_NOT_REACHABLE';
       // Start search for local mdns servers
       const serversPromise = searchAsync();
+
+      // Try saved server if present
+      if (serverNetwork?.currentIp && serverNetwork.currentPort) {
+        serverResponded = await TryServer(
+          serverNetwork?.currentIp,
+          serverNetwork.currentPort,
+          backendToken,
+        );
+        if (serverResponded.token) {
+          setReachableServer({
+            ip: serverNetwork?.currentIp,
+            port: serverNetwork?.currentPort,
+            token: serverResponded.token,
+          });
+          setFindingServer(false);
+        }
+
+        if (serverResponded.responded) {
+          serverErrorToSet = 'SERVER_AUTH_FAILED';
+        }
+      }
 
       // Try backend server local address
       serverResponded = await TryServer(
@@ -49,7 +77,7 @@ export const ServerEffects: React.FC<PropsType> = props => {
         backendToken,
       );
 
-      if (serverResponded.responded) {
+      if (serverResponded.token) {
         setReachableServer({
           ip: claimedServer.ipPrivate,
           port: claimedServer.port,
@@ -58,12 +86,16 @@ export const ServerEffects: React.FC<PropsType> = props => {
         return;
       }
 
+      if (serverResponded.responded) {
+        serverErrorToSet = 'SERVER_AUTH_FAILED';
+      }
+
       // Try discovered servers
       const servers = await serversPromise;
 
       const serversTriedPromises = servers.map(server => {
         return TryServer(server.ip, server.port, backendToken).then(response => {
-          if (response.responded) {
+          if (response.token) {
             return { server, response };
           } else {
             throw 'NO_RESPONSE';
@@ -97,30 +129,14 @@ export const ServerEffects: React.FC<PropsType> = props => {
         }
       }
 
-      if (anyServerResponded?.response.responded) {
+      if (anyServerResponded?.response.token) {
         setReachableServer({
           ip: anyServerResponded.server.ip,
           port: anyServerResponded.server.port,
           token: anyServerResponded.response.token,
         });
+        setFindingServer(false);
         return;
-      }
-
-      // Try saved server if present
-      if (serverNetwork?.currentIp && serverNetwork.currentPort) {
-        serverResponded = await TryServer(
-          serverNetwork?.currentIp,
-          serverNetwork.currentPort,
-          backendToken,
-        );
-        if (serverResponded.responded) {
-          setReachableServer({
-            ip: serverNetwork?.currentIp,
-            port: serverNetwork?.currentPort,
-            token: serverResponded.token,
-          });
-          return;
-        }
       }
 
       // Try backend server public address
@@ -130,17 +146,26 @@ export const ServerEffects: React.FC<PropsType> = props => {
         backendToken,
       );
 
-      if (serverResponded.responded) {
+      if (serverResponded.token) {
         setReachableServer({
           ip: claimedServer.ipPublic,
           port: claimedServer.port,
           token: serverResponded.token,
         });
+        setFindingServer(false);
         return;
       }
+
+      if (serverResponded.responded) {
+        serverErrorToSet = 'SERVER_AUTH_FAILED';
+      }
+
+      setError(serverErrorToSet);
+      setFindingServer(false);
     }
 
     async function FindServerLocal(serverNetwork: ServerNetworkType, serverToken: string) {
+      setFindingServer(true);
       const ret = await TryServerLocalAccount(
         serverNetwork.currentIp,
         serverNetwork.currentPort,
@@ -153,7 +178,15 @@ export const ServerEffects: React.FC<PropsType> = props => {
           port: serverNetwork.currentPort,
           token: serverToken,
         });
+      } else {
+        if (ret.responded) {
+          setError('SERVER_AUTH_FAILED');
+        } else {
+          setError('SERVER_NOT_REACHABLE');
+        }
       }
+
+      setFindingServer(false);
     }
 
     if (isUsingLocalAccount) {
@@ -174,6 +207,8 @@ export const ServerEffects: React.FC<PropsType> = props => {
     serverToken,
     serverNetwork,
     isServerReachable,
+    setFindingServer,
+    setError,
   ]);
 
   return props.children;
@@ -219,7 +254,8 @@ async function TryServer(
       console.log('Server found');
       return { responded: true, token: TokenManager.GetUserToken() };
     }
-    return { responded: false, token: '' };
+
+    return { responded: true, token: '' };
   } catch (e) {
     console.log('Error: TryServer', e);
     if (e instanceof ErrorServerUnreachable) {
