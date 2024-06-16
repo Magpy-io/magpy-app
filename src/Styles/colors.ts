@@ -55,6 +55,7 @@ export type colorsType = {
   SUCCESS: string;
   ERROR: string;
   WARNING: string;
+  PENDING: string;
 
   //Misc
   UNDERLAY: string;
@@ -90,6 +91,7 @@ export const LightTheme: { dark: boolean; colors: colorsType } = {
     SUCCESS: colors.SUCCESS_500,
     ERROR: colors.ERROR_500,
     WARNING: colors.WARNING_500,
+    PENDING: colors.GREY_400,
 
     // Misc
     UNDERLAY: colors.GREY_100,
@@ -126,6 +128,7 @@ export const DarkTheme: { dark: boolean; colors: colorsType } = {
     SUCCESS: colors.SUCCESS_500,
     ERROR: colors.ERROR_500,
     WARNING: colors.WARNING_400,
+    PENDING: colors.GREY_400,
 
     // Misc
     TRANSPARENT: colors.TRANSPARENT,
