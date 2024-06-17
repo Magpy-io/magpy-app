@@ -51,7 +51,13 @@ export function useServerContextFunctions() {
     [serverNetwork, setReachableServer],
   );
 
-  return { setReachableServer, setServer, setCurrentServerReachable };
+  const forgetServer = useCallback(() => {
+    setServerNetwork(null);
+    setIsServerReachable(false);
+    setToken(null);
+  }, [setIsServerReachable, setServerNetwork, setToken]);
+
+  return { setReachableServer, setServer, setCurrentServerReachable, forgetServer };
 }
 
 function setAddressForServerApi(ip: string, port: string) {

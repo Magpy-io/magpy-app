@@ -25,7 +25,6 @@ export function ClaimServerForm() {
   const { setIsNewUser } = useMainContextFunctions();
 
   const onSubmit = async (values: { username: string; password: string }) => {
-    console.log('hdisofshoifhdo');
     try {
       const ret = await ClaimServerLocal.Post(values);
       if (ret.ok) {
