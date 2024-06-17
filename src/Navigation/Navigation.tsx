@@ -1,13 +1,11 @@
 import React from 'react';
 import { useColorScheme } from 'react-native';
 
-import { NavigationContainer, useNavigation } from '@react-navigation/native';
+import { NavigationContainer } from '@react-navigation/native';
 import { DarkTheme, DefaultTheme } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
 
 import { TabNavigationProvider } from '~/Navigation/TabNavigation/TabNavigationContext';
 
-import { MainStackParamList } from './Navigators/MainStackNavigator';
 import { Root } from './Root';
 
 const Navigation = () => {
@@ -21,9 +19,5 @@ const Navigation = () => {
     </NavigationContainer>
   );
 };
-
-export function useMainNavigation() {
-  return useNavigation<StackNavigationProp<MainStackParamList>>();
-}
 
 export default Navigation;

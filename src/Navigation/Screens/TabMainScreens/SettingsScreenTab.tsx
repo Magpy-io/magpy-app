@@ -23,7 +23,6 @@ import { TokenManager } from '~/Helpers/ServerQueries';
 import { GetPath } from '~/Helpers/ServerQueries/PathManager';
 import { useStyles } from '~/Hooks/useStyles';
 import { AutoBackupModule } from '~/NativeModules/AutoBackupModule';
-import { useMainNavigation } from '~/Navigation/Navigation';
 import { TabBarPadding } from '~/Navigation/TabNavigation/TabBar';
 import { colorsType } from '~/Styles/colors';
 import { spacing } from '~/Styles/spacing';
@@ -37,7 +36,6 @@ type ItemType = {
 
 export default function SettingsScreenTab() {
   const insets = useSafeAreaInsets();
-  const navigation = useMainNavigation();
   const styles = useStyles(makeStyles);
 
   const path = GetPath();
@@ -95,9 +93,7 @@ export default function SettingsScreenTab() {
       data: [
         {
           title: 'Account settings',
-          onPress: () => {
-            navigation.navigate('SettingsStackNavigator', { screen: 'AccountSettings' });
-          },
+          onPress: () => {},
           icon: <AccountIcon />,
         },
         {

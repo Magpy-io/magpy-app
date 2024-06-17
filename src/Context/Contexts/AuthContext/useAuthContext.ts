@@ -8,6 +8,12 @@ export function useAuthContextFunctions() {
 
   const [, , setToken] = tokenState;
 
+  const logout = function () {
+    setUser(null);
+    setToken(null);
+    TokenManager.SetUserToken('');
+  };
+
   const authenticate = async function () {
     const token = TokenManager.GetUserToken();
     console.log('Authenticate, getToken', token);
@@ -16,13 +22,11 @@ export function useAuthContextFunctions() {
     if (ret.ok) {
       setToken(token);
       setUser(ret.data.user);
+      return true;
+    } else {
+      logout();
     }
-  };
-
-  const logout = function () {
-    setUser(null);
-    setToken(null);
-    TokenManager.SetUserToken('');
+    return false;
   };
 
   return { authenticate, logout, setLoading };

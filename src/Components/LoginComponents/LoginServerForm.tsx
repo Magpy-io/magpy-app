@@ -8,10 +8,10 @@ import { PrimaryButtonExtraWide } from '~/Components/CommonComponents/Buttons';
 import ViewWithGap from '~/Components/CommonComponents/ViewWithGap';
 import LoginTextInput from '~/Components/LoginComponents/LoginTextInput';
 import { PasswordInput } from '~/Components/LoginComponents/PasswordInput';
-import { useMainContextFunctions } from '~/Context/Contexts/MainContext';
 import { useServerContextFunctions } from '~/Context/Contexts/ServerContext';
 import { GetTokenLocal, TokenManager } from '~/Helpers/ServerQueries';
 import { useStyles } from '~/Hooks/useStyles';
+import { useMainStackNavigation } from '~/Navigation/Navigators/MainStackNavigator';
 import { colorsType } from '~/Styles/colors';
 import { spacing } from '~/Styles/spacing';
 import { textSize } from '~/Styles/typography';
@@ -22,17 +22,18 @@ const LoginSchema = Yup.object().shape({
 });
 
 export function LoginServerForm() {
-  const { setCurrentServerReachable } = useServerContextFunctions();
-  const { setIsNewUser } = useMainContextFunctions();
+  const { setCurrentSelectingServerReachable } = useServerContextFunctions();
   const styles = useStyles(makeStyles);
+
+  const { navigate } = useMainStackNavigation();
 
   const onSubmit = async (values: { username: string; password: string }) => {
     try {
       const loginRet = await GetTokenLocal.Post(values);
       if (loginRet.ok) {
         const token = TokenManager.GetUserToken();
-        setCurrentServerReachable(token);
-        setIsNewUser(false);
+        setCurrentSelectingServerReachable(token);
+        navigate('Tabs');
       } else {
         console.log(loginRet);
       }

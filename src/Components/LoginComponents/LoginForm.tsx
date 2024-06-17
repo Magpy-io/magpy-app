@@ -11,8 +11,10 @@ import ViewWithGap from '~/Components/CommonComponents/ViewWithGap';
 import LoginTextInput from '~/Components/LoginComponents/LoginTextInput';
 import { PasswordInput } from '~/Components/LoginComponents/PasswordInput';
 import { useAuthContextFunctions } from '~/Context/Contexts/AuthContext';
+import { useMainContext } from '~/Context/Contexts/MainContext';
 import { Login } from '~/Helpers/BackendQueries';
 import { useStyles } from '~/Hooks/useStyles';
+import { useMainStackNavigation } from '~/Navigation/Navigators/MainStackNavigator';
 import { colorsType } from '~/Styles/colors';
 import { spacing } from '~/Styles/spacing';
 import { textSize } from '~/Styles/typography';
@@ -27,12 +29,23 @@ const LoginSchema = Yup.object().shape({
 export default function LoginForm() {
   const { authenticate } = useAuthContextFunctions();
   const styles = useStyles(makeStyles);
+  const { isNewUser } = useMainContext();
+
+  const { navigate } = useMainStackNavigation();
 
   const onSubmit = async (values: { email: string; password: string }) => {
     try {
       const loginRet = await Login.Post(values);
       if (loginRet.ok) {
-        await authenticate();
+        const authentificated = await authenticate();
+
+        if (authentificated) {
+          if (isNewUser) {
+            navigate('ServerSelect');
+          } else {
+            navigate('Tabs');
+          }
+        }
       }
     } catch (err) {
       console.log('Login Error', err);

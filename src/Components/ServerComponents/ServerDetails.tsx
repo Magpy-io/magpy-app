@@ -1,15 +1,13 @@
 import React, { useCallback } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
 import { Text } from 'react-native-elements';
 
 import { useMainContext } from '~/Context/Contexts/MainContext';
 import { useServerClaimContext } from '~/Context/Contexts/ServerClaimContext';
 import { useServerContext, useServerContextFunctions } from '~/Context/Contexts/ServerContext';
 import { useStyles } from '~/Hooks/useStyles';
-import { MainStackParamList } from '~/Navigation/Navigators/MainStackNavigator';
+import { useMainStackNavigation } from '~/Navigation/Navigators/MainStackNavigator';
 import { colorsType } from '~/Styles/colors';
 import { spacing } from '~/Styles/spacing';
 import { typography } from '~/Styles/typography';
@@ -23,12 +21,12 @@ export default function ServerDetails() {
   const { serverNetwork, isServerReachable, findingServer, error } = useServerContext();
   const { forgetServer } = useServerContextFunctions();
   const styles = useStyles(makeStyles);
-  const navigation = useNavigation<StackNavigationProp<MainStackParamList>>();
+  const { navigate } = useMainStackNavigation();
   const hasServerLocal = isUsingLocalAccount && !!serverNetwork;
   const hasServerRemote = !isUsingLocalAccount && !!server;
 
   const hasServer = hasServerLocal || hasServerRemote;
-
+  console.log(error);
   const ServerComponentLocal = () => (
     <ServerComponent
       hasServer={hasServer}
@@ -54,8 +52,8 @@ export default function ServerDetails() {
   );
 
   const OnAddServerPress = useCallback(() => {
-    navigation.navigate('ServerSelectNavigator', { screen: 'ServerSelect' });
-  }, [navigation]);
+    navigate('ServerSelect');
+  }, [navigate]);
 
   const OnForgetServerPress = useCallback(() => {
     if (isUsingLocalAccount) {

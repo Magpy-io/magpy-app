@@ -20,6 +20,7 @@ export type ServerNetworkType = {
 export type ServerContextDataType = {
   isServerReachable: boolean;
   serverNetworkState: StatePersistentType<ServerNetworkType | null>;
+  serverNetworkSelecting: ServerNetworkType | null;
   tokenState: StatePersistentType<string | null>;
   findingServer: boolean;
   error: ConnectingToServerError;
@@ -28,6 +29,7 @@ export type ServerContextDataType = {
 const initialState: ServerContextDataType = {
   isServerReachable: false,
   serverNetworkState: StatePersistentDefaultValue(null),
+  serverNetworkSelecting: null,
   tokenState: StatePersistentDefaultValue(null),
   findingServer: false,
   error: null,
@@ -36,6 +38,7 @@ const initialState: ServerContextDataType = {
 export type ServerContextDataSettersType = {
   setIsServerReachable: SetStateType<boolean>;
   setFindingServer: SetStateType<boolean>;
+  setServerNetworkSelecting: SetStateType<ServerNetworkType | null>;
   setError: SetStateType<ConnectingToServerError>;
 };
 
@@ -43,6 +46,7 @@ const initialStateSetters: ServerContextDataSettersType = {
   setIsServerReachable: () => {},
   setFindingServer: () => {},
   setError: () => {},
+  setServerNetworkSelecting: () => {},
 };
 
 const ServerContext = createContext<ServerContextDataType>(initialState);
@@ -61,12 +65,26 @@ export const ServerContextProvider: React.FC<PropsType> = props => {
     'ASYNC_STORAGE_KEY_SERVER_NETWORK_INFO',
   );
   const tokenState = useStatePersistent<string | null>(null, 'ASYNC_STORAGE_KEY_SERVER_TOKEN');
+  const [serverNetworkSelecting, setServerNetworkSelecting] =
+    useState<ServerNetworkType | null>(null);
 
   return (
     <ServerContext.Provider
-      value={{ isServerReachable, serverNetworkState, tokenState, findingServer, error }}>
+      value={{
+        isServerReachable,
+        serverNetworkState,
+        tokenState,
+        findingServer,
+        error,
+        serverNetworkSelecting,
+      }}>
       <ServerContextSetters.Provider
-        value={{ setIsServerReachable, setFindingServer, setError }}>
+        value={{
+          setIsServerReachable,
+          setFindingServer,
+          setError,
+          setServerNetworkSelecting,
+        }}>
         <ServerEffects>{props.children}</ServerEffects>
       </ServerContextSetters.Provider>
     </ServerContext.Provider>

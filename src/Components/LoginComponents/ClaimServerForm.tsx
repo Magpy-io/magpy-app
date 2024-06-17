@@ -8,9 +8,9 @@ import { PrimaryButtonExtraWide } from '~/Components/CommonComponents/Buttons';
 import ViewWithGap from '~/Components/CommonComponents/ViewWithGap';
 import LoginTextInput from '~/Components/LoginComponents/LoginTextInput';
 import { PasswordInput } from '~/Components/LoginComponents/PasswordInput';
-import { useMainContextFunctions } from '~/Context/Contexts/MainContext';
 import { useServerContextFunctions } from '~/Context/Contexts/ServerContext';
 import { ClaimServerLocal, GetTokenLocal, TokenManager } from '~/Helpers/ServerQueries';
+import { useMainStackNavigation } from '~/Navigation/Navigators/MainStackNavigator';
 import { spacing } from '~/Styles/spacing';
 
 const RegisterSchema = Yup.object().shape({
@@ -21,8 +21,9 @@ const RegisterSchema = Yup.object().shape({
 });
 
 export function ClaimServerForm() {
-  const { setCurrentServerReachable } = useServerContextFunctions();
-  const { setIsNewUser } = useMainContextFunctions();
+  const { setCurrentSelectingServerReachable } = useServerContextFunctions();
+
+  const { navigate } = useMainStackNavigation();
 
   const onSubmit = async (values: { username: string; password: string }) => {
     try {
@@ -31,8 +32,8 @@ export function ClaimServerForm() {
         const loginRet = await GetTokenLocal.Post(values);
         if (loginRet.ok) {
           const token = TokenManager.GetUserToken();
-          setCurrentServerReachable(token);
-          setIsNewUser(false);
+          setCurrentSelectingServerReachable(token);
+          navigate('Tabs');
         } else {
           console.log(loginRet.message);
         }

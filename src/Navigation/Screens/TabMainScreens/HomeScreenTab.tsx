@@ -3,13 +3,10 @@ import { Text } from 'react-native';
 
 import PhotoGallery from '~/Components/PhotoComponents/PhotoGallery';
 import { PhotoGalleryContextProvider } from '~/Components/PhotoComponents/PhotoGalleryContext';
-import { useMainContextFunctions } from '~/Context/Contexts/MainContext';
 import * as AndroidPermissions from '~/Helpers/GetPermissionsAndroid';
 
 export default function HomeScreenTab() {
   const [hasPermissions, setHasPermissions] = useState<boolean>(true);
-
-  const { setIsNewUser } = useMainContextFunctions();
 
   const getPermissions = useCallback(async () => {
     const hasPerm = await AndroidPermissions.hasAndroidPermissionWriteExternalStorage();
@@ -23,10 +20,6 @@ export default function HomeScreenTab() {
       console.log('Error getting permissions', e);
     });
   }, [getPermissions]);
-
-  useEffect(() => {
-    setIsNewUser(false);
-  }, [setIsNewUser]);
 
   return (
     <>

@@ -8,7 +8,7 @@ import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { recentServerGalleryPhotos } from '~/Context/ReduxStore/Slices/Photos/Selectors';
 import { useAppSelector } from '~/Context/ReduxStore/Store';
 import { useStyles } from '~/Hooks/useStyles';
-import { useMainNavigation } from '~/Navigation/Navigation';
+import { useMainStackNavigation } from '~/Navigation/Navigators/MainStackNavigator';
 import { colorsType } from '~/Styles/colors';
 import { borderRadius, spacing } from '~/Styles/spacing';
 import { typography } from '~/Styles/typography';
@@ -17,9 +17,9 @@ import RecentPhotoComponent from './RecentPhotoComponent';
 
 export default function RecentPhotos() {
   const photosGalleryServer = useAppSelector(recentServerGalleryPhotos);
-  const navigation = useMainNavigation();
+  const { navigate } = useMainStackNavigation();
   const onPressSeeAll = () => {
-    navigation.navigate('ServerGalleryScreen');
+    navigate('ServerGalleryScreen');
   };
   const renderItem = ({ item }: { item: PhotoGalleryType }) => {
     return <RecentPhotoComponent photo={item} />;

@@ -10,8 +10,10 @@ import ViewWithGap from '~/Components/CommonComponents/ViewWithGap';
 import LoginTextInput from '~/Components/LoginComponents/LoginTextInput';
 import { PasswordInput } from '~/Components/LoginComponents/PasswordInput';
 import { useAuthContextFunctions } from '~/Context/Contexts/AuthContext';
+import { useMainContext } from '~/Context/Contexts/MainContext';
 import { Login, Register } from '~/Helpers/BackendQueries';
 import { ErrorBackendUnreachable } from '~/Helpers/BackendQueries/ExceptionsManager';
+import { useMainStackNavigation } from '~/Navigation/Navigators/MainStackNavigator';
 import { spacing } from '~/Styles/spacing';
 
 const specialChars = /(?=.*[!@#$%^&*()_\-+={}[\]\\|:;'<>,.?/])/;
@@ -33,6 +35,8 @@ const RegisterSchema = Yup.object().shape({
 
 export default function RegisterForm() {
   const { authenticate } = useAuthContextFunctions();
+  const { isNewUser } = useMainContext();
+  const { navigate } = useMainStackNavigation();
 
   const onSubmit = async (values: { name: string; email: string; password: string }) => {
     try {
@@ -45,7 +49,15 @@ export default function RegisterForm() {
           });
           console.log('login result', loginRet);
           if (loginRet.ok) {
-            await authenticate();
+            const authentificated = await authenticate();
+
+            if (authentificated) {
+              if (isNewUser) {
+                navigate('ServerSelect');
+              } else {
+                navigate('Tabs');
+              }
+            }
           }
         } catch (err) {
           console.log('login Err', err);

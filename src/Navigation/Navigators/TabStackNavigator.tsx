@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View } from 'react-native';
 
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
+import { useMainContextFunctions } from '~/Context/Contexts/MainContext';
 
 import HomeScreenTab from '../Screens/TabMainScreens/HomeScreenTab';
 import ServerScreenTab from '../Screens/TabMainScreens/ServerScreenTab';
@@ -17,6 +19,12 @@ export type TabStackParamList = {
 
 const TabStack = createNativeStackNavigator<TabStackParamList>();
 export function TabStackNavigator() {
+  const { setIsNewUser } = useMainContextFunctions();
+
+  useEffect(() => {
+    setIsNewUser(false);
+  }, [setIsNewUser]);
+
   return (
     <View style={{ flex: 1 }}>
       <TabStack.Navigator
@@ -24,7 +32,7 @@ export function TabStackNavigator() {
           headerShown: false,
           animation: 'fade',
         }}
-        initialRouteName={TabName.Home}>
+        initialRouteName={TabName.Server}>
         <TabStack.Screen name={TabName.Server} component={ServerScreenTab} />
         <TabStack.Screen name={TabName.Home} component={HomeScreenTab} />
         <TabStack.Screen name={TabName.Settings} component={SettingsScreenTab} />

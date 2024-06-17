@@ -27,6 +27,7 @@ export const AuthEffects: React.FC<PropsType> = props => {
       }
       setLoading(false);
     }
+
     if (isUsingLocalAccountLoaded && isUsingLocalAccount == false && firstTime) {
       retrieveToken().catch(console.log);
     }

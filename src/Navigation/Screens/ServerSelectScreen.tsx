@@ -1,57 +1,38 @@
 import React, { useCallback, useEffect } from 'react';
 import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import { useIsFocused, useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import ServersList from '~/Components/SelectServerComponents/ServersList';
-import { useAuthContextFunctions } from '~/Context/Contexts/AuthContext';
 import { Server } from '~/Context/Contexts/LocalServersContext';
 import {
   useLocalServersContext,
   useLocalServersFunctions,
 } from '~/Context/Contexts/LocalServersContext';
-import { useMainContext, useMainContextFunctions } from '~/Context/Contexts/MainContext';
+import { useMainContext } from '~/Context/Contexts/MainContext';
 import { useServerClaimFunctions } from '~/Context/Contexts/ServerClaimContext';
 import { useServerContextFunctions } from '~/Context/Contexts/ServerContext';
 import { useTheme } from '~/Context/Contexts/ThemeContext';
 import { Status } from '~/Helpers/ServerQueries';
 import { formatAddressHttp } from '~/Helpers/Utilities';
-import { useCustomBackPress } from '~/Hooks/useCustomBackPress';
 import { useStyles } from '~/Hooks/useStyles';
-import { ServerSelectStackParamList } from '~/Navigation/Navigators/ServerSelectNavigator';
 import { colorsType } from '~/Styles/colors';
 import { spacing } from '~/Styles/spacing';
 import { typography } from '~/Styles/typography';
+
+import { useMainStackNavigation } from '../Navigators/MainStackNavigator';
 
 export default function ServerSelectScreen() {
   const { localServers, isScanning } = useLocalServersContext();
   const { tryClaimServer } = useServerClaimFunctions();
   const { refreshData } = useLocalServersFunctions();
-  const navigation = useNavigation<StackNavigationProp<ServerSelectStackParamList>>();
-  const { setServer } = useServerContextFunctions();
 
-  const { logout } = useAuthContextFunctions();
+  const { navigate } = useMainStackNavigation();
+  const { setServerSelecting } = useServerContextFunctions();
 
-  const { setIsUsingLocalAccount } = useMainContextFunctions();
   const { isUsingLocalAccount } = useMainContext();
 
   const { colors } = useTheme();
-
-  const { setIsNewUser } = useMainContextFunctions();
-
-  const isFocused = useIsFocused();
-
-  const onBackButton = useCallback(() => {
-    if (isUsingLocalAccount) {
-      setIsUsingLocalAccount(false);
-    } else {
-      logout();
-    }
-  }, [isUsingLocalAccount, logout, setIsUsingLocalAccount]);
-
-  useCustomBackPress(onBackButton, isFocused);
 
   const onSelectServer = useCallback(
     async (server: Server) => {
@@ -67,12 +48,12 @@ export default function ServerSelectScreen() {
               return;
             }
 
-            setServer(server.ip, server.port);
+            setServerSelecting(server.ip, server.port);
 
             if (ret.data.claimed == 'None') {
-              navigation.navigate('ServerRegister');
+              navigate('ServerClaim');
             } else {
-              navigation.navigate('ServerLogin');
+              navigate('ServerLogin');
             }
           }
         } catch (err) {
@@ -82,11 +63,11 @@ export default function ServerSelectScreen() {
         const serverClaimed = await tryClaimServer(server.ip, server.port);
 
         if (serverClaimed) {
-          setIsNewUser(false);
+          navigate('Tabs');
         }
       }
     },
-    [isUsingLocalAccount, navigation, setIsNewUser, setServer, tryClaimServer],
+    [isUsingLocalAccount, navigate, setServerSelecting, tryClaimServer],
   );
 
   useEffect(() => {
@@ -115,7 +96,7 @@ export default function ServerSelectScreen() {
         }}>
         <TouchableOpacity
           onPress={() => {
-            setIsNewUser(false);
+            navigate('Tabs');
           }}
           style={{ paddingVertical: spacing.spacing_s }}>
           <Text style={{ color: colors.TEXT, fontWeight: 'bold' }}>
