@@ -32,7 +32,7 @@ export function TabStackNavigator() {
           headerShown: false,
           animation: 'fade',
         }}
-        initialRouteName={TabName.Server}>
+        initialRouteName={TabName.Home}>
         <TabStack.Screen name={TabName.Server} component={ServerScreenTab} />
         <TabStack.Screen name={TabName.Home} component={HomeScreenTab} />
         <TabStack.Screen name={TabName.Settings} component={SettingsScreenTab} />

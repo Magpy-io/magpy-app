@@ -19,14 +19,14 @@ export function useAuthContextFunctions() {
     console.log('Authenticate, getToken', token);
     const ret = await WhoAmI.Post();
     console.log('Authenticate, whoAmI', ret);
+
     if (ret.ok) {
       setToken(token);
       setUser(ret.data.user);
-      return true;
     } else {
       logout();
     }
-    return false;
+    return ret.ok;
   };
 
   return { authenticate, logout, setLoading };
@@ -35,7 +35,7 @@ export function useAuthContextFunctions() {
 export function useAuthContext() {
   const { user, tokenState, loading } = useAuthContextInner();
 
-  const [token] = tokenState;
+  const [token, isTokenLoaded] = tokenState;
 
-  return { user, loading, token };
+  return { user, loading, token, isTokenLoaded };
 }

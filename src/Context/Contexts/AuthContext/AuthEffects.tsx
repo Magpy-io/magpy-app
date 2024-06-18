@@ -12,24 +12,33 @@ type PropsType = {
 export const AuthEffects: React.FC<PropsType> = props => {
   const [firstTime, setFirstTime] = useState(true);
   const { setLoading, authenticate } = useAuthContextFunctions();
-  const { token } = useAuthContext();
+  const { token, isTokenLoaded } = useAuthContext();
 
   const { isUsingLocalAccount, isUsingLocalAccountLoaded } = useMainContext();
 
   useEffect(() => {
     async function retrieveToken() {
       if (token) {
-        setFirstTime(false);
-        setLoading(true);
         TokenManager.SetUserToken(token);
 
         await authenticate();
       }
-      setLoading(false);
     }
 
-    if (isUsingLocalAccountLoaded && isUsingLocalAccount == false && firstTime) {
-      retrieveToken().catch(console.log);
+    if (!firstTime) {
+      return;
+    }
+
+    if (isTokenLoaded && isUsingLocalAccountLoaded) {
+      setFirstTime(false);
+
+      if (isUsingLocalAccount) {
+        return;
+      }
+
+      retrieveToken()
+        .then(() => setLoading(false))
+        .catch(console.log);
     }
   }, [
     setLoading,
@@ -38,6 +47,7 @@ export const AuthEffects: React.FC<PropsType> = props => {
     token,
     authenticate,
     firstTime,
+    isTokenLoaded,
   ]);
 
   return props.children;
