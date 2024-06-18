@@ -4,6 +4,7 @@ import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'rea
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import ServersList from '~/Components/SelectServerComponents/ServersList';
+import { useAuthContext } from '~/Context/Contexts/AuthContext';
 import { Server } from '~/Context/Contexts/LocalServersContext';
 import {
   useLocalServersContext,
@@ -13,7 +14,7 @@ import { useMainContext } from '~/Context/Contexts/MainContext';
 import { useServerClaimFunctions } from '~/Context/Contexts/ServerClaimContext';
 import { useServerContextFunctions } from '~/Context/Contexts/ServerContext';
 import { useTheme } from '~/Context/Contexts/ThemeContext';
-import { IsClaimed } from '~/Helpers/ServerQueries';
+import { GetToken, IsClaimed, TokenManager } from '~/Helpers/ServerQueries';
 import { formatAddressHttp } from '~/Helpers/Utilities';
 import { useStyles } from '~/Hooks/useStyles';
 import { colorsType } from '~/Styles/colors';
@@ -26,9 +27,9 @@ export default function ServerSelectScreen() {
   const { localServers, isScanning } = useLocalServersContext();
   const { tryClaimServer } = useServerClaimFunctions();
   const { refreshData } = useLocalServersFunctions();
-
+  const { token } = useAuthContext();
   const { navigate } = useMainStackNavigation();
-  const { setServerSelecting } = useServerContextFunctions();
+  const { setServerSelecting, setReachableServer } = useServerContextFunctions();
 
   const { isUsingLocalAccount } = useMainContext();
 
@@ -64,10 +65,37 @@ export default function ServerSelectScreen() {
 
         if (serverClaimed) {
           navigate('Tabs');
+          return;
+        }
+
+        if (!token) {
+          return;
+        }
+
+        const res = await GetToken.Post(
+          { userToken: token },
+          { path: formatAddressHttp(server.ip, server.port) },
+        );
+
+        if (res.ok) {
+          const ServerToken = TokenManager.GetUserToken();
+          setReachableServer({
+            ip: server.ip,
+            port: server.port,
+            token: ServerToken,
+          });
+          navigate('Tabs');
         }
       }
     },
-    [isUsingLocalAccount, navigate, setServerSelecting, tryClaimServer],
+    [
+      isUsingLocalAccount,
+      navigate,
+      setReachableServer,
+      setServerSelecting,
+      token,
+      tryClaimServer,
+    ],
   );
 
   useEffect(() => {
