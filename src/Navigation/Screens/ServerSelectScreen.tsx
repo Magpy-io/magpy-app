@@ -13,7 +13,7 @@ import { useMainContext } from '~/Context/Contexts/MainContext';
 import { useServerClaimFunctions } from '~/Context/Contexts/ServerClaimContext';
 import { useServerContextFunctions } from '~/Context/Contexts/ServerContext';
 import { useTheme } from '~/Context/Contexts/ThemeContext';
-import { Status } from '~/Helpers/ServerQueries';
+import { IsClaimed } from '~/Helpers/ServerQueries';
 import { formatAddressHttp } from '~/Helpers/Utilities';
 import { useStyles } from '~/Hooks/useStyles';
 import { colorsType } from '~/Styles/colors';
@@ -38,7 +38,7 @@ export default function ServerSelectScreen() {
     async (server: Server) => {
       if (isUsingLocalAccount) {
         try {
-          const ret = await Status.Post(
+          const ret = await IsClaimed.Post(
             {},
             { path: formatAddressHttp(server.ip, server.port) },
           );
