@@ -4,7 +4,10 @@ import { StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-elements';
 
 import { useMainContext } from '~/Context/Contexts/MainContext';
-import { useServerClaimContext } from '~/Context/Contexts/ServerClaimContext';
+import {
+  useServerClaimContext,
+  useServerClaimFunctions,
+} from '~/Context/Contexts/ServerClaimContext';
 import { useServerContext, useServerContextFunctions } from '~/Context/Contexts/ServerContext';
 import { useStyles } from '~/Hooks/useStyles';
 import { useMainStackNavigation } from '~/Navigation/Navigators/MainStackNavigator';
@@ -19,7 +22,8 @@ export default function ServerDetails() {
   const { server } = useServerClaimContext();
   const { isUsingLocalAccount } = useMainContext();
   const { serverNetwork, isServerReachable, findingServer, error } = useServerContext();
-  const { forgetServer } = useServerContextFunctions();
+  const { forgetServer: forgetServerLocal } = useServerContextFunctions();
+  const { forgetServer: forgetServerRemote } = useServerClaimFunctions();
   const styles = useStyles(makeStyles);
   const { navigate } = useMainStackNavigation();
   const hasServerLocal = isUsingLocalAccount && !!serverNetwork;
@@ -55,11 +59,13 @@ export default function ServerDetails() {
     navigate('ServerSelect');
   }, [navigate]);
 
-  const OnForgetServerPress = useCallback(() => {
+  const OnForgetServerPress = useCallback(async () => {
     if (isUsingLocalAccount) {
-      forgetServer();
+      forgetServerLocal();
+    } else {
+      await forgetServerRemote();
     }
-  }, [forgetServer, isUsingLocalAccount]);
+  }, [forgetServerLocal, forgetServerRemote, isUsingLocalAccount]);
 
   return (
     <View style={styles.viewStyle}>
@@ -69,7 +75,9 @@ export default function ServerDetails() {
         <PrimaryButton
           title={'Forget Server'}
           buttonStyle={{ marginTop: 5 }}
-          onPress={OnForgetServerPress}
+          onPress={() => {
+            OnForgetServerPress().catch(console.log);
+          }}
         />
       )}
       {!hasServer && (
