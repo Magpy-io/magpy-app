@@ -6,7 +6,8 @@ import { formatAddressHttp } from '~/Helpers/Utilities';
 import { useServerContextInner, useServerContextSettersInner } from './ServerContext';
 
 export function useServerContextFunctions() {
-  const { setIsServerReachable, setServerNetworkSelecting } = useServerContextSettersInner();
+  const { setIsServerReachable, setServerNetworkSelecting, setError } =
+    useServerContextSettersInner();
 
   const { tokenState, serverNetworkState, serverNetworkSelecting } = useServerContextInner();
   const [, , setServerNetwork] = serverNetworkState;
@@ -21,8 +22,9 @@ export function useServerContextFunctions() {
       setToken(server.token);
       setIsServerReachable(true);
       setAddressForServerApi(server.ip, server.port);
+      setError(null);
     },
-    [setIsServerReachable, setServerNetwork, setToken],
+    [setError, setIsServerReachable, setServerNetwork, setToken],
   );
 
   const setServerSelecting = useCallback(
@@ -57,8 +59,9 @@ export function useServerContextFunctions() {
     setServerNetwork(null);
     setIsServerReachable(false);
     setToken(null);
+    setError(null);
     clearAddressForServerApi();
-  }, [setIsServerReachable, setServerNetwork, setToken]);
+  }, [setError, setIsServerReachable, setServerNetwork, setToken]);
 
   return {
     setReachableServer,
