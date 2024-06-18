@@ -3,17 +3,15 @@
 import { ErrorNoAssociatedServer, ErrorsAuthorization } from '../ErrorTypes';
 import { ServerType, TokenAuthentification } from '../Types';
 
-export type ResponseData = {
-  server: ServerType;
-};
+export type ResponseData = string;
 
 
 
-export type ResponseErrorTypes = ErrorNoAssociatedServer | ErrorsAuthorization;
+export type ResponseErrorTypes = ErrorsAuthorization;
 
-export const endpoint = 'getMyServerInfo';
+export const endpoint = 'deleteMyServer';
 
 export const tokenAuth: TokenAuthentification = 'user';
 
 //auto-generated file using "yarn types"
-export * from '../RequestTypes/getMyServerInfo';
+export * from '../RequestTypes/deleteMyServer';

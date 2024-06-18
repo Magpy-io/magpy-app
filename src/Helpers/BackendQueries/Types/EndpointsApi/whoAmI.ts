@@ -1,9 +1,13 @@
+
+
 import { ErrorsAuthorization } from '../ErrorTypes';
 import { TokenAuthentification, UserType } from '../Types';
 
 export type ResponseData = {
   user: UserType;
 };
+
+
 
 export type ResponseErrorTypes = ErrorsAuthorization;
 

@@ -7,6 +7,7 @@ export * as Register from './endpoints/register';
 export * as RegisterServer from './endpoints/registerServer';
 export * as UpdateServerData from './endpoints/updateServerData';
 export * as WhoAmI from './endpoints/whoAmI';
+export * as DeleteMyServer from './endpoints/deleteMyServer';
 
 export * as Types from './Types';
 export * as TokenManager from './TokenManager';

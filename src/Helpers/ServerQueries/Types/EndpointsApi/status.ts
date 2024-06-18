@@ -1,9 +1,8 @@
 
 
-import { ErrorServerNotClaimed, ErrorsAuthorization } from '../ErrorTypes';
-import { APIPhoto, TokenAuthentification } from '../Types';
+import { TokenAuthentification } from '../Types';
 
-export type ResponseData = { claimed: 'None' | 'Locally' | 'Remotely' };
+export type ResponseData = string;
 
 
 

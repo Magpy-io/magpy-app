@@ -1,7 +1,11 @@
+
+
 import { ErrorsAuthorization } from '../ErrorTypes';
 import { TokenAuthentification } from '../Types';
 
 export type ResponseData = string;
+
+
 
 export type ResponseErrorTypes = ErrorsAuthorization;
 
