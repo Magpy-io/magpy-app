@@ -16,8 +16,10 @@ export const ServerClaimEffects: React.FC<PropsType> = props => {
 
   useEffect(() => {
     async function GetServer() {
+      console.log('Getting claimed server');
       try {
         const serverInfo = await GetMyServerInfo.Post();
+        console.log(serverInfo);
         if (serverInfo.ok) {
           setServer(serverInfo.data.server);
         } else {

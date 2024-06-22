@@ -15,12 +15,12 @@ export function useServerContextFunctions() {
 
   const setReachableServer = useCallback(
     (server: { ip: string; port: string; token: string }) => {
+      setIsServerReachable(true);
       setServerNetwork({
         currentPort: server.port,
         currentIp: server.ip,
       });
       setToken(server.token);
-      setIsServerReachable(true);
       setAddressForServerApi(server.ip, server.port);
       setError(null);
     },
