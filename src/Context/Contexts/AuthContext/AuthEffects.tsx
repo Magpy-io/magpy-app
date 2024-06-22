@@ -33,6 +33,7 @@ export const AuthEffects: React.FC<PropsType> = props => {
       setFirstTime(false);
 
       if (isUsingLocalAccount) {
+        setLoading(false);
         return;
       }
 
