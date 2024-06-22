@@ -10,6 +10,8 @@ import LoginTextInput from '~/Components/LoginComponents/LoginTextInput';
 import { PasswordInput } from '~/Components/LoginComponents/PasswordInput';
 import { useServerContextFunctions } from '~/Context/Contexts/ServerContext';
 import { ClaimServerLocal, GetTokenLocal, TokenManager } from '~/Helpers/ServerQueries';
+import { ErrorServerUnreachable } from '~/Helpers/ServerQueries/ExceptionsManager';
+import { useToast } from '~/Hooks/useToast';
 import { useMainStackNavigation } from '~/Navigation/Navigators/MainStackNavigator';
 import { spacing } from '~/Styles/spacing';
 
@@ -22,7 +24,7 @@ const RegisterSchema = Yup.object().shape({
 
 export function ClaimServerForm() {
   const { setCurrentSelectingServerReachable } = useServerContextFunctions();
-
+  const { showToastError } = useToast();
   const { navigate } = useMainStackNavigation();
 
   const onSubmit = async (values: { username: string; password: string }) => {
@@ -36,12 +38,23 @@ export function ClaimServerForm() {
           navigate('Tabs');
         } else {
           console.log(loginRet.message);
+          showToastError('Unexpected error while connecting to server', 'top');
         }
       } else {
         console.log(ret.message);
+        if (ret.errorCode == 'SERVER_ALREADY_CLAIMED') {
+          showToastError('Server already claimed by another user.', 'top');
+        } else {
+          showToastError('Unexpected error while claiming server', 'top');
+        }
       }
     } catch (err) {
       console.log(err);
+      if (err instanceof ErrorServerUnreachable) {
+        showToastError('Server unreachable', 'top');
+      } else {
+        showToastError('Unexpected error while claiming server', 'top');
+      }
     }
   };
 

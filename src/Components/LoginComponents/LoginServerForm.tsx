@@ -10,7 +10,9 @@ import LoginTextInput from '~/Components/LoginComponents/LoginTextInput';
 import { PasswordInput } from '~/Components/LoginComponents/PasswordInput';
 import { useServerContextFunctions } from '~/Context/Contexts/ServerContext';
 import { GetTokenLocal, TokenManager } from '~/Helpers/ServerQueries';
+import { ErrorServerUnreachable } from '~/Helpers/ServerQueries/ExceptionsManager';
 import { useStyles } from '~/Hooks/useStyles';
+import { useToast } from '~/Hooks/useToast';
 import { useMainStackNavigation } from '~/Navigation/Navigators/MainStackNavigator';
 import { colorsType } from '~/Styles/colors';
 import { spacing } from '~/Styles/spacing';
@@ -24,6 +26,7 @@ const LoginSchema = Yup.object().shape({
 export function LoginServerForm() {
   const { setCurrentSelectingServerReachable } = useServerContextFunctions();
   const styles = useStyles(makeStyles);
+  const { showToastError } = useToast();
 
   const { navigate } = useMainStackNavigation();
 
@@ -36,9 +39,22 @@ export function LoginServerForm() {
         navigate('Tabs');
       } else {
         console.log(loginRet);
+
+        if (loginRet.errorCode == 'INVALID_CREDENTIALS') {
+          showToastError('Invalid username or password', 'top');
+        } else if (loginRet.errorCode == 'SERVER_NOT_CLAIMED') {
+          showToastError('Server is not claimed', 'top');
+        } else {
+          showToastError('Unexpected error while connecting to server', 'top');
+        }
       }
     } catch (err) {
       console.log('Login Error', err);
+      if (err instanceof ErrorServerUnreachable) {
+        showToastError('Server unreachable', 'top');
+      } else {
+        showToastError('Unexpected error while claiming server', 'top');
+      }
     }
   };
   return (

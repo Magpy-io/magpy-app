@@ -14,10 +14,16 @@ export function useServerClaimFunctions() {
 
   const { setServer } = serverClaimContextSetters;
 
-  const tryClaimServer = useCallback(
+  const tryClaimServer: (
+    ip: string,
+    port: string,
+  ) => Promise<{
+    claimed: boolean;
+    error?: 'NO_BACKEND_TOKEN' | 'SERVER_ALREADY_CLAIMED' | 'UNEXPECTED_ERROR';
+  }> = useCallback(
     async (ip: string, port: string) => {
       if (!token) {
-        return false;
+        return { claimed: false, error: 'NO_BACKEND_TOKEN' };
       }
 
       try {
@@ -31,13 +37,20 @@ export function useServerClaimFunctions() {
           console.log('Server Info', serverInfo);
           if (serverInfo.ok) {
             setServer(serverInfo.data.server);
-            return true;
+            return { claimed: true };
+          } else {
+            return { claimed: false, error: 'UNEXPECTED_ERROR' };
           }
         }
-        return false;
+
+        if (ret.errorCode == 'SERVER_ALREADY_CLAIMED') {
+          return { claimed: false, error: 'SERVER_ALREADY_CLAIMED' };
+        } else {
+          return { claimed: false, error: 'UNEXPECTED_ERROR' };
+        }
       } catch (err) {
         console.log('Claim Server Error', err);
-        return false;
+        return { claimed: false, error: 'UNEXPECTED_ERROR' };
       }
     },
     [setServer, token],

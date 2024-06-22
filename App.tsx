@@ -3,6 +3,7 @@ import { StatusBar } from 'react-native';
 
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import Toast from 'react-native-toast-message';
 import { Provider } from 'react-redux';
 
 import { ConfigModules } from '~/Config/configModules';
@@ -23,6 +24,7 @@ function App(): React.JSX.Element {
               <ThemeContextProvider>
                 <StatusBar backgroundColor={'transparent'} translucent />
                 <Navigation />
+                <Toast />
               </ThemeContextProvider>
             </SafeAreaProvider>
           </GestureHandlerRootView>

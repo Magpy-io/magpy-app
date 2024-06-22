@@ -17,6 +17,7 @@ import { useTheme } from '~/Context/Contexts/ThemeContext';
 import { GetToken, IsClaimed, TokenManager } from '~/Helpers/ServerQueries';
 import { formatAddressHttp } from '~/Helpers/Utilities';
 import { useStyles } from '~/Hooks/useStyles';
+import { useToast } from '~/Hooks/useToast';
 import { colorsType } from '~/Styles/colors';
 import { spacing } from '~/Styles/spacing';
 import { typography } from '~/Styles/typography';
@@ -30,6 +31,8 @@ export default function ServerSelectScreen() {
   const { token } = useAuthContext();
   const { navigate } = useMainStackNavigation();
   const { setServerSelecting, setReachableServer } = useServerContextFunctions();
+
+  const { showToastError } = useToast();
 
   const { isUsingLocalAccount } = useMainContext();
 
@@ -46,6 +49,7 @@ export default function ServerSelectScreen() {
 
           if (ret.ok) {
             if (ret.data.claimed == 'Remotely') {
+              showToastError('Server already claimed by another user.');
               return;
             }
 
@@ -59,16 +63,23 @@ export default function ServerSelectScreen() {
           }
         } catch (err) {
           console.log(err);
+          showToastError('Unexpected error while connecting to this server.');
         }
       } else {
+        if (!token) {
+          showToastError('You need to be logged in before being able to claim a server.');
+          return;
+        }
+
         const serverClaimed = await tryClaimServer(server.ip, server.port);
 
-        if (serverClaimed) {
+        if (serverClaimed.claimed) {
           navigate('Tabs');
           return;
         }
 
-        if (!token) {
+        if (serverClaimed.error != 'SERVER_ALREADY_CLAIMED') {
+          showToastError('Unexpected error while connecting to this server.');
           return;
         }
 
@@ -85,6 +96,9 @@ export default function ServerSelectScreen() {
             token: ServerToken,
           });
           navigate('Tabs');
+        } else {
+          showToastError('Server already claimed by another user.');
+          return;
         }
       }
     },
@@ -93,6 +107,7 @@ export default function ServerSelectScreen() {
       navigate,
       setReachableServer,
       setServerSelecting,
+      showToastError,
       token,
       tryClaimServer,
     ],
