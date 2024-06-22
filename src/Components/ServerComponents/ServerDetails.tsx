@@ -8,7 +8,11 @@ import {
   useServerClaimContext,
   useServerClaimFunctions,
 } from '~/Context/Contexts/ServerClaimContext';
-import { useServerContext, useServerContextFunctions } from '~/Context/Contexts/ServerContext';
+import {
+  useFindServerFunctions,
+  useServerContext,
+  useServerContextFunctions,
+} from '~/Context/Contexts/ServerContext';
 import { useStyles } from '~/Hooks/useStyles';
 import { useMainStackNavigation } from '~/Navigation/Navigators/MainStackNavigator';
 import { colorsType } from '~/Styles/colors';
@@ -24,6 +28,7 @@ export default function ServerDetails() {
   const { serverNetwork, isServerReachable, findingServer, error } = useServerContext();
   const { forgetServer: forgetServerLocal } = useServerContextFunctions();
   const { forgetServer: forgetServerRemote } = useServerClaimFunctions();
+  const { FindServerLocal, FindServerRemote } = useFindServerFunctions();
   const styles = useStyles(makeStyles);
   const { navigate } = useMainStackNavigation();
   const hasServerLocal = isUsingLocalAccount && !!serverNetwork;
@@ -59,6 +64,18 @@ export default function ServerDetails() {
     navigate('ServerSelect');
   }, [navigate]);
 
+  const OnReconnectPress = useCallback(() => {
+    if (error == 'SERVER_NOT_REACHABLE') {
+      if (isUsingLocalAccount) {
+        FindServerLocal().catch(console.log);
+      } else {
+        FindServerRemote().catch(console.log);
+      }
+    } else {
+      navigate('ServerSelect');
+    }
+  }, [FindServerLocal, FindServerRemote, error, isUsingLocalAccount, navigate]);
+
   const OnForgetServerPress = useCallback(async () => {
     if (isUsingLocalAccount) {
       forgetServerLocal();
@@ -71,6 +88,21 @@ export default function ServerDetails() {
     <View style={styles.viewStyle}>
       <Text style={styles.titleStyle}>Details</Text>
       {isUsingLocalAccount ? <ServerComponentLocal /> : <ServerComponentRemote />}
+
+      {!hasServer && (
+        <PrimaryButton
+          title={'Add a server'}
+          buttonStyle={{ marginTop: 5 }}
+          onPress={OnAddServerPress}
+        />
+      )}
+      {error && (
+        <PrimaryButton
+          title={'Reconnect To Server'}
+          buttonStyle={{ marginTop: 5 }}
+          onPress={OnReconnectPress}
+        />
+      )}
       {hasServer && (
         <PrimaryButton
           title={'Forget Server'}
@@ -80,14 +112,6 @@ export default function ServerDetails() {
           }}
         />
       )}
-      {!hasServer && (
-        <PrimaryButton
-          title={'Add a server'}
-          buttonStyle={{ marginTop: 5 }}
-          onPress={OnAddServerPress}
-        />
-      )}
-      {error && <PrimaryButton title={'Reconnect To Server'} buttonStyle={{ marginTop: 5 }} />}
     </View>
   );
 }
