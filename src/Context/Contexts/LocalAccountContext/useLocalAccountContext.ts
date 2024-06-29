@@ -1,14 +1,25 @@
 import { useLocalAccountContextInternal } from './LocalAccountContext';
 
-export function useLocalAccountFunctions() {}
+export function useLocalAccountContextFunctions() {
+  const { serverNameState, usernameState } = useLocalAccountContextInternal();
 
-export function useLocalAccountContext() {
-  const { serverIp, serverPort, serverToken } = useLocalAccountContextInternal();
+  const [, , setServerName] = serverNameState;
+  const [, , setUsername] = usernameState;
 
   return {
-    hasSavedClaimedServer: serverIp != null,
-    serverIp,
-    serverPort,
-    serverToken,
+    setServerName,
+    setUsername,
+  };
+}
+
+export function useLocalAccountContext() {
+  const { serverNameState, usernameState } = useLocalAccountContextInternal();
+
+  const [serverName] = serverNameState;
+  const [username] = usernameState;
+
+  return {
+    serverName,
+    username,
   };
 }
