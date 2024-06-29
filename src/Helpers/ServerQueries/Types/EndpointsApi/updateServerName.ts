@@ -3,7 +3,8 @@
 import {
   ErrorBackendServerUnreachable,
   ErrorInvalidName,
-  ErrorsNotFromLocal,
+  ErrorCouldNotGetRequestAddress,
+  ErrorAuthorizationFailed,
 } from '../ErrorTypes';
 import { TokenAuthentification } from '../Types';
 
@@ -12,8 +13,9 @@ export type ResponseData = string;
 
 
 export type ResponseErrorTypes =
+  | ErrorAuthorizationFailed
   | ErrorInvalidName
-  | ErrorsNotFromLocal
+  | ErrorCouldNotGetRequestAddress
   | ErrorBackendServerUnreachable;
 
 export const endpoint = 'updateServerName';
