@@ -26,8 +26,6 @@ export const ServerEffects: React.FC<PropsType> = props => {
   const { isUsingLocalAccount } = useMainContext();
 
   useEffect(() => {
-    console.log('ServerEffect');
-
     if (isUsingLocalAccount) {
       FindServerLocal().catch(console.log);
     } else {
