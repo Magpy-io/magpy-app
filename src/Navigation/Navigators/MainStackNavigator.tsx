@@ -6,6 +6,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 import { useTheme } from '~/Context/Contexts/ThemeContext';
 
+import AccountSettingsScreen from '../Screens/AccountSettingsScreen';
 import LoginScreen from '../Screens/LoginScreen';
 import RegisterScreen from '../Screens/RegisterScreen';
 import ServerClaimScreen from '../Screens/ServerClaimScreen';
@@ -22,6 +23,7 @@ export type MainStackParamList = {
   ServerLogin: undefined;
   Login: undefined;
   Register: undefined;
+  AccountSettings: undefined;
 };
 
 const Stack = createNativeStackNavigator<MainStackParamList>();
@@ -47,6 +49,7 @@ export function MainStackNavigator({ initialScreen }: propsType) {
       <Stack.Screen name="ServerLogin" component={ServerLoginScreen} />
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="Register" component={RegisterScreen} />
+      <Stack.Screen name="AccountSettings" component={AccountSettingsScreen} />
     </Stack.Navigator>
   );
 }

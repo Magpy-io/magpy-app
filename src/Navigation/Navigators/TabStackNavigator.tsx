@@ -9,7 +9,7 @@ import HomeScreenTab from '../Screens/TabMainScreens/HomeScreenTab';
 import ServerScreenTab from '../Screens/TabMainScreens/ServerScreenTab';
 import SettingsScreenTab from '../Screens/TabMainScreens/SettingsScreenTab';
 import TabBar from '../TabNavigation/TabBar';
-import { TabName } from '../TabNavigation/TabNavigationContext';
+import { TabName, useTabNavigationContext } from '../TabNavigation/TabNavigationContext';
 
 export type TabStackParamList = {
   [TabName.Home]: undefined;
@@ -19,7 +19,15 @@ export type TabStackParamList = {
 
 const TabStack = createNativeStackNavigator<TabStackParamList>();
 export function TabStackNavigator() {
+  const { resetFocusedTab } = useTabNavigationContext();
+
   const { setIsNewUser } = useMainContextFunctions();
+
+  useEffect(() => {
+    return () => {
+      resetFocusedTab();
+    };
+  }, [resetFocusedTab]);
 
   useEffect(() => {
     setIsNewUser(false);
