@@ -98,6 +98,10 @@ export function usePhotosFunctionsStore() {
     [dispatch],
   );
 
+  const ClearServerPhotos = useCallback(() => {
+    dispatch(setPhotosServer([]));
+  }, [dispatch]);
+
   const AddPhotoThumbnailIfMissing = useCallback(
     async (serverPhoto: PhotoServerType) => {
       if (serverPhoto.uriThumbnail) {
@@ -153,9 +157,11 @@ export function usePhotosFunctionsStore() {
       await RefreshLocalPhotos(nLocal);
       if (isServerReachableRef.current) {
         await RefreshServerPhotos(nServer);
+      } else {
+        ClearServerPhotos();
       }
     },
-    [RefreshLocalPhotos, RefreshServerPhotos],
+    [RefreshLocalPhotos, RefreshServerPhotos, ClearServerPhotos],
   );
 
   const UploadPhotos = useCallback(
@@ -231,6 +237,7 @@ export function usePhotosFunctionsStore() {
     DeletePhotosLocal,
     DeletePhotosServer,
     DeletePhotosEverywhere,
+    ClearServerPhotos,
   };
 }
 
