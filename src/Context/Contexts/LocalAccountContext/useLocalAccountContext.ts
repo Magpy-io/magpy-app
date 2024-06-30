@@ -7,8 +7,8 @@ import { useLocalAccountContextInternal } from './LocalAccountContext';
 export function useLocalAccountContextFunctions() {
   const { serverNameState, usernameState } = useLocalAccountContextInternal();
 
-  const [, , setServerName] = serverNameState;
-  const [, , setUsername] = usernameState;
+  const [, , setServerName, clearServerName] = serverNameState;
+  const [, , setUsername, clearUsername] = usernameState;
 
   const updateLocalAccountDetails = useCallback(async () => {
     const ret = await GetServerInfo.Post({});
@@ -30,10 +30,16 @@ export function useLocalAccountContextFunctions() {
     }
   }, [setServerName, setUsername]);
 
+  const forgetServerLocal = useCallback(() => {
+    clearServerName();
+    clearUsername();
+  }, [clearServerName, clearUsername]);
+
   return {
     setServerName,
     setUsername,
     updateLocalAccountDetails,
+    forgetServerLocal,
   };
 }
 

@@ -3,7 +3,10 @@ import { StyleSheet, View } from 'react-native';
 
 import { Text } from 'react-native-elements';
 
-import { useLocalAccountContext } from '~/Context/Contexts/LocalAccountContext';
+import {
+  useLocalAccountContext,
+  useLocalAccountContextFunctions,
+} from '~/Context/Contexts/LocalAccountContext';
 import { useMainContext } from '~/Context/Contexts/MainContext';
 import {
   useServerClaimContext,
@@ -26,9 +29,10 @@ import { ServerComponent } from './ServerComponent';
 export default function ServerDetails() {
   const { server } = useServerClaimContext();
   const { serverName } = useLocalAccountContext();
+  const { forgetServerLocal } = useLocalAccountContextFunctions();
   const { isUsingLocalAccount } = useMainContext();
   const { serverNetwork, isServerReachable, findingServer, error } = useServerContext();
-  const { forgetServer: forgetServerLocal } = useServerContextFunctions();
+  const { forgetServer } = useServerContextFunctions();
   const { forgetServer: forgetServerRemote } = useServerClaimFunctions();
   const { FindServerLocal, FindServerRemote } = useFindServerFunctions();
   const styles = useStyles(makeStyles);
@@ -80,12 +84,13 @@ export default function ServerDetails() {
   }, [FindServerLocal, FindServerRemote, error, isUsingLocalAccount, navigate]);
 
   const OnForgetServerPress = useCallback(async () => {
-    if (isUsingLocalAccount) {
-      forgetServerLocal();
-    } else {
+    if (!isUsingLocalAccount) {
       await forgetServerRemote();
+    } else {
+      forgetServerLocal();
     }
-  }, [forgetServerLocal, forgetServerRemote, isUsingLocalAccount]);
+    forgetServer();
+  }, [forgetServer, forgetServerLocal, forgetServerRemote, isUsingLocalAccount]);
 
   return (
     <View style={styles.viewStyle}>
