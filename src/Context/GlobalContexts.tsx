@@ -17,21 +17,21 @@ type PropsType = {
 export const GlobalContexts: React.FC<PropsType> = props => {
   return (
     <MainContextProvider>
-      <LocalAccountContextProvider>
-        <AuthContextProvider>
-          <LocalServersContextProvider>
-            <BackgroundServiceContextProvider>
-              <ServerClaimContextProvider>
-                <ServerContextProvider>
+      <AuthContextProvider>
+        <LocalServersContextProvider>
+          <BackgroundServiceContextProvider>
+            <ServerClaimContextProvider>
+              <ServerContextProvider>
+                <LocalAccountContextProvider>
                   <PhotosDownloadingContextProvider>
                     {props.children}
                   </PhotosDownloadingContextProvider>
-                </ServerContextProvider>
-              </ServerClaimContextProvider>
-            </BackgroundServiceContextProvider>
-          </LocalServersContextProvider>
-        </AuthContextProvider>
-      </LocalAccountContextProvider>
+                </LocalAccountContextProvider>
+              </ServerContextProvider>
+            </ServerClaimContextProvider>
+          </BackgroundServiceContextProvider>
+        </LocalServersContextProvider>
+      </AuthContextProvider>
     </MainContextProvider>
   );
 };
