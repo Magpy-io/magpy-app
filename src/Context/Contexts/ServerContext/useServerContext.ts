@@ -93,6 +93,11 @@ export function useServerContext() {
   const [serverNetwork] = serverNetworkState;
   const [token] = tokenState;
 
+  let serverPath = null;
+  if (serverNetwork) {
+    serverPath = formatAddressHttp(serverNetwork.currentIp, serverNetwork.currentPort);
+  }
+
   return {
     isServerReachable,
     findingServer,
@@ -100,5 +105,6 @@ export function useServerContext() {
     serverNetwork,
     error,
     serverNetworkSelecting,
+    serverPath,
   };
 }
