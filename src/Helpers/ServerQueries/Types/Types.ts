@@ -17,4 +17,4 @@ export type APIPhoto = {
   image64: string;
 };
 
-export type TokenAuthentification = 'no' | 'yes' | 'set-token';
+export type TokenAuthentification = 'no' | 'yes' | 'set-token' | 'optional';

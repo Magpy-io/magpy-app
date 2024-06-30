@@ -18,7 +18,7 @@ export type ResponseErrorTypes =
 
 export const endpoint = 'unclaimServer';
 
-export const tokenAuth: TokenAuthentification = 'no';
+export const tokenAuth: TokenAuthentification = 'optional';
 
 //auto-generated file using "yarn types"
 export * from '../RequestTypes/unclaimServer';

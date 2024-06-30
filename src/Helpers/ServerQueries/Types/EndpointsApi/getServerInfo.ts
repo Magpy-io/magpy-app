@@ -1,5 +1,3 @@
-
-
 import {
   ErrorAuthorizationFailed,
   ErrorBackendServerUnreachable,
@@ -14,8 +12,6 @@ export type ResponseData = {
   ownerLocal: { name: string } | null;
 };
 
-
-
 export type ResponseErrorTypes =
   | ErrorAuthorizationFailed
   | ErrorCouldNotGetRequestAddress
@@ -23,7 +19,7 @@ export type ResponseErrorTypes =
 
 export const endpoint = 'getServerInfo';
 
-export const tokenAuth: TokenAuthentification = 'no';
+export const tokenAuth: TokenAuthentification = 'optional';
 
 //auto-generated file using "yarn types"
 export * from '../RequestTypes/getServerInfo';
