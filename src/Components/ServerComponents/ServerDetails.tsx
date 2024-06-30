@@ -3,6 +3,7 @@ import { StyleSheet, View } from 'react-native';
 
 import { Text } from 'react-native-elements';
 
+import { useLocalAccountContext } from '~/Context/Contexts/LocalAccountContext';
 import { useMainContext } from '~/Context/Contexts/MainContext';
 import {
   useServerClaimContext,
@@ -24,6 +25,7 @@ import { ServerComponent } from './ServerComponent';
 
 export default function ServerDetails() {
   const { server } = useServerClaimContext();
+  const { serverName } = useLocalAccountContext();
   const { isUsingLocalAccount } = useMainContext();
   const { serverNetwork, isServerReachable, findingServer, error } = useServerContext();
   const { forgetServer: forgetServerLocal } = useServerContextFunctions();
@@ -39,6 +41,7 @@ export default function ServerDetails() {
   const ServerComponentLocal = () => (
     <ServerComponent
       hasServer={hasServer}
+      name={serverName ?? undefined}
       ip={serverNetwork?.currentIp}
       port={serverNetwork?.currentPort}
       reachable={isServerReachable}
