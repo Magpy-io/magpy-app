@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, TextStyle, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
 import { Text } from 'react-native-elements';
 
@@ -10,26 +10,20 @@ import { typography } from '~/Styles/typography';
 
 import { ChevronIcon } from '../CommonComponents/Icons';
 
-type SettingNavigateComponentProps = {
+type SettingComponentProps = {
   title: string;
   onPress: () => void;
   icon: JSX.Element;
-  style?: TextStyle;
 };
 
-export default function SettingNavigateComponent({
-  icon,
-  title,
-  onPress,
-  style,
-}: SettingNavigateComponentProps) {
+export default function SettingComponent({ icon, title, onPress }: SettingComponentProps) {
   const styles = useStyles(makeStyles);
 
   return (
     <TouchableOpacity style={styles.container} onPress={onPress}>
       <View style={styles.iconTitle}>
         {icon}
-        <Text style={[styles.titleStyle, style]}>{title}</Text>
+        <Text style={styles.titleStyle}>{title}</Text>
       </View>
       <ChevronIcon />
     </TouchableOpacity>
