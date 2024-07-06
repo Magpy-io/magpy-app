@@ -41,7 +41,7 @@ export function useBackupWorkerContextFunctions() {
 
     if (!isStarted) {
       console.log('worker stopped');
-      setAutobackupEnabled(true);
+      setAutobackupEnabled(false);
       return;
     }
 
@@ -51,7 +51,7 @@ export function useBackupWorkerContextFunctions() {
   return { StartAutoBackup, StopAutoBackup };
 }
 
-export function useAuthContext() {
+export function useBackupWorkerContext() {
   const { autobackupEnabled } = useBackupWorkerContextInner();
 
   return { autobackupEnabled };

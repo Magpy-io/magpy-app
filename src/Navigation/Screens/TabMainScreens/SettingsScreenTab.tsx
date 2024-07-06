@@ -37,7 +37,9 @@ export default function SettingsScreenTab() {
         {
           type: 'Navigation',
           title: 'Backup Settings',
-          onPress: () => {},
+          onPress: () => {
+            navigate('BackupSettings');
+          },
           icon: <UploadIcon />,
         },
         {

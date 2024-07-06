@@ -34,6 +34,7 @@ export type SwitchType = {
   type: 'Switch';
   onPress: (switchState: boolean) => void;
   initialState: boolean;
+  disabled?: boolean;
   title: string;
   icon: JSX.Element;
   style?: TextStyle;
@@ -89,6 +90,7 @@ export default function SettingsPageComponent({
             onPress={item.onPress}
             style={item.style}
             initialState={item.initialState}
+            disabled={item.disabled}
           />
         );
     }

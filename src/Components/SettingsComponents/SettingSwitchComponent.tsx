@@ -1,12 +1,13 @@
 import React from 'react';
 import { TextStyle } from 'react-native';
 
+import SwitchComponent from '../CommonComponents/SwitchComponent';
 import SettingEntryComponent from './SettingEntryComponent';
-import SwitchComponent from './SwitchComponent';
 
 type SettingSwitchComponentProps = {
   title: string;
   initialState: boolean;
+  disabled?: boolean;
   onPress: (switchState: boolean) => void;
   icon: JSX.Element;
   style?: TextStyle;
@@ -18,13 +19,20 @@ export default function SettingSwitchComponent({
   style,
   onPress,
   initialState,
+  disabled,
 }: SettingSwitchComponentProps) {
   return (
     <SettingEntryComponent
       title={title}
       icon={icon}
       style={style}
-      componentEnd={<SwitchComponent onSwitchChanged={onPress} initialState={initialState} />}
+      componentEnd={
+        <SwitchComponent
+          onSwitchChanged={onPress}
+          initialState={initialState}
+          disabled={disabled}
+        />
+      }
     />
   );
 }
