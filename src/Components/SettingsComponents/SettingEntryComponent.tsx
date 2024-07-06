@@ -10,7 +10,7 @@ import { typography } from '~/Styles/typography';
 
 type SettingEntryComponentProps = {
   title: string;
-  onPress: () => void;
+  onPress?: () => void;
   icon: JSX.Element;
   componentEnd?: JSX.Element;
   style?: TextStyle;
@@ -39,7 +39,7 @@ export default function SettingEntryComponent({
 const makeStyles = (colors: colorsType) =>
   StyleSheet.create({
     titleStyle: {
-      ...typography(colors).mediumText,
+      ...typography(colors).largeText,
     },
     iconTitle: {
       flexDirection: 'row',

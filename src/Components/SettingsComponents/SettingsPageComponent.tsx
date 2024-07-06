@@ -12,16 +12,35 @@ import { spacing } from '~/Styles/spacing';
 import { typography } from '~/Styles/typography';
 
 import SettingButtonComponent from './SettingButtonComponent';
+import SettingSwitchComponent from './SettingSwitchComponent';
 
-export type ItemType = {
-  type: 'Button' | 'Navigation';
-  title: string;
+export type ButtonType = {
+  type: 'Button';
   onPress: () => void;
+  title: string;
   icon: JSX.Element;
   style?: TextStyle;
 };
 
-export type SettingsListType = Array<{ title: string; data: Array<ItemType> }>;
+export type NavigationType = {
+  type: 'Navigation';
+  onPress: () => void;
+  title: string;
+  icon: JSX.Element;
+  style?: TextStyle;
+};
+
+export type SwitchType = {
+  type: 'Switch';
+  onPress: (switchState: boolean) => void;
+  title: string;
+  icon: JSX.Element;
+  style?: TextStyle;
+};
+
+export type EntryTypes = ButtonType | NavigationType | SwitchType;
+
+export type SettingsListType = Array<{ title: string; data: Array<EntryTypes> }>;
 
 type SettingsPageComponentProps = {
   data: SettingsListType;
@@ -41,7 +60,7 @@ export default function SettingsPageComponent({
     return <Text style={styles.title}>{title}</Text>;
   };
 
-  const renderItem = ({ item }: { item: ItemType }) => {
+  const renderItem = ({ item }: { item: EntryTypes }) => {
     switch (item.type) {
       case 'Button':
         return (
@@ -55,6 +74,15 @@ export default function SettingsPageComponent({
       case 'Navigation':
         return (
           <SettingNavigateComponent
+            icon={item.icon}
+            title={item.title}
+            onPress={item.onPress}
+            style={item.style}
+          />
+        );
+      case 'Switch':
+        return (
+          <SettingSwitchComponent
             icon={item.icon}
             title={item.title}
             onPress={item.onPress}
