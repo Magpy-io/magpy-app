@@ -1,8 +1,7 @@
-import * as mockValues from '../mockValues';
-
 import { GetServerToken, verifyHasServerToken } from '../../TokenManager';
 import { UpdateServerData } from '../../Types/';
 import { ResponseTypeFrom } from '../../Types/ApiGlobalTypes';
+import * as mockValues from '../mockValues';
 
 export const Post = async (data: UpdateServerData.RequestData): Promise<ResponseType> => {
   verifyHasServerToken();

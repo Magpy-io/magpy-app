@@ -3,11 +3,11 @@ import React from 'react';
 import PhotoGallery from '~/Components/PhotoComponents/PhotoGallery';
 import { PhotoGalleryContextProvider } from '~/Components/PhotoComponents/PhotoGalleryContext';
 
-import { useMainNavigation } from '../Navigation';
+import { useMainStackNavigation } from '../Navigators/MainStackNavigator';
 
 export default function ServerGalleryScreen() {
   console.log('render server gallery screen');
-  const navigation = useMainNavigation();
+  const { goBack } = useMainStackNavigation();
 
   return (
     <PhotoGalleryContextProvider isServer>
@@ -15,7 +15,7 @@ export default function ServerGalleryScreen() {
         key={'ServerPhotos'}
         title="Server photos"
         showBackButton
-        onPressBack={() => navigation.goBack()}
+        onPressBack={() => goBack()}
       />
     </PhotoGalleryContextProvider>
   );

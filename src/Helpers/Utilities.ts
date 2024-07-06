@@ -9,3 +9,7 @@
 export function clamp(val: number, max: number): number {
   return val > max ? max : val < 0 ? 0 : val;
 }
+
+export function formatAddressHttp(ip: string, port: string) {
+  return `http://${ip}:${port}`;
+}

@@ -1,3 +1,5 @@
+
+
 import {
   ErrorInvalidIpAddress,
   ErrorInvalidKeyFormat,
@@ -10,6 +12,8 @@ import { ServerType, TokenAuthentification } from '../Types';
 export type ResponseData = {
   server: ServerType;
 };
+
+
 
 export type ResponseErrorTypes =
   | ErrorInvalidIpAddress

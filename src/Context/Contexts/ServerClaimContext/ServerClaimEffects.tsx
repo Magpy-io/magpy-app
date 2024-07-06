@@ -10,30 +10,31 @@ type PropsType = {
 };
 
 export const ServerClaimEffects: React.FC<PropsType> = props => {
-  const { token } = useAuthContext();
+  const { token, loading } = useAuthContext();
 
-  const serverClaimContextSetters = useServerClaimContextSetters();
-
-  const { setServer, setHasServer } = serverClaimContextSetters;
+  const { setServer } = useServerClaimContextSetters();
 
   useEffect(() => {
     async function GetServer() {
+      console.log('Getting claimed server');
       try {
         const serverInfo = await GetMyServerInfo.Post();
+        console.log(serverInfo);
         if (serverInfo.ok) {
           setServer(serverInfo.data.server);
-          setHasServer(true);
         } else {
-          setHasServer(false);
+          setServer(null);
+          console.log(serverInfo);
         }
       } catch (e) {
         console.log('Error: GetMyServerInfo backend request failed');
+        console.log(e);
       }
     }
-    if (token) {
+    if (!loading && token) {
       GetServer().catch(console.log);
     }
-  }, [setHasServer, setServer, token]);
+  }, [loading, setServer, token]);
 
   return props.children;
 };

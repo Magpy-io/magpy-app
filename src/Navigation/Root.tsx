@@ -1,24 +1,31 @@
 import React from 'react';
 
 import { useAuthContext } from '~/Context/Contexts/AuthContext';
-import { useServerClaimContext } from '~/Context/Contexts/ServerClaimContext';
+import { useMainContext } from '~/Context/Contexts/MainContext';
 
-import { LoginStackNavigator } from './Navigators/LoginStackNavigator';
 import { MainStackNavigator } from './Navigators/MainStackNavigator';
-import { ServerSelectNavigator } from './Navigators/ServerSelectNavigator';
-import { SplashScreenNavigator } from './Navigators/SplashScreenNavigator';
+import SplashScreen from './Screens/SplashScreen';
 
 export const Root = () => {
   const { token, loading } = useAuthContext();
-  const { hasServer } = useServerClaimContext();
 
-  if (loading) {
-    return <SplashScreenNavigator />;
-  } else if (!token) {
-    return <LoginStackNavigator />;
-  } else if (!hasServer) {
-    return <ServerSelectNavigator />;
-  } else {
-    return <MainStackNavigator />;
+  const { isNewUser, isUsingLocalAccount, isContextLoaded } = useMainContext();
+
+  if (!isContextLoaded) {
+    return <SplashScreen />;
   }
+
+  if (!isUsingLocalAccount && loading) {
+    return <SplashScreen />;
+  }
+
+  if (isNewUser) {
+    return <MainStackNavigator initialScreen="Login" />;
+  }
+
+  if (!isUsingLocalAccount && !token) {
+    return <MainStackNavigator initialScreen="Login" />;
+  }
+
+  return <MainStackNavigator initialScreen="Tabs" />;
 };

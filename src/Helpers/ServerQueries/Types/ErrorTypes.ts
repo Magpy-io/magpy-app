@@ -16,11 +16,11 @@ export type ErrorAuthorizationWrongFormat = 'AUTHORIZATION_WRONG_FORMAT';
 export type ErrorAuthorizationFailed = 'AUTHORIZATION_FAILED';
 export type ErrorAuthorizationExpired = 'AUTHORIZATION_EXPIRED';
 export type ErrorCouldNotGetRequestAddress = 'COULD_NOT_GET_REQUEST_ADDRESS';
-export type ErrorRequestNotFromLoopback = 'REQUEST_NOT_FROM_LOOPBACK';
 export type ErrorPathAccessDenied = 'PATH_ACCESS_DENIED';
 export type ErrorPathFolderDoesNotExist = 'PATH_FOLDER_DOES_NOT_EXIST';
 export type ErrorInvalidName = 'INVALID_NAME';
 export type ErrorInvalidCredentials = 'INVALID_CREDENTIALS';
+export type ErrorRequestNotFromLoopback = 'REQUEST_NOT_FROM_LOOPBACK';
 
 export type ErrorCodes =
   | ErrorBadRequest
@@ -41,13 +41,11 @@ export type ErrorCodes =
   | ErrorAuthorizationFailed
   | ErrorAuthorizationExpired
   | ErrorCouldNotGetRequestAddress
-  | ErrorRequestNotFromLoopback
   | ErrorPathAccessDenied
   | ErrorPathFolderDoesNotExist
   | ErrorInvalidName
-  | ErrorInvalidCredentials;
-
-export type ErrorsNotFromLocal = ErrorCouldNotGetRequestAddress | ErrorRequestNotFromLoopback;
+  | ErrorInvalidCredentials
+  | ErrorRequestNotFromLoopback;
 
 export type ErrorsAuthorization =
   | ErrorAuthorizationFailed

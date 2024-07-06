@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { SectionList, StyleSheet, View } from 'react-native';
 
 import { Text } from 'react-native-elements';
@@ -19,11 +19,10 @@ import LogoutComponent from '~/Components/SettingsComponents/LogoutComponent';
 import ProfileHeader from '~/Components/SettingsComponents/ProfileHeader';
 import SettingComponent from '~/Components/SettingsComponents/SettingComponent';
 import { uniqueDeviceId } from '~/Config/config';
-import { GetPath } from '~/Helpers/ServerQueries/PathManager';
-import { GetUserToken } from '~/Helpers/ServerQueries/TokenManager';
+import { useServerContext } from '~/Context/Contexts/ServerContext';
 import { useStyles } from '~/Hooks/useStyles';
 import { AutoBackupModule } from '~/NativeModules/AutoBackupModule';
-import { useMainNavigation } from '~/Navigation/Navigation';
+import { useMainStackNavigation } from '~/Navigation/Navigators/MainStackNavigator';
 import { TabBarPadding } from '~/Navigation/TabNavigation/TabBar';
 import { colorsType } from '~/Styles/colors';
 import { spacing } from '~/Styles/spacing';
@@ -36,12 +35,25 @@ type ItemType = {
 };
 
 export default function SettingsScreenTab() {
+  const { navigate } = useMainStackNavigation();
   const insets = useSafeAreaInsets();
-  const navigation = useMainNavigation();
   const styles = useStyles(makeStyles);
 
-  const path = GetPath();
-  const token = GetUserToken();
+  const { isServerReachable, serverPath, token } = useServerContext();
+
+  const onAutobackupClick = useCallback(async () => {
+    if (isServerReachable) {
+      await AutoBackupModule.StartBackupWorker({
+        url: serverPath ?? '',
+        deviceId: uniqueDeviceId,
+        serverToken: token ?? '',
+      });
+      console.log('worker started');
+
+      const s = await AutoBackupModule.IsWorkerAlive();
+      setBackupOn(s);
+    }
+  }, [isServerReachable, serverPath, token]);
 
   const [backupOn, setBackupOn] = useState(false);
   console.log('backupOn', backupOn);
@@ -58,17 +70,7 @@ export default function SettingsScreenTab() {
       data: [
         {
           title: 'Activate auto-backup',
-          onPress: async () => {
-            await AutoBackupModule.StartBackupWorker({
-              url: path,
-              deviceId: uniqueDeviceId,
-              serverToken: token,
-            });
-            console.log('worker started');
-
-            const s = await AutoBackupModule.IsWorkerAlive();
-            setBackupOn(s);
-          },
+          onPress: onAutobackupClick,
           icon: <UploadIcon />,
         },
         {
@@ -96,7 +98,7 @@ export default function SettingsScreenTab() {
         {
           title: 'Account settings',
           onPress: () => {
-            navigation.navigate('SettingsStackNavigator', { screen: 'AccountSettings' });
+            navigate('AccountSettings');
           },
           icon: <AccountIcon />,
         },

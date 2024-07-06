@@ -1,6 +1,8 @@
-
-
-import { ErrorBackendServerUnreachable, ErrorsNotFromLocal } from '../ErrorTypes';
+import {
+  ErrorAuthorizationFailed,
+  ErrorBackendServerUnreachable,
+  ErrorCouldNotGetRequestAddress,
+} from '../ErrorTypes';
 import { TokenAuthentification } from '../Types';
 
 export type ResponseData = {
@@ -10,13 +12,14 @@ export type ResponseData = {
   ownerLocal: { name: string } | null;
 };
 
-
-
-export type ResponseErrorTypes = ErrorsNotFromLocal | ErrorBackendServerUnreachable;
+export type ResponseErrorTypes =
+  | ErrorAuthorizationFailed
+  | ErrorCouldNotGetRequestAddress
+  | ErrorBackendServerUnreachable;
 
 export const endpoint = 'getServerInfo';
 
-export const tokenAuth: TokenAuthentification = 'no';
+export const tokenAuth: TokenAuthentification = 'optional';
 
 //auto-generated file using "yarn types"
 export * from '../RequestTypes/getServerInfo';

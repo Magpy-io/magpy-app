@@ -1,6 +1,11 @@
 import React, { ReactNode, createContext, useContext, useState } from 'react';
 
 import { Types } from '~/Helpers/BackendQueries';
+import {
+  StatePersistentDefaultValue,
+  StatePersistentType,
+  useStatePersistent,
+} from '~/Hooks/useStatePersistent';
 
 import { AuthEffects } from './AuthEffects';
 
@@ -9,25 +14,23 @@ type SetStateType<T> = React.Dispatch<React.SetStateAction<T>>;
 export type AuthDataType = {
   user: Types.UserType | null;
   loading: boolean;
-  token: string | null;
+  tokenState: StatePersistentType<string | null>;
 };
 
 const initialState: AuthDataType = {
   user: null,
   loading: true,
-  token: null,
+  tokenState: StatePersistentDefaultValue(null),
 };
 
 export type AuthDataSettersType = {
   setUser: SetStateType<Types.UserType | null>;
   setLoading: SetStateType<boolean>;
-  setToken: SetStateType<string | null>;
 };
 
 const initialStateSetters: AuthDataSettersType = {
   setUser: () => {},
   setLoading: () => {},
-  setToken: () => {},
 };
 
 const AuthContext = createContext<AuthDataType>(initialState);
@@ -40,18 +43,21 @@ type PropsType = {
 export const AuthContextProvider: React.FC<PropsType> = props => {
   const [user, setUser] = useState<Types.UserType | null>(null);
   const [loading, setLoading] = useState(true);
-  const [token, setToken] = useState<string | null>(null);
+  const tokenState = useStatePersistent<string | null>(
+    null,
+    'ASYNC_STORAGE_KEY_BACKEND_TOKEN',
+  );
 
   return (
-    <AuthContext.Provider value={{ user, loading, token }}>
-      <AuthContextSetters.Provider value={{ setUser, setLoading, setToken }}>
+    <AuthContext.Provider value={{ user, loading, tokenState }}>
+      <AuthContextSetters.Provider value={{ setUser, setLoading }}>
         <AuthEffects>{props.children}</AuthEffects>
       </AuthContextSetters.Provider>
     </AuthContext.Provider>
   );
 };
 
-export function useAuthContext(): AuthDataType {
+export function useAuthContextInner(): AuthDataType {
   const context = useContext(AuthContext);
 
   if (!context) {
@@ -61,7 +67,7 @@ export function useAuthContext(): AuthDataType {
   return context;
 }
 
-export function useAuthContextSetters(): AuthDataSettersType {
+export function useAuthContextSettersInner(): AuthDataSettersType {
   const context = useContext(AuthContextSetters);
 
   if (!context) {

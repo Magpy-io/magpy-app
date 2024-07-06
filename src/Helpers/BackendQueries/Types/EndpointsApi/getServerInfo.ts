@@ -1,9 +1,13 @@
+
+
 import { ErrorsAuthorization } from '../ErrorTypes';
 import { ServerType, TokenAuthentification } from '../Types';
 
 export type ResponseData = {
   server: ServerType;
 };
+
+
 
 export type ResponseErrorTypes = ErrorsAuthorization;
 

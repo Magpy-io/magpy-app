@@ -6,8 +6,8 @@ import { FullScreenModule } from '~/NativeModules/FullScreenModule';
 import { NativeEventEmitterWrapper } from '~/NativeModules/NativeModulesEventNames';
 import { useTabNavigationContext } from '~/Navigation/TabNavigation/TabNavigationContext';
 
+import { useCustomBackPress } from '../../../Hooks/useCustomBackPress';
 import ToolBarPhotos from '../common/ToolBarPhotos';
-import { useCustomBackPress } from '../common/useCustomBackPress';
 import PhotoSliderComponent, { PhotoSliderComponentRefType } from './PhotoSliderComponent';
 import PhotoSliderHeader from './PhotoSliderHeader';
 

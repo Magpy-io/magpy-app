@@ -1,8 +1,7 @@
-import * as mockValues from '../mockValues';
-
 import { SetUserToken } from '../../TokenManager';
 import { Login } from '../../Types/';
 import { ResponseTypeFrom } from '../../Types/ApiGlobalTypes';
+import * as mockValues from '../mockValues';
 
 export const Post = async (data: Login.RequestData): Promise<ResponseType> => {
   await mockValues.timeout(10);

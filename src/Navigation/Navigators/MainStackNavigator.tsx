@@ -1,34 +1,59 @@
 import React from 'react';
 
-import { NavigatorScreenParams } from '@react-navigation/native';
+import { NavigatorScreenParams, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 import { useTheme } from '~/Context/Contexts/ThemeContext';
 
+import AccountSettingsScreen from '../Screens/AccountSettingsScreen';
+import LoginScreen from '../Screens/LoginScreen';
+import RegisterScreen from '../Screens/RegisterScreen';
+import ServerClaimScreen from '../Screens/ServerClaimScreen';
 import ServerGalleryScreen from '../Screens/ServerGalleryScreen';
-import { SettingsStackNavigator, SettingsStackParamList } from './SettingsStackNavigator';
+import ServerLoginScreen from '../Screens/ServerLoginScreen';
+import ServerSelectScreen from '../Screens/ServerSelectScreen';
 import { TabStackNavigator, TabStackParamList } from './TabStackNavigator';
 
 export type MainStackParamList = {
-  Tabs: NavigatorScreenParams<TabStackParamList>;
-  SettingsStackNavigator: NavigatorScreenParams<SettingsStackParamList>;
+  Tabs: NavigatorScreenParams<TabStackParamList> | undefined;
   ServerGalleryScreen: undefined;
+  ServerSelect: undefined;
+  ServerClaim: undefined;
+  ServerLogin: undefined;
+  Login: undefined;
+  Register: undefined;
+  AccountSettings: undefined;
 };
 
-const ParentStack = createNativeStackNavigator<MainStackParamList>();
+const Stack = createNativeStackNavigator<MainStackParamList>();
 
-export function MainStackNavigator() {
+type propsType = {
+  initialScreen?: keyof MainStackParamList | undefined;
+};
+
+export function MainStackNavigator({ initialScreen }: propsType) {
   const { colors } = useTheme();
   return (
-    <ParentStack.Navigator
+    <Stack.Navigator
       screenOptions={{
         headerShown: false,
         animation: 'fade',
         navigationBarColor: colors.BACKGROUND,
-      }}>
-      <ParentStack.Screen name="Tabs" component={TabStackNavigator} />
-      <ParentStack.Screen name="SettingsStackNavigator" component={SettingsStackNavigator} />
-      <ParentStack.Screen name="ServerGalleryScreen" component={ServerGalleryScreen} />
-    </ParentStack.Navigator>
+      }}
+      initialRouteName={initialScreen ?? 'Login'}>
+      <Stack.Screen name="Tabs" component={TabStackNavigator} />
+      <Stack.Screen name="ServerGalleryScreen" component={ServerGalleryScreen} />
+      <Stack.Screen name="ServerSelect" component={ServerSelectScreen} />
+      <Stack.Screen name="ServerClaim" component={ServerClaimScreen} />
+      <Stack.Screen name="ServerLogin" component={ServerLoginScreen} />
+      <Stack.Screen name="Login" component={LoginScreen} />
+      <Stack.Screen name="Register" component={RegisterScreen} />
+      <Stack.Screen name="AccountSettings" component={AccountSettingsScreen} />
+    </Stack.Navigator>
   );
+}
+
+export function useMainStackNavigation() {
+  return useNavigation<StackNavigationProp<MainStackParamList>>();
 }

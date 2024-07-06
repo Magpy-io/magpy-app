@@ -1,40 +1,55 @@
-import React, { ReactNode, useEffect } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 
-import { getStoredToken } from '~/Helpers/AsyncStorage';
-import { TokenManager, WhoAmI } from '~/Helpers/BackendQueries';
+import { TokenManager } from '~/Helpers/BackendQueries';
 
-import { useAuthContextSetters } from './AuthContext';
+import { useMainContext } from '../MainContext';
+import { useAuthContext, useAuthContextFunctions } from './useAuthContext';
 
 type PropsType = {
   children: ReactNode;
 };
 
 export const AuthEffects: React.FC<PropsType> = props => {
-  const authContextSetters = useAuthContextSetters();
+  const [firstTime, setFirstTime] = useState(true);
+  const { setLoading, authenticate } = useAuthContextFunctions();
+  const { token, isTokenLoaded } = useAuthContext();
 
-  const { setUser, setToken, setLoading } = authContextSetters;
+  const { isUsingLocalAccount, isUsingLocalAccountLoaded } = useMainContext();
 
   useEffect(() => {
     async function retrieveToken() {
-      const t = await getStoredToken();
-      if (t) {
-        TokenManager.SetUserToken(t);
-        try {
-          const ret = await WhoAmI.Post();
-          console.log('Who am I ret', ret);
-          if (ret.ok) {
-            setUser(ret.data.user);
-            setToken(t);
-          }
-        } catch (err) {
-          console.log('Error in WhoAmI', err);
-        }
+      if (token) {
+        TokenManager.SetUserToken(token);
+
+        await authenticate();
       }
-      setLoading(false);
     }
 
-    retrieveToken().catch(console.log);
-  }, [setLoading, setToken, setUser]);
+    if (!firstTime) {
+      return;
+    }
+
+    if (isTokenLoaded && isUsingLocalAccountLoaded) {
+      setFirstTime(false);
+
+      if (isUsingLocalAccount) {
+        setLoading(false);
+        return;
+      }
+
+      retrieveToken()
+        .then(() => setLoading(false))
+        .catch(console.log);
+    }
+  }, [
+    setLoading,
+    isUsingLocalAccount,
+    isUsingLocalAccountLoaded,
+    token,
+    authenticate,
+    firstTime,
+    isTokenLoaded,
+  ]);
 
   return props.children;
 };

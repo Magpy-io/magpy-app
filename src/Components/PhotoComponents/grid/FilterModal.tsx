@@ -35,8 +35,6 @@ export default function FilterModal({ visible, onRequestClose }: FilterModalProp
     setFilters(storeFilters);
   });
 
-  console.log('filters', filters);
-
   const onSubmit = () => {
     onRequestClose();
     addFilters(filters);

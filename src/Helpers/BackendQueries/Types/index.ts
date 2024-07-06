@@ -7,5 +7,6 @@ export * as Register from './EndpointsApi/register';
 export * as RegisterServer from './EndpointsApi/registerServer';
 export * as UpdateServerData from './EndpointsApi/updateServerData';
 export * as WhoAmI from './EndpointsApi/whoAmI';
+export * as DeleteMyServer from './EndpointsApi/deleteMyServer';
 
 export * from './Types';
