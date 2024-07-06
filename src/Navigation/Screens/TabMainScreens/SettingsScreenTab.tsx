@@ -13,12 +13,22 @@ import ProfileHeader from '~/Components/SettingsComponents/ProfileHeader';
 import SettingsPageComponent, {
   SettingsListType,
 } from '~/Components/SettingsComponents/SettingsPageComponent';
+import { useAuthContextFunctions } from '~/Context/Contexts/AuthContext';
 import { useStyles } from '~/Hooks/useStyles';
 import { useMainStackNavigation } from '~/Navigation/Navigators/MainStackNavigator';
+import { useTabNavigationContext } from '~/Navigation/TabNavigation/TabNavigationContext';
 import { spacing } from '~/Styles/spacing';
 
 export default function SettingsScreenTab() {
   const { navigate } = useMainStackNavigation();
+
+  const { logout } = useAuthContextFunctions();
+  const { resetFocusedTab } = useTabNavigationContext();
+
+  const onPressLogout = () => {
+    logout();
+    resetFocusedTab();
+  };
 
   const data: SettingsListType = [
     {
@@ -53,7 +63,7 @@ export default function SettingsScreenTab() {
         {
           type: 'Button',
           title: 'Logout',
-          onPress: () => {},
+          onPress: onPressLogout,
           icon: <LogoutIcon />,
         },
       ],
