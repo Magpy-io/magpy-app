@@ -5,6 +5,7 @@ import { Text } from 'react-native-elements';
 
 import { UploadIcon } from '~/Components/CommonComponents/Icons';
 import { useStyles } from '~/Hooks/useStyles';
+import { useMainStackNavigation } from '~/Navigation/Navigators/MainStackNavigator';
 import { colorsType } from '~/Styles/colors';
 import { borderRadius, spacing } from '~/Styles/spacing';
 import { typography } from '~/Styles/typography';
@@ -16,6 +17,8 @@ const TEXT = 'Automatically back up your media even when the app is closed';
 
 export default function AutoBackupCard() {
   const styles = useStyles(makeStyles);
+
+  const { navigate } = useMainStackNavigation();
 
   return (
     <View style={styles.container}>
@@ -30,7 +33,9 @@ export default function AutoBackupCard() {
       <PrimaryButtonSmall
         title="Enable"
         containerStyle={styles.buttonStyle}
-        onPress={() => {}}
+        onPress={() => {
+          navigate('BackupSettings');
+        }}
       />
     </View>
   );
