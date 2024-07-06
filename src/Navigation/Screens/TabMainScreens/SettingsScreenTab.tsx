@@ -4,6 +4,7 @@ import { StyleSheet, View } from 'react-native';
 import {
   AccountIcon,
   InfoIcon,
+  LogoutIcon,
   PreferencesIcon,
   UploadIcon,
 } from '~/Components/CommonComponents/Icons';
@@ -24,11 +25,13 @@ export default function SettingsScreenTab() {
       title: 'Settings',
       data: [
         {
+          type: 'Navigation',
           title: 'Backup Settings',
           onPress: () => {},
           icon: <UploadIcon />,
         },
         {
+          type: 'Navigation',
           title: 'Account settings',
           onPress: () => {
             navigate('AccountSettings');
@@ -36,14 +39,22 @@ export default function SettingsScreenTab() {
           icon: <AccountIcon />,
         },
         {
+          type: 'Navigation',
           title: 'Preferences',
           onPress: () => {},
           icon: <PreferencesIcon />,
         },
         {
+          type: 'Navigation',
           title: 'About Magpy',
           onPress: () => {},
           icon: <InfoIcon />,
+        },
+        {
+          type: 'Button',
+          title: 'Logout',
+          onPress: () => {},
+          icon: <LogoutIcon />,
         },
       ],
     },

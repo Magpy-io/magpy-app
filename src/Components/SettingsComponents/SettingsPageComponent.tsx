@@ -11,7 +11,10 @@ import { colorsType } from '~/Styles/colors';
 import { spacing } from '~/Styles/spacing';
 import { typography } from '~/Styles/typography';
 
+import SettingButtonComponent from './SettingButtonComponent';
+
 export type ItemType = {
+  type: 'Button' | 'Navigation';
   title: string;
   onPress: () => void;
   icon: JSX.Element;
@@ -39,14 +42,26 @@ export default function SettingsPageComponent({
   };
 
   const renderItem = ({ item }: { item: ItemType }) => {
-    return (
-      <SettingNavigateComponent
-        icon={item.icon}
-        title={item.title}
-        onPress={item.onPress}
-        style={item.style}
-      />
-    );
+    switch (item.type) {
+      case 'Button':
+        return (
+          <SettingButtonComponent
+            icon={item.icon}
+            title={item.title}
+            onPress={item.onPress}
+            style={item.style}
+          />
+        );
+      case 'Navigation':
+        return (
+          <SettingNavigateComponent
+            icon={item.icon}
+            title={item.title}
+            onPress={item.onPress}
+            style={item.style}
+          />
+        );
+    }
   };
 
   return (

@@ -262,3 +262,11 @@ export function PhoneIcon({ ...props }: CustomIconProps) {
     />
   );
 }
+
+export function LogoutIcon({ ...props }: CustomIconProps) {
+  const { colors } = useTheme();
+
+  return (
+    <Icon name="log-out-outline" type="ionicon" color={colors.TEXT} size={22} {...props} />
+  );
+}
