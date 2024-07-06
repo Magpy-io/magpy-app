@@ -8,11 +8,13 @@ import { colorsType } from '~/Styles/colors';
 
 type SwitchComponentProps = {
   initialState: boolean;
+  disabled?: boolean;
   onSwitchChanged?: (switchState: boolean) => void;
 };
 
 export default function SwitchComponent({
   initialState,
+  disabled,
   onSwitchChanged,
 }: SwitchComponentProps) {
   const [state, setState] = useState(initialState);
@@ -32,6 +34,7 @@ export default function SwitchComponent({
         onSwitchChanged?.(s);
       }}
       color={styles.switch.color}
+      disabled={disabled}
     />
   );
 }
