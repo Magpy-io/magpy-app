@@ -14,13 +14,19 @@ import SettingsPageComponent, {
   SettingsListType,
 } from '~/Components/SettingsComponents/SettingsPageComponent';
 import { useAuthContextFunctions } from '~/Context/Contexts/AuthContext';
+import { useBackupWorkerContext } from '~/Context/Contexts/BackupWorkerContext';
+import { useServerContext } from '~/Context/Contexts/ServerContext';
 import { useStyles } from '~/Hooks/useStyles';
 import { useMainStackNavigation } from '~/Navigation/Navigators/MainStackNavigator';
 import { useTabNavigationContext } from '~/Navigation/TabNavigation/TabNavigationContext';
+import { colorsType } from '~/Styles/colors';
 import { spacing } from '~/Styles/spacing';
 
 export default function SettingsScreenTab() {
   const { navigate } = useMainStackNavigation();
+
+  const { autobackupEnabled } = useBackupWorkerContext();
+  const { isServerReachable } = useServerContext();
 
   const { logout } = useAuthContextFunctions();
   const { resetFocusedTab } = useTabNavigationContext();
@@ -72,23 +78,31 @@ export default function SettingsScreenTab() {
     },
   ];
 
-  return <SettingsPageComponent data={data} header={<Header />} />;
+  return (
+    <SettingsPageComponent
+      data={data}
+      header={<Header displayCard={!autobackupEnabled && isServerReachable} />}
+    />
+  );
 }
 
-function Header() {
+function Header(props: { displayCard?: boolean }) {
   const styles = useStyles(makeStyles);
   return (
     <View style={styles.header}>
       <ProfileHeader />
-      <AutoBackupCard />
+      {props.displayCard && <AutoBackupCard />}
     </View>
   );
 }
 
-const makeStyles = () =>
+const makeStyles = (colors: colorsType) =>
   StyleSheet.create({
     header: {
       paddingTop: spacing.spacing_xl,
       gap: spacing.spacing_xl,
+    },
+    logoutButton: {
+      color: colors.ERROR,
     },
   });
