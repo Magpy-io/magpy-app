@@ -66,12 +66,6 @@ export default function SettingsScreenTab() {
           onPress: onPressLogout,
           icon: <LogoutIcon />,
         },
-        {
-          type: 'Switch',
-          title: 'Switch',
-          onPress: () => {},
-          icon: <LogoutIcon />,
-        },
       ],
     },
   ];

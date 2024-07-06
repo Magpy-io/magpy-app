@@ -33,6 +33,7 @@ export type NavigationType = {
 export type SwitchType = {
   type: 'Switch';
   onPress: (switchState: boolean) => void;
+  initialState: boolean;
   title: string;
   icon: JSX.Element;
   style?: TextStyle;
@@ -87,6 +88,7 @@ export default function SettingsPageComponent({
             title={item.title}
             onPress={item.onPress}
             style={item.style}
+            initialState={item.initialState}
           />
         );
     }

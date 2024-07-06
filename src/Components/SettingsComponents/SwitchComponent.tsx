@@ -7,11 +7,15 @@ import { useStyles } from '~/Hooks/useStyles';
 import { colorsType } from '~/Styles/colors';
 
 type SwitchComponentProps = {
+  initialState: boolean;
   onSwitchChanged?: (switchState: boolean) => void;
 };
 
-export default function SwitchComponent({ onSwitchChanged }: SwitchComponentProps) {
-  const [state, setState] = useState(false);
+export default function SwitchComponent({
+  initialState,
+  onSwitchChanged,
+}: SwitchComponentProps) {
+  const [state, setState] = useState(initialState);
 
   const styles = useStyles(makeStyles);
 
