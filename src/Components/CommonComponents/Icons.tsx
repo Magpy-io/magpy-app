@@ -270,3 +270,15 @@ export function LogoutIcon({ ...props }: CustomIconProps) {
     <Icon name="log-out-outline" type="ionicon" color={colors.TEXT} size={22} {...props} />
   );
 }
+
+export function LightModeIcon({ ...props }: CustomIconProps) {
+  const { colors } = useTheme();
+
+  return <Icon name="sunny-outline" type="ionicon" color={colors.TEXT} size={22} {...props} />;
+}
+
+export function DarkModeIcon({ ...props }: CustomIconProps) {
+  const { colors } = useTheme();
+
+  return <Icon name="moon-outline" type="ionicon" color={colors.TEXT} size={22} {...props} />;
+}

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { AccountIcon } from '~/Components/CommonComponents/Icons';
+import { DarkModeIcon, LightModeIcon, PhoneIcon } from '~/Components/CommonComponents/Icons';
 import SettingsPageComponent, {
   SettingsListType,
 } from '~/Components/SettingsComponents/SettingsPageComponent';
@@ -40,7 +40,7 @@ export default function PreferencesSettingsScreen() {
           onPress: () => {
             setUserSelectedTheme('light');
           },
-          icon: <AccountIcon />,
+          icon: <LightModeIcon />,
         },
 
         {
@@ -51,7 +51,7 @@ export default function PreferencesSettingsScreen() {
           onPress: () => {
             setUserSelectedTheme('dark');
           },
-          icon: <AccountIcon />,
+          icon: <DarkModeIcon />,
         },
 
         {
@@ -62,7 +62,7 @@ export default function PreferencesSettingsScreen() {
           onPress: () => {
             setUserSelectedTheme('deviceDefault');
           },
-          icon: <AccountIcon />,
+          icon: <PhoneIcon />,
         },
       ],
     },
