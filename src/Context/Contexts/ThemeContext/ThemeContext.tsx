@@ -6,6 +6,8 @@ import {
   useStatePersistent,
 } from '~/Hooks/useStatePersistent';
 
+import { ThemeEffect } from './ThemeEffect';
+
 export type userThemeTypes = 'light' | 'dark' | 'deviceDefault';
 
 export type ThemeContextType = {
@@ -30,7 +32,7 @@ export const ThemeContextProvider: React.FC<PropsType> = props => {
 
   return (
     <ThemeContext.Provider value={{ userSelectedThemeState }}>
-      {props.children}
+      <ThemeEffect>{props.children}</ThemeEffect>
     </ThemeContext.Provider>
   );
 };

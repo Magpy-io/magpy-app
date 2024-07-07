@@ -1,20 +1,22 @@
 import React, { ReactNode, useEffect } from 'react';
-import { useColorScheme } from 'react-native';
+import { StatusBar } from 'react-native';
 
 import { DarkTheme, LightTheme } from '~/Styles/colors';
+
+import { useTheme } from './useThemeContext';
 
 type PropsType = {
   children: ReactNode;
 };
 
 export const ThemeEffect: React.FC<PropsType> = props => {
-  const scheme = useColorScheme();
+  const { dark } = useTheme();
 
   useEffect(() => {
-    const theme = scheme === 'dark' ? DarkTheme : LightTheme;
-    //StatusBar.setBarStyle(scheme === 'light' ? 'dark-content' : 'light-content');
-    //StatusBar.setBackgroundColor(theme.colors.BACKGROUND);
-  }, [scheme]);
+    const theme = dark ? DarkTheme : LightTheme;
+    StatusBar.setBarStyle(dark ? 'light-content' : 'dark-content');
+    StatusBar.setBackgroundColor(theme.colors.BACKGROUND);
+  }, [dark]);
 
   return props.children;
 };
