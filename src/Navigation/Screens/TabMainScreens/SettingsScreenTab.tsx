@@ -15,25 +15,28 @@ import SettingsPageComponent, {
 } from '~/Components/SettingsComponents/SettingsPageComponent';
 import { useAuthContextFunctions } from '~/Context/Contexts/AuthContext';
 import { useBackupWorkerContext } from '~/Context/Contexts/BackupWorkerContext';
+import { useMainContext } from '~/Context/Contexts/MainContext';
 import { useServerContext } from '~/Context/Contexts/ServerContext';
 import { useStyles } from '~/Hooks/useStyles';
 import { useMainStackNavigation } from '~/Navigation/Navigators/MainStackNavigator';
-import { useTabNavigationContext } from '~/Navigation/TabNavigation/TabNavigationContext';
 import { colorsType } from '~/Styles/colors';
 import { spacing } from '~/Styles/spacing';
 
 export default function SettingsScreenTab() {
-  const { navigate } = useMainStackNavigation();
+  const { navigate, reset } = useMainStackNavigation();
 
+  const { isUsingLocalAccount } = useMainContext();
   const { autobackupEnabled } = useBackupWorkerContext();
   const { isServerReachable } = useServerContext();
 
   const { logout } = useAuthContextFunctions();
-  const { resetFocusedTab } = useTabNavigationContext();
 
   const onPressLogout = () => {
     logout();
-    resetFocusedTab();
+    reset({
+      index: 0,
+      routes: [{ name: 'Login' }],
+    });
   };
 
   const data: SettingsListType = [
@@ -70,15 +73,18 @@ export default function SettingsScreenTab() {
           onPress: () => {},
           icon: <InfoIcon />,
         },
-        {
-          type: 'Button',
-          title: 'Logout',
-          onPress: onPressLogout,
-          icon: <LogoutIcon />,
-        },
       ],
     },
   ];
+
+  if (!isUsingLocalAccount) {
+    data[0].data.push({
+      type: 'Button',
+      title: 'Logout',
+      onPress: onPressLogout,
+      icon: <LogoutIcon />,
+    });
+  }
 
   return (
     <SettingsPageComponent
