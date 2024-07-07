@@ -10,7 +10,7 @@ import { useServerContextFunctions } from '~/Context/Contexts/ServerContext';
 
 import { useMainStackNavigation } from '../Navigators/MainStackNavigator';
 
-export default function SettingsScreenTab() {
+export default function AccountSettingsScreen() {
   const navigation = useMainStackNavigation();
   const { logout } = useAuthContextFunctions();
   const { isUsingLocalAccount } = useMainContext();

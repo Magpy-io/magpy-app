@@ -4,6 +4,13 @@ import { DarkTheme, LightTheme } from '~/Styles/colors';
 
 import { useThemeContextInner } from './ThemeContext';
 
+export function useThemeFunctions() {
+  const { userSelectedThemeState } = useThemeContextInner();
+  const [, , setUserSelectedTheme] = userSelectedThemeState;
+
+  return { setUserSelectedTheme };
+}
+
 export function useTheme() {
   const { userSelectedThemeState } = useThemeContextInner();
 
@@ -27,5 +34,5 @@ export function useTheme() {
 
   const theme = dark ? DarkTheme : LightTheme;
 
-  return { dark, colors: theme.colors };
+  return { dark, colors: theme.colors, userSelectedTheme };
 }

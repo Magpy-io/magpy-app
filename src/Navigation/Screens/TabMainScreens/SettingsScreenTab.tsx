@@ -59,7 +59,9 @@ export default function SettingsScreenTab() {
         {
           type: 'Navigation',
           title: 'Preferences',
-          onPress: () => {},
+          onPress: () => {
+            navigate('PreferencesSettings');
+          },
           icon: <PreferencesIcon />,
         },
         {
