@@ -12,6 +12,7 @@ import { spacing } from '~/Styles/spacing';
 import { typography } from '~/Styles/typography';
 
 import SettingButtonComponent from './SettingButtonComponent';
+import SettingRadioButtonComponent from './SettingRadioButtonComponent';
 import SettingSwitchComponent from './SettingSwitchComponent';
 
 export type ButtonType = {
@@ -40,7 +41,18 @@ export type SwitchType = {
   style?: TextStyle;
 };
 
-export type EntryTypes = ButtonType | NavigationType | SwitchType;
+export type ComboBoxType = {
+  type: 'RadioButton';
+  onPress: () => void;
+  name: string;
+  checked: string;
+  disabled?: boolean;
+  title: string;
+  icon: JSX.Element;
+  style?: TextStyle;
+};
+
+export type EntryTypes = ButtonType | NavigationType | SwitchType | ComboBoxType;
 
 export type SettingsListType = Array<{ title: string; data: Array<EntryTypes> }>;
 
@@ -90,6 +102,19 @@ export default function SettingsPageComponent({
             onPress={item.onPress}
             style={item.style}
             initialState={item.initialState}
+            disabled={item.disabled}
+          />
+        );
+
+      case 'RadioButton':
+        return (
+          <SettingRadioButtonComponent
+            icon={item.icon}
+            title={item.title}
+            onPress={item.onPress}
+            style={item.style}
+            name={item.name}
+            checked={item.checked}
             disabled={item.disabled}
           />
         );

@@ -1,26 +1,28 @@
 import React from 'react';
 import { TextStyle } from 'react-native';
 
-import SwitchComponent from '../CommonComponents/SwitchComponent';
+import RadioButtonComponent from '../CommonComponents/RadioButtonComponent';
 import SettingEntryComponent from './SettingEntryComponent';
 
-type SettingSwitchComponentProps = {
+type SettingRadioButtonComponentProps = {
   title: string;
-  initialState: boolean;
+  name: string;
+  checked: string;
   disabled?: boolean;
-  onPress: (switchState: boolean) => void;
+  onPress: () => void;
   icon: JSX.Element;
   style?: TextStyle;
 };
 
-export default function SettingSwitchComponent({
+export default function SettingRadioButtonComponent({
   icon,
   title,
   style,
   onPress,
-  initialState,
+  name,
+  checked,
   disabled,
-}: SettingSwitchComponentProps) {
+}: SettingRadioButtonComponentProps) {
   return (
     <SettingEntryComponent
       title={title}
@@ -28,9 +30,10 @@ export default function SettingSwitchComponent({
       style={style}
       notTouchable
       componentEnd={
-        <SwitchComponent
-          onSwitchChanged={onPress}
-          initialState={initialState}
+        <RadioButtonComponent
+          onPress={onPress}
+          name={name}
+          checked={checked}
           disabled={disabled}
         />
       }
