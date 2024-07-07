@@ -62,7 +62,9 @@ export type colorsType = {
   TRANSPARENT: string;
 };
 
-export const LightTheme: { dark: boolean; colors: colorsType } = {
+export type ThemeType = { dark: boolean; colors: colorsType };
+
+export const LightTheme: ThemeType = {
   dark: false,
   colors: {
     // Background
@@ -99,7 +101,7 @@ export const LightTheme: { dark: boolean; colors: colorsType } = {
   },
 };
 
-export const DarkTheme: { dark: boolean; colors: colorsType } = {
+export const DarkTheme: ThemeType = {
   dark: true,
   colors: {
     // Background
