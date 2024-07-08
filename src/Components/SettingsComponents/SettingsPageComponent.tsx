@@ -12,12 +12,20 @@ import { spacing } from '~/Styles/spacing';
 import { typography } from '~/Styles/typography';
 
 import SettingButtonComponent from './SettingButtonComponent';
+import SettingLabelComponent from './SettingLabelComponent';
 import SettingRadioButtonComponent from './SettingRadioButtonComponent';
 import SettingSwitchComponent from './SettingSwitchComponent';
 
 export type ButtonType = {
   type: 'Button';
   onPress: () => void;
+  title: string;
+  icon?: JSX.Element;
+  style?: TextStyle;
+};
+
+export type LabelType = {
+  type: 'Label';
   title: string;
   icon?: JSX.Element;
   style?: TextStyle;
@@ -52,7 +60,7 @@ export type ComboBoxType = {
   style?: TextStyle;
 };
 
-export type EntryTypes = ButtonType | NavigationType | SwitchType | ComboBoxType;
+export type EntryTypes = ButtonType | LabelType | NavigationType | SwitchType | ComboBoxType;
 
 export type SettingsListType = Array<{ title: string; data: Array<EntryTypes> }>;
 
@@ -84,6 +92,10 @@ export default function SettingsPageComponent({
             onPress={item.onPress}
             style={item.style}
           />
+        );
+      case 'Label':
+        return (
+          <SettingLabelComponent icon={item.icon} title={item.title} style={item.style} />
         );
       case 'Navigation':
         return (
