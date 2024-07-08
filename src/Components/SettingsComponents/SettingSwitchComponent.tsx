@@ -9,7 +9,7 @@ type SettingSwitchComponentProps = {
   initialState: boolean;
   disabled?: boolean;
   onPress: (switchState: boolean) => void;
-  icon: JSX.Element;
+  icon?: JSX.Element;
   style?: TextStyle;
 };
 

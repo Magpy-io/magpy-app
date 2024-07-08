@@ -11,7 +11,7 @@ import { typography } from '~/Styles/typography';
 type SettingEntryComponentProps = {
   title: string;
   onPress?: () => void;
-  icon: JSX.Element;
+  icon?: JSX.Element;
   componentEnd?: JSX.Element;
   style?: TextStyle;
   notTouchable?: boolean;

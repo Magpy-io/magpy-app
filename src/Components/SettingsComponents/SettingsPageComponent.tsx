@@ -19,7 +19,7 @@ export type ButtonType = {
   type: 'Button';
   onPress: () => void;
   title: string;
-  icon: JSX.Element;
+  icon?: JSX.Element;
   style?: TextStyle;
 };
 
@@ -27,7 +27,7 @@ export type NavigationType = {
   type: 'Navigation';
   onPress: () => void;
   title: string;
-  icon: JSX.Element;
+  icon?: JSX.Element;
   style?: TextStyle;
 };
 
@@ -37,7 +37,7 @@ export type SwitchType = {
   initialState: boolean;
   disabled?: boolean;
   title: string;
-  icon: JSX.Element;
+  icon?: JSX.Element;
   style?: TextStyle;
 };
 
@@ -48,7 +48,7 @@ export type ComboBoxType = {
   checked: string;
   disabled?: boolean;
   title: string;
-  icon: JSX.Element;
+  icon?: JSX.Element;
   style?: TextStyle;
 };
 

@@ -6,7 +6,7 @@ import SettingEntryComponent from './SettingEntryComponent';
 type SettingButtonComponentProps = {
   title: string;
   onPress: () => void;
-  icon: JSX.Element;
+  icon?: JSX.Element;
   style?: TextStyle;
 };
 

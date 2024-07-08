@@ -10,7 +10,7 @@ type SettingRadioButtonComponentProps = {
   checked: string;
   disabled?: boolean;
   onPress: () => void;
-  icon: JSX.Element;
+  icon?: JSX.Element;
   style?: TextStyle;
 };
 

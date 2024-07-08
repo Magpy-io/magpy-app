@@ -7,7 +7,7 @@ import SettingEntryComponent from './SettingEntryComponent';
 type SettingNavigateComponentProps = {
   title: string;
   onPress: () => void;
-  icon: JSX.Element;
+  icon?: JSX.Element;
   style?: TextStyle;
 };
 
