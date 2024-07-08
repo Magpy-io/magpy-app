@@ -1,14 +1,13 @@
-import React, { useCallback, useEffect } from 'react';
-import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useCallback, useState } from 'react';
+import { Keyboard, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { isIP, isPort } from 'validator';
 
-import ServersList from '~/Components/SelectServerComponents/ServersList';
+import { PrimaryButton } from '~/Components/CommonComponents/Buttons';
+import KeyboardDismissingView from '~/Components/CommonComponents/KeyboardDismissingView';
+import TextInputComponent from '~/Components/CommonComponents/TextInputComponent';
 import { useAuthContext } from '~/Context/Contexts/AuthContext';
-import {
-  useLocalServersContext,
-  useLocalServersFunctions,
-} from '~/Context/Contexts/LocalServersContext';
 import { useMainContext } from '~/Context/Contexts/MainContext';
 import { useServerClaimFunctions } from '~/Context/Contexts/ServerClaimContext';
 import { useServerContextFunctions } from '~/Context/Contexts/ServerContext';
@@ -19,24 +18,29 @@ import { formatAddressHttp } from '~/Helpers/Utilities';
 import { useStyles } from '~/Hooks/useStyles';
 import { useToast } from '~/Hooks/useToast';
 import { colorsType } from '~/Styles/colors';
-import { spacing } from '~/Styles/spacing';
+import { borderRadius, spacing } from '~/Styles/spacing';
 import { typography } from '~/Styles/typography';
 
 import { useMainStackNavigation } from '../Navigators/MainStackNavigator';
 
-export default function ServerSelectScreen() {
-  const { localServers, isScanning } = useLocalServersContext();
-  const { tryClaimServer } = useServerClaimFunctions();
-  const { refreshData } = useLocalServersFunctions();
-  const { token } = useAuthContext();
+export default function ServerManualAddressScreen() {
+  const { colors } = useTheme();
   const { navigate } = useMainStackNavigation();
+
+  const [ipTextInput, setIpTextInput] = useState('');
+  const [ipTextInputError, setIpTextInputError] = useState('');
+  const [portTextInput, setportTextInput] = useState('');
+  const [portTextInputError, setportTextInputError] = useState('');
+
+  const insets = useSafeAreaInsets();
+  const styles = useStyles(makeStyles);
+
+  const { tryClaimServer } = useServerClaimFunctions();
+  const { token } = useAuthContext();
   const { setServerSelecting, setReachableServer } = useServerContextFunctions();
-
   const { showToastError } = useToast();
-
   const { isUsingLocalAccount } = useMainContext();
 
-  const { colors } = useTheme();
   const onSelectServer = useCallback(
     async (server: { ip: string; port: string }) => {
       if (isUsingLocalAccount) {
@@ -124,70 +128,104 @@ export default function ServerSelectScreen() {
     ],
   );
 
-  useEffect(() => {
-    console.log('Refresh local servers');
-    refreshData();
-  }, [refreshData]);
-
-  const insets = useSafeAreaInsets();
-  const styles = useStyles(makeStyles);
   return (
-    <View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
-      <ServersList
-        servers={localServers}
-        refreshData={refreshData}
-        header={<Header isScanning={isScanning} />}
-        onSelectServer={server => {
-          onSelectServer(server).catch(e => console.log(e));
-        }}
-      />
-
+    <KeyboardDismissingView>
       <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-        }}>
-        <TouchableOpacity
-          onPress={() => {
-            navigate('ServerManualAddress');
-          }}
-          style={{ paddingVertical: spacing.spacing_s }}>
-          <Text style={{ color: colors.TEXT, fontWeight: 'bold' }}>
-            Enter Address Manually
-          </Text>
-        </TouchableOpacity>
-      </View>
+        style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
+        <View style={{ flex: 1, alignItems: 'center' }}>
+          <Header />
 
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          marginBottom: spacing.spacing_xxl_2,
-        }}>
-        <TouchableOpacity
-          onPress={() => {
-            navigate('Tabs');
-          }}
-          style={{ paddingVertical: spacing.spacing_s }}>
-          <Text style={{ color: colors.TEXT, fontWeight: 'bold' }}>
-            Continue Without Server
-          </Text>
-        </TouchableOpacity>
+          <TextInputComponent
+            placeholder="IP Address"
+            textAlign="center"
+            keyboardType="numeric"
+            style={{ width: 150, marginBottom: spacing.spacing_s }}
+            onChangeText={text => {
+              setIpTextInputError('');
+              setIpTextInput(text);
+            }}
+            onFocus={() => {
+              setIpTextInputError('');
+            }}
+            error={ipTextInputError}
+          />
+
+          <TextInputComponent
+            placeholder="Port"
+            textAlign="center"
+            keyboardType="numeric"
+            style={{ width: 100, marginBottom: spacing.spacing_s }}
+            onChangeText={text => {
+              setportTextInput(text);
+              setportTextInputError('');
+            }}
+            onFocus={() => {
+              setportTextInputError('');
+            }}
+            error={portTextInputError}
+          />
+
+          <PrimaryButton
+            title="Connect to server"
+            onPress={() => {
+              if (!isIP(ipTextInput)) {
+                setIpTextInputError('Invalid IP Address');
+                return;
+              }
+
+              if (!isPort(portTextInput)) {
+                setportTextInputError('Invalid Port Number');
+                return;
+              }
+              Keyboard.dismiss();
+
+              onSelectServer({ ip: ipTextInput, port: portTextInput }).catch(console.log);
+            }}
+          />
+        </View>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+          }}>
+          <TouchableOpacity
+            onPress={() => {
+              navigate('ServerSelect');
+            }}
+            style={{ paddingVertical: spacing.spacing_s }}>
+            <Text style={{ color: colors.TEXT, fontWeight: 'bold' }}>
+              Search local network
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginBottom: spacing.spacing_xxl_2,
+          }}>
+          <TouchableOpacity
+            onPress={() => {
+              navigate('Tabs');
+            }}
+            style={{ paddingVertical: spacing.spacing_s }}>
+            <Text style={{ color: colors.TEXT, fontWeight: 'bold' }}>
+              Continue Without Server
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </KeyboardDismissingView>
   );
 }
 
-function Header({ isScanning }: { isScanning: boolean }) {
-  const title = isScanning ? 'Searching for your local server' : 'Select your local server';
+function Header() {
+  const title = "Enter your server's address";
   const styles = useStyles(makeStyles);
-  const { colors } = useTheme();
 
   return (
     <View style={styles.headerView}>
-      {isScanning && (
-        <ActivityIndicator style={styles.indicatorStyle} color={colors.PRIMARY} />
-      )}
       <Text style={styles.title}>{title}</Text>
     </View>
   );
@@ -195,11 +233,6 @@ function Header({ isScanning }: { isScanning: boolean }) {
 
 const makeStyles = (colors: colorsType) =>
   StyleSheet.create({
-    indicatorStyle: {
-      position: 'absolute',
-      top: spacing.spacing_xxl_4,
-      alignSelf: 'center',
-    },
     headerView: {
       paddingBottom: spacing.spacing_xxl,
       paddingTop: spacing.spacing_xxl_5,
@@ -213,5 +246,16 @@ const makeStyles = (colors: colorsType) =>
       flex: 1,
       alignItems: 'center',
       backgroundColor: colors.BACKGROUND,
+    },
+    textInputStyle: {
+      flex: 1,
+    },
+    viewStyle: {
+      flexDirection: 'row',
+      paddingLeft: spacing.spacing_xxl_2,
+      borderColor: colors.FORM_BORDER,
+      borderWidth: 0.5,
+      borderRadius: borderRadius.input,
+      height: spacing.spacing_xxl_3,
     },
   });

@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 
 import { DeleteMyServer, GetMyServerInfo } from '~/Helpers/BackendQueries';
 import { ClaimServer } from '~/Helpers/ServerQueries';
+import { ErrorServerUnreachable } from '~/Helpers/ServerQueries/ExceptionsManager';
 import { formatAddressHttp } from '~/Helpers/Utilities';
 
 import { useAuthContext } from '../AuthContext';
@@ -19,7 +20,11 @@ export function useServerClaimFunctions() {
     port: string,
   ) => Promise<{
     claimed: boolean;
-    error?: 'NO_BACKEND_TOKEN' | 'SERVER_ALREADY_CLAIMED' | 'UNEXPECTED_ERROR';
+    error?:
+      | 'NO_BACKEND_TOKEN'
+      | 'SERVER_ALREADY_CLAIMED'
+      | 'SERVER_UNREACHABLE'
+      | 'UNEXPECTED_ERROR';
   }> = useCallback(
     async (ip: string, port: string) => {
       if (!token) {
@@ -50,7 +55,11 @@ export function useServerClaimFunctions() {
         }
       } catch (err) {
         console.log('Claim Server Error', err);
-        return { claimed: false, error: 'UNEXPECTED_ERROR' };
+        if (err instanceof ErrorServerUnreachable) {
+          return { claimed: false, error: 'SERVER_UNREACHABLE' };
+        } else {
+          return { claimed: false, error: 'UNEXPECTED_ERROR' };
+        }
       }
     },
     [setServer, token],

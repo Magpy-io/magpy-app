@@ -9,7 +9,7 @@ type ServersListProps = {
   servers: Server[];
   refreshData: () => void;
   header: React.JSX.Element;
-  onSelectServer: (server: Server) => void;
+  onSelectServer: (server: { ip: string; port: string }) => void;
 };
 
 export default function ServersList({
