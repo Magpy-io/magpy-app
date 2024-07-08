@@ -6,6 +6,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 import { useTheme } from '~/Context/Contexts/ThemeContext';
 
+import AboutSettingsScreen from '../Screens/AboutSettingsScreen';
 import AccountSettingsScreen from '../Screens/AccountSettingsScreen';
 import BackupSettingsScreen from '../Screens/BackupSettingsScreen';
 import LoginScreen from '../Screens/LoginScreen';
@@ -28,6 +29,7 @@ export type MainStackParamList = {
   AccountSettings: undefined;
   BackupSettings: undefined;
   PreferencesSettings: undefined;
+  AboutSettings: undefined;
 };
 
 const Stack = createNativeStackNavigator<MainStackParamList>();
@@ -56,6 +58,7 @@ export function MainStackNavigator({ initialScreen }: propsType) {
       <Stack.Screen name="AccountSettings" component={AccountSettingsScreen} />
       <Stack.Screen name="BackupSettings" component={BackupSettingsScreen} />
       <Stack.Screen name="PreferencesSettings" component={PreferencesSettingsScreen} />
+      <Stack.Screen name="AboutSettings" component={AboutSettingsScreen} />
     </Stack.Navigator>
   );
 }

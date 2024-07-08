@@ -70,7 +70,9 @@ export default function SettingsScreenTab() {
         {
           type: 'Navigation',
           title: 'About Magpy',
-          onPress: () => {},
+          onPress: () => {
+            navigate('AboutSettings');
+          },
           icon: <InfoIcon />,
         },
       ],

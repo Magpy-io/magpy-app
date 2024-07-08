@@ -3387,6 +3387,7 @@ __metadata:
     react-native-tab-view: "npm:^3.5.2"
     react-native-toast-message: "npm:^2.2.0"
     react-native-vector-icons: "npm:^10.0.3"
+    react-native-version-info: "npm:^1.1.1"
     react-native-zeroconf: "npm:^0.13.8"
     react-redux: "npm:^9.1.0"
     react-test-renderer: "npm:^18.2.0"
@@ -9762,6 +9763,15 @@ __metadata:
     fa6-upgrade: bin/fa6-upgrade.sh
     generate-icon: bin/generate-icon.js
   checksum: f7741e03cba701ac577779784db64ef581d5056a14698ac34de0bea731ff0d2bbe4b1c5ede441caa1b8748b18e57ee96b4d8dd75d53ef1b240995d1ffdc6419d
+  languageName: node
+  linkType: hard
+
+"react-native-version-info@npm:^1.1.1":
+  version: 1.1.1
+  resolution: "react-native-version-info@npm:1.1.1"
+  peerDependencies:
+    react-native: ">= 0.60.2"
+  checksum: a6e4fb72a553c39940f8c3c3d0e4e71746404c1bb3da1167a8f422c65837eb0898ccab4108fdcf6c5a7b8b216fd20ddd79ef7e7a18c70401e0e295637eb8f2d9
   languageName: node
   linkType: hard
 
