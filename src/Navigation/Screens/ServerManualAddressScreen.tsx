@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Keyboard, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -9,6 +9,7 @@ import KeyboardDismissingView from '~/Components/CommonComponents/KeyboardDismis
 import TextInputComponent from '~/Components/CommonComponents/TextInputComponent';
 import { useTheme } from '~/Context/Contexts/ThemeContext';
 import { useServerSelectionFunction } from '~/Hooks/useServerSelectionFunction';
+import { useStatePersistent } from '~/Hooks/useStatePersistent';
 import { useStyles } from '~/Hooks/useStyles';
 import { colorsType } from '~/Styles/colors';
 import { borderRadius, spacing } from '~/Styles/spacing';
@@ -20,6 +21,15 @@ export default function ServerManualAddressScreen() {
   const { colors } = useTheme();
   const { navigate } = useMainStackNavigation();
 
+  const [cachedIpInput, cachedIpLoaded, setCachedIpInput] = useStatePersistent(
+    '',
+    'CACHED_IP_INPUT',
+  );
+  const [cachedPortInput, cachedPortLoaded, setCachedPortInput] = useStatePersistent(
+    '',
+    'CACHED_PORT_INPUT',
+  );
+
   const [ipTextInput, setIpTextInput] = useState('');
   const [ipTextInputError, setIpTextInputError] = useState('');
   const [portTextInput, setportTextInput] = useState('');
@@ -30,6 +40,13 @@ export default function ServerManualAddressScreen() {
 
   const { SelectServer } = useServerSelectionFunction();
 
+  useEffect(() => {
+    if (cachedIpLoaded && cachedPortLoaded) {
+      setIpTextInput(cachedIpInput);
+      setportTextInput(cachedPortInput);
+    }
+  }, [cachedIpInput, cachedIpLoaded, cachedPortInput, cachedPortLoaded]);
+
   return (
     <KeyboardDismissingView>
       <View
@@ -38,6 +55,7 @@ export default function ServerManualAddressScreen() {
           <Header />
 
           <TextInputComponent
+            value={ipTextInput}
             placeholder="IP Address"
             textAlign="center"
             keyboardType="numeric"
@@ -49,10 +67,14 @@ export default function ServerManualAddressScreen() {
             onFocus={() => {
               setIpTextInputError('');
             }}
+            onEndEditing={() => {
+              setCachedIpInput(ipTextInput);
+            }}
             error={ipTextInputError}
           />
 
           <TextInputComponent
+            value={portTextInput}
             placeholder="Port"
             textAlign="center"
             keyboardType="numeric"
@@ -63,6 +85,9 @@ export default function ServerManualAddressScreen() {
             }}
             onFocus={() => {
               setportTextInputError('');
+            }}
+            onEndEditing={() => {
+              setCachedPortInput(portTextInput);
             }}
             error={portTextInputError}
           />
