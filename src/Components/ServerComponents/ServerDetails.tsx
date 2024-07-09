@@ -53,9 +53,9 @@ export default function ServerDetails() {
   const ServerComponentRemote = () => (
     <ServerComponent
       name={server?.name}
-      ip={server?.ipPrivate}
+      ip={serverNetwork?.currentIp}
+      port={serverNetwork?.currentPort}
       ipPublic={server?.ipPublic}
-      port={server?.port}
       error={error}
     />
   );
@@ -97,11 +97,18 @@ export default function ServerDetails() {
           onPress={OnAddServerPress}
         />
       )}
-      {error && (
+      {hasServer && error && (
         <PrimaryButton
           title={'Reconnect To Server'}
           buttonStyle={{ marginTop: 5 }}
           onPress={OnReconnectPress}
+        />
+      )}
+      {hasServer && error == 'SERVER_NOT_REACHABLE' && (
+        <PrimaryButton
+          title={'Find Server'}
+          buttonStyle={{ marginTop: 5 }}
+          onPress={() => navigate('ServerSelect')}
         />
       )}
       {hasServer && (
