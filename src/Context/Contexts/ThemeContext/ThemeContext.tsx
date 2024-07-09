@@ -27,7 +27,7 @@ type PropsType = {
 export const ThemeContextProvider: React.FC<PropsType> = props => {
   const userSelectedThemeState = useStatePersistent<userThemeTypes>(
     'deviceDefault',
-    'ASYNC_STORAGE_USER_SELECTED_THEME',
+    'USER_SELECTED_THEME',
   );
 
   return (

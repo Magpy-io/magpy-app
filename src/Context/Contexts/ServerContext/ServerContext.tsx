@@ -62,9 +62,9 @@ export const ServerContextProvider: React.FC<PropsType> = props => {
   const [error, setError] = useState<ConnectingToServerError>(null);
   const serverNetworkState = useStatePersistent<ServerNetworkType | null>(
     null,
-    'ASYNC_STORAGE_KEY_SERVER_NETWORK_INFO',
+    'SERVER_NETWORK_INFO',
   );
-  const tokenState = useStatePersistent<string | null>(null, 'ASYNC_STORAGE_KEY_SERVER_TOKEN');
+  const tokenState = useStatePersistent<string | null>(null, 'SERVER_TOKEN');
   const [serverNetworkSelecting, setServerNetworkSelecting] =
     useState<ServerNetworkType | null>(null);
 

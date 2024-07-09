@@ -25,14 +25,8 @@ type PropsType = {
 };
 
 export const LocalAccountContextProvider: React.FC<PropsType> = props => {
-  const serverNameState = useStatePersistent<string | null>(
-    null,
-    'ASYNC_STORAGE_KEY_LOCAL_CLAIM_SERVER_NAME',
-  );
-  const usernameState = useStatePersistent<string | null>(
-    null,
-    'ASYNC_STORAGE_KEY_LOCAL_CLAIM_USERNAME',
-  );
+  const serverNameState = useStatePersistent<string | null>(null, 'LOCAL_CLAIM_SERVER_NAME');
+  const usernameState = useStatePersistent<string | null>(null, 'LOCAL_CLAIM_USERNAME');
 
   return (
     <LocalAccountContext.Provider value={{ serverNameState, usernameState }}>

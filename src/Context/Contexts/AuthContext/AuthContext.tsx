@@ -43,10 +43,7 @@ type PropsType = {
 export const AuthContextProvider: React.FC<PropsType> = props => {
   const [user, setUser] = useState<Types.UserType | null>(null);
   const [loading, setLoading] = useState(true);
-  const tokenState = useStatePersistent<string | null>(
-    null,
-    'ASYNC_STORAGE_KEY_BACKEND_TOKEN',
-  );
+  const tokenState = useStatePersistent<string | null>(null, 'BACKEND_TOKEN');
 
   return (
     <AuthContext.Provider value={{ user, loading, tokenState }}>

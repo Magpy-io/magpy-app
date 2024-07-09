@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -12,14 +12,16 @@ export function useStatePersistent<T>(
   const [value, setValue] = useState<T>(initialValue);
   const [isLoaded, setLoaded] = useState(false);
 
+  const keyNameFull = useMemo(() => 'USE_STATE_PERSISTENT_KEY_' + keyName, [keyName]);
+
   const loadValue = useCallback(async () => {
-    const objectSerialized = await AsyncStorage.getItem(keyName);
+    const objectSerialized = await AsyncStorage.getItem(keyNameFull);
 
     if (objectSerialized) {
       const objectStored = JSON.parse(objectSerialized) as T;
       setValue(objectStored);
     }
-  }, [keyName]);
+  }, [keyNameFull]);
 
   const clearValue = useCallback(() => {
     setValue(initialValue);
@@ -35,8 +37,8 @@ export function useStatePersistent<T>(
     if (!isLoaded) {
       return;
     }
-    AsyncStorage.setItem(keyName, JSON.stringify(value)).catch(console.log);
-  }, [keyName, value, isLoaded]);
+    AsyncStorage.setItem(keyNameFull, JSON.stringify(value)).catch(console.log);
+  }, [keyNameFull, value, isLoaded]);
 
   return [value, isLoaded, setValue, clearValue];
 }
