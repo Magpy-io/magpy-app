@@ -4,7 +4,7 @@ import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Badge, Icon, Text } from 'react-native-elements';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { useServerContext } from '~/Context/Contexts/ServerContext';
+import { useServerStatusColor } from '~/Components/ServerComponents/hooks/useServerStatusColor';
 import { useTheme } from '~/Context/Contexts/ThemeContext';
 import { useStyles } from '~/Hooks/useStyles';
 import {
@@ -90,11 +90,13 @@ type TabElementProps = {
 
 function TabElement({ routeName, icon, iconFocused }: TabElementProps) {
   const { navigateTo, focusedTab } = useTabNavigationContext();
-  const { isServerReachable } = useServerContext();
 
   const focused = useMemo(() => focusedTab === routeName, [focusedTab, routeName]);
   const styles = useStyles(makeStyles);
   const { colors } = useTheme();
+
+  const badgeColor = useServerStatusColor();
+
   const COLOR = colors.TEXT_LIGHT;
   const FOCUSED_COLOR = colors.SECONDARY;
 
@@ -117,7 +119,7 @@ function TabElement({ routeName, icon, iconFocused }: TabElementProps) {
           {routeName === TabName.Server && (
             <Badge
               badgeStyle={{
-                backgroundColor: isServerReachable ? colors.SUCCESS : colors.WARNING,
+                backgroundColor: badgeColor,
               }}
               containerStyle={{ position: 'absolute', top: -2, right: -2 }}
             />

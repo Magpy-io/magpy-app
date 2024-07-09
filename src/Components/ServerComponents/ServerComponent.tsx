@@ -4,44 +4,29 @@ import { StyleSheet, Text, View } from 'react-native';
 import { Badge } from 'react-native-elements';
 
 import { ConnectingToServerError } from '~/Context/Contexts/ServerContext';
-import { useTheme } from '~/Context/Contexts/ThemeContext';
 import { useStyles } from '~/Hooks/useStyles';
 import Logo from '~/Images/logoWhite.svg';
 import { colorsType } from '~/Styles/colors';
 import { borderRadius, spacing } from '~/Styles/spacing';
 import { typography } from '~/Styles/typography';
 
+import { useServerStatusColor } from './hooks/useServerStatusColor';
+import { useUserHasServer } from './hooks/useUserHasServer';
+
 type ServerComponentProps = {
-  hasServer: boolean;
   name?: string;
   ip?: string;
   ipPublic?: string;
   port?: string;
-  reachable: boolean;
-  findingServer: boolean;
   error: ConnectingToServerError;
 };
 
-export function ServerComponent({
-  hasServer,
-  name,
-  ip,
-  port,
-  reachable,
-  findingServer,
-  error,
-}: ServerComponentProps) {
+export function ServerComponent({ name, ip, port, error }: ServerComponentProps) {
   const IpAddress = `${ip}:${port}`;
   const styles = useStyles(makeStyles);
-  const { colors } = useTheme();
 
-  const serverStateColor = !hasServer
-    ? 'black'
-    : findingServer
-      ? colors.PENDING
-      : reachable
-        ? colors.SUCCESS
-        : colors.WARNING;
+  const hasServer = useUserHasServer();
+  const serverStateColor = useServerStatusColor();
 
   const errorMessage: string =
     error == 'SERVER_AUTH_FAILED'
