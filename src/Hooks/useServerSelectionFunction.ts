@@ -3,8 +3,8 @@ import { useCallback } from 'react';
 import { useAuthContext } from '~/Context/Contexts/AuthContext';
 import { useMainContext } from '~/Context/Contexts/MainContext';
 import { useServerClaimFunctions } from '~/Context/Contexts/ServerClaimContext';
-import { useServerContextFunctions } from '~/Context/Contexts/ServerContext';
-import { GetToken, IsClaimed, TokenManager } from '~/Helpers/ServerQueries';
+import { useServerContext, useServerContextFunctions } from '~/Context/Contexts/ServerContext';
+import { GetToken, IsClaimed, TokenManager, WhoAmI } from '~/Helpers/ServerQueries';
 import { ErrorServerUnreachable } from '~/Helpers/ServerQueries/ExceptionsManager';
 import { formatAddressHttp } from '~/Helpers/Utilities';
 import { useToast } from '~/Hooks/useToast';
@@ -12,10 +12,11 @@ import { useMainStackNavigation } from '~/Navigation/Navigators/MainStackNavigat
 
 export function useServerSelectionFunction() {
   const { tryClaimServer } = useServerClaimFunctions();
-  const { token } = useAuthContext();
+  const { token: userToken } = useAuthContext();
   const { navigate } = useMainStackNavigation();
   const { setServerSelecting, setReachableServer } = useServerContextFunctions();
 
+  const { token: serverToken } = useServerContext();
   const { showToastError } = useToast();
 
   const { isUsingLocalAccount } = useMainContext();
@@ -40,6 +41,20 @@ export function useServerSelectionFunction() {
             if (ret.data.claimed == 'None') {
               navigate('ServerClaim');
             } else {
+              if (serverToken) {
+                TokenManager.SetUserToken(serverToken);
+                const ret = await WhoAmI.Post(
+                  {},
+                  { path: formatAddressHttp(server.ip, server.port) },
+                );
+
+                if (ret.ok) {
+                  setReachableServer({ ip: server.ip, port: server.port, token: serverToken });
+                  navigate('Tabs');
+                  return;
+                }
+              }
+
               navigate('ServerLogin');
             }
           }
@@ -52,7 +67,7 @@ export function useServerSelectionFunction() {
           }
         }
       } else {
-        if (!token) {
+        if (!userToken) {
           showToastError('You need to be logged in before being able to claim a server.');
           return;
         }
@@ -78,7 +93,7 @@ export function useServerSelectionFunction() {
         }
 
         const res = await GetToken.Post(
-          { userToken: token },
+          { userToken: userToken },
           { path: formatAddressHttp(server.ip, server.port) },
         );
 
@@ -98,11 +113,12 @@ export function useServerSelectionFunction() {
     },
     [
       isUsingLocalAccount,
-      navigate,
-      setReachableServer,
       setServerSelecting,
       showToastError,
-      token,
+      navigate,
+      serverToken,
+      setReachableServer,
+      userToken,
       tryClaimServer,
     ],
   );
