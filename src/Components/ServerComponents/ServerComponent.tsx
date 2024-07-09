@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { Badge } from 'react-native-elements';
 
-import { ConnectingToServerError } from '~/Context/Contexts/ServerContext';
+import { ConnectingToServerError, useServerContext } from '~/Context/Contexts/ServerContext';
 import { useStyles } from '~/Hooks/useStyles';
 import Logo from '~/Images/logoWhite.svg';
 import { colorsType } from '~/Styles/colors';
@@ -24,7 +24,7 @@ type ServerComponentProps = {
 export function ServerComponent({ name, ip, port, error }: ServerComponentProps) {
   const IpAddress = `${ip}:${port}`;
   const styles = useStyles(makeStyles);
-
+  const { findingServer } = useServerContext();
   const hasServer = useUserHasServer();
   const serverStateColor = useServerStatusColor();
 
@@ -44,7 +44,10 @@ export function ServerComponent({ name, ip, port, error }: ServerComponentProps)
       <View>
         {name && <Text style={styles.name}>{name}</Text>}
         {<Text style={styles.ipAddress}>{IpAddress}</Text>}
-        {error && <Text style={styles.unreachable}>{errorMessage}</Text>}
+        {findingServer && (
+          <Text style={styles.findingServer}>{'Trying to locate your server...'}</Text>
+        )}
+        {!findingServer && error && <Text style={styles.unreachable}>{errorMessage}</Text>}
       </View>
     );
   };
@@ -77,6 +80,10 @@ const makeStyles = (colors: colorsType) =>
     unreachable: {
       ...typography(colors).mediumTextBold,
       color: colors.WARNING,
+    },
+    findingServer: {
+      ...typography(colors).mediumTextBold,
+      color: colors.PENDING,
     },
     name: {
       ...typography(colors).mediumTextBold,
