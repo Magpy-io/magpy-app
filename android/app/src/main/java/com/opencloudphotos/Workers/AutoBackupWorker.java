@@ -128,6 +128,7 @@ public class AutoBackupWorker extends Worker {
 
         new GetMediaTask(
                 context,
+                null,
                 MAX_GALLERY_PHOTOS_TO_UPLOAD,
                 null,
                 null,

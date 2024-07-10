@@ -136,27 +136,14 @@ export type SaveToCameraRollOptions = {
 
 export interface MediaManagementModuleType {
   getRestoredMediaAbsolutePath: () => Promise<string>;
-  getPhotoById: (id: string) => Promise<LocalPhotoById>;
-  deleteMedia: (ids: string[]) => Promise<void>;
   getPhotos: (params: GetPhotosParams) => Promise<PhotoIdentifiersPage>;
+  getPhotoById: (id: string, params: GetPhotosParams) => Promise<PhotoIdentifiersPage>;
+  deleteMedia: (ids: string[]) => Promise<void>;
   saveToCameraRoll: (
     path: string,
     options: SaveToCameraRollOptions,
   ) => Promise<PhotoIdentifier>;
 }
-
-export type LocalPhotoById = {
-  id: string;
-  type: string;
-  group_name: string[];
-  timestamp: number;
-  modificationTimestamp: number;
-  uri: string;
-  filename: string;
-  fileSize: number;
-  width: number;
-  height: number;
-};
 
 const Module = MediaManagementModule as MediaManagementModuleType;
 

@@ -8,6 +8,11 @@ export async function UploadPhotoTask(photo: { mediaId: string }) {
   try {
     const photoLocal = await getPhotoFromDevice(photo.mediaId);
 
+    if (!photoLocal) {
+      SendingMediaServiceModule.onJsTaskFinished({ code: 'ERROR', id: '' });
+      return;
+    }
+
     const res = await RNFS.readFile(photoLocal.uri, 'base64');
 
     const result = await Queries.addPhotoWithProgress({

@@ -50,6 +50,7 @@ public class GetMediaTask{
     private final long mFromTime;
     private final long mToTime;
     private final Set<String> mInclude;
+    private final String mMediaId;
 
     public interface ResultCallback{
         public void reject(String s, String s1);
@@ -59,6 +60,7 @@ public class GetMediaTask{
 
     public GetMediaTask(
             Context context,
+            String mediaId,
             int first,
             @Nullable String after,
             @Nullable String groupName,
@@ -69,6 +71,7 @@ public class GetMediaTask{
             @Nullable ReadableArray include,
             ResultCallback promise) {
         mContext = context;
+        mMediaId = mediaId;
         mFirst = first;
         mAfter = after;
         mGroupName = groupName;
@@ -154,7 +157,18 @@ public class GetMediaTask{
 
         try {
             Cursor media;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+
+            if(mMediaId != null){
+                Uri external_images_uri = MediaStore.Files.getContentUri("external");
+                Uri imageUri = Uri.withAppendedPath(external_images_uri, mMediaId);
+                media = resolver.query(
+                        imageUri,
+                        Definitions.PROJECTION,
+                        null,
+                        null,
+                        null);
+            }
+            else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                 Bundle bundle = new Bundle();
                 bundle.putString(ContentResolver.QUERY_ARG_SQL_SELECTION, selection.toString());
                 bundle.putStringArray(ContentResolver.QUERY_ARG_SQL_SELECTION_ARGS,

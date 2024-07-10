@@ -24,22 +24,22 @@ export async function GalleryGetPhotos(
   return result.edges.map(parsePhotoIdentifierToPhotoLocalType);
 }
 
-export async function getPhotoFromDevice(mediaId: string): Promise<PhotoLocalType> {
-  const photo = await MediaManagementModule.getPhotoById(mediaId);
+export async function getPhotoFromDevice(mediaId: string): Promise<PhotoLocalType | null> {
+  const result = await MediaManagementModule.getPhotoById(mediaId, {
+    first: 0,
+    assetType: 'Photos',
+    include: ['fileSize', 'filename', 'imageSize', 'albums'],
+  });
 
-  const timestamp = getCorrectDate(photo) * 1000;
+  if (result.edges.length == 0) {
+    return null;
+  }
 
-  return {
-    id: photo.id,
-    uri: photo.uri,
-    fileSize: photo.fileSize,
-    fileName: photo.filename,
-    height: photo.height,
-    width: photo.width,
-    group_name: photo.group_name,
-    date: new Date(timestamp).toISOString(),
-    type: photo.type,
-  };
+  if (result.edges.length > 1) {
+    throw new Error('getPhotoFromDevice: found more than one photo with same mediaId');
+  }
+
+  return parsePhotoIdentifierToPhotoLocalType(result.edges[0]);
 }
 
 export function parsePhotoIdentifierToPhotoLocalType(edge: PhotoIdentifier) {
