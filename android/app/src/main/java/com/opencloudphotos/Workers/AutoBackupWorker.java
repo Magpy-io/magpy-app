@@ -103,42 +103,31 @@ public class AutoBackupWorker extends Worker {
 
         setForegroundAsync(new ForegroundInfo(NOTIFICATION_ID, notificationBuilder.build()));
 
-
-        GetMediaTask.ResultCallback resultCallback = new GetMediaTask.ResultCallback(){
-
-            @Override
-            public void reject(String s, String s1) {
-                throw new RuntimeException(s1);
-            }
-
-            @RequiresApi(api = Build.VERSION_CODES.O)
-            @Override
-            public void resolve(WritableMap result) {
-
-                treatReturnedMedia(result);
-            }
-        };
-
         WritableArray include = Arguments.createArray();
         include.pushString("fileSize");
         include.pushString("filename");
         include.pushString("imageSize");
 
 
+        WritableMap result = null;
+        try {
+            result = new GetMediaTask(
+                    context,
+                    null,
+                    MAX_GALLERY_PHOTOS_TO_UPLOAD,
+                    null,
+                    null,
+                    null,
+                    Definitions.ASSET_TYPE_PHOTOS,
+                    0,
+                    0,
+                    include)
+                    .execute();
+        } catch (GetMediaTask.RejectionException e) {
+            throw new RuntimeException(e);
+        }
 
-        new GetMediaTask(
-                context,
-                null,
-                MAX_GALLERY_PHOTOS_TO_UPLOAD,
-                null,
-                null,
-                null,
-                Definitions.ASSET_TYPE_PHOTOS,
-                0,
-                0,
-                include,
-                resultCallback)
-                .execute();
+        treatReturnedMedia(result);
 
         return Result.success();
     }

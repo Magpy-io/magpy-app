@@ -45,17 +45,20 @@ public class GetMediaTask{
     String mGroupName;
     private final @Nullable
     ReadableArray mMimeTypes;
-    private final ResultCallback mPromise;
     private final String mAssetType;
     private final long mFromTime;
     private final long mToTime;
     private final Set<String> mInclude;
     private final String mMediaId;
 
-    public interface ResultCallback{
-        public void reject(String s, String s1);
+    public static class RejectionException extends Exception{
+        public String errorCode;
+        public String errorMessage;
 
-        public void resolve(WritableMap result);
+        public RejectionException(String pErrorCode, String pErrorMessage){
+            errorCode = pErrorCode;
+            errorMessage = pErrorMessage;
+        }
     }
 
     public GetMediaTask(
@@ -68,15 +71,13 @@ public class GetMediaTask{
             String assetType,
             long fromTime,
             long toTime,
-            @Nullable ReadableArray include,
-            ResultCallback promise) {
+            @Nullable ReadableArray include) {
         mContext = context;
         mMediaId = mediaId;
         mFirst = first;
         mAfter = after;
         mGroupName = groupName;
         mMimeTypes = mimeTypes;
-        mPromise = promise;
         mAssetType = assetType;
         mFromTime = fromTime;
         mToTime = toTime;
@@ -100,7 +101,7 @@ public class GetMediaTask{
         return includeSet;
     }
 
-    public void execute() {
+    public WritableMap execute() throws RejectionException {
         StringBuilder selection = new StringBuilder("1");
         List<String> selectionArgs = new ArrayList<>();
         if (!TextUtils.isEmpty(mGroupName)) {
@@ -119,12 +120,9 @@ public class GetMediaTask{
                     + MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO + ","
                     + MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE + ")");
         } else {
-            mPromise.reject(
-                    Definitions.ERROR_UNABLE_TO_FILTER,
+            throw new RejectionException(Definitions.ERROR_UNABLE_TO_FILTER,
                     "Invalid filter option: '" + mAssetType + "'. Expected one of '"
-                            + Definitions.ASSET_TYPE_PHOTOS + "', '" + Definitions.ASSET_TYPE_VIDEOS + "' or '" + Definitions.ASSET_TYPE_ALL + "'."
-            );
-            return;
+                            + Definitions.ASSET_TYPE_PHOTOS + "', '" + Definitions.ASSET_TYPE_VIDEOS + "' or '" + Definitions.ASSET_TYPE_ALL + "'.");
         }
 
 
@@ -198,20 +196,19 @@ public class GetMediaTask{
             }
 
             if (media == null) {
-                mPromise.reject(Definitions.ERROR_UNABLE_TO_LOAD, "Could not get media");
+                throw new RejectionException(Definitions.ERROR_UNABLE_TO_LOAD, "Could not get media");
             } else {
                 try {
                     putEdges(resolver, media, response, mFirst, mInclude);
                     putPageInfo(media, response, mFirst, !TextUtils.isEmpty(mAfter) ? Integer.parseInt(mAfter) : 0);
                 } finally {
                     media.close();
-                    mPromise.resolve(response);
                 }
+                return response;
             }
         } catch (SecurityException e) {
-            mPromise.reject(
-                    Definitions.ERROR_UNABLE_TO_LOAD_PERMISSION,
-                    "Could not get media: need READ_EXTERNAL_STORAGE permission, " + e.toString());
+            throw new RejectionException(Definitions.ERROR_UNABLE_TO_LOAD_PERMISSION,
+                    "Could not get media: need READ_EXTERNAL_STORAGE permission, " + e);
         }
     }
 

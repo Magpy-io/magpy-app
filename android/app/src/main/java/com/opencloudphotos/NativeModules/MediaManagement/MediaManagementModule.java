@@ -82,35 +82,26 @@ public class MediaManagementModule extends ReactContextBaseJavaModule {
                 : null;
         ReadableArray include = params.hasKey("include") ? params.getArray("include") : null;
 
-        GetMediaTask.ResultCallback resultCallback = new GetMediaTask.ResultCallback(){
-
-            @Override
-            public void reject(String s, String s1) {
-                promise.reject(s,s1);
-            }
-
-            @Override
-            public void resolve(WritableMap result) {
-                promise.resolve(result);
-            }
-        };
-
         ExecutorsManager.executorService.execute(new Runnable() {
             @Override
             public void run() {
-                new GetMediaTask(
-                        getReactApplicationContext(),
-                        id,
-                        1,
-                        after,
-                        groupName,
-                        mimeTypes,
-                        assetType,
-                        fromTime,
-                        toTime,
-                        include,
-                        resultCallback)
-                        .execute();
+                try{
+                    WritableMap result =  new GetMediaTask(
+                            getReactApplicationContext(),
+                            id,
+                            1,
+                            after,
+                            groupName,
+                            mimeTypes,
+                            assetType,
+                            fromTime,
+                            toTime,
+                            include)
+                            .execute();
+                    promise.resolve(result);
+                } catch (GetMediaTask.RejectionException e){
+                    promise.reject(e.errorCode, e.errorMessage);
+                }
             }
         });
     }
@@ -128,35 +119,26 @@ public class MediaManagementModule extends ReactContextBaseJavaModule {
                 : null;
         ReadableArray include = params.hasKey("include") ? params.getArray("include") : null;
 
-        GetMediaTask.ResultCallback resultCallback = new GetMediaTask.ResultCallback(){
-
-            @Override
-            public void reject(String s, String s1) {
-                promise.reject(s,s1);
-            }
-
-            @Override
-            public void resolve(WritableMap result) {
-                promise.resolve(result);
-            }
-        };
-
         ExecutorsManager.executorService.execute(new Runnable() {
             @Override
             public void run() {
-                new GetMediaTask(
-                        getReactApplicationContext(),
-                        null,
-                        first,
-                        after,
-                        groupName,
-                        mimeTypes,
-                        assetType,
-                        fromTime,
-                        toTime,
-                        include,
-                        resultCallback)
-                        .execute();
+                try{
+                    WritableMap result = new GetMediaTask(
+                            getReactApplicationContext(),
+                            null,
+                            first,
+                            after,
+                            groupName,
+                            mimeTypes,
+                            assetType,
+                            fromTime,
+                            toTime,
+                            include)
+                            .execute();
+                    promise.resolve(result);
+                } catch (GetMediaTask.RejectionException e){
+                    promise.reject(e.errorCode, e.errorMessage);
+                }
             }
         });
     }
