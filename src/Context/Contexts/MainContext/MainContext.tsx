@@ -25,11 +25,8 @@ type PropsType = {
 };
 
 export const MainContextProvider: React.FC<PropsType> = props => {
-  const isNewUserState = useStatePersistent(true, 'ASYNC_STORAGE_KEY_IS_NEW_USER');
-  const isUsingLocalAccountState = useStatePersistent(
-    false,
-    'ASYNC_STORAGE_KEY_IS_USING_LOCAL_ACCOUNT',
-  );
+  const isNewUserState = useStatePersistent(true, 'IS_NEW_USER');
+  const isUsingLocalAccountState = useStatePersistent(false, 'IS_USING_LOCAL_ACCOUNT');
 
   return (
     <MainContext.Provider value={{ isNewUserState, isUsingLocalAccountState }}>

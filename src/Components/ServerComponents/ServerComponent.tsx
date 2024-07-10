@@ -3,45 +3,30 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { Badge } from 'react-native-elements';
 
-import { ConnectingToServerError } from '~/Context/Contexts/ServerContext';
-import { useTheme } from '~/Context/Contexts/ThemeContext';
+import { ConnectingToServerError, useServerContext } from '~/Context/Contexts/ServerContext';
 import { useStyles } from '~/Hooks/useStyles';
 import Logo from '~/Images/logoWhite.svg';
 import { colorsType } from '~/Styles/colors';
 import { borderRadius, spacing } from '~/Styles/spacing';
 import { typography } from '~/Styles/typography';
 
+import { useServerStatusColor } from './hooks/useServerStatusColor';
+import { useUserHasServer } from './hooks/useUserHasServer';
+
 type ServerComponentProps = {
-  hasServer: boolean;
   name?: string;
   ip?: string;
   ipPublic?: string;
   port?: string;
-  reachable: boolean;
-  findingServer: boolean;
   error: ConnectingToServerError;
 };
 
-export function ServerComponent({
-  hasServer,
-  name,
-  ip,
-  port,
-  reachable,
-  findingServer,
-  error,
-}: ServerComponentProps) {
+export function ServerComponent({ name, ip, port, error }: ServerComponentProps) {
   const IpAddress = `${ip}:${port}`;
   const styles = useStyles(makeStyles);
-  const { colors } = useTheme();
-
-  const serverStateColor = !hasServer
-    ? 'black'
-    : findingServer
-      ? colors.PENDING
-      : reachable
-        ? colors.SUCCESS
-        : colors.WARNING;
+  const { findingServer } = useServerContext();
+  const hasServer = useUserHasServer();
+  const serverStateColor = useServerStatusColor();
 
   const errorMessage: string =
     error == 'SERVER_AUTH_FAILED'
@@ -59,7 +44,10 @@ export function ServerComponent({
       <View>
         {name && <Text style={styles.name}>{name}</Text>}
         {<Text style={styles.ipAddress}>{IpAddress}</Text>}
-        {error && <Text style={styles.unreachable}>{errorMessage}</Text>}
+        {findingServer && (
+          <Text style={styles.findingServer}>{'Trying to locate your server...'}</Text>
+        )}
+        {!findingServer && error && <Text style={styles.unreachable}>{errorMessage}</Text>}
       </View>
     );
   };
@@ -92,6 +80,10 @@ const makeStyles = (colors: colorsType) =>
     unreachable: {
       ...typography(colors).mediumTextBold,
       color: colors.WARNING,
+    },
+    findingServer: {
+      ...typography(colors).mediumTextBold,
+      color: colors.PENDING,
     },
     name: {
       ...typography(colors).mediumTextBold,

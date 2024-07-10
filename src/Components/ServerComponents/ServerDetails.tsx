@@ -25,44 +25,37 @@ import { typography } from '~/Styles/typography';
 
 import { PrimaryButton } from '../CommonComponents/Buttons';
 import { ServerComponent } from './ServerComponent';
+import { useUserHasServer } from './hooks/useUserHasServer';
 
 export default function ServerDetails() {
   const { server } = useServerClaimContext();
   const { serverName } = useLocalAccountContext();
   const { forgetServerLocal } = useLocalAccountContextFunctions();
   const { isUsingLocalAccount } = useMainContext();
-  const { serverNetwork, isServerReachable, findingServer, error } = useServerContext();
+  const { serverNetwork, error } = useServerContext();
   const { forgetServer } = useServerContextFunctions();
   const { forgetServer: forgetServerRemote } = useServerClaimFunctions();
   const { FindServerLocal, FindServerRemote } = useFindServerFunctions();
   const styles = useStyles(makeStyles);
   const { navigate } = useMainStackNavigation();
-  const hasServerLocal = isUsingLocalAccount && !!serverNetwork;
-  const hasServerRemote = !isUsingLocalAccount && !!server;
 
-  const hasServer = hasServerLocal || hasServerRemote;
-  console.log(error);
+  const hasServer = useUserHasServer();
+
   const ServerComponentLocal = () => (
     <ServerComponent
-      hasServer={hasServer}
       name={serverName ?? undefined}
       ip={serverNetwork?.currentIp}
       port={serverNetwork?.currentPort}
-      reachable={isServerReachable}
-      findingServer={findingServer}
       error={error}
     />
   );
 
   const ServerComponentRemote = () => (
     <ServerComponent
-      hasServer={hasServer}
       name={server?.name}
-      ip={server?.ipPrivate}
+      ip={serverNetwork?.currentIp}
+      port={serverNetwork?.currentPort}
       ipPublic={server?.ipPublic}
-      port={server?.port}
-      reachable={isServerReachable}
-      findingServer={findingServer}
       error={error}
     />
   );
@@ -104,11 +97,18 @@ export default function ServerDetails() {
           onPress={OnAddServerPress}
         />
       )}
-      {error && (
+      {hasServer && error && (
         <PrimaryButton
           title={'Reconnect To Server'}
           buttonStyle={{ marginTop: 5 }}
           onPress={OnReconnectPress}
+        />
+      )}
+      {hasServer && error == 'SERVER_NOT_REACHABLE' && (
+        <PrimaryButton
+          title={'Find Server'}
+          buttonStyle={{ marginTop: 5 }}
+          onPress={() => navigate('ServerSelect')}
         />
       )}
       {hasServer && (

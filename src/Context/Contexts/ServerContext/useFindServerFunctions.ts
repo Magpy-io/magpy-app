@@ -60,8 +60,9 @@ export function useFindServerFunctions() {
     if (loading || !backendToken || !claimedServer || isServerReachable) {
       return;
     }
-
     console.log('Finding Server Remote');
+
+    let savedServerResponded: boolean = false;
 
     setFindingServer(true);
     let serverResponded: { responded: boolean; token: string } | null = null;
@@ -77,13 +78,13 @@ export function useFindServerFunctions() {
         backendToken,
       );
       if (serverResponded.token) {
-        console.log('setReachableServer');
         setReachableServer({
           ip: serverNetwork?.currentIp,
           port: serverNetwork?.currentPort,
           token: serverResponded.token,
         });
         setFindingServer(false);
+        savedServerResponded = true;
       }
 
       if (serverResponded.responded) {
@@ -156,6 +157,12 @@ export function useFindServerFunctions() {
         port: anyServerResponded.server.port,
         token: anyServerResponded.response.token,
       });
+      setFindingServer(false);
+      return;
+    }
+
+    // No need to try public address because a local one was already found
+    if (savedServerResponded) {
       setFindingServer(false);
       return;
     }

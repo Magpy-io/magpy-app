@@ -76,7 +76,7 @@ public class GetPhotos {
             throw new RuntimeException("Error creating JSON request object.");
         }
 
-        jsonResponse = HttpManager.SendRequest(url + "getPhotosByMediaId", jsonRequest, serverToken);
+        jsonResponse = HttpManager.SendRequest(url + "/getPhotosByMediaId", jsonRequest, serverToken);
 
         try {
             JSONObject data = jsonResponse.getJSONObject("data");

@@ -6,12 +6,16 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 import { useTheme } from '~/Context/Contexts/ThemeContext';
 
+import AboutSettingsScreen from '../Screens/AboutSettingsScreen';
 import AccountSettingsScreen from '../Screens/AccountSettingsScreen';
+import BackupSettingsScreen from '../Screens/BackupSettingsScreen';
 import LoginScreen from '../Screens/LoginScreen';
+import PreferencesSettingsScreen from '../Screens/PreferencesSettingsScreen';
 import RegisterScreen from '../Screens/RegisterScreen';
 import ServerClaimScreen from '../Screens/ServerClaimScreen';
 import ServerGalleryScreen from '../Screens/ServerGalleryScreen';
 import ServerLoginScreen from '../Screens/ServerLoginScreen';
+import ServerManualAddressScreen from '../Screens/ServerManualAddressScreen';
 import ServerSelectScreen from '../Screens/ServerSelectScreen';
 import { TabStackNavigator, TabStackParamList } from './TabStackNavigator';
 
@@ -19,11 +23,15 @@ export type MainStackParamList = {
   Tabs: NavigatorScreenParams<TabStackParamList> | undefined;
   ServerGalleryScreen: undefined;
   ServerSelect: undefined;
+  ServerManualAddress: undefined;
   ServerClaim: undefined;
   ServerLogin: undefined;
   Login: undefined;
   Register: undefined;
   AccountSettings: undefined;
+  BackupSettings: undefined;
+  PreferencesSettings: undefined;
+  AboutSettings: undefined;
 };
 
 const Stack = createNativeStackNavigator<MainStackParamList>();
@@ -45,11 +53,15 @@ export function MainStackNavigator({ initialScreen }: propsType) {
       <Stack.Screen name="Tabs" component={TabStackNavigator} />
       <Stack.Screen name="ServerGalleryScreen" component={ServerGalleryScreen} />
       <Stack.Screen name="ServerSelect" component={ServerSelectScreen} />
+      <Stack.Screen name="ServerManualAddress" component={ServerManualAddressScreen} />
       <Stack.Screen name="ServerClaim" component={ServerClaimScreen} />
       <Stack.Screen name="ServerLogin" component={ServerLoginScreen} />
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="Register" component={RegisterScreen} />
       <Stack.Screen name="AccountSettings" component={AccountSettingsScreen} />
+      <Stack.Screen name="BackupSettings" component={BackupSettingsScreen} />
+      <Stack.Screen name="PreferencesSettings" component={PreferencesSettingsScreen} />
+      <Stack.Screen name="AboutSettings" component={AboutSettingsScreen} />
     </Stack.Navigator>
   );
 }

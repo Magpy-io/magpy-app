@@ -7,6 +7,7 @@ import { PhotosDownloadingContextProvider } from '~/Context/Contexts/PhotosDownl
 import { ServerClaimContextProvider } from '~/Context/Contexts/ServerClaimContext';
 import { ServerContextProvider } from '~/Context/Contexts/ServerContext';
 
+import { BackupWorkerContextProvider } from './Contexts/BackupWorkerContext';
 import { LocalAccountContextProvider } from './Contexts/LocalAccountContext';
 import { MainContextProvider } from './Contexts/MainContext';
 
@@ -24,7 +25,7 @@ export const GlobalContexts: React.FC<PropsType> = props => {
               <ServerContextProvider>
                 <LocalAccountContextProvider>
                   <PhotosDownloadingContextProvider>
-                    {props.children}
+                    <BackupWorkerContextProvider>{props.children}</BackupWorkerContextProvider>
                   </PhotosDownloadingContextProvider>
                 </LocalAccountContextProvider>
               </ServerContextProvider>

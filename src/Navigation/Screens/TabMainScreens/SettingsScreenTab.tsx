@@ -1,101 +1,58 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { SectionList, StyleSheet, View } from 'react-native';
-
-import { Text } from 'react-native-elements';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import React from 'react';
+import { StyleSheet, View } from 'react-native';
 
 import {
   AccountIcon,
-  CloseIcon,
-  HelpIcon,
   InfoIcon,
-  NotificationIcon,
-  PhoneIcon,
+  LogoutIcon,
   PreferencesIcon,
   UploadIcon,
 } from '~/Components/CommonComponents/Icons';
 import AutoBackupCard from '~/Components/SettingsComponents/AutoBackupCard';
-import LogoutComponent from '~/Components/SettingsComponents/LogoutComponent';
 import ProfileHeader from '~/Components/SettingsComponents/ProfileHeader';
-import SettingComponent from '~/Components/SettingsComponents/SettingComponent';
-import { uniqueDeviceId } from '~/Config/config';
+import SettingsPageComponent, {
+  SettingsListType,
+} from '~/Components/SettingsComponents/SettingsPageComponent';
+import { useAuthContextFunctions } from '~/Context/Contexts/AuthContext';
+import { useBackupWorkerContext } from '~/Context/Contexts/BackupWorkerContext';
+import { useMainContext } from '~/Context/Contexts/MainContext';
 import { useServerContext } from '~/Context/Contexts/ServerContext';
 import { useStyles } from '~/Hooks/useStyles';
-import { AutoBackupModule } from '~/NativeModules/AutoBackupModule';
 import { useMainStackNavigation } from '~/Navigation/Navigators/MainStackNavigator';
-import { TabBarPadding } from '~/Navigation/TabNavigation/TabBar';
 import { colorsType } from '~/Styles/colors';
 import { spacing } from '~/Styles/spacing';
-import { typography } from '~/Styles/typography';
-
-type ItemType = {
-  title: string;
-  onPress: () => void;
-  icon: JSX.Element;
-};
 
 export default function SettingsScreenTab() {
-  const { navigate } = useMainStackNavigation();
-  const insets = useSafeAreaInsets();
-  const styles = useStyles(makeStyles);
+  const { navigate, reset } = useMainStackNavigation();
 
-  const { isServerReachable, serverPath, token } = useServerContext();
+  const { isUsingLocalAccount } = useMainContext();
+  const { autobackupEnabled } = useBackupWorkerContext();
+  const { isServerReachable } = useServerContext();
 
-  const onAutobackupClick = useCallback(async () => {
-    if (isServerReachable) {
-      await AutoBackupModule.StartBackupWorker({
-        url: serverPath ?? '',
-        deviceId: uniqueDeviceId,
-        serverToken: token ?? '',
-      });
-      console.log('worker started');
+  const { logout } = useAuthContextFunctions();
 
-      const s = await AutoBackupModule.IsWorkerAlive();
-      setBackupOn(s);
-    }
-  }, [isServerReachable, serverPath, token]);
+  const onPressLogout = () => {
+    logout();
+    reset({
+      index: 0,
+      routes: [{ name: 'Login' }],
+    });
+  };
 
-  const [backupOn, setBackupOn] = useState(false);
-  console.log('backupOn', backupOn);
-
-  useEffect(() => {
-    AutoBackupModule.IsWorkerAlive()
-      .then(s => setBackupOn(s))
-      .catch(console.log);
-  }, []);
-
-  const data = [
+  const data: SettingsListType = [
     {
-      title: 'Storage settings',
+      title: 'Settings',
       data: [
         {
-          title: 'Activate auto-backup',
-          onPress: onAutobackupClick,
+          type: 'Navigation',
+          title: 'Backup Settings',
+          onPress: () => {
+            navigate('BackupSettings');
+          },
           icon: <UploadIcon />,
         },
         {
-          title: 'Disable auto-backup',
-          onPress: async () => {
-            console.log('stop button');
-            await AutoBackupModule.StopWorker();
-            console.log('worker stopped');
-
-            const s = await AutoBackupModule.IsWorkerAlive();
-            setBackupOn(s);
-          },
-          icon: <CloseIcon />,
-        },
-        {
-          title: 'Free up space from this device',
-          onPress: () => {},
-          icon: <PhoneIcon />,
-        },
-      ],
-    },
-    {
-      title: 'App settings',
-      data: [
-        {
+          type: 'Navigation',
           title: 'Account settings',
           onPress: () => {
             navigate('AccountSettings');
@@ -103,64 +60,48 @@ export default function SettingsScreenTab() {
           icon: <AccountIcon />,
         },
         {
+          type: 'Navigation',
           title: 'Preferences',
-          onPress: () => {},
+          onPress: () => {
+            navigate('PreferencesSettings');
+          },
           icon: <PreferencesIcon />,
         },
         {
-          title: 'Notifications',
-          onPress: () => {},
-          icon: <NotificationIcon />,
-        },
-      ],
-    },
-    {
-      title: 'Info',
-      data: [
-        {
-          title: 'Help & Support',
-          onPress: () => {},
-          icon: <HelpIcon />,
-        },
-        {
+          type: 'Navigation',
           title: 'About Magpy',
-          onPress: () => {},
+          onPress: () => {
+            navigate('AboutSettings');
+          },
           icon: <InfoIcon />,
         },
       ],
     },
   ];
 
-  const renderSectionHeader = ({ section: { title } }: { section: { title: string } }) => {
-    return <Text style={styles.title}>{title}</Text>;
-  };
-
-  const renderItem = ({ item }: { item: ItemType }) => {
-    return <SettingComponent icon={item.icon} title={item.title} onPress={item.onPress} />;
-  };
+  if (!isUsingLocalAccount) {
+    data[0].data.push({
+      type: 'Button',
+      title: 'Logout',
+      onPress: onPressLogout,
+      icon: <LogoutIcon />,
+    });
+  }
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
-      <SectionList
-        ListHeaderComponent={<Header backupOn={backupOn} />}
-        sections={data}
-        renderSectionHeader={renderSectionHeader}
-        renderItem={renderItem}
-        contentContainerStyle={{ paddingHorizontal: spacing.spacing_l }}
-        ListFooterComponent={<LogoutComponent />}
-      />
-      <TabBarPadding />
-    </View>
+    <SettingsPageComponent
+      data={data}
+      header={<Header displayCard={!autobackupEnabled && isServerReachable} />}
+    />
   );
 }
 
-function Header(props: { backupOn: boolean }) {
+function Header(props: { displayCard?: boolean }) {
   const styles = useStyles(makeStyles);
   return (
     <View style={styles.header}>
       <ProfileHeader />
-      <AutoBackupCard />
-      {props.backupOn ? <Text>Backup On</Text> : <Text>Backup Off</Text>}
+      {props.displayCard && <AutoBackupCard />}
     </View>
   );
 }
@@ -171,16 +112,7 @@ const makeStyles = (colors: colorsType) =>
       paddingTop: spacing.spacing_xl,
       gap: spacing.spacing_xl,
     },
-    logoutText: {
-      ...typography(colors).mediumTextBold,
+    logoutButton: {
       color: colors.ERROR,
-    },
-    title: {
-      ...typography(colors).sectionTitle,
-      paddingVertical: spacing.spacing_l,
-    },
-    container: {
-      flex: 1,
-      backgroundColor: colors.BACKGROUND,
     },
   });

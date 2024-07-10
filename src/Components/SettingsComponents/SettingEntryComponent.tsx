@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, TextStyle, TouchableOpacity, View } from 'react-native';
 
 import { Text } from 'react-native-elements';
 
@@ -8,24 +8,32 @@ import { colorsType } from '~/Styles/colors';
 import { spacing } from '~/Styles/spacing';
 import { typography } from '~/Styles/typography';
 
-import { ChevronIcon } from '../CommonComponents/Icons';
-
-type SettingComponentProps = {
+type SettingEntryComponentProps = {
   title: string;
-  onPress: () => void;
-  icon: JSX.Element;
+  onPress?: () => void;
+  icon?: JSX.Element;
+  componentEnd?: JSX.Element;
+  style?: TextStyle;
+  notTouchable?: boolean;
 };
 
-export default function SettingComponent({ icon, title, onPress }: SettingComponentProps) {
+export default function SettingEntryComponent({
+  icon,
+  componentEnd,
+  title,
+  onPress,
+  style,
+  notTouchable,
+}: SettingEntryComponentProps) {
   const styles = useStyles(makeStyles);
 
   return (
-    <TouchableOpacity style={styles.container} onPress={onPress}>
+    <TouchableOpacity style={styles.container} onPress={onPress} disabled={notTouchable}>
       <View style={styles.iconTitle}>
         {icon}
-        <Text style={styles.titleStyle}>{title}</Text>
+        <Text style={[styles.titleStyle, style]}>{title}</Text>
       </View>
-      <ChevronIcon />
+      {componentEnd}
     </TouchableOpacity>
   );
 }
@@ -33,7 +41,7 @@ export default function SettingComponent({ icon, title, onPress }: SettingCompon
 const makeStyles = (colors: colorsType) =>
   StyleSheet.create({
     titleStyle: {
-      ...typography(colors).mediumText,
+      ...typography(colors).largeText,
     },
     iconTitle: {
       flexDirection: 'row',
@@ -44,6 +52,6 @@ const makeStyles = (colors: colorsType) =>
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      paddingVertical: spacing.spacing_s,
+      height: spacing.spacing_xxl_2,
     },
   });
