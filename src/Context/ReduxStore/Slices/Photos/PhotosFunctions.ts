@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef } from 'react';
 
 import { Promise as BluebirdPromise } from 'bluebird';
 
-import { useBackgroundServiceFunctions } from '~/Context/Contexts/BackgroundServiceContext';
+import { uniqueDeviceId } from '~/Config/config';
 import { useServerContext } from '~/Context/Contexts/ServerContext';
 import {
   addPhotoCompressedToCache,
@@ -12,6 +12,7 @@ import {
 } from '~/Helpers/GalleryFunctions/Functions';
 import { GalleryGetPhotos } from '~/Helpers/GalleryFunctions/GetGalleryPhotos';
 import { DeletePhotosById, GetPhotos, GetPhotosById } from '~/Helpers/ServerQueries';
+import { UploadMediaModule } from '~/NativeModules/UploadMediaModule';
 
 import { useAppDispatch } from '../../Store';
 import { ParseApiPhoto } from './Functions';
@@ -31,9 +32,7 @@ import {
 export function usePhotosFunctionsStore() {
   const dispatch = useAppDispatch();
 
-  const { SendPhotoToBackgroundServiceForUpload } = useBackgroundServiceFunctions();
-
-  const { isServerReachable } = useServerContext();
+  const { isServerReachable, serverPath, token } = useServerContext();
   const isServerReachableRef = useRef(false);
   isServerReachableRef.current = isServerReachable;
 
@@ -169,9 +168,15 @@ export function usePhotosFunctionsStore() {
       if (photos.length == 0) {
         return;
       }
-      await SendPhotoToBackgroundServiceForUpload(photos);
+
+      await UploadMediaModule.StartUploadWorker({
+        url: serverPath ?? '',
+        deviceId: uniqueDeviceId,
+        serverToken: token ?? '',
+        photosIds: photos.map(photo => photo.id),
+      });
     },
-    [SendPhotoToBackgroundServiceForUpload],
+    [serverPath, token],
   );
 
   const DeletePhotosLocal = useCallback(
