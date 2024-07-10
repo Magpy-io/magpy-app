@@ -38,31 +38,6 @@ public class SendingMediaServiceModule extends ReactContextBaseJavaModule{
         return "SendingMediaServiceModule";
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
-    @ReactMethod
-    public void getPhotoExifDate(String uri, Promise mPromise) {
-        try {
-
-            Uri mUri = Uri.parse(uri);
-            ExifInterface exifInterface = new ExifInterface(mUri.getPath());
-
-            String date_time = exifInterface.getAttribute(
-                    ExifInterface.TAG_DATETIME_ORIGINAL);
-
-            DateFormat df = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss");
-            Date date = df.parse(date_time);
-
-            if(date == null){
-                Log.e("Tag", "Could not parse date from exif data");
-            }else{
-                mPromise.resolve((double)(date.getTime() / 1000));
-            }
-
-        } catch (Exception e) {
-           mPromise.resolve(-1);
-        }
-    }
-
     @RequiresApi(api = Build.VERSION_CODES.Q)
     public static boolean isServiceRunningInner(ReactContext context){
         //TODO change how to check for service running (maybe using broadcast receivers), getRunningServices is deprecated
