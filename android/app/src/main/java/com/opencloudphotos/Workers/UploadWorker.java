@@ -5,7 +5,6 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.util.Base64;
 import android.util.Log;
@@ -23,7 +22,6 @@ import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
-import com.opencloudphotos.GlobalManagers.ExecutorsManager;
 import com.opencloudphotos.GlobalManagers.ServerQueriesManager.Common.PhotoData;
 import com.opencloudphotos.GlobalManagers.ServerQueriesManager.GetPhotos;
 import com.opencloudphotos.GlobalManagers.ServerQueriesManager.PhotoUploader;
@@ -39,26 +37,25 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AutoBackupWorker extends Worker {
-    final int NOTIFICATION_ID = 1002;
-    final String CHANNEL_ID = "AUTO BACKUP CHANNEL";
+public class UploadWorker extends Worker {
+    final int NOTIFICATION_ID = 1003;
+    final String CHANNEL_ID = "UPLOAD CHANNEL";
 
-    public static final String WORKER_NAME = "AUTO_BACKUP_WORKER_NAME";
+    public static final String WORKER_NAME = "UPLOAD_WORKER_NAME";
     public static final String DATA_KEY_URL = "URL";
     public static final String DATA_KEY_SERVER_TOKEN = "SERVER_TOKEN";
     public static final String DATA_KEY_DEVICE_UNIQUE_ID = "DEVICE_UNIQUE_ID";
+    public static final String DATA_KEY_PHOTOS_IDS = "PHOTOS_IDS";
 
-
-    protected final int MAX_MISSING_PHOTOS_TO_UPLOAD = 10;
-    protected final int MAX_GALLERY_PHOTOS_TO_UPLOAD = 100;
 
     protected String url;
     protected String serverToken;
     protected String deviceId;
+    protected String[] photosIds;
 
     NotificationCompat.Builder notificationBuilder;
 
-    public AutoBackupWorker(
+    public UploadWorker(
             @NonNull Context context,
             @NonNull WorkerParameters params) {
         super(context, params);
@@ -68,15 +65,16 @@ public class AutoBackupWorker extends Worker {
         url = getInputData().getString(DATA_KEY_URL);
         serverToken = getInputData().getString(DATA_KEY_SERVER_TOKEN);
         deviceId = getInputData().getString(DATA_KEY_DEVICE_UNIQUE_ID);
+        photosIds = getInputData().getStringArray(DATA_KEY_PHOTOS_IDS);
 
-        return url != null && serverToken != null && deviceId != null;
+        return url != null && serverToken != null && deviceId != null && photosIds != null;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @NonNull
     @Override
     public Result doWork() {
-        Log.d("AutoBackupWorker", "Work started.");
+        Log.d("UploadWorker", "Work started.");
 
         boolean dataParsed = parseInputData();
         if(!dataParsed) {
@@ -88,7 +86,7 @@ public class AutoBackupWorker extends Worker {
         PendingIntent cancelIntent = WorkManager.getInstance(context)
                 .createCancelPendingIntent(getId());
 
-        String title = "Backing up your media";
+        String title = "Uploading photos";
         String cancel = "Cancel";
 
         createChannel();
@@ -96,7 +94,7 @@ public class AutoBackupWorker extends Worker {
         notificationBuilder = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setContentTitle(title)
                 .setTicker(title)
-                .setContentText("Starting backup of your media.")
+                .setContentText("Staring photos upload")
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setOngoing(true)
                 .addAction(android.R.drawable.ic_delete, cancel, cancelIntent);
@@ -108,28 +106,125 @@ public class AutoBackupWorker extends Worker {
         include.pushString("filename");
         include.pushString("imageSize");
 
+        PhotoUploader photoUploader = new PhotoUploader(
+                url,
+                serverToken,
+                deviceId);
 
-        WritableMap result = null;
-        try {
-            result = new GetMediaTask(
-                    context,
-                    null,
-                    MAX_GALLERY_PHOTOS_TO_UPLOAD,
-                    null,
-                    null,
-                    null,
-                    Definitions.ASSET_TYPE_PHOTOS,
-                    0,
-                    0,
-                    include)
-                    .execute();
-        } catch (GetMediaTask.RejectionException e) {
-            throw new RuntimeException(e);
+        for (int i=0; i<photosIds.length; i++) {
+            String mediaId = photosIds[i];
+
+            WritableMap result;
+            try {
+                result = new GetMediaTask(
+                        context,
+                        mediaId,
+                        1,
+                        null,
+                        null,
+                        null,
+                        Definitions.ASSET_TYPE_PHOTOS,
+                        0,
+                        0,
+                        include)
+                        .execute();
+            } catch (GetMediaTask.RejectionException e) {
+                throw new RuntimeException(e);
+            }
+
+            PhotoData photoData = parseResult(result);
+
+            if(photoData == null){
+                throw new RuntimeException("UploadWorker: mediaId not found in device.");
+            }
+
+            if(isStopped()){
+                Log.d("UploadWorker", "Stopped");
+                break;
+            }
+
+            notificationBuilder.setContentText("Backing up " + (i+1) + "/" + photosIds.length);
+            getApplicationContext().getSystemService(NotificationManager.class).notify(NOTIFICATION_ID, notificationBuilder.build());
+
+            try {
+                photoUploader.uploadPhoto(photoData);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
 
-        treatReturnedMedia(result);
-
         return Result.success();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private PhotoData parseResult(WritableMap result){
+        ReadableArray edges = result.getArray("edges");
+
+        if(edges == null){
+            throw new RuntimeException("UploadWorker: in parseResult edges found null.");
+        }
+
+        if(edges.size() == 0){
+            return null;
+        }
+
+        if(edges.size() > 1){
+            throw new RuntimeException("UploadWorker: in parseResult found more than on result for a mediaId");
+        }
+
+        ReadableMap item = edges.getMap(0);
+        ReadableMap node = item.getMap("node");
+
+        if(node == null){
+            throw new RuntimeException("UploadWorker: in parseResult node found null.");
+        }
+
+        ReadableMap image = node.getMap("image");
+        PhotoData photoData = new PhotoData();
+
+        double timestamp = node.getDouble("timestamp");
+        double modificationTimestamp = node.getDouble("modificationTimestamp");
+
+        double correctTimestamp = Math.min(timestamp, modificationTimestamp);
+
+        Instant instant = Instant.ofEpochSecond((long)correctTimestamp);
+        String timestampAsIso = instant.toString();
+
+        photoData.mediaId = node.getString("id");
+        photoData.uri = image.getString("uri");
+        photoData.fileSize = image.getDouble("fileSize");
+        photoData.height = image.getDouble("height");
+        photoData.width = image.getDouble("width");
+        photoData.name = image.getString("filename");
+        photoData.date = timestampAsIso;
+
+
+        InputStream inputStream = null;
+        try {
+            inputStream = getApplicationContext().getContentResolver().openInputStream(Uri.parse(photoData.uri));
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException("Media file not found.", e);
+        }
+        ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
+
+        int bufferSize = 1024;
+        byte[] buffer = new byte[bufferSize];
+
+        int len = 0;
+
+        try{
+            while ((len = inputStream.read(buffer)) != -1) {
+                byteBuffer.write(buffer, 0, len);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Error while reading media file.", e);
+        }
+
+        byte[] b = byteBuffer.toByteArray();
+
+        photoData.image64 = Base64.encodeToString(b, 0);
+
+        return photoData;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -149,7 +244,7 @@ public class AutoBackupWorker extends Worker {
             throw new RuntimeException(e);
         }
 
-        List<PhotoData> missingPhotos = getPhotosDataFromGetMediaIfNotInServer(result, photosExist, MAX_MISSING_PHOTOS_TO_UPLOAD);
+        List<PhotoData> missingPhotos = getPhotosDataFromGetMediaIfNotInServer(result, photosExist, 1);
 
         PhotoUploader photoUploader = new PhotoUploader(
                 url,
@@ -159,7 +254,7 @@ public class AutoBackupWorker extends Worker {
         for (int i=0; i<missingPhotos.size(); i++) {
             PhotoData photoData = missingPhotos.get(i);
             if(isStopped()){
-                Log.d("AutoBackupWorker", "Stopped");
+                Log.d("main", "Stopped");
                 break;
             }
 
