@@ -51,7 +51,7 @@ public class AutoBackupWorker extends Worker {
 
 
     protected final int MAX_MISSING_PHOTOS_TO_UPLOAD = 100;
-    protected final int MAX_GALLERY_PHOTOS_TO_UPLOAD = 100;
+    protected final int MAX_GALLERY_PHOTOS_TO_UPLOAD = 3000;
 
     protected String url;
     protected String serverToken;
@@ -160,6 +160,8 @@ public class AutoBackupWorker extends Worker {
 
         for (int i=0; i<missingPhotos.size(); i++) {
             PhotoData photoData = missingPhotos.get(i);
+            photoData.image64 = FileOperations.getBase64FromUri(getApplicationContext(), photoData.uri);
+
             if(isStopped()){
                 Log.d("AutoBackupWorker", "Stopped");
                 break;
@@ -230,8 +232,6 @@ public class AutoBackupWorker extends Worker {
                 photoData.width = image.getDouble("width");
                 photoData.name = image.getString("filename");
                 photoData.date = timestampAsIso;
-
-                photoData.image64 = FileOperations.getBase64FromUri(getApplicationContext(), photoData.uri);
 
                 missingPhotos.add(photoData);
 
