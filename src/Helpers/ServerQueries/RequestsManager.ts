@@ -3,11 +3,11 @@ import axios from 'axios';
 import { handleAxiosError } from './ExceptionsManager';
 import { getPathWithEndpoint } from './PathManager';
 import {
-  HasUserToken,
   SetUserToken,
   extractToken,
   userAuthorizationObject,
   verifyHasUserToken,
+  HasUserToken,
 } from './TokenManager';
 import { ResponseTypeFrom } from './Types/ApiGlobalTypes';
 import { TokenAuthentification } from './Types/Types';
@@ -42,6 +42,7 @@ function GeneratePostWithAuthOptional<RequestData, ResponseData, ResponseErrorTy
     options?: { path?: string },
   ): Promise<ResponseTypeFrom<ResponseData, ResponseErrorTypes>> => {
     const hasToken = HasUserToken();
+
     try {
       if (hasToken) {
         const response = await axios.post(

@@ -1,6 +1,6 @@
 
 
-import { ErrorServerNotClaimed, ErrorsAuthorization } from '../ErrorTypes';
+import { ErrorPhotoExists, ErrorServerNotClaimed, ErrorsAuthorization } from '../ErrorTypes';
 import { APIPhoto, TokenAuthentification } from '../Types';
 
 export type ResponseData = {
@@ -9,7 +9,10 @@ export type ResponseData = {
 
 
 
-export type ResponseErrorTypes = ErrorServerNotClaimed | ErrorsAuthorization;
+export type ResponseErrorTypes =
+  | ErrorServerNotClaimed
+  | ErrorsAuthorization
+  | ErrorPhotoExists;
 
 export const endpoint = 'addPhoto';
 

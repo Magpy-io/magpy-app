@@ -6,7 +6,7 @@ export type ResponseData = string;
 
 
 
-export type ResponseErrorTypes = void;
+export type ResponseErrorTypes = null;
 
 export const endpoint = 'status';
 
