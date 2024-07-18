@@ -50,11 +50,16 @@ public class UploadMediaModule extends ReactContextBaseJavaModule {
 
         String[] photosIds = new String[photosIdsReadableArray.size()];
 
-        for(int i=0; i<photosIdsReadableArray.size(); i++){
-            String photoId = photosIdsReadableArray.getString(i);
-            photosIds[i] = photoId;
+        try{
+            for(int i=0; i<photosIdsReadableArray.size(); i++){
+                String photoId = photosIdsReadableArray.getString(i);
+                photosIds[i] = photoId;
+            }
+        }catch (ClassCastException e){
+            mPromise.reject("Error", "photosIds should be an array of strings.");
+            return;
         }
-
+        
         uploadWorkerManager.StartWorker(url, serverToken, deviceId, photosIds);
     }
 
