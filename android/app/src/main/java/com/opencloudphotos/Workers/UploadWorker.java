@@ -28,6 +28,7 @@ import com.opencloudphotos.GlobalManagers.ServerQueriesManager.PhotoUploader;
 import com.opencloudphotos.NativeModules.MediaManagement.Utils.Definitions;
 import com.opencloudphotos.NativeModules.MediaManagement.Utils.GetMediaTask;
 import com.opencloudphotos.R;
+import com.opencloudphotos.Utils.FileOperations;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
@@ -128,36 +129,35 @@ public class UploadWorker extends Worker {
                         0,
                         include)
                         .execute();
-            } catch (GetMediaTask.RejectionException e) {
-                throw new RuntimeException(e);
-            }
 
-            PhotoData photoData = parseResult(result);
+                PhotoData photoData = parseResult(result);
 
-            if(photoData == null){
-                throw new RuntimeException("UploadWorker: mediaId not found in device.");
-            }
+                if(photoData == null){
+                    throw new RuntimeException("UploadWorker: mediaId not found in device.");
+                }
 
-            if(isStopped()){
-                Log.d("UploadWorker", "Stopped");
-                break;
-            }
+                if(isStopped()){
+                    Log.d("UploadWorker", "Stopped");
+                    break;
+                }
 
-            notificationBuilder.setContentText("Backing up " + (i+1) + "/" + photosIds.length);
-            getApplicationContext().getSystemService(NotificationManager.class).notify(NOTIFICATION_ID, notificationBuilder.build());
+                notificationBuilder.setContentText("Backing up " + (i+1) + "/" + photosIds.length);
+                getApplicationContext().getSystemService(NotificationManager.class).notify(NOTIFICATION_ID, notificationBuilder.build());
 
-            try {
                 photoUploader.uploadPhoto(photoData);
-            } catch (IOException e) {
+
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
+
+
         }
 
         return Result.success();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    private PhotoData parseResult(WritableMap result){
+    private PhotoData parseResult(WritableMap result) throws IOException {
         ReadableArray edges = result.getArray("edges");
 
         if(edges == null){
@@ -198,31 +198,7 @@ public class UploadWorker extends Worker {
         photoData.name = image.getString("filename");
         photoData.date = timestampAsIso;
 
-
-        InputStream inputStream = null;
-        try {
-            inputStream = getApplicationContext().getContentResolver().openInputStream(Uri.parse(photoData.uri));
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException("Media file not found.", e);
-        }
-        ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
-
-        int bufferSize = 1024;
-        byte[] buffer = new byte[bufferSize];
-
-        int len = 0;
-
-        try{
-            while ((len = inputStream.read(buffer)) != -1) {
-                byteBuffer.write(buffer, 0, len);
-            }
-        } catch (IOException e) {
-            throw new RuntimeException("Error while reading media file.", e);
-        }
-
-        byte[] b = byteBuffer.toByteArray();
-
-        photoData.image64 = Base64.encodeToString(b, 0);
+        photoData.image64 = FileOperations.getBase64FromUri(getApplicationContext(), photoData.uri);
 
         return photoData;
     }
