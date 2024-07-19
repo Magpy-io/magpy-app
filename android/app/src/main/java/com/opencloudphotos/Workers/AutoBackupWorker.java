@@ -13,6 +13,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
+import androidx.work.Data;
 import androidx.work.ForegroundInfo;
 import androidx.work.WorkManager;
 import androidx.work.Worker;
@@ -49,6 +50,7 @@ public class AutoBackupWorker extends Worker {
     public static final String DATA_KEY_SERVER_TOKEN = "SERVER_TOKEN";
     public static final String DATA_KEY_DEVICE_UNIQUE_ID = "DEVICE_UNIQUE_ID";
 
+    public static final String UPLOADED_PHOTO_MEDIA_ID = "UPLOADED_PHOTO_MEDIA_ID";
 
     protected final int MAX_MISSING_PHOTOS_TO_UPLOAD = 100;
     protected final int MAX_GALLERY_PHOTOS_TO_UPLOAD = 3000;
@@ -123,9 +125,9 @@ public class AutoBackupWorker extends Worker {
                     include)
                     .execute();
 
-            treatReturnedMedia(result);
+            String lastUploadedMediaId = treatReturnedMedia(result);
 
-            return Result.success();
+            return Result.success(new Data.Builder().putString(UPLOADED_PHOTO_MEDIA_ID, lastUploadedMediaId).build());
 
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -135,7 +137,7 @@ public class AutoBackupWorker extends Worker {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    private void treatReturnedMedia(WritableMap result) throws IOException {
+    private String treatReturnedMedia(WritableMap result) throws IOException {
         String[] ids = getIdsFromGetMedia(result);
 
         GetPhotos getPhotos = new GetPhotos(
@@ -172,10 +174,13 @@ public class AutoBackupWorker extends Worker {
 
             try {
                 photoUploader.uploadPhoto(photoData);
+                setProgressAsync(new Data.Builder().putString(UPLOADED_PHOTO_MEDIA_ID, photoData.mediaId).build());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
+
+        return missingPhotos.get(missingPhotos.size() - 1).mediaId;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)

@@ -31,6 +31,30 @@ public class UploadWorkerManager {
         this.mPromise = promise;
     }
 
+    public void StartWorker(String url, String serverToken, String deviceId, String[] photosIds, Observer<String> observer){
+        OneTimeWorkRequest uploadRequest =
+                new OneTimeWorkRequest.Builder(UploadWorker.class)
+                        .setInputData(
+                                new Data.Builder()
+                                        .putString(UploadWorker.DATA_KEY_URL, url)
+                                        .putString(UploadWorker.DATA_KEY_SERVER_TOKEN, serverToken)
+                                        .putString(UploadWorker.DATA_KEY_DEVICE_UNIQUE_ID, deviceId)
+                                        .putStringArray(UploadWorker.DATA_KEY_PHOTOS_IDS, photosIds)
+                                        .build()
+                        )
+                        .build();
+
+        ExecutorsManager.ExecuteOnBackgroundThread(() -> {
+            try {
+                WorkManager.getInstance(context).enqueueUniqueWork(UploadWorker.WORKER_NAME, ExistingWorkPolicy.REPLACE, uploadRequest).getResult().get();
+                SetupWorkerObserver(observer);
+                mPromise.resolve(null);
+            } catch (ExecutionException | InterruptedException e) {
+                mPromise.reject("Error", e.toString());
+            }
+        });
+    }
+
     private void SetupWorkerObserver(Observer<String> observer){
         ExecutorsManager.ExecuteOnMainThread(() -> {
             try {
@@ -59,30 +83,6 @@ public class UploadWorkerManager {
         });
     }
 
-    public void StartWorker(String url, String serverToken, String deviceId, String[] photosIds, Observer<String> observer){
-        OneTimeWorkRequest uploadRequest =
-                new OneTimeWorkRequest.Builder(UploadWorker.class)
-                        .setInputData(
-                                new Data.Builder()
-                                        .putString(UploadWorker.DATA_KEY_URL, url)
-                                        .putString(UploadWorker.DATA_KEY_SERVER_TOKEN, serverToken)
-                                        .putString(UploadWorker.DATA_KEY_DEVICE_UNIQUE_ID, deviceId)
-                                        .putStringArray(UploadWorker.DATA_KEY_PHOTOS_IDS, photosIds)
-                                        .build()
-                        )
-                        .build();
-
-        ExecutorsManager.ExecuteOnBackgroundThread(() -> {
-            try {
-                WorkManager.getInstance(context).enqueueUniqueWork(UploadWorker.WORKER_NAME, ExistingWorkPolicy.REPLACE, uploadRequest).getResult().get();
-                SetupWorkerObserver(observer);
-                mPromise.resolve(null);
-            } catch (ExecutionException | InterruptedException e) {
-                mPromise.reject("Error", e.toString());
-            }
-        });
-    }
-
     public WorkInfo GetWorker() throws ExecutionException, InterruptedException {
         List<WorkInfo> result = WorkManager
                 .getInstance(context)
@@ -101,6 +101,11 @@ public class UploadWorkerManager {
         ExecutorsManager.ExecuteOnBackgroundThread(() -> {
             try {
                 WorkInfo workInfo = GetWorker();
+
+                if(workInfo == null){
+                    mPromise.resolve(false);
+                    return;
+                }
 
                 if(!workInfo.getState().isFinished()){
                     mPromise.resolve(true);

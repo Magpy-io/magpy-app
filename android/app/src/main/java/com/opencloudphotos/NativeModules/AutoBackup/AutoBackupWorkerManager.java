@@ -1,7 +1,11 @@
 package com.opencloudphotos.NativeModules.AutoBackup;
 
+import static com.opencloudphotos.Workers.AutoBackupWorker.UPLOADED_PHOTO_MEDIA_ID;
+
 import android.content.Context;
 
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ProcessLifecycleOwner;
 import androidx.work.Data;
 import androidx.work.ExistingPeriodicWorkPolicy;
 import androidx.work.PeriodicWorkRequest;
@@ -9,17 +13,11 @@ import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 
 import com.facebook.react.bridge.Promise;
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.ListeningExecutorService;
 import com.opencloudphotos.GlobalManagers.ExecutorsManager;
 import com.opencloudphotos.Workers.AutoBackupWorker;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 public class AutoBackupWorkerManager {
@@ -32,11 +30,7 @@ public class AutoBackupWorkerManager {
         this.mPromise = promise;
     }
 
-    public void StartWorker(String url, String serverToken, String deviceId){
-
-        Context context = this.context;
-        Promise promise = this.mPromise;
-
+    public void StartWorker(String url, String serverToken, String deviceId, Observer<String> observer){
         PeriodicWorkRequest uploadRequest =
                 new PeriodicWorkRequest.Builder(AutoBackupWorker.class, 15, TimeUnit.MINUTES)
                         .setInputData(
@@ -51,50 +45,85 @@ public class AutoBackupWorkerManager {
         ExecutorsManager.ExecuteOnBackgroundThread(() -> {
             try {
                 WorkManager.getInstance(context).enqueueUniquePeriodicWork(AutoBackupWorker.WORKER_NAME, ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE, uploadRequest).getResult().get();
-                promise.resolve(null);
+                SetupWorkerObserver(observer);
+                mPromise.resolve(null);
             } catch (ExecutionException | InterruptedException e) {
-                promise.reject("Error", e.toString());
+                mPromise.reject("Error", e.toString());
             }
         });
     }
 
-    public void IsWorkerAlive(){
-        Context context = this.context;
-        Promise promise = this.mPromise;
-
-        ExecutorsManager.ExecuteOnBackgroundThread(() -> {
-            List<WorkInfo> result;
+    private void SetupWorkerObserver(Observer<String> observer){
+        ExecutorsManager.ExecuteOnMainThread(() -> {
             try {
-                result = WorkManager
-                        .getInstance(context)
-                        .getWorkInfosForUniqueWork(AutoBackupWorker.WORKER_NAME)
-                        .get();
-            } catch (ExecutionException | InterruptedException e) {
-                promise.reject("Error", e.toString());
-                return;
-            }
+                WorkInfo result = GetWorker();
+                WorkManager.getInstance(context).getWorkInfoByIdLiveData(result.getId()).observe(ProcessLifecycleOwner.get(), (workInfo -> {
+                    if (workInfo != null) {
+                        Data progress;
 
-            for (WorkInfo workinfo:result) {
-                if(!workinfo.getState().isFinished()){
-                    promise.resolve(true);
+                        if(workInfo.getState().isFinished()){
+                            progress = workInfo.getOutputData();
+                        }else{
+                            progress = workInfo.getProgress();
+                        }
+
+                        String uploadedMediaId = progress.getString(UPLOADED_PHOTO_MEDIA_ID);
+
+                        if(uploadedMediaId != null){
+                            observer.onChanged(uploadedMediaId);
+                        }
+                    }
+                }));
+            } catch (ExecutionException | InterruptedException e) {
+                mPromise.reject("Error", e.toString());
+            }
+            mPromise.resolve(null);
+        });
+    }
+
+    public WorkInfo GetWorker() throws ExecutionException, InterruptedException {
+        List<WorkInfo> result = WorkManager
+                .getInstance(context)
+                .getWorkInfosForUniqueWork(AutoBackupWorker.WORKER_NAME)
+                .get();
+
+
+        if(result.isEmpty()){
+            return null;
+        }
+
+        return result.get(0);
+    }
+
+    public void IsWorkerAlive(){
+        ExecutorsManager.ExecuteOnBackgroundThread(() -> {
+            try {
+                WorkInfo workInfo = GetWorker();
+
+                if(workInfo == null){
+                    mPromise.resolve(false);
                     return;
                 }
-            }
 
-            promise.resolve(false);
+                if(!workInfo.getState().isFinished()){
+                    mPromise.resolve(true);
+                    return;
+                }
+                mPromise.resolve(false);
+
+            } catch (ExecutionException | InterruptedException e) {
+                mPromise.reject("Error", e.toString());
+            }
         });
     }
 
     public void StopWorker(){
-        Context context = this.context;
-        Promise promise = this.mPromise;
-
         ExecutorsManager.ExecuteOnBackgroundThread(() -> {
             try {
                 WorkManager.getInstance(context).cancelUniqueWork(AutoBackupWorker.WORKER_NAME).getResult().get();
-                promise.resolve(null);
+                mPromise.resolve(null);
             } catch (ExecutionException | InterruptedException e) {
-                promise.reject("Error", e.toString());
+                mPromise.reject("Error", e.toString());
             }
         });
     }
