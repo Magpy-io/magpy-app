@@ -199,49 +199,7 @@ public class UploadWorker extends Worker {
 
         return photoData;
     }
-
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    private void treatReturnedMedia(WritableMap result){
-        String[] ids = getIdsFromGetMedia(result);
-
-        GetPhotos getPhotos = new GetPhotos(
-                url,
-                serverToken,
-                deviceId);
-
-        boolean[] photosExist;
-
-        try {
-            photosExist = getPhotos.getPhotosExistById(ids);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        List<PhotoData> missingPhotos = getPhotosDataFromGetMediaIfNotInServer(result, photosExist, 1);
-
-        PhotoUploader photoUploader = new PhotoUploader(
-                url,
-                serverToken,
-                deviceId);
-
-        for (int i=0; i<missingPhotos.size(); i++) {
-            PhotoData photoData = missingPhotos.get(i);
-            if(isStopped()){
-                Log.d("main", "Stopped");
-                break;
-            }
-
-            notificationBuilder.setContentText("Backing up " + (i+1) + "/" + missingPhotos.size());
-            getApplicationContext().getSystemService(NotificationManager.class).notify(NOTIFICATION_ID, notificationBuilder.build());
-
-            try {
-                photoUploader.uploadPhoto(photoData);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
+    
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void createChannel() {
         NotificationChannel channel = new NotificationChannel(
@@ -251,86 +209,6 @@ public class UploadWorker extends Worker {
         );
 
         getApplicationContext().getSystemService(NotificationManager.class).createNotificationChannel(channel);
-    }
-
-    public String[] getIdsFromGetMedia(WritableMap result){
-        ReadableArray edges = result.getArray("edges");
-
-        String[] ids = new String[edges.size()];
-
-        for(int i = 0; i< edges.size(); i++){
-            ReadableMap item = edges.getMap(i);
-            ReadableMap node = item.getMap("node");
-            String id = node.getString("id");
-            ids[i] = id;
-        }
-        return ids;
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    public List<PhotoData> getPhotosDataFromGetMediaIfNotInServer(WritableMap result, boolean[] photosExist, int numberOfPhotosToReturn){
-        ReadableArray edges = result.getArray("edges");
-
-        List<PhotoData> missingPhotos = new ArrayList<>();
-
-        for(int i = 0; i< photosExist.length; i++) {
-            boolean exists = photosExist[i];
-            if(!exists){
-                ReadableMap item = edges.getMap(i);
-                ReadableMap node = item.getMap("node");
-                ReadableMap image = node.getMap("image");
-                PhotoData photoData = new PhotoData();
-
-                double timestamp = node.getDouble("timestamp");
-                double modificationTimestamp = node.getDouble("modificationTimestamp");
-
-                double correctTimestamp = Math.min(timestamp, modificationTimestamp);
-
-                Instant instant = Instant.ofEpochSecond((long)correctTimestamp);
-                String timestampAsIso = instant.toString();
-
-                photoData.mediaId = node.getString("id");
-                photoData.uri = image.getString("uri");
-                photoData.fileSize = image.getDouble("fileSize");
-                photoData.height = image.getDouble("height");
-                photoData.width = image.getDouble("width");
-                photoData.name = image.getString("filename");
-                photoData.date = timestampAsIso;
-
-
-                InputStream inputStream = null;
-                try {
-                    inputStream = getApplicationContext().getContentResolver().openInputStream(Uri.parse(photoData.uri));
-                } catch (FileNotFoundException e) {
-                    throw new RuntimeException("Media file not found.", e);
-                }
-                ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
-
-                int bufferSize = 1024;
-                byte[] buffer = new byte[bufferSize];
-
-                int len = 0;
-
-                try{
-                    while ((len = inputStream.read(buffer)) != -1) {
-                        byteBuffer.write(buffer, 0, len);
-                    }
-                } catch (IOException e) {
-                    throw new RuntimeException("Error while reading media file.", e);
-                }
-
-                byte[] b = byteBuffer.toByteArray();
-
-                photoData.image64 = Base64.encodeToString(b, 0);
-
-                missingPhotos.add(photoData);
-
-                if(missingPhotos.size() >= numberOfPhotosToReturn){
-                    break;
-                }
-            }
-        }
-        return missingPhotos;
     }
 
 }
