@@ -96,7 +96,7 @@ public class UploadWorker extends Worker {
                 .setContentTitle(title)
                 .setTicker(title)
                 .setContentText("Staring photos upload")
-                .setSmallIcon(R.mipmap.ic_launcher)
+                .setSmallIcon(R.drawable.ic_notification)
                 .setOngoing(true)
                 .addAction(android.R.drawable.ic_delete, cancel, cancelIntent);
 
@@ -199,7 +199,7 @@ public class UploadWorker extends Worker {
 
         return photoData;
     }
-    
+
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void createChannel() {
         NotificationChannel channel = new NotificationChannel(

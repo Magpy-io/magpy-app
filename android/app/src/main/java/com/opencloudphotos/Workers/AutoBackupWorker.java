@@ -98,7 +98,7 @@ public class AutoBackupWorker extends Worker {
                 .setContentTitle(title)
                 .setTicker(title)
                 .setContentText("Starting backup of your media.")
-                .setSmallIcon(R.mipmap.ic_launcher)
+                .setSmallIcon(R.drawable.ic_notification)
                 .setOngoing(true)
                 .addAction(android.R.drawable.ic_delete, cancel, cancelIntent);
 
