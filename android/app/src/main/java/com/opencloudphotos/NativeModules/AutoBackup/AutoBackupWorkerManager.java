@@ -6,6 +6,7 @@ import android.content.Context;
 
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ProcessLifecycleOwner;
+import androidx.work.Configuration;
 import androidx.work.Data;
 import androidx.work.ExistingPeriodicWorkPolicy;
 import androidx.work.PeriodicWorkRequest;
@@ -44,6 +45,10 @@ public class AutoBackupWorkerManager {
 
         ExecutorsManager.ExecuteOnBackgroundThread(() -> {
             try {
+                if(!WorkManager.isInitialized()){
+                    WorkManager.initialize(context, new Configuration.Builder().setExecutor(ExecutorsManager.executorService).build());
+                }
+
                 WorkManager.getInstance(context).enqueueUniquePeriodicWork(AutoBackupWorker.WORKER_NAME, ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE, uploadRequest).getResult().get();
                 SetupWorkerObserver(observer);
                 mPromise.resolve(null);

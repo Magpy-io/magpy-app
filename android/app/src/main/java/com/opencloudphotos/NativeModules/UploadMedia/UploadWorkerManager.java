@@ -7,6 +7,7 @@ import android.content.Context;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ProcessLifecycleOwner;
+import androidx.work.Configuration;
 import androidx.work.Data;
 import androidx.work.ExistingWorkPolicy;
 import androidx.work.OneTimeWorkRequest;
@@ -46,6 +47,10 @@ public class UploadWorkerManager {
 
         ExecutorsManager.ExecuteOnBackgroundThread(() -> {
             try {
+                if(!WorkManager.isInitialized()){
+                    WorkManager.initialize(context, new Configuration.Builder().setExecutor(ExecutorsManager.executorService).build());
+                }
+
                 WorkManager.getInstance(context).enqueueUniqueWork(UploadWorker.WORKER_NAME, ExistingWorkPolicy.REPLACE, uploadRequest).getResult().get();
                 SetupWorkerObserver(observer);
                 mPromise.resolve(null);
