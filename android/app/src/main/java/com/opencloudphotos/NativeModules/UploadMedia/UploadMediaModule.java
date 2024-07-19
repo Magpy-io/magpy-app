@@ -1,6 +1,14 @@
 package com.opencloudphotos.NativeModules.UploadMedia;
 
+import static com.opencloudphotos.Workers.UploadWorker.UPLOADED_PHOTO_MEDIA_ID;
+
+import android.util.Log;
+
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.lifecycle.Observer;
+import androidx.work.Data;
+import androidx.work.WorkInfo;
 
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -8,6 +16,9 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.bridge.WritableNativeMap;
+import com.opencloudphotos.Utils.BridgeFunctions;
 
 public class UploadMediaModule extends ReactContextBaseJavaModule {
     public UploadMediaModule(ReactApplicationContext context) {
@@ -60,7 +71,11 @@ public class UploadMediaModule extends ReactContextBaseJavaModule {
             return;
         }
         
-        uploadWorkerManager.StartWorker(url, serverToken, deviceId, photosIds);
+        uploadWorkerManager.StartWorker(url, serverToken, deviceId, photosIds, mediaId -> {
+            WritableMap params = new WritableNativeMap();
+            params.putString("mediaId", mediaId);
+            BridgeFunctions.sendEvent(getReactApplicationContext(), "PhotoUploaded", params);
+        });
     }
 
     @ReactMethod

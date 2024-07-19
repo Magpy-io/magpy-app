@@ -12,6 +12,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
+import androidx.work.Data;
 import androidx.work.ForegroundInfo;
 import androidx.work.WorkManager;
 import androidx.work.Worker;
@@ -41,6 +42,8 @@ import java.util.List;
 public class UploadWorker extends Worker {
     final int NOTIFICATION_ID = 1003;
     final String CHANNEL_ID = "UPLOAD CHANNEL";
+
+    public static final String UPLOADED_PHOTO_MEDIA_ID = "UPLOADED_PHOTO_MEDIA_ID";
 
     public static final String WORKER_NAME = "UPLOAD_WORKER_NAME";
     public static final String DATA_KEY_URL = "URL";
@@ -144,13 +147,14 @@ public class UploadWorker extends Worker {
                 }
 
                 photoUploader.uploadPhoto(photoData);
-
+                setProgressAsync(new Data.Builder().putString(UPLOADED_PHOTO_MEDIA_ID, mediaId).build());
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
+
         }
 
-        return Result.success();
+        return Result.success(new Data.Builder().putString(UPLOADED_PHOTO_MEDIA_ID, photosIds[photosIds.length - 1]).build());
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)

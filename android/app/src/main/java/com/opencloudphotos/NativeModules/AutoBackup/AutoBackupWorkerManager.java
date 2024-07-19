@@ -48,7 +48,7 @@ public class AutoBackupWorkerManager {
                         )
                         .build();
 
-        ExecutorsManager.executorService.execute(() -> {
+        ExecutorsManager.ExecuteOnBackgroundThread(() -> {
             try {
                 WorkManager.getInstance(context).enqueueUniquePeriodicWork(AutoBackupWorker.WORKER_NAME, ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE, uploadRequest).getResult().get();
                 promise.resolve(null);
@@ -62,7 +62,7 @@ public class AutoBackupWorkerManager {
         Context context = this.context;
         Promise promise = this.mPromise;
 
-        ExecutorsManager.executorService.execute(() -> {
+        ExecutorsManager.ExecuteOnBackgroundThread(() -> {
             List<WorkInfo> result;
             try {
                 result = WorkManager
@@ -89,7 +89,7 @@ public class AutoBackupWorkerManager {
         Context context = this.context;
         Promise promise = this.mPromise;
 
-        ExecutorsManager.executorService.execute(() -> {
+        ExecutorsManager.ExecuteOnBackgroundThread(() -> {
             try {
                 WorkManager.getInstance(context).cancelUniqueWork(AutoBackupWorker.WORKER_NAME).getResult().get();
                 promise.resolve(null);

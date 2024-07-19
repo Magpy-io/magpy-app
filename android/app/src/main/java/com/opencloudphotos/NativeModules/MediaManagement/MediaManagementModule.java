@@ -82,7 +82,7 @@ public class MediaManagementModule extends ReactContextBaseJavaModule {
                 : null;
         ReadableArray include = params.hasKey("include") ? params.getArray("include") : null;
 
-        ExecutorsManager.executorService.execute(new Runnable() {
+        ExecutorsManager.ExecuteOnBackgroundThread(new Runnable() {
             @Override
             public void run() {
                 try{
@@ -119,7 +119,7 @@ public class MediaManagementModule extends ReactContextBaseJavaModule {
                 : null;
         ReadableArray include = params.hasKey("include") ? params.getArray("include") : null;
 
-        ExecutorsManager.executorService.execute(new Runnable() {
+        ExecutorsManager.ExecuteOnBackgroundThread(new Runnable() {
             @Override
             public void run() {
                 try{
