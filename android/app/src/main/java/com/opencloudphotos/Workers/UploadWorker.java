@@ -144,6 +144,7 @@ public class UploadWorker extends Worker {
 
                 if(isStopped()){
                     Log.d("UploadWorker", "Stopped");
+                    getApplicationContext().getSystemService(NotificationManager.class).cancel(NOTIFICATION_ID);
                     break;
                 }
 
