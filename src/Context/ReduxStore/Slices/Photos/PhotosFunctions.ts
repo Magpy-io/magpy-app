@@ -2,8 +2,8 @@ import { useCallback, useEffect, useRef } from 'react';
 
 import { Promise as BluebirdPromise } from 'bluebird';
 
-import { useBackgroundServiceFunctions } from '~/Context/Contexts/BackgroundServiceContext';
 import { useServerContext } from '~/Context/Contexts/ServerContext';
+import { useUploadWorkerFunctions } from '~/Context/Contexts/UploadWorkerContext';
 import {
   addPhotoCompressedToCache,
   addPhotoThumbnailToCache,
@@ -31,11 +31,11 @@ import {
 export function usePhotosFunctionsStore() {
   const dispatch = useAppDispatch();
 
-  const { SendPhotoToBackgroundServiceForUpload } = useBackgroundServiceFunctions();
-
   const { isServerReachable } = useServerContext();
   const isServerReachableRef = useRef(false);
   isServerReachableRef.current = isServerReachable;
+
+  const { UploadPhotosWorker } = useUploadWorkerFunctions();
 
   const RefreshLocalPhotos = useCallback(
     async (n: number) => {
@@ -169,9 +169,10 @@ export function usePhotosFunctionsStore() {
       if (photos.length == 0) {
         return;
       }
-      await SendPhotoToBackgroundServiceForUpload(photos);
+
+      await UploadPhotosWorker(photos.map(photo => photo.id));
     },
-    [SendPhotoToBackgroundServiceForUpload],
+    [UploadPhotosWorker],
   );
 
   const DeletePhotosLocal = useCallback(

@@ -13,6 +13,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
+import androidx.work.Data;
 import androidx.work.ForegroundInfo;
 import androidx.work.WorkManager;
 import androidx.work.Worker;
@@ -30,6 +31,7 @@ import com.opencloudphotos.GlobalManagers.ServerQueriesManager.PhotoUploader;
 import com.opencloudphotos.NativeModules.MediaManagement.Utils.Definitions;
 import com.opencloudphotos.NativeModules.MediaManagement.Utils.GetMediaTask;
 import com.opencloudphotos.R;
+import com.opencloudphotos.Utils.FileOperations;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
@@ -48,9 +50,10 @@ public class AutoBackupWorker extends Worker {
     public static final String DATA_KEY_SERVER_TOKEN = "SERVER_TOKEN";
     public static final String DATA_KEY_DEVICE_UNIQUE_ID = "DEVICE_UNIQUE_ID";
 
+    public static final String UPLOADED_PHOTO_MEDIA_ID = "UPLOADED_PHOTO_MEDIA_ID";
 
-    protected final int MAX_MISSING_PHOTOS_TO_UPLOAD = 10;
-    protected final int MAX_GALLERY_PHOTOS_TO_UPLOAD = 100;
+    protected final int MAX_MISSING_PHOTOS_TO_UPLOAD = 100;
+    protected final int MAX_GALLERY_PHOTOS_TO_UPLOAD = 3000;
 
     protected String url;
     protected String serverToken;
@@ -94,56 +97,48 @@ public class AutoBackupWorker extends Worker {
         createChannel();
 
         notificationBuilder = new NotificationCompat.Builder(context, CHANNEL_ID)
+                .setOnlyAlertOnce(true)
                 .setContentTitle(title)
                 .setTicker(title)
                 .setContentText("Starting backup of your media.")
-                .setSmallIcon(R.mipmap.ic_launcher)
+                .setSmallIcon(R.drawable.ic_notification)
                 .setOngoing(true)
                 .addAction(android.R.drawable.ic_delete, cancel, cancelIntent);
 
         setForegroundAsync(new ForegroundInfo(NOTIFICATION_ID, notificationBuilder.build()));
-
-
-        GetMediaTask.ResultCallback resultCallback = new GetMediaTask.ResultCallback(){
-
-            @Override
-            public void reject(String s, String s1) {
-                throw new RuntimeException(s1);
-            }
-
-            @RequiresApi(api = Build.VERSION_CODES.O)
-            @Override
-            public void resolve(WritableMap result) {
-
-                treatReturnedMedia(result);
-            }
-        };
 
         WritableArray include = Arguments.createArray();
         include.pushString("fileSize");
         include.pushString("filename");
         include.pushString("imageSize");
 
+        try {
+            WritableMap result = new GetMediaTask(
+                    context,
+                    null,
+                    MAX_GALLERY_PHOTOS_TO_UPLOAD,
+                    null,
+                    null,
+                    null,
+                    Definitions.ASSET_TYPE_PHOTOS,
+                    0,
+                    0,
+                    include)
+                    .execute();
+
+            String lastUploadedMediaId = treatReturnedMedia(result);
+
+            return Result.success(new Data.Builder().putString(UPLOADED_PHOTO_MEDIA_ID, lastUploadedMediaId).build());
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
 
 
-        new GetMediaTask(
-                context,
-                MAX_GALLERY_PHOTOS_TO_UPLOAD,
-                null,
-                null,
-                null,
-                Definitions.ASSET_TYPE_PHOTOS,
-                0,
-                0,
-                include,
-                resultCallback)
-                .execute();
-
-        return Result.success();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    private void treatReturnedMedia(WritableMap result){
+    private String treatReturnedMedia(WritableMap result) throws IOException {
         String[] ids = getIdsFromGetMedia(result);
 
         GetPhotos getPhotos = new GetPhotos(
@@ -168,20 +163,26 @@ public class AutoBackupWorker extends Worker {
 
         for (int i=0; i<missingPhotos.size(); i++) {
             PhotoData photoData = missingPhotos.get(i);
+            photoData.image64 = FileOperations.getBase64FromUri(getApplicationContext(), photoData.uri);
+
             if(isStopped()){
-                Log.d("main", "Stopped");
+                Log.d("AutoBackupWorker", "Stopped");
+                getApplicationContext().getSystemService(NotificationManager.class).cancel(NOTIFICATION_ID);
                 break;
             }
 
-            notificationBuilder.setContentText("Backing up " + (i+1) + "/" + missingPhotos.size());
+            notificationBuilder.setContentText("Backed up " + i + " photos out of " + missingPhotos.size());
             getApplicationContext().getSystemService(NotificationManager.class).notify(NOTIFICATION_ID, notificationBuilder.build());
 
             try {
                 photoUploader.uploadPhoto(photoData);
+                setProgressAsync(new Data.Builder().putString(UPLOADED_PHOTO_MEDIA_ID, photoData.mediaId).build());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
+
+        return missingPhotos.get(missingPhotos.size() - 1).mediaId;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -210,7 +211,7 @@ public class AutoBackupWorker extends Worker {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public List<PhotoData> getPhotosDataFromGetMediaIfNotInServer(WritableMap result, boolean[] photosExist, int numberOfPhotosToReturn){
+    public List<PhotoData> getPhotosDataFromGetMediaIfNotInServer(WritableMap result, boolean[] photosExist, int numberOfPhotosToReturn) {
         ReadableArray edges = result.getArray("edges");
 
         List<PhotoData> missingPhotos = new ArrayList<>();
@@ -239,32 +240,6 @@ public class AutoBackupWorker extends Worker {
                 photoData.name = image.getString("filename");
                 photoData.date = timestampAsIso;
 
-
-                InputStream inputStream = null;
-                try {
-                    inputStream = getApplicationContext().getContentResolver().openInputStream(Uri.parse(photoData.uri));
-                } catch (FileNotFoundException e) {
-                    throw new RuntimeException("Media file not found.", e);
-                }
-                ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
-
-                int bufferSize = 1024;
-                byte[] buffer = new byte[bufferSize];
-
-                int len = 0;
-
-                try{
-                    while ((len = inputStream.read(buffer)) != -1) {
-                        byteBuffer.write(buffer, 0, len);
-                    }
-                } catch (IOException e) {
-                    throw new RuntimeException("Error while reading media file.", e);
-                }
-
-                byte[] b = byteBuffer.toByteArray();
-
-                photoData.image64 = Base64.encodeToString(b, 0);
-
                 missingPhotos.add(photoData);
 
                 if(missingPhotos.size() >= numberOfPhotosToReturn){
@@ -274,5 +249,4 @@ public class AutoBackupWorker extends Worker {
         }
         return missingPhotos;
     }
-
 }

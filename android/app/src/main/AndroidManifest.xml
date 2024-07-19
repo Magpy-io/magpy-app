@@ -31,7 +31,5 @@
             <category android:name="android.intent.category.LAUNCHER" />
         </intent-filter>
       </activity>
-      <service android:name=".Services.SendingMediaForegroundService"/>
-      
     </application>
 </manifest>

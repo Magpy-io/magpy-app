@@ -1,44 +1,48 @@
-package com.opencloudphotos.NativeModules.AutoBackup;
+package com.opencloudphotos.NativeModules.UploadMedia;
 
-import static com.opencloudphotos.Workers.AutoBackupWorker.UPLOADED_PHOTO_MEDIA_ID;
+import static com.opencloudphotos.Workers.UploadWorker.UPLOADED_PHOTO_MEDIA_ID;
 
 import android.content.Context;
 
+import androidx.annotation.Nullable;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ProcessLifecycleOwner;
 import androidx.work.Configuration;
 import androidx.work.Data;
-import androidx.work.ExistingPeriodicWorkPolicy;
-import androidx.work.PeriodicWorkRequest;
+import androidx.work.ExistingWorkPolicy;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.OutOfQuotaPolicy;
 import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 
 import com.facebook.react.bridge.Promise;
+import com.facebook.react.bridge.ReactApplicationContext;
 import com.opencloudphotos.GlobalManagers.ExecutorsManager;
-import com.opencloudphotos.Workers.AutoBackupWorker;
+import com.opencloudphotos.Workers.UploadWorker;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 
-public class AutoBackupWorkerManager {
+public class UploadWorkerManager {
 
     Context context;
     Promise mPromise;
 
-    public AutoBackupWorkerManager(Context context, Promise promise){
+    public UploadWorkerManager(Context context, Promise promise){
         this.context = context;
         this.mPromise = promise;
     }
 
-    public void StartWorker(String url, String serverToken, String deviceId, Observer<String> observer){
-        PeriodicWorkRequest uploadRequest =
-                new PeriodicWorkRequest.Builder(AutoBackupWorker.class, 15, TimeUnit.MINUTES)
+    public void StartWorker(String url, String serverToken, String deviceId, String[] photosIds, Observer<String> observer){
+        OneTimeWorkRequest uploadRequest =
+                new OneTimeWorkRequest.Builder(UploadWorker.class)
+                        .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
                         .setInputData(
                                 new Data.Builder()
-                                        .putString(AutoBackupWorker.DATA_KEY_URL, url)
-                                        .putString(AutoBackupWorker.DATA_KEY_SERVER_TOKEN, serverToken)
-                                        .putString(AutoBackupWorker.DATA_KEY_DEVICE_UNIQUE_ID, deviceId)
+                                        .putString(UploadWorker.DATA_KEY_URL, url)
+                                        .putString(UploadWorker.DATA_KEY_SERVER_TOKEN, serverToken)
+                                        .putString(UploadWorker.DATA_KEY_DEVICE_UNIQUE_ID, deviceId)
+                                        .putStringArray(UploadWorker.DATA_KEY_PHOTOS_IDS, photosIds)
                                         .build()
                         )
                         .build();
@@ -49,7 +53,7 @@ public class AutoBackupWorkerManager {
                     WorkManager.initialize(context, new Configuration.Builder().setExecutor(ExecutorsManager.executorService).build());
                 }
 
-                WorkManager.getInstance(context).enqueueUniquePeriodicWork(AutoBackupWorker.WORKER_NAME, ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE, uploadRequest).getResult().get();
+                WorkManager.getInstance(context).enqueueUniqueWork(UploadWorker.WORKER_NAME, ExistingWorkPolicy.REPLACE, uploadRequest).getResult().get();
                 SetupWorkerObserver(observer);
                 mPromise.resolve(null);
             } catch (ExecutionException | InterruptedException e) {
@@ -89,7 +93,7 @@ public class AutoBackupWorkerManager {
     public WorkInfo GetWorker() throws ExecutionException, InterruptedException {
         List<WorkInfo> result = WorkManager
                 .getInstance(context)
-                .getWorkInfosForUniqueWork(AutoBackupWorker.WORKER_NAME)
+                .getWorkInfosForUniqueWork(UploadWorker.WORKER_NAME)
                 .get();
 
 
@@ -125,7 +129,7 @@ public class AutoBackupWorkerManager {
     public void StopWorker(){
         ExecutorsManager.ExecuteOnBackgroundThread(() -> {
             try {
-                WorkManager.getInstance(context).cancelUniqueWork(AutoBackupWorker.WORKER_NAME).getResult().get();
+                WorkManager.getInstance(context).cancelUniqueWork(UploadWorker.WORKER_NAME).getResult().get();
                 mPromise.resolve(null);
             } catch (ExecutionException | InterruptedException e) {
                 mPromise.reject("Error", e.toString());

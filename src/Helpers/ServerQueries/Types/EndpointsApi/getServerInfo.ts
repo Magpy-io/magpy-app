@@ -1,3 +1,5 @@
+
+
 import {
   ErrorAuthorizationFailed,
   ErrorBackendServerUnreachable,
@@ -11,6 +13,8 @@ export type ResponseData = {
   owner: { name: string; email: string } | null;
   ownerLocal: { name: string } | null;
 };
+
+
 
 export type ResponseErrorTypes =
   | ErrorAuthorizationFailed

@@ -21,6 +21,7 @@ export type ErrorPathFolderDoesNotExist = 'PATH_FOLDER_DOES_NOT_EXIST';
 export type ErrorInvalidName = 'INVALID_NAME';
 export type ErrorInvalidCredentials = 'INVALID_CREDENTIALS';
 export type ErrorRequestNotFromLoopback = 'REQUEST_NOT_FROM_LOOPBACK';
+export type ErrorPhotoExists = 'PHOTO_EXISTS';
 
 export type ErrorCodes =
   | ErrorBadRequest
@@ -35,6 +36,7 @@ export type ErrorCodes =
   | ErrorServerAlreadyClaimed
   | ErrorPhotoTransferNotFound
   | ErrorMissingParts
+  | ErrorPhotoExists
   | ErrorPhotoSizeExceeded
   | ErrorAuthorizationMissing
   | ErrorAuthorizationWrongFormat

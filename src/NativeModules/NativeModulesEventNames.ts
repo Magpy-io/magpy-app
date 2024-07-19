@@ -12,9 +12,7 @@ export class NativeEventEmitterWrapper {
     this.emitter = new NativeEventEmitter();
   }
 
-  subscribeOnPhotoUploaded(
-    f: (event: { serverId: string; mediaId: string; state: string }) => void,
-  ): EmitterSubscription {
+  subscribeOnPhotoUploaded(f: (event: { mediaId: string }) => void): EmitterSubscription {
     return this.emitter.addListener(NativeEventsNames.PhotoUploaded, f);
   }
 
