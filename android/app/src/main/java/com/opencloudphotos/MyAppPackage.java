@@ -6,7 +6,6 @@ import com.facebook.react.uimanager.ViewManager;
 import com.opencloudphotos.NativeModules.AutoBackup.AutoBackupModule;
 import com.opencloudphotos.NativeModules.FullScreen.FullScreenModule;
 import com.opencloudphotos.NativeModules.PhotoExifDataModule;
-import com.opencloudphotos.NativeModules.SendingMediaServiceModule;
 import com.opencloudphotos.NativeModules.MediaManagement.MediaManagementModule;
 import com.opencloudphotos.NativeModules.UploadMedia.UploadMediaModule;
 
@@ -25,7 +24,6 @@ public class MyAppPackage implements ReactPackage{
             ReactApplicationContext reactContext) {
         List<NativeModule> modules = new ArrayList<>();
 
-        modules.add(new SendingMediaServiceModule(reactContext));
         modules.add(new MediaManagementModule(reactContext));
         modules.add(new PhotoExifDataModule(reactContext));
         modules.add(new FullScreenModule(reactContext));

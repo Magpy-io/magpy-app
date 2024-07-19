@@ -11,7 +11,7 @@ type PropsType = {
   children: ReactNode;
 };
 
-export const BackgroundServiceEffects: React.FC<PropsType> = props => {
+export const UploadWorkerEffects: React.FC<PropsType> = props => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {

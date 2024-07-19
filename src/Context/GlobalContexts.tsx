@@ -1,11 +1,11 @@
 import React, { ReactNode } from 'react';
 
 import { AuthContextProvider } from '~/Context/Contexts/AuthContext';
-import { BackgroundServiceContextProvider } from '~/Context/Contexts/BackgroundServiceContext';
 import { LocalServersContextProvider } from '~/Context/Contexts/LocalServersContext';
 import { PhotosDownloadingContextProvider } from '~/Context/Contexts/PhotosDownloadingContext/PhotosDownloadingContext';
 import { ServerClaimContextProvider } from '~/Context/Contexts/ServerClaimContext';
 import { ServerContextProvider } from '~/Context/Contexts/ServerContext';
+import { UploadWorkerContextProvider } from '~/Context/Contexts/UploadWorkerContext';
 
 import { BackupWorkerContextProvider } from './Contexts/BackupWorkerContext';
 import { LocalAccountContextProvider } from './Contexts/LocalAccountContext';
@@ -20,7 +20,7 @@ export const GlobalContexts: React.FC<PropsType> = props => {
     <MainContextProvider>
       <AuthContextProvider>
         <LocalServersContextProvider>
-          <BackgroundServiceContextProvider>
+          <UploadWorkerContextProvider>
             <ServerClaimContextProvider>
               <ServerContextProvider>
                 <LocalAccountContextProvider>
@@ -30,7 +30,7 @@ export const GlobalContexts: React.FC<PropsType> = props => {
                 </LocalAccountContextProvider>
               </ServerContextProvider>
             </ServerClaimContextProvider>
-          </BackgroundServiceContextProvider>
+          </UploadWorkerContextProvider>
         </LocalServersContextProvider>
       </AuthContextProvider>
     </MainContextProvider>
