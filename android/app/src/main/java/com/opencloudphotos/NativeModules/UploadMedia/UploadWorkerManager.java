@@ -11,6 +11,7 @@ import androidx.work.Configuration;
 import androidx.work.Data;
 import androidx.work.ExistingWorkPolicy;
 import androidx.work.OneTimeWorkRequest;
+import androidx.work.OutOfQuotaPolicy;
 import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 
@@ -35,6 +36,7 @@ public class UploadWorkerManager {
     public void StartWorker(String url, String serverToken, String deviceId, String[] photosIds, Observer<String> observer){
         OneTimeWorkRequest uploadRequest =
                 new OneTimeWorkRequest.Builder(UploadWorker.class)
+                        .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
                         .setInputData(
                                 new Data.Builder()
                                         .putString(UploadWorker.DATA_KEY_URL, url)
