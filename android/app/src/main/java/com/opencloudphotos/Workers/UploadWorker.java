@@ -96,6 +96,7 @@ public class UploadWorker extends Worker {
         createChannel();
 
         notificationBuilder = new NotificationCompat.Builder(context, CHANNEL_ID)
+                .setOnlyAlertOnce(true)
                 .setContentTitle(title)
                 .setTicker(title)
                 .setContentText("Staring photos upload")
