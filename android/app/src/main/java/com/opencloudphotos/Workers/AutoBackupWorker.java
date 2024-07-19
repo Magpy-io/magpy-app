@@ -171,7 +171,7 @@ public class AutoBackupWorker extends Worker {
                 break;
             }
 
-            notificationBuilder.setContentText("Backing up " + (i+1) + "/" + missingPhotos.size());
+            notificationBuilder.setContentText("Backed up " + i + " photos out of " + missingPhotos.size());
             getApplicationContext().getSystemService(NotificationManager.class).notify(NOTIFICATION_ID, notificationBuilder.build());
 
             try {

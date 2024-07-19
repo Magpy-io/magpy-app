@@ -119,7 +119,7 @@ public class UploadWorker extends Worker {
         for (int i=0; i<photosIds.length; i++) {
             String mediaId = photosIds[i];
 
-            notificationBuilder.setContentText("Backing up " + (i+1) + "/" + photosIds.length);
+            notificationBuilder.setContentText("Uploaded " + i + " photo out of " + photosIds.length);
             getApplicationContext().getSystemService(NotificationManager.class).notify(NOTIFICATION_ID, notificationBuilder.build());
 
             try {
