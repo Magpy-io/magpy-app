@@ -204,7 +204,7 @@ public class AutoBackupWorker extends Worker {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public List<PhotoData> getPhotosDataFromGetMediaIfNotInServer(WritableMap result, boolean[] photosExist, int numberOfPhotosToReturn) throws IOException {
+    public List<PhotoData> getPhotosDataFromGetMediaIfNotInServer(WritableMap result, boolean[] photosExist, int numberOfPhotosToReturn) {
         ReadableArray edges = result.getArray("edges");
 
         List<PhotoData> missingPhotos = new ArrayList<>();

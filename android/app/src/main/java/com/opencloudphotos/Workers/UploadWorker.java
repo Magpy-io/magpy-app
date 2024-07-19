@@ -115,9 +115,11 @@ public class UploadWorker extends Worker {
         for (int i=0; i<photosIds.length; i++) {
             String mediaId = photosIds[i];
 
-            WritableMap result;
+            notificationBuilder.setContentText("Backing up " + (i+1) + "/" + photosIds.length);
+            getApplicationContext().getSystemService(NotificationManager.class).notify(NOTIFICATION_ID, notificationBuilder.build());
+
             try {
-                result = new GetMediaTask(
+                WritableMap result = new GetMediaTask(
                         context,
                         mediaId,
                         1,
@@ -133,7 +135,7 @@ public class UploadWorker extends Worker {
                 PhotoData photoData = parseResult(result);
 
                 if(photoData == null){
-                    throw new RuntimeException("UploadWorker: mediaId not found in device.");
+                    continue;
                 }
 
                 if(isStopped()){
@@ -141,16 +143,11 @@ public class UploadWorker extends Worker {
                     break;
                 }
 
-                notificationBuilder.setContentText("Backing up " + (i+1) + "/" + photosIds.length);
-                getApplicationContext().getSystemService(NotificationManager.class).notify(NOTIFICATION_ID, notificationBuilder.build());
-
                 photoUploader.uploadPhoto(photoData);
 
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-
-
         }
 
         return Result.success();
