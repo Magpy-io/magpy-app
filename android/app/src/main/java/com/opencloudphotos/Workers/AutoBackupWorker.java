@@ -167,6 +167,7 @@ public class AutoBackupWorker extends Worker {
 
             if(isStopped()){
                 Log.d("AutoBackupWorker", "Stopped");
+                getApplicationContext().getSystemService(NotificationManager.class).cancel(NOTIFICATION_ID);
                 break;
             }
 
