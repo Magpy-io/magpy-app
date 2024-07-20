@@ -17,3 +17,17 @@ export function formatAddressHttp(ip: string, port: string) {
 export function timeout(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function memoDebugger(a: any, b: any) {
+  let equal = true;
+  for (const p in a) {
+    if (p in a) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      console.log(p, ':', a[p] === b[p]);
+    }
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    equal = equal && a[p] == b[p];
+  }
+  return equal;
+}
