@@ -1,18 +1,28 @@
-import React, { ReactNode, createContext, useContext } from 'react';
+import React, { ReactNode, createContext, useContext, useState } from 'react';
 
 import { UploadWorkerEffects } from './UploadWorkerEffects';
 
-export type UploadWorkerDataType = null;
+type SetStateType<T> = React.Dispatch<React.SetStateAction<T>>;
 
-const UploadWorkerContext = createContext<UploadWorkerDataType>(null);
+export type UploadWorkerDataType = {
+  photosUploaded: string[];
+  setPhotosUploaded: SetStateType<string[]>;
+};
+
+const UploadWorkerContext = createContext<UploadWorkerDataType>({
+  photosUploaded: [],
+  setPhotosUploaded: () => {},
+});
 
 type PropsType = {
   children: ReactNode;
 };
 
 export const UploadWorkerContextProvider: React.FC<PropsType> = props => {
+  const [photosUploaded, setPhotosUploaded] = useState<string[]>([]);
+
   return (
-    <UploadWorkerContext.Provider value={null}>
+    <UploadWorkerContext.Provider value={{ photosUploaded, setPhotosUploaded }}>
       <UploadWorkerEffects>{props.children}</UploadWorkerEffects>
     </UploadWorkerContext.Provider>
   );
