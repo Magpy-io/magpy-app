@@ -3,7 +3,6 @@ import { StyleSheet, View } from 'react-native';
 
 import { Text } from 'react-native-elements';
 
-import { memoDebugger } from '~/Helpers/Utilities';
 import { useStyles } from '~/Hooks/useStyles';
 import { colorsType } from '~/Styles/colors';
 import { spacing } from '~/Styles/spacing';
@@ -53,4 +52,4 @@ const makeStyles = (colors: colorsType) =>
     },
   });
 
-export default React.memo(PhotoGalleryHeader, memoDebugger);
+export default React.memo(PhotoGalleryHeader);
