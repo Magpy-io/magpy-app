@@ -2,7 +2,7 @@ import React, { ReactNode, useEffect, useRef, useState } from 'react';
 
 import { uniqueDeviceId } from '~/Config/config';
 import { ParseApiPhoto } from '~/Context/ReduxStore/Slices/Photos/Functions';
-import { addPhotoFromLocalToServer } from '~/Context/ReduxStore/Slices/Photos/Photos';
+import { addPhotosFromLocalToServer } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { useAppDispatch } from '~/Context/ReduxStore/Store';
 import { GetPhotosByMediaId } from '~/Helpers/ServerQueries';
 import { NativeEventEmitterWrapper } from '~/NativeModules/NativeModulesEventNames';
@@ -76,21 +76,12 @@ export const UploadWorkerEffects: React.FC<PropsType> = props => {
           photos.push(ParseApiPhoto(ret.data.photos[0].photo));
         }
 
-        // dispatch(
-        //   addPhotosFromLocalToServer({
-        //     photosServer: photos,
-        //     mediaIds: currentPhotosUploaded,
-        //   }),
-        // );
-
-        for (let i = 0; i < nbCurrentPhotos; i++) {
-          dispatch(
-            addPhotoFromLocalToServer({
-              photoServer: photos[i],
-              mediaId: currentPhotosUploaded[i],
-            }),
-          );
-        }
+        dispatch(
+          addPhotosFromLocalToServer({
+            photosServer: photos,
+            mediaIds: currentPhotosUploaded,
+          }),
+        );
 
         photosUploadedRef.current = photosUploadedRef.current.slice(nbCurrentPhotos);
       } finally {
