@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, useRef } from 'react';
+import React, { ReactNode, useEffect, useRef, useState } from 'react';
 
 import { uniqueDeviceId } from '~/Config/config';
 import { ParseApiPhoto } from '~/Context/ReduxStore/Slices/Photos/Functions';
@@ -7,9 +7,6 @@ import { useAppDispatch } from '~/Context/ReduxStore/Store';
 import { GetPhotosByMediaId } from '~/Helpers/ServerQueries';
 import { NativeEventEmitterWrapper } from '~/NativeModules/NativeModulesEventNames';
 
-import { useUploadWorkerContext } from './UploadWorkerContext';
-import { useUploadWorkerFunctions } from './useUploadWorkerContext';
-
 type PropsType = {
   children: ReactNode;
 };
@@ -17,19 +14,25 @@ type PropsType = {
 export const UploadWorkerEffects: React.FC<PropsType> = props => {
   const dispatch = useAppDispatch();
 
-  const { photosUploaded } = useUploadWorkerContext();
-  const { photosUploadedPush, photosUploadedShift } = useUploadWorkerFunctions();
+  const photosUploadedRef = useRef<string[]>([]);
+
+  const [rerunEffect, setRerunEffect] = useState(false);
 
   useEffect(() => {
+    const interval = setInterval(() => {
+      setRerunEffect(s => !s);
+    }, 2000);
+
     const emitter = new NativeEventEmitterWrapper();
     const subscription = emitter.subscribeOnPhotoUploaded(({ mediaId }) => {
-      photosUploadedPush(mediaId);
+      photosUploadedRef.current.push(mediaId);
     });
 
     return () => {
       subscription.remove();
+      clearInterval(interval);
     };
-  }, [photosUploadedPush]);
+  }, []);
 
   const isEffectRunning = useRef(false);
 
@@ -43,11 +46,11 @@ export const UploadWorkerEffects: React.FC<PropsType> = props => {
       try {
         isEffectRunning.current = true;
 
-        if (photosUploaded.length == 0) {
+        if (photosUploadedRef.current.length == 0) {
           return;
         }
 
-        const currentPhotosUploaded = [...photosUploaded];
+        const currentPhotosUploaded = [...photosUploadedRef.current];
         const nbCurrentPhotos = currentPhotosUploaded.length;
 
         const photos = [];
@@ -73,6 +76,13 @@ export const UploadWorkerEffects: React.FC<PropsType> = props => {
           photos.push(ParseApiPhoto(ret.data.photos[0].photo));
         }
 
+        // dispatch(
+        //   addPhotosFromLocalToServer({
+        //     photosServer: photos,
+        //     mediaIds: currentPhotosUploaded,
+        //   }),
+        // );
+
         for (let i = 0; i < nbCurrentPhotos; i++) {
           dispatch(
             addPhotoFromLocalToServer({
@@ -82,14 +92,14 @@ export const UploadWorkerEffects: React.FC<PropsType> = props => {
           );
         }
 
-        photosUploadedShift(nbCurrentPhotos);
+        photosUploadedRef.current = photosUploadedRef.current.slice(nbCurrentPhotos);
       } finally {
         isEffectRunning.current = false;
       }
     }
 
     innerAsync().catch(console.log);
-  }, [dispatch, photosUploaded, photosUploadedShift]);
+  }, [dispatch, rerunEffect]);
 
   return props.children;
 };
