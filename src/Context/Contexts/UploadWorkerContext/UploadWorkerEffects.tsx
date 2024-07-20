@@ -56,7 +56,7 @@ export const UploadWorkerEffects: React.FC<PropsType> = props => {
         const photos = [];
 
         for (let i = 0; i < nbCurrentPhotos; i++) {
-          const mediaId = currentPhotosUploaded[0];
+          const mediaId = currentPhotosUploaded[i];
 
           countRef.current++;
           console.log('Effect UploadWorker count ', countRef.current);

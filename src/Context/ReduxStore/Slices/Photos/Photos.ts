@@ -112,7 +112,6 @@ const photosServerSlice = createSlice({
       if (galleryPhoto) {
         galleryPhoto.serverId = action.payload.photoServer.id;
       }
-      console.log(state);
     },
 
     addPhotosFromLocalToServer: (
