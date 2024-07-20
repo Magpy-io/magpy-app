@@ -36,7 +36,6 @@ export const UploadWorkerEffects: React.FC<PropsType> = props => {
 
   const isEffectRunning = useRef(false);
 
-  const countRef = useRef(0);
   useEffect(() => {
     async function innerAsync() {
       if (isEffectRunning.current) {
@@ -53,33 +52,40 @@ export const UploadWorkerEffects: React.FC<PropsType> = props => {
         const currentPhotosUploaded = [...photosUploadedRef.current];
         const nbCurrentPhotos = currentPhotosUploaded.length;
 
+        const ret = await GetPhotosByMediaId.Post({
+          photosData: currentPhotosUploaded.map(mediaId => {
+            return { mediaId };
+          }),
+          photoType: 'data',
+          deviceUniqueId: uniqueDeviceId,
+        });
+
+        if (!ret.ok) {
+          console.log('UploadWorkerEffects: Error retrieving photos');
+          return;
+        }
+
         const photos = [];
+        const mediaIds = [];
 
         for (let i = 0; i < nbCurrentPhotos; i++) {
-          const mediaId = currentPhotosUploaded[i];
-
-          countRef.current++;
-          console.log('Effect UploadWorker count ', countRef.current);
-          console.log('Effect UploadWorker current mediaId: ', mediaId);
-
-          const ret = await GetPhotosByMediaId.Post({
-            photosData: [{ mediaId: mediaId }],
-            photoType: 'data',
-            deviceUniqueId: uniqueDeviceId,
-          });
-
-          if (!ret.ok || !ret.data.photos[0].exists) {
-            console.log('photo just added but not found on server, mediaId: ', mediaId);
-            return;
+          const retPhoto = ret.data.photos[i];
+          if (!retPhoto.exists) {
+            console.log(
+              'UploadWorkerEffects: photo just added but not found on server, mediaId: ',
+              retPhoto.mediaId,
+            );
+            continue;
           }
 
-          photos.push(ParseApiPhoto(ret.data.photos[0].photo));
+          photos.push(ParseApiPhoto(retPhoto.photo));
+          mediaIds.push(retPhoto.mediaId);
         }
 
         dispatch(
           addPhotosFromLocalToServer({
             photosServer: photos,
-            mediaIds: currentPhotosUploaded,
+            mediaIds: mediaIds,
           }),
         );
 
