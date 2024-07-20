@@ -18,7 +18,6 @@ import SectionListWithColumns, {
 } from '../../CommonComponents/SectionListWithColumns/SectionListWithColumns';
 import PhotoComponentForGrid from './PhotoComponentForGrid';
 import SelectedFilters from './SelectedFilters';
-import { KeysSelection } from './useKeysSelection';
 import { getGridNumberOfColumns } from './usePhotosGrouped/Helpers';
 import { SectionTypePhotoGrid, usePhotosGrouped } from './usePhotosGrouped/usePhotosGrouped';
 
@@ -32,109 +31,117 @@ type PhotoGridComponentProps = {
   onLongPressPhoto: (item: PhotoGalleryType) => void;
   onRefresh: () => void;
   isSelecting: boolean;
-  photosSelection: KeysSelection;
+  isSelected: (photo: PhotoGalleryType) => boolean;
+  selectGroup: (photos: PhotoGalleryType[]) => void;
   ref: React.MutableRefObject<PhotoGridComponentRefType | null>;
 };
 
-export default forwardRef(function PhotoGridComponent(
-  {
-    photos,
-    onLongPressPhoto,
-    onPressPhoto,
-    onRefresh,
-    isSelecting,
-    photosSelection,
-  }: PhotoGridComponentProps,
-  ref: React.ForwardedRef<PhotoGridComponentRefType>,
-) {
-  const sectionlistRef = useRef<SectionListWithColumnsRefType>(null);
+const PhotoGridComponent = forwardRef(
+  (
+    {
+      photos,
+      onLongPressPhoto,
+      onPressPhoto,
+      onRefresh,
+      isSelecting,
+      isSelected,
+      selectGroup,
+    }: PhotoGridComponentProps,
+    ref: React.ForwardedRef<PhotoGridComponentRefType>,
+  ) => {
+    const sectionlistRef = useRef<SectionListWithColumnsRefType>(null);
 
-  const { colors } = useTheme();
-  const styles = useStyles(makeStyles);
+    const { colors } = useTheme();
+    const styles = useStyles(makeStyles);
 
-  const groupType = useAppSelector(GroupOptionSelector);
+    const groupType = useAppSelector(GroupOptionSelector);
 
-  const numberOfColumns = getGridNumberOfColumns(groupType);
-  const { sections, indexToSectionLocation } = usePhotosGrouped(photos, groupType);
+    const numberOfColumns = getGridNumberOfColumns(groupType);
+    const { sections, indexToSectionLocation } = usePhotosGrouped(photos, groupType);
 
-  useImperativeHandle(
-    ref,
-    () => {
-      return {
-        scrollToIndex(params) {
-          if (photos.length <= 0) {
-            return;
-          }
+    useImperativeHandle(
+      ref,
+      () => {
+        return {
+          scrollToIndex(params) {
+            if (photos.length <= 0) {
+              return;
+            }
 
-          const indexClamped = clamp(params.index, photos.length - 1);
-          const currentPhoto = photos[indexClamped];
+            const indexClamped = clamp(params.index, photos.length - 1);
+            const currentPhoto = photos[indexClamped];
 
-          const { sectionIndex, itemIndex } = indexToSectionLocation(currentPhoto);
+            const { sectionIndex, itemIndex } = indexToSectionLocation(currentPhoto);
 
-          sectionlistRef.current?.scrollToLocation({
-            sectionIndex: sectionIndex,
-            itemIndex: itemIndex,
-            animated: params.animated,
-          });
-        },
-      };
-    },
-    [indexToSectionLocation, photos],
-  );
+            sectionlistRef.current?.scrollToLocation({
+              sectionIndex: sectionIndex,
+              itemIndex: itemIndex,
+              animated: params.animated,
+            });
+          },
+        };
+      },
+      [indexToSectionLocation, photos],
+    );
 
-  const renderItem = useCallback(
-    ({ item }: { item: PhotoGalleryType }) => {
-      return (
-        <PhotoComponentForGrid
-          photo={item}
-          isSelecting={isSelecting}
-          isSelected={photosSelection.isSelected(item)}
-          onPress={onPressPhoto}
-          onLongPress={onLongPressPhoto}
+    const renderItem = useCallback(
+      ({ item }: { item: PhotoGalleryType }) => {
+        return (
+          <PhotoComponentForGrid
+            photo={item}
+            isSelecting={isSelecting}
+            isSelected={isSelected(item)}
+            onPress={onPressPhoto}
+            onLongPress={onLongPressPhoto}
+          />
+        );
+      },
+      [onLongPressPhoto, onPressPhoto, isSelecting, isSelected],
+    );
+
+    const renderSectionHeader = useCallback(
+      ({ section }: { section: SectionTypePhotoGrid }) => {
+        return (
+          <View style={styles.sectionHeaderStyle}>
+            <Text style={styles.headerTitleStyle}>{section.sectionData.getTitle()}</Text>
+            {isSelecting && (
+              <TouchableHighlight
+                style={styles.headerButtonStyle}
+                onPress={() => {
+                  selectGroup(section.data);
+                }}
+                underlayColor={colors.UNDERLAY}>
+                <Text style={styles.headerButtonTextStyle}>Select all</Text>
+              </TouchableHighlight>
+            )}
+          </View>
+        );
+      },
+      [colors, styles, isSelecting, selectGroup],
+    );
+
+    return (
+      <View style={[styles.mainViewStyle, { backgroundColor: colors.BACKGROUND }]}>
+        <SectionListWithColumns
+          mref={sectionlistRef}
+          sections={sections}
+          renderItem={renderItem}
+          ListHeaderComponent={SelectedFilters}
+          renderSectionHeader={renderSectionHeader}
+          numberColumns={numberOfColumns}
+          itemSpacing={SPACE_BETWEEN_PHOTOS}
+          sectionHeaderHeight={SECTION_HEADER_HEIGHT}
+          onRefresh={onRefresh}
+          refreshing={false}
         />
-      );
-    },
-    [onLongPressPhoto, onPressPhoto, isSelecting, photosSelection],
-  );
+      </View>
+    );
+  },
+);
 
-  const renderSectionHeader = useCallback(
-    ({ section }: { section: SectionTypePhotoGrid }) => {
-      return (
-        <View style={styles.sectionHeaderStyle}>
-          <Text style={styles.headerTitleStyle}>{section.sectionData.getTitle()}</Text>
-          {isSelecting && (
-            <TouchableHighlight
-              style={styles.headerButtonStyle}
-              onPress={() => {
-                photosSelection.selectGroup(section.data);
-              }}
-              underlayColor={colors.UNDERLAY}>
-              <Text style={styles.headerButtonTextStyle}>Select all</Text>
-            </TouchableHighlight>
-          )}
-        </View>
-      );
-    },
-    [colors, styles, isSelecting, photosSelection],
-  );
+PhotoGridComponent.displayName = 'PhotoGridComponent';
 
-  return (
-    <View style={[styles.mainViewStyle, { backgroundColor: colors.BACKGROUND }]}>
-      <SectionListWithColumns
-        mref={sectionlistRef}
-        sections={sections}
-        renderItem={renderItem}
-        ListHeaderComponent={SelectedFilters}
-        renderSectionHeader={renderSectionHeader}
-        numberColumns={numberOfColumns}
-        itemSpacing={SPACE_BETWEEN_PHOTOS}
-        sectionHeaderHeight={SECTION_HEADER_HEIGHT}
-        onRefresh={onRefresh}
-        refreshing={false}
-      />
-    </View>
-  );
-});
+export default React.memo(PhotoGridComponent);
 
 const SECTION_HEADER_HEIGHT = 60;
 const SPACE_BETWEEN_PHOTOS = 1;

@@ -46,8 +46,8 @@ const PhotoGridController = forwardRef<PhotoGridComponentRefType, PropsType>(
     photosRef.current = photos;
 
     const [isSelecting, setIsSelecting] = useState(false);
-    const photosSelection = useKeysSelection();
-    const { selectSingle, selectAll, resetSelection, isSelected } = photosSelection;
+    const { selectSingle, selectAll, resetSelection, isSelected, countSelected, selectGroup } =
+      useKeysSelection();
     const [menuModalVisible, setMenuModalVisible] = useState(false);
     const [filterModalVisible, setFilterModalVisible] = useState(false);
 
@@ -147,7 +147,8 @@ const PhotoGridController = forwardRef<PhotoGridComponentRefType, PropsType>(
           onLongPressPhoto={onRenderItemLongPress}
           onRefresh={onRefresh}
           isSelecting={isSelecting}
-          photosSelection={photosSelection}
+          isSelected={isSelected}
+          selectGroup={selectGroup}
           ref={ref}
         />
 
@@ -160,7 +161,7 @@ const PhotoGridController = forwardRef<PhotoGridComponentRefType, PropsType>(
 
         {isSelecting && (
           <SelectionBar
-            selectedNb={photosSelection.countSelected()}
+            selectedNb={countSelected()}
             onCancelButton={onBackButton}
             onSelectAllButton={onSelectAll}
           />
