@@ -3,6 +3,7 @@ import { StyleSheet, View } from 'react-native';
 
 import { Text } from 'react-native-elements';
 
+import { memoDebugger } from '~/Helpers/Utilities';
 import { useStyles } from '~/Hooks/useStyles';
 import { colorsType } from '~/Styles/colors';
 import { spacing } from '~/Styles/spacing';
@@ -17,7 +18,7 @@ type PhotoGalleryHeaderProps = {
   iconRight?: () => JSX.Element;
 };
 
-export function PhotoGalleryHeader(props: PhotoGalleryHeaderProps) {
+function PhotoGalleryHeader(props: PhotoGalleryHeaderProps) {
   const styles = useStyles(makeStyles);
 
   return (
@@ -51,3 +52,5 @@ const makeStyles = (colors: colorsType) =>
       padding: spacing.spacing_m,
     },
   });
+
+export default React.memo(PhotoGalleryHeader, memoDebugger);

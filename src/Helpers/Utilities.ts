@@ -29,5 +29,6 @@ export function memoDebugger(a: any, b: any) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     equal = equal && a[p] == b[p];
   }
+  console.log('props are same :', equal);
   return equal;
 }

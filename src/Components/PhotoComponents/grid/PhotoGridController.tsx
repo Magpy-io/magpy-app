@@ -11,7 +11,7 @@ import { useTabNavigationContext } from '~/Navigation/TabNavigation/TabNavigatio
 import { spacing } from '~/Styles/spacing';
 
 import { useCustomBackPress } from '../../../Hooks/useCustomBackPress';
-import { PhotoGalleryHeader } from '../PhotoGalleryHeader';
+import PhotoGalleryHeader from '../PhotoGalleryHeader';
 import ToolBarPhotos from '../common/ToolBarPhotos';
 import FilterModal from './FilterModal';
 import PhotoGridComponent, { PhotoGridComponentRefType } from './PhotoGridComponent';
@@ -80,10 +80,10 @@ const PhotoGridController = forwardRef<PhotoGridComponentRefType, PropsType>(
       return index;
     }, []);
 
-    const showMenuModal = () => setMenuModalVisible(true);
-    const hideMenuModal = () => setMenuModalVisible(false);
-    const showFilterModal = () => setFilterModalVisible(true);
-    const hideFilterModal = () => setFilterModalVisible(false);
+    const showMenuModal = useCallback(() => setMenuModalVisible(true), []);
+    const hideMenuModal = useCallback(() => setMenuModalVisible(false), []);
+    const showFilterModal = useCallback(() => setFilterModalVisible(true), []);
+    const hideFilterModal = useCallback(() => setFilterModalVisible(false), []);
 
     const onRenderItemPress = useCallback(
       (item: PhotoGalleryType) => {
@@ -124,20 +124,27 @@ const PhotoGridController = forwardRef<PhotoGridComponentRefType, PropsType>(
       RefreshAllPhotos(3000, 3000).catch(console.log);
     }, [RefreshAllPhotos]);
 
-    const menuButton = () => (
-      <Pressable onPress={showMenuModal}>
-        <TuneIcon iconStyle={{ padding: spacing.spacing_m }} />
-      </Pressable>
+    const menuButton = useCallback(
+      () => (
+        <Pressable onPress={showMenuModal}>
+          <TuneIcon iconStyle={{ padding: spacing.spacing_m }} />
+        </Pressable>
+      ),
+      [showMenuModal],
     );
 
-    const Header = () => (
-      <PhotoGalleryHeader
-        title={title}
-        iconRight={menuButton}
-        showBackButton={showBackButton}
-        onPressBack={onPressBack}
-      />
+    const Header = useCallback(
+      () => (
+        <PhotoGalleryHeader
+          title={title}
+          iconRight={menuButton}
+          showBackButton={showBackButton}
+          onPressBack={onPressBack}
+        />
+      ),
+      [menuButton, onPressBack, showBackButton, title],
     );
+
     return (
       <View style={{ flex: 1 }}>
         <Header />

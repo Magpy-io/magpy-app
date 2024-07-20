@@ -4,7 +4,7 @@ import { StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { MoreIcon } from '~/Components/CommonComponents/Icons';
-import { PhotoGalleryHeader } from '~/Components/PhotoComponents/PhotoGalleryHeader';
+import PhotoGalleryHeader from '~/Components/PhotoComponents/PhotoGalleryHeader';
 import RecentPhotos from '~/Components/ServerComponents/RecentPhotos';
 import ServerDetails from '~/Components/ServerComponents/ServerDetails';
 import { useStyles } from '~/Hooks/useStyles';
