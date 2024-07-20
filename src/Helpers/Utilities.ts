@@ -13,3 +13,7 @@ export function clamp(val: number, max: number): number {
 export function formatAddressHttp(ip: string, port: string) {
   return `http://${ip}:${port}`;
 }
+
+export function timeout(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
