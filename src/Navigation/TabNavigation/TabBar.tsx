@@ -10,6 +10,7 @@ import { useStyles } from '~/Hooks/useStyles';
 import {
   TabName,
   useTabNavigationContext,
+  useTabNavigationContextFunctions,
 } from '~/Navigation/TabNavigation/TabNavigationContext';
 import { colorsType } from '~/Styles/colors';
 import { typography } from '~/Styles/typography';
@@ -57,7 +58,7 @@ const routes: RouteType[] = [
   },
 ];
 
-export default function TabBar() {
+function TabBar() {
   const { hidden } = useTabNavigationContext();
   const insets = useSafeAreaInsets();
   const styles = useStyles(makeStyles);
@@ -89,7 +90,8 @@ type TabElementProps = {
 };
 
 function TabElement({ routeName, icon, iconFocused }: TabElementProps) {
-  const { navigateTo, focusedTab } = useTabNavigationContext();
+  const { focusedTab } = useTabNavigationContext();
+  const { navigateTo } = useTabNavigationContextFunctions();
 
   const focused = useMemo(() => focusedTab === routeName, [focusedTab, routeName]);
   const styles = useStyles(makeStyles);
@@ -165,3 +167,5 @@ const makeStyles = (colors: colorsType) =>
       width: '100%',
     },
   });
+
+export default React.memo(TabBar);

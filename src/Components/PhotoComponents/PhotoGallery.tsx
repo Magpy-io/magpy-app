@@ -4,7 +4,7 @@ import { StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useStyles } from '~/Hooks/useStyles';
-import { useTabNavigationContext } from '~/Navigation/TabNavigation/TabNavigationContext';
+import { useTabNavigationContextFunctions } from '~/Navigation/TabNavigation/TabNavigationContext';
 import { colorsType } from '~/Styles/colors';
 
 import { usePhotoGalleryContext } from './PhotoGalleryContext';
@@ -23,7 +23,7 @@ type PhotoGalleryPropsType = {
 
 export default function PhotoGallery({ ...props }: PhotoGalleryPropsType) {
   const { filters: storeFilters, photos } = usePhotoGalleryContext();
-  const { hideTab, showTab } = useTabNavigationContext();
+  const { hideTab, showTab } = useTabNavigationContextFunctions();
 
   const [isSlidingPhotos, setIsSlidingPhotos] = useState(false);
 

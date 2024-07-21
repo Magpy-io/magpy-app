@@ -7,7 +7,7 @@ import { usePhotosFunctionsStore } from '~/Context/ReduxStore/Slices/Photos/Phot
 import { photosGalleryFilteredSelector } from '~/Context/ReduxStore/Slices/Photos/Selectors';
 import { RootState, useAppSelector } from '~/Context/ReduxStore/Store';
 import { TabBarPadding } from '~/Navigation/TabNavigation/TabBar';
-import { useTabNavigationContext } from '~/Navigation/TabNavigation/TabNavigationContext';
+import { useTabNavigationContextFunctions } from '~/Navigation/TabNavigation/TabNavigationContext';
 import { spacing } from '~/Styles/spacing';
 
 import { useCustomBackPress } from '../../../Hooks/useCustomBackPress';
@@ -50,7 +50,7 @@ const PhotoGridController = forwardRef<PhotoGridComponentRefType, PropsType>(
     const [menuModalVisible, setMenuModalVisible] = useState(false);
     const [filterModalVisible, setFilterModalVisible] = useState(false);
 
-    const { hideTab, showTab } = useTabNavigationContext();
+    const { hideTab, showTab } = useTabNavigationContextFunctions();
     const { RefreshAllPhotos } = usePhotosFunctionsStore();
 
     const selectedPhotos = useAppSelector((state: RootState) =>
