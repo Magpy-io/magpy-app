@@ -17,7 +17,7 @@ type PhotoGalleryHeaderProps = {
   iconRight?: () => JSX.Element;
 };
 
-export function PhotoGalleryHeader(props: PhotoGalleryHeaderProps) {
+function PhotoGalleryHeader(props: PhotoGalleryHeaderProps) {
   const styles = useStyles(makeStyles);
 
   return (
@@ -51,3 +51,5 @@ const makeStyles = (colors: colorsType) =>
       padding: spacing.spacing_m,
     },
   });
+
+export default React.memo(PhotoGalleryHeader);

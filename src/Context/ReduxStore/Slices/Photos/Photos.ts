@@ -114,6 +114,26 @@ const photosServerSlice = createSlice({
       }
     },
 
+    addPhotosFromLocalToServer: (
+      state,
+      action: { payload: { photosServer: PhotoServerType[]; mediaIds: string[] } },
+    ) => {
+      for (let i = 0; i < action.payload.mediaIds.length; i++) {
+        const photoServer = action.payload.photosServer[i];
+        const mediaId = action.payload.mediaIds[i];
+
+        state.photosServer[photoServer.id] = photoServer;
+
+        insertPhotoKeyWithOrder(state.photosServer, state.photosServerIdsOrdered, photoServer);
+
+        const galleryPhoto = state.photosGallery.find(p => p.mediaId == mediaId);
+
+        if (galleryPhoto) {
+          galleryPhoto.serverId = photoServer.id;
+        }
+      }
+    },
+
     addPhotoFromServerToLocal: (
       state,
       action: { payload: { photoLocal: PhotoLocalType; serverId: string } },
@@ -191,6 +211,7 @@ export const {
   addThumbnailPhotoById,
   addMediaIdToServerPhoto,
   addPhotoFromLocalToServer,
+  addPhotosFromLocalToServer,
   addPhotoFromServerToLocal,
   deletePhotosFromLocal,
   deletePhotosFromServer,

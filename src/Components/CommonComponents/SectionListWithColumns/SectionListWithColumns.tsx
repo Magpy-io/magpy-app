@@ -143,13 +143,13 @@ function SectionListWithColumns<ItemType extends { key: string }, SectionData>({
     [itemSpacing],
   );
 
-  const NewListHeaderComponent = () => {
+  const NewListHeaderComponent = useCallback(() => {
     return (
       <View onLayout={event => setHeaderHeight(event.nativeEvent.layout.height)}>
         {ListHeaderComponent && <ListHeaderComponent />}
       </View>
     );
-  };
+  }, [ListHeaderComponent]);
 
   return (
     <SectionList
