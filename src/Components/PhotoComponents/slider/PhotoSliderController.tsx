@@ -1,10 +1,9 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { FullScreenModule } from '~/NativeModules/FullScreenModule';
 import { NativeEventEmitterWrapper } from '~/NativeModules/NativeModulesEventNames';
-import { useTabNavigationContext } from '~/Navigation/TabNavigation/TabNavigationContext';
 
 import { useCustomBackPress } from '../../../Hooks/useCustomBackPress';
 import ToolBarPhotos from '../common/ToolBarPhotos';
@@ -24,8 +23,6 @@ const PhotoSliderController = React.forwardRef<PhotoSliderComponentRefType, Prop
 
     const [isFullScreen, setIsFullScreen] = useState(false);
 
-    const { hideTab } = useTabNavigationContext();
-
     const currentPhoto = photos[flatListCurrentIndex] as PhotoGalleryType | undefined;
 
     useEffect(() => {
@@ -44,12 +41,6 @@ const PhotoSliderController = React.forwardRef<PhotoSliderComponentRefType, Prop
         subscription.remove();
       };
     }, []);
-
-    useEffect(() => {
-      if (isSlidingPhotos) {
-        hideTab();
-      }
-    }, [hideTab, isSlidingPhotos]);
 
     const onCurrentIndexChanged = useCallback((index: number) => {
       flatListCurrentIndexRef.current = index;
@@ -79,6 +70,10 @@ const PhotoSliderController = React.forwardRef<PhotoSliderComponentRefType, Prop
       onSwitchMode(false, flatListCurrentIndexRef.current);
     }, [onSwitchMode]);
 
+    const selectedGalleryPhotos = useMemo(() => {
+      return currentPhoto ? [currentPhoto] : [];
+    }, [currentPhoto]);
+
     return (
       <View style={[styles.mainViewStyle]}>
         <PhotoSliderComponent
@@ -93,9 +88,7 @@ const PhotoSliderController = React.forwardRef<PhotoSliderComponentRefType, Prop
           <PhotoSliderHeader photo={currentPhoto} onBackButton={onStatusBarBackButton} />
         )}
 
-        {!isFullScreen && (
-          <ToolBarPhotos selectedGalleryPhotos={currentPhoto ? [currentPhoto] : []} />
-        )}
+        {!isFullScreen && <ToolBarPhotos selectedGalleryPhotos={selectedGalleryPhotos} />}
       </View>
     );
   },

@@ -28,7 +28,7 @@ type PropsType = {
   onPhotoLongClick?: (item: PhotoGalleryType) => void;
 };
 
-export default React.forwardRef(function PhotoSliderComponent(
+const PhotoSliderComponent = React.forwardRef(function PhotoSliderComponent(
   { onIndexChanged, onPhotoClick, onPhotoLongClick, photos, isFullScreen }: PropsType,
   ref: React.ForwardedRef<PhotoSliderComponentRefType>,
 ) {
@@ -106,3 +106,5 @@ export default React.forwardRef(function PhotoSliderComponent(
 const styles = StyleSheet.create({
   flatListStyle: { width: '100%' },
 });
+
+export default React.memo(PhotoSliderComponent);

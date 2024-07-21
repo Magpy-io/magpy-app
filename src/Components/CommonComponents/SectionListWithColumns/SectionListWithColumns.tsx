@@ -162,7 +162,7 @@ function SectionListWithColumns<ItemType extends { key: string }, SectionData>({
       ItemSeparatorComponent={Separator}
       refreshing={refreshing}
       onRefresh={onRefresh}
-      windowSize={11}
+      windowSize={3}
       ref={sectionListRef}
     />
   );

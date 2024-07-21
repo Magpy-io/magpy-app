@@ -1,4 +1,4 @@
-import { ReactNode, createContext, useCallback, useContext, useState } from 'react';
+import { ReactNode, createContext, useCallback, useContext, useMemo, useState } from 'react';
 import React from 'react';
 
 import { CommonActions, useNavigation } from '@react-navigation/native';
@@ -9,16 +9,28 @@ export enum TabName {
   Settings = 'Settings',
 }
 
-type ContextType = {
+type TabNavigationContextType = {
   focusedTab: TabName;
-  navigateTo: (tabName: TabName) => void;
   hidden: boolean;
+};
+
+type TabNavigationContextFunctionsType = {
+  navigateTo: (tabName: TabName) => void;
   hideTab: () => void;
   showTab: () => void;
   resetFocusedTab: () => void;
 };
 
-const TabNavigationContext = createContext<ContextType | undefined>(undefined);
+const TabNavigationContext = createContext<TabNavigationContextType>({
+  focusedTab: TabName.Home,
+  hidden: false,
+});
+const TabNavigationFunctionsContext = createContext<TabNavigationContextFunctionsType>({
+  navigateTo: () => {},
+  hideTab: () => {},
+  showTab: () => {},
+  resetFocusedTab: () => {},
+});
 
 const TabNavigationProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const navigation = useNavigation();
@@ -44,26 +56,37 @@ const TabNavigationProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     setFocusedTab(TabName.Home);
   }, []);
 
-  const value = {
-    focusedTab: focusedTab,
-    navigateTo: navigateTo,
-    hidden: hidden,
-    hideTab: hideTab,
-    showTab: showTab,
-    resetFocusedTab: resetFocusedTab,
-  };
+  const valueContext = useMemo(() => {
+    return { focusedTab, hidden };
+  }, [focusedTab, hidden]);
+
+  const valueFunctions = useMemo(() => {
+    return { navigateTo, hideTab, showTab, resetFocusedTab };
+  }, [hideTab, navigateTo, resetFocusedTab, showTab]);
 
   return (
-    <TabNavigationContext.Provider value={value}>{children}</TabNavigationContext.Provider>
+    <TabNavigationContext.Provider value={valueContext}>
+      <TabNavigationFunctionsContext.Provider value={valueFunctions}>
+        {children}
+      </TabNavigationFunctionsContext.Provider>
+    </TabNavigationContext.Provider>
   );
 };
 
 function useTabNavigationContext() {
   const context = useContext(TabNavigationContext);
   if (!context) {
-    throw Error('TabNavigationContext can only be used inside TabNavigationContext');
+    throw Error('TabNavigationContext can only be used inside TabNavigationProvider');
   }
   return context;
 }
 
-export { TabNavigationProvider, useTabNavigationContext };
+function useTabNavigationContextFunctions() {
+  const context = useContext(TabNavigationFunctionsContext);
+  if (!context) {
+    throw Error('TabNavigationContext can only be used inside TabNavigationProvider');
+  }
+  return context;
+}
+
+export { TabNavigationProvider, useTabNavigationContext, useTabNavigationContextFunctions };

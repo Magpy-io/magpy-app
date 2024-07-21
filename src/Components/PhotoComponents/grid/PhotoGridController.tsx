@@ -1,4 +1,4 @@
-import React, { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
+import React, { forwardRef, useCallback, useRef, useState } from 'react';
 import { Pressable, View } from 'react-native';
 
 import { TuneIcon } from '~/Components/CommonComponents/Icons';
@@ -7,7 +7,7 @@ import { usePhotosFunctionsStore } from '~/Context/ReduxStore/Slices/Photos/Phot
 import { photosGalleryFilteredSelector } from '~/Context/ReduxStore/Slices/Photos/Selectors';
 import { RootState, useAppSelector } from '~/Context/ReduxStore/Store';
 import { TabBarPadding } from '~/Navigation/TabNavigation/TabBar';
-import { useTabNavigationContext } from '~/Navigation/TabNavigation/TabNavigationContext';
+import { useTabNavigationContextFunctions } from '~/Navigation/TabNavigation/TabNavigationContext';
 import { spacing } from '~/Styles/spacing';
 
 import { useCustomBackPress } from '../../../Hooks/useCustomBackPress';
@@ -21,7 +21,6 @@ import { useKeysSelection } from './useKeysSelection';
 
 type PropsType = {
   photos: Array<PhotoGalleryType>;
-  isSlidingPhotos: boolean;
   onSwitchMode: (isPhotoSelected: boolean, index: number) => void;
   isInTabScreen?: boolean;
   title?: string;
@@ -33,7 +32,7 @@ const PhotoGridController = forwardRef<PhotoGridComponentRefType, PropsType>(
   (
     {
       photos,
-      isSlidingPhotos,
+
       onSwitchMode,
       isInTabScreen,
       title,
@@ -51,7 +50,7 @@ const PhotoGridController = forwardRef<PhotoGridComponentRefType, PropsType>(
     const [menuModalVisible, setMenuModalVisible] = useState(false);
     const [filterModalVisible, setFilterModalVisible] = useState(false);
 
-    const { hideTab, showTab } = useTabNavigationContext();
+    const { hideTab, showTab } = useTabNavigationContextFunctions();
     const { RefreshAllPhotos } = usePhotosFunctionsStore();
 
     const selectedPhotos = useAppSelector((state: RootState) =>
@@ -64,12 +63,6 @@ const PhotoGridController = forwardRef<PhotoGridComponentRefType, PropsType>(
     }, [showTab]);
 
     useCustomBackPress(backPressAction, isSelecting);
-
-    useEffect(() => {
-      if (!isSlidingPhotos) {
-        showTab();
-      }
-    }, [isSlidingPhotos, showTab]);
 
     const findPhotoIndex = useCallback((item: PhotoGalleryType) => {
       const index = photosRef.current.findIndex(photo => photo.key == item.key);
