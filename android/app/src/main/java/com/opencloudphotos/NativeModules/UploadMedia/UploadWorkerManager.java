@@ -34,6 +34,12 @@ public class UploadWorkerManager {
     }
 
     public void StartWorker(String url, String serverToken, String deviceId, String[] photosIds, Observer<String> observer){
+
+        if(photosIds.length == 0){
+            mPromise.resolve(null);
+            return;
+        }
+
         OneTimeWorkRequest uploadRequest =
                 new OneTimeWorkRequest.Builder(UploadWorker.class)
                         .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
