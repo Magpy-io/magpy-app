@@ -66,11 +66,7 @@ public class AutoBackupWorkerManager {
                     if (workInfo != null) {
                         Data progress;
 
-                        if(workInfo.getState().isFinished()){
-                            progress = workInfo.getOutputData();
-                        }else{
-                            progress = workInfo.getProgress();
-                        }
+                        progress = workInfo.getProgress();
 
                         String uploadedMediaId = progress.getString(UPLOADED_PHOTO_MEDIA_ID);
 

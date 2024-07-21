@@ -1,5 +1,7 @@
 package com.opencloudphotos.Workers;
 
+import static java.lang.Thread.sleep;
+
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -53,7 +55,7 @@ public class AutoBackupWorker extends Worker {
     public static final String UPLOADED_PHOTO_MEDIA_ID = "UPLOADED_PHOTO_MEDIA_ID";
 
     protected final int MAX_MISSING_PHOTOS_TO_UPLOAD = 100;
-    protected final int MAX_GALLERY_PHOTOS_TO_UPLOAD = 3000;
+    protected final int MAX_GALLERY_PHOTOS_TO_UPLOAD = 5000;
 
     protected String url;
     protected String serverToken;
@@ -88,25 +90,6 @@ public class AutoBackupWorker extends Worker {
 
         Context context = getApplicationContext();
 
-        PendingIntent cancelIntent = WorkManager.getInstance(context)
-                .createCancelPendingIntent(getId());
-
-        String title = "Backing up your media";
-        String cancel = "Cancel";
-
-        createChannel();
-
-        notificationBuilder = new NotificationCompat.Builder(context, CHANNEL_ID)
-                .setOnlyAlertOnce(true)
-                .setContentTitle(title)
-                .setTicker(title)
-                .setContentText("Starting backup of your media.")
-                .setSmallIcon(R.drawable.ic_notification)
-                .setOngoing(true)
-                .addAction(android.R.drawable.ic_delete, cancel, cancelIntent);
-
-        setForegroundAsync(new ForegroundInfo(NOTIFICATION_ID, notificationBuilder.build()));
-
         WritableArray include = Arguments.createArray();
         include.pushString("fileSize");
         include.pushString("filename");
@@ -126,19 +109,17 @@ public class AutoBackupWorker extends Worker {
                     include)
                     .execute();
 
-            String lastUploadedMediaId = treatReturnedMedia(result);
+            treatReturnedMedia(result);
 
-            return Result.success(new Data.Builder().putString(UPLOADED_PHOTO_MEDIA_ID, lastUploadedMediaId).build());
+            return Result.success();
 
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
-
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    private String treatReturnedMedia(WritableMap result) throws IOException {
+    private void treatReturnedMedia(WritableMap result) throws IOException {
         String[] ids = getIdsFromGetMedia(result);
 
         GetPhotos getPhotos = new GetPhotos(
@@ -150,11 +131,17 @@ public class AutoBackupWorker extends Worker {
 
         try {
             photosExist = getPhotos.getPhotosExistById(ids);
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
         List<PhotoData> missingPhotos = getPhotosDataFromGetMediaIfNotInServer(result, photosExist, MAX_MISSING_PHOTOS_TO_UPLOAD);
+
+        if(missingPhotos.isEmpty()){
+            return;
+        }
+
+        createNotification();
 
         PhotoUploader photoUploader = new PhotoUploader(
                 url,
@@ -182,7 +169,12 @@ public class AutoBackupWorker extends Worker {
             }
         }
 
-        return missingPhotos.get(missingPhotos.size() - 1).mediaId;
+        // Wait time to avoid the worker finishing before the progress is received by the AutoBackupWorkerManager
+        try {
+            sleep(1000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -248,5 +240,28 @@ public class AutoBackupWorker extends Worker {
             }
         }
         return missingPhotos;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void createNotification(){
+        Context context = getApplicationContext();
+        PendingIntent cancelIntent = WorkManager.getInstance(context)
+                .createCancelPendingIntent(getId());
+
+        String title = "Backing up your media";
+        String cancel = "Cancel";
+
+        createChannel();
+
+        notificationBuilder = new NotificationCompat.Builder(context, CHANNEL_ID)
+                .setOnlyAlertOnce(true)
+                .setContentTitle(title)
+                .setTicker(title)
+                .setContentText("Starting backup of your media.")
+                .setSmallIcon(R.drawable.ic_notification)
+                .setOngoing(true)
+                .addAction(android.R.drawable.ic_delete, cancel, cancelIntent);
+
+        setForegroundAsync(new ForegroundInfo(NOTIFICATION_ID, notificationBuilder.build()));
     }
 }
