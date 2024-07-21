@@ -54,7 +54,7 @@ public class AutoBackupWorker extends Worker {
 
     public static final String UPLOADED_PHOTO_MEDIA_ID = "UPLOADED_PHOTO_MEDIA_ID";
 
-    protected final int MAX_MISSING_PHOTOS_TO_UPLOAD = 100;
+    protected final int MAX_MISSING_PHOTOS_TO_UPLOAD = 500;
     protected final int MAX_GALLERY_PHOTOS_TO_UPLOAD = 5000;
 
     protected String url;
@@ -163,6 +163,7 @@ public class AutoBackupWorker extends Worker {
 
             try {
                 photoUploader.uploadPhoto(photoData);
+
                 setProgressAsync(new Data.Builder().putString(UPLOADED_PHOTO_MEDIA_ID, photoData.mediaId).build());
             } catch (IOException e) {
                 throw new RuntimeException(e);
