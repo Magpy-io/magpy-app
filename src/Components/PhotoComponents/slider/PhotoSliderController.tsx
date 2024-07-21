@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
@@ -79,6 +79,10 @@ const PhotoSliderController = React.forwardRef<PhotoSliderComponentRefType, Prop
       onSwitchMode(false, flatListCurrentIndexRef.current);
     }, [onSwitchMode]);
 
+    const selectedGalleryPhotos = useMemo(() => {
+      return currentPhoto ? [currentPhoto] : [];
+    }, [currentPhoto]);
+
     return (
       <View style={[styles.mainViewStyle]}>
         <PhotoSliderComponent
@@ -93,9 +97,7 @@ const PhotoSliderController = React.forwardRef<PhotoSliderComponentRefType, Prop
           <PhotoSliderHeader photo={currentPhoto} onBackButton={onStatusBarBackButton} />
         )}
 
-        {!isFullScreen && (
-          <ToolBarPhotos selectedGalleryPhotos={currentPhoto ? [currentPhoto] : []} />
-        )}
+        {!isFullScreen && <ToolBarPhotos selectedGalleryPhotos={selectedGalleryPhotos} />}
       </View>
     );
   },

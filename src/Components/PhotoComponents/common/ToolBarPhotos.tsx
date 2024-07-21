@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { usePhotosDownloadingFunctions } from '~/Context/Contexts/PhotosDownloadingContext/usePhotosDownloadingContext';
-import { PhotoGalleryType, PhotoLocalType } from '~/Context/ReduxStore/Slices/Photos/Photos';
+import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { usePhotosFunctionsStore } from '~/Context/ReduxStore/Slices/Photos/PhotosFunctions';
 import { photosLocalSelector } from '~/Context/ReduxStore/Slices/Photos/Selectors';
 import { useAppSelector } from '~/Context/ReduxStore/Store';
@@ -20,8 +20,10 @@ type ToolBarProps = {
 function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) {
   const styles = useStyles(makeStyles);
   const [modalVisible, setModalVisible] = useState(false);
-  const onRequestClose = () => setModalVisible(false);
-  const showModal = () => setModalVisible(true);
+
+  const onRequestClose = useCallback(() => setModalVisible(false), []);
+  const showModal = useCallback(() => setModalVisible(true), []);
+
   const isOnePhoto = selectedGalleryPhotos.length == 1;
 
   const localPhotos = useAppSelector(photosLocalSelector);
@@ -30,50 +32,93 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
     usePhotosFunctionsStore();
   const { StartPhotosDownload } = usePhotosDownloadingFunctions();
 
-  const selectedLocalOnlyPhotos: PhotoLocalType[] = [];
-  const selectedServerOnlyPhotosIds: string[] = [];
-  const selectedLocalPhotosIds: string[] = [];
-  const selectedServerPhotosIds: string[] = [];
+  const selectedLocalOnlyPhotos = useMemo(() => {
+    const selectedLocalOnlyPhotos = [];
+    for (const photo of selectedGalleryPhotos) {
+      if (photo.serverId) {
+        continue;
+      }
+      const localPhoto = photo.mediaId ? localPhotos[photo.mediaId] : undefined;
+      if (localPhoto) {
+        selectedLocalOnlyPhotos.push(localPhoto);
+      }
+    }
+    return selectedLocalOnlyPhotos;
+  }, [localPhotos, selectedGalleryPhotos]);
 
-  for (const photo of selectedGalleryPhotos) {
-    if (photo.serverId) {
-      continue;
-    }
-    const localPhoto = photo.mediaId ? localPhotos[photo.mediaId] : undefined;
-    if (localPhoto) {
-      selectedLocalOnlyPhotos.push(localPhoto);
-    }
-  }
+  const selectedServerOnlyPhotosIds = useMemo(() => {
+    const selectedServerOnlyPhotosIds = [];
+    for (const photo of selectedGalleryPhotos) {
+      if (photo.mediaId) {
+        continue;
+      }
 
-  for (const photo of selectedGalleryPhotos) {
-    if (photo.mediaId) {
-      continue;
+      if (!photo.serverId) {
+        continue;
+      }
+      selectedServerOnlyPhotosIds.push(photo.serverId);
+    }
+    return selectedServerOnlyPhotosIds;
+  }, [selectedGalleryPhotos]);
+
+  const selectedLocalPhotosIds = useMemo(() => {
+    const selectedLocalPhotosIds = [];
+
+    for (const photo of selectedGalleryPhotos) {
+      if (!photo.mediaId) {
+        continue;
+      }
+      selectedLocalPhotosIds.push(photo.mediaId);
     }
 
-    if (!photo.serverId) {
-      continue;
-    }
-    selectedServerOnlyPhotosIds.push(photo.serverId);
-  }
+    return selectedLocalPhotosIds;
+  }, [selectedGalleryPhotos]);
 
-  for (const photo of selectedGalleryPhotos) {
-    if (!photo.mediaId) {
-      continue;
-    }
-    selectedLocalPhotosIds.push(photo.mediaId);
-  }
+  const selectedServerPhotosIds = useMemo(() => {
+    const selectedServerPhotosIds = [];
 
-  for (const photo of selectedGalleryPhotos) {
-    if (!photo.serverId) {
-      continue;
+    for (const photo of selectedGalleryPhotos) {
+      if (!photo.serverId) {
+        continue;
+      }
+      selectedServerPhotosIds.push(photo.serverId);
     }
-    selectedServerPhotosIds.push(photo.serverId);
-  }
+    return selectedServerPhotosIds;
+  }, [selectedGalleryPhotos]);
 
   const atleastOneLocal = selectedGalleryPhotos.find(p => p.mediaId);
   const atleastOneServer = selectedGalleryPhotos.find(p => p.serverId);
 
   const atleastOneServerAndOneLocal = atleastOneLocal && atleastOneServer;
+
+  const onBackup = useCallback(() => {
+    UploadPhotos(selectedLocalOnlyPhotos).catch(console.log);
+  }, [UploadPhotos, selectedLocalOnlyPhotos]);
+
+  const onDownload = useCallback(
+    () => StartPhotosDownload(selectedServerOnlyPhotosIds),
+    [StartPhotosDownload, selectedServerOnlyPhotosIds],
+  );
+
+  const onDelete = useCallback(() => {
+    DeletePhotosEverywhere(selectedGalleryPhotos)
+      .then(() => clearSelection?.())
+      .catch(console.log);
+  }, [DeletePhotosEverywhere, clearSelection, selectedGalleryPhotos]);
+
+  const onDeleteFromServer = useCallback(() => {
+    DeletePhotosServer(selectedServerPhotosIds)
+      .then(() => clearSelection?.())
+      .catch(console.log);
+  }, [DeletePhotosServer, clearSelection, selectedServerPhotosIds]);
+
+  const onDeleteFromDevice = useCallback(() => {
+    DeletePhotosLocal(selectedLocalPhotosIds)
+      .then(() => clearSelection?.())
+      .catch(console.log);
+  }, [DeletePhotosLocal, clearSelection, selectedLocalPhotosIds]);
+
+  const onShare = useCallback(() => {}, []);
 
   return (
     <View style={[styles.toolBarView]}>
@@ -86,26 +131,12 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
         }
         nbPhotosToDeleteFromServer={selectedServerPhotosIds.length}
         nbPhotosToDeleteFromDevice={selectedLocalPhotosIds.length}
-        onBackUp={() => {
-          UploadPhotos(selectedLocalOnlyPhotos).catch(console.log);
-        }}
-        onDownload={() => StartPhotosDownload(selectedServerOnlyPhotosIds)}
-        onDelete={() => {
-          DeletePhotosEverywhere(selectedGalleryPhotos)
-            .then(() => clearSelection?.())
-            .catch(console.log);
-        }}
-        onDeleteFromServer={() => {
-          DeletePhotosServer(selectedServerPhotosIds)
-            .then(() => clearSelection?.())
-            .catch(console.log);
-        }}
-        onDeleteFromDevice={() => {
-          DeletePhotosLocal(selectedLocalPhotosIds)
-            .then(() => clearSelection?.())
-            .catch(console.log);
-        }}
-        onShare={() => {}}
+        onBackUp={onBackup}
+        onDownload={onDownload}
+        onDelete={onDelete}
+        onDeleteFromServer={onDeleteFromServer}
+        onDeleteFromDevice={onDeleteFromDevice}
+        onShare={onShare}
         showInfo={isOnePhoto}
         onInfo={showModal}
       />

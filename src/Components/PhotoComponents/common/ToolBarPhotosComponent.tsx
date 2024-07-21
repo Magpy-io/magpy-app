@@ -33,7 +33,7 @@ type ToolBarPhotosComponentProps = {
   nbPhotosToDeleteFromDevice: number;
 };
 
-export default function ToolBarPhotosComponent(props: ToolBarPhotosComponentProps) {
+function ToolBarPhotosComponent(props: ToolBarPhotosComponentProps) {
   const {
     nbPhotos,
     nbPhotosToBackUp,
@@ -130,3 +130,5 @@ const makeStyles = (colors: colorsType) =>
       bottom: 0,
     },
   });
+
+export default React.memo(ToolBarPhotosComponent);
