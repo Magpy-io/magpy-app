@@ -52,7 +52,7 @@ public class GetPhotos {
         this.serverToken = serverToken;
     }
 
-    public boolean[] getPhotosExistById(String[] photosIds) throws IOException {
+    public boolean[] getPhotosExistById(String[] photosIds) throws Exception {
 
         JSONObject jsonRequest = new JSONObject();
         JSONObject jsonResponse;
@@ -79,6 +79,14 @@ public class GetPhotos {
         jsonResponse = HttpManager.SendRequest(url + "/getPhotosByMediaId", jsonRequest, serverToken);
 
         try {
+
+            boolean ok = jsonResponse.getBoolean("ok");
+
+            if(!ok){
+                String message = jsonResponse.getString("message");
+                throw new Exception("GetPhotos.getPhotosExistById: request failed" + message);
+            }
+
             JSONObject data = jsonResponse.getJSONObject("data");
             JSONArray photos = data.getJSONArray("photos");
 
