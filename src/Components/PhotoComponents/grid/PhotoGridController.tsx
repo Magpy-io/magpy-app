@@ -1,4 +1,4 @@
-import React, { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
+import React, { forwardRef, useCallback, useRef, useState } from 'react';
 import { Pressable, View } from 'react-native';
 
 import { TuneIcon } from '~/Components/CommonComponents/Icons';
@@ -21,7 +21,6 @@ import { useKeysSelection } from './useKeysSelection';
 
 type PropsType = {
   photos: Array<PhotoGalleryType>;
-  isSlidingPhotos: boolean;
   onSwitchMode: (isPhotoSelected: boolean, index: number) => void;
   isInTabScreen?: boolean;
   title?: string;
@@ -33,7 +32,7 @@ const PhotoGridController = forwardRef<PhotoGridComponentRefType, PropsType>(
   (
     {
       photos,
-      isSlidingPhotos,
+
       onSwitchMode,
       isInTabScreen,
       title,
@@ -64,12 +63,6 @@ const PhotoGridController = forwardRef<PhotoGridComponentRefType, PropsType>(
     }, [showTab]);
 
     useCustomBackPress(backPressAction, isSelecting);
-
-    useEffect(() => {
-      if (!isSlidingPhotos) {
-        showTab();
-      }
-    }, [isSlidingPhotos, showTab]);
 
     const findPhotoIndex = useCallback((item: PhotoGalleryType) => {
       const index = photosRef.current.findIndex(photo => photo.key == item.key);
