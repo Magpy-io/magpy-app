@@ -144,13 +144,13 @@ public class AutoBackupWorker extends Worker {
         createNotification();
 
         PhotoUploader photoUploader = new PhotoUploader(
+                getApplicationContext(),
                 url,
                 serverToken,
                 deviceId);
 
         for (int i=0; i<missingPhotos.size(); i++) {
             PhotoData photoData = missingPhotos.get(i);
-            photoData.image64 = FileOperations.getBase64FromUri(getApplicationContext(), photoData.uri);
 
             if(isStopped()){
                 Log.d("AutoBackupWorker", "Stopped");

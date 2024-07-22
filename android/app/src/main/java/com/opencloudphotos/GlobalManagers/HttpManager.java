@@ -49,4 +49,23 @@ public class HttpManager {
             throw new RuntimeException("HttpManager.SendRequest: error while parsing response to Json object.", e);
         }
     }
+
+    public static JSONObject SendRequest(String url, byte[] bodyArray, String token) throws IOException {
+
+        RequestBody body = RequestBody.create(bodyArray, JSON);
+
+        Request request = new Request.Builder()
+                .url(url)
+                .post(body)
+                .addHeader("x-authorization","Bearer " + token)
+                .build();
+
+        Call call = getInstance().client.newCall(request);
+        try (Response response = call.execute()){
+            String responseString = response.body().string();
+            return new JSONObject(responseString);
+        } catch (JSONException e) {
+            throw new RuntimeException("HttpManager.SendRequest: error while parsing response to Json object.", e);
+        }
+    }
 }

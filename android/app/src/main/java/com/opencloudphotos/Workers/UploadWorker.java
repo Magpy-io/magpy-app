@@ -112,6 +112,7 @@ public class UploadWorker extends Worker {
         include.pushString("imageSize");
 
         PhotoUploader photoUploader = new PhotoUploader(
+                getApplicationContext(),
                 url,
                 serverToken,
                 deviceId);
@@ -200,8 +201,6 @@ public class UploadWorker extends Worker {
         photoData.width = image.getDouble("width");
         photoData.name = image.getString("filename");
         photoData.date = timestampAsIso;
-
-        photoData.image64 = FileOperations.getBase64FromUri(getApplicationContext(), photoData.uri);
 
         return photoData;
     }

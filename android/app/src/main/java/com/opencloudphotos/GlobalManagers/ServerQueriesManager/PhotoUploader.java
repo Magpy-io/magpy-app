@@ -1,13 +1,20 @@
 package com.opencloudphotos.GlobalManagers.ServerQueriesManager;
 
+import android.content.Context;
+
+import androidx.core.graphics.drawable.IconCompat;
+
 import com.opencloudphotos.GlobalManagers.HttpManager;
 import com.opencloudphotos.GlobalManagers.ServerQueriesManager.Common.PhotoData;
+import com.opencloudphotos.Utils.FileOperations;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class PhotoUploader {
@@ -15,8 +22,10 @@ public class PhotoUploader {
     protected String url;
     protected String deviceId;
     protected String serverToken;
+    protected Context context;
 
-    public PhotoUploader(String url, String serverToken, String deviceId){
+    public PhotoUploader(Context context, String url, String serverToken, String deviceId){
+        this.context = context;
         this.url = url;
         this.deviceId = deviceId;
         this.serverToken = serverToken;
@@ -29,6 +38,8 @@ public class PhotoUploader {
         JSONObject jsonRequest = new JSONObject();
         JSONObject jsonResponse;
 
+        byte[] image64 = FileOperations.getBase64FromUri(context, photo.uri);
+
         try {
             jsonRequest.put("name", photo.name);
             jsonRequest.put("fileSize", photo.fileSize);
@@ -36,10 +47,10 @@ public class PhotoUploader {
             jsonRequest.put("height", photo.height);
             jsonRequest.put("mediaId", photo.mediaId);
             jsonRequest.put("date", photo.date);
-            jsonRequest.put("image64Len", photo.image64.length());
+            jsonRequest.put("image64Len", image64.length);
             jsonRequest.put("deviceUniqueId", deviceId);
         } catch (Exception e) {
-            throw new RuntimeException("Error creating JSON request object.");
+            throw new RuntimeException("Error creating JSON request object.", e);
         }
 
         jsonResponse = HttpManager.SendRequest(url + "/addPhotoInit", jsonRequest, serverToken);
@@ -56,22 +67,32 @@ public class PhotoUploader {
             throw new RuntimeException("Error parsing json response, expected properties not found.");
         }
 
-        List<String> parts = splitString(photo.image64);
+
+        List<byte[]> parts = splitBytes(image64);
 
         for(int i = 0; i<parts.size(); i++){
 
-            String part = parts.get(i);
+            byte[] part = parts.get(i);
             jsonRequest = new JSONObject();
             try {
                 jsonRequest.put("id", transferId);
                 jsonRequest.put("partNumber", i);
-                jsonRequest.put("partSize", part.length());
-                jsonRequest.put("photoPart", part);
+                jsonRequest.put("partSize", part.length);
+                jsonRequest.put("photoPart", "");
             } catch (Exception e) {
                 throw new RuntimeException("Error creating JSON request object.");
             }
 
-            jsonResponse = HttpManager.SendRequest(url + "/addPhotoPart", jsonRequest, serverToken);
+            byte[] jsonRequestByteArray = jsonRequest.toString().getBytes();
+
+            ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
+
+            byteBuffer.write(jsonRequestByteArray, 0, jsonRequestByteArray.length - 2);
+            byteBuffer.write(part);
+            byteBuffer.write('"');
+            byteBuffer.write('}');
+
+            jsonResponse = HttpManager.SendRequest(url + "/addPhotoPart", byteBuffer.toByteArray(), serverToken);
 
             try {
                 boolean ok = jsonResponse.getBoolean("ok");
@@ -81,23 +102,24 @@ public class PhotoUploader {
             } catch (JSONException e) {
                 throw new RuntimeException("Error parsing json response, expected properties not found.");
             }
+
         }
 
         return true;
     }
 
-    protected List<String> splitString(String str){
+    protected List<byte[]> splitBytes(byte[] bytes){
         int partSize = 100000;
-        int numberOfParts = (int)(str.length() / partSize);
+        int numberOfParts = (int)(bytes.length / partSize);
 
-        List<String> parts = new ArrayList<>();
+        List<byte[]> parts = new ArrayList<>();
 
         for(int i = 0; i<numberOfParts; i++){
-            parts.add(str.substring(i * partSize, (i+1) * partSize));
+            parts.add(Arrays.copyOfRange(bytes, i * partSize, (i+1) * partSize));
         }
 
-        if(str.length() % partSize != 0){
-            parts.add(str.substring(numberOfParts * partSize));
+        if(bytes.length % partSize != 0){
+            parts.add(Arrays.copyOfRange(bytes, numberOfParts * partSize, bytes.length));
         }
 
         return parts;

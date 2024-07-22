@@ -7,7 +7,6 @@ public class PhotoData{
     public double height;
     public String mediaId;
     public String date;
-    public String image64;
     public String uri;
 
 }
