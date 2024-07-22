@@ -1,5 +1,7 @@
 package com.opencloudphotos.Workers;
 
+import static java.lang.Thread.sleep;
+
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -156,8 +158,14 @@ public class UploadWorker extends Worker {
             }
 
         }
+        // Wait time to avoid the worker finishing before the progress is received by the AutoBackupWorkerManager
+        try {
+            sleep(500);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
 
-        return Result.success(new Data.Builder().putString(UPLOADED_PHOTO_MEDIA_ID, photosIds[photosIds.length - 1]).build());
+        return Result.success();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)

@@ -61,7 +61,6 @@ public class UploadWorkerManager {
 
                 WorkManager.getInstance(context).enqueueUniqueWork(UploadWorker.WORKER_NAME, ExistingWorkPolicy.REPLACE, uploadRequest).getResult().get();
                 SetupWorkerObserver(observer);
-                mPromise.resolve(null);
             } catch (ExecutionException | InterruptedException e) {
                 mPromise.reject("Error", e.toString());
             }
@@ -74,14 +73,7 @@ public class UploadWorkerManager {
                 WorkInfo result = GetWorker();
                 WorkManager.getInstance(context).getWorkInfoByIdLiveData(result.getId()).observe(ProcessLifecycleOwner.get(), (workInfo -> {
                     if (workInfo != null) {
-                        Data progress;
-
-                        if(workInfo.getState().isFinished()){
-                            progress = workInfo.getOutputData();
-                        }else{
-                            progress = workInfo.getProgress();
-                        }
-
+                        Data progress = workInfo.getProgress();
                         String uploadedMediaId = progress.getString(UPLOADED_PHOTO_MEDIA_ID);
 
                         if(uploadedMediaId != null){
@@ -96,12 +88,11 @@ public class UploadWorkerManager {
         });
     }
 
-    public WorkInfo GetWorker() throws ExecutionException, InterruptedException {
+    private WorkInfo GetWorker() throws ExecutionException, InterruptedException {
         List<WorkInfo> result = WorkManager
                 .getInstance(context)
                 .getWorkInfosForUniqueWork(UploadWorker.WORKER_NAME)
                 .get();
-
 
         if(result.isEmpty()){
             return null;
@@ -125,7 +116,6 @@ public class UploadWorkerManager {
                     return;
                 }
                 mPromise.resolve(false);
-
             } catch (ExecutionException | InterruptedException e) {
                 mPromise.reject("Error", e.toString());
             }

@@ -172,7 +172,7 @@ public class AutoBackupWorker extends Worker {
 
         // Wait time to avoid the worker finishing before the progress is received by the AutoBackupWorkerManager
         try {
-            sleep(1000);
+            sleep(500);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }

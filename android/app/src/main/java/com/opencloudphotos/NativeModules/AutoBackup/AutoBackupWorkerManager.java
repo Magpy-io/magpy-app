@@ -51,7 +51,6 @@ public class AutoBackupWorkerManager {
 
                 WorkManager.getInstance(context).enqueueUniquePeriodicWork(AutoBackupWorker.WORKER_NAME, ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE, uploadRequest).getResult().get();
                 SetupWorkerObserver(observer);
-                mPromise.resolve(null);
             } catch (ExecutionException | InterruptedException e) {
                 mPromise.reject("Error", e.toString());
             }
@@ -64,10 +63,7 @@ public class AutoBackupWorkerManager {
                 WorkInfo result = GetWorker();
                 WorkManager.getInstance(context).getWorkInfoByIdLiveData(result.getId()).observe(ProcessLifecycleOwner.get(), (workInfo -> {
                     if (workInfo != null) {
-                        Data progress;
-
-                        progress = workInfo.getProgress();
-
+                        Data progress = workInfo.getProgress();
                         String uploadedMediaId = progress.getString(UPLOADED_PHOTO_MEDIA_ID);
 
                         if(uploadedMediaId != null){
@@ -82,12 +78,11 @@ public class AutoBackupWorkerManager {
         });
     }
 
-    public WorkInfo GetWorker() throws ExecutionException, InterruptedException {
+    private WorkInfo GetWorker() throws ExecutionException, InterruptedException {
         List<WorkInfo> result = WorkManager
                 .getInstance(context)
                 .getWorkInfosForUniqueWork(AutoBackupWorker.WORKER_NAME)
                 .get();
-
 
         if(result.isEmpty()){
             return null;
@@ -111,7 +106,6 @@ public class AutoBackupWorkerManager {
                     return;
                 }
                 mPromise.resolve(false);
-
             } catch (ExecutionException | InterruptedException e) {
                 mPromise.reject("Error", e.toString());
             }
