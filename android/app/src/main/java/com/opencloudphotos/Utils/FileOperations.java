@@ -18,7 +18,6 @@ public class FileOperations {
             byte[] buffer = new byte[bufferSize];
 
             int len = 0;
-
             try{
                 while ((len = inputStream.read(buffer)) != -1) {
                     byteBuffer.write(buffer, 0, len);
@@ -27,11 +26,11 @@ public class FileOperations {
                 throw new RuntimeException("Error while reading media file.", e);
             }
 
-            byte[] b = byteBuffer.toByteArray();
-
-            return Base64.encodeToString(b, 0);
+            return Base64.encodeToString(byteBuffer.toByteArray(), 0);
         } catch (FileNotFoundException e) {
-            throw new RuntimeException("Media file not found.", e);
+            throw new RuntimeException("getBase64FromUri: Media file not found.", e);
+        } catch (Exception e){
+            throw new RuntimeException("getBase64FromUri: Error reading media file.", e);
         }
     }
 }
