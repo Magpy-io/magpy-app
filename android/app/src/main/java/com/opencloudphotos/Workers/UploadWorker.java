@@ -221,7 +221,7 @@ public class UploadWorker extends Worker {
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void updateNotification(int progress){
-        notificationBuilder.setContentText("Uploaded " + progress + " photo out of " + photosIds.length);
+        notificationBuilder.setContentText("Uploaded " + progress + " photo out of " + photosIds.length).setSilent(true);
         getApplicationContext().getSystemService(NotificationManager.class).notify(NOTIFICATION_ID, notificationBuilder.build());
     }
 

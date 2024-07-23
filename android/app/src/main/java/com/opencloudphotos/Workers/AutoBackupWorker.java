@@ -244,7 +244,7 @@ public class AutoBackupWorker extends Worker {
         notificationBuilder = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setOnlyAlertOnce(true)
                 .setContentTitle(title)
-                .setTicker(title)
+                .setSilent(true)
                 .setContentText("Starting backup of your media.")
                 .setSmallIcon(R.drawable.ic_notification)
                 .setOngoing(true)
@@ -255,7 +255,7 @@ public class AutoBackupWorker extends Worker {
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void updateNotification(int progress, int total){
-        notificationBuilder.setContentText("Backed up " + progress + " photos out of " + total);
+        notificationBuilder.setContentText("Backed up " + progress + " photos out of " + total).setSilent(true);
         getApplicationContext().getSystemService(NotificationManager.class).notify(NOTIFICATION_ID, notificationBuilder.build());
     }
 
