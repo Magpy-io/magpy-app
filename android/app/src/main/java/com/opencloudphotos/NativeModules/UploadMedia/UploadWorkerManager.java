@@ -62,7 +62,7 @@ public class UploadWorkerManager {
                 WorkManager.getInstance(context).enqueueUniqueWork(UploadWorker.WORKER_NAME, ExistingWorkPolicy.REPLACE, uploadRequest).getResult().get();
                 SetupWorkerObserver(observer);
             } catch (ExecutionException | InterruptedException e) {
-                mPromise.reject("Error", e.toString());
+                mPromise.reject("Error", e);
             }
         });
     }
@@ -82,7 +82,7 @@ public class UploadWorkerManager {
                     }
                 }));
             } catch (ExecutionException | InterruptedException e) {
-                mPromise.reject("Error", e.toString());
+                mPromise.reject("Error", e);
             }
             mPromise.resolve(null);
         });
@@ -117,7 +117,7 @@ public class UploadWorkerManager {
                 }
                 mPromise.resolve(false);
             } catch (ExecutionException | InterruptedException e) {
-                mPromise.reject("Error", e.toString());
+                mPromise.reject("Error", e);
             }
         });
     }
@@ -128,7 +128,7 @@ public class UploadWorkerManager {
                 WorkManager.getInstance(context).cancelUniqueWork(UploadWorker.WORKER_NAME).getResult().get();
                 mPromise.resolve(null);
             } catch (ExecutionException | InterruptedException e) {
-                mPromise.reject("Error", e.toString());
+                mPromise.reject("Error", e);
             }
         });
     }

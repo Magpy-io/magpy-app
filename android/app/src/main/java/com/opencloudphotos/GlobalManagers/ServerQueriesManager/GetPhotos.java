@@ -1,25 +1,15 @@
 package com.opencloudphotos.GlobalManagers.ServerQueriesManager;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 
 import com.opencloudphotos.GlobalManagers.HttpManager;
-import com.opencloudphotos.GlobalManagers.ServerQueriesManager.Common.PhotoData;
+import com.opencloudphotos.GlobalManagers.ServerQueriesManager.Common.ResponseNotOkException;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
 
 public class GetPhotos {
 
@@ -52,10 +42,38 @@ public class GetPhotos {
         this.serverToken = serverToken;
     }
 
-    public boolean[] getPhotosExistById(String[] photosIds) throws Exception {
+    public boolean[] getPhotosExistById(String[] photosIds) throws ResponseNotOkException, IOException {
 
+        JSONObject jsonRequest = formatJsonRequest(photosIds);
+
+        JSONObject jsonResponse = HttpManager.SendRequest(url + "/getPhotosByMediaId", jsonRequest, serverToken);
+
+        try {
+            boolean ok = jsonResponse.getBoolean("ok");
+            if(!ok){
+                String errorCode = jsonResponse.getString("errorCode");
+                String message = jsonResponse.getString("message");
+                throw new ResponseNotOkException(errorCode, message);
+            }
+
+            JSONObject data = jsonResponse.getJSONObject("data");
+            JSONArray photos = data.getJSONArray("photos");
+
+            boolean[] response = new boolean[photos.length()];
+
+            for(int i = 0; i< photos.length(); i++) {
+                JSONObject photo = photos.getJSONObject(i);
+                response[i] = photo.getBoolean("exists");
+            }
+
+            return response;
+        } catch (JSONException e) {
+            throw new RuntimeException("Error parsing json response, expected properties not found.", e);
+        }
+    }
+
+    private @NonNull JSONObject formatJsonRequest(String[] photosIds) {
         JSONObject jsonRequest = new JSONObject();
-        JSONObject jsonResponse;
 
         try {
             jsonRequest.put("photoType", PhotoType.DATA.toString());
@@ -71,38 +89,9 @@ public class GetPhotos {
             }
 
             jsonRequest.put("photosData", photosData);
-
-        } catch (Exception e) {
-            throw new RuntimeException("Error creating JSON request object.");
-        }
-
-        jsonResponse = HttpManager.SendRequest(url + "/getPhotosByMediaId", jsonRequest, serverToken);
-
-        try {
-
-            boolean ok = jsonResponse.getBoolean("ok");
-
-            if(!ok){
-                String message = jsonResponse.getString("message");
-                throw new Exception("GetPhotos.getPhotosExistById: request failed" + message);
-            }
-
-            JSONObject data = jsonResponse.getJSONObject("data");
-            JSONArray photos = data.getJSONArray("photos");
-
-            boolean[] response = new boolean[photos.length()];
-
-            for(int i = 0; i< photos.length(); i++) {
-                JSONObject photo = photos.getJSONObject(i);
-                response[i] = photo.getBoolean("exists");
-            }
-
-            return response;
         } catch (JSONException e) {
-            throw new RuntimeException("Error parsing json response, expected properties not found.");
+            throw new RuntimeException("Error creating JSON request object.", e);
         }
+        return jsonRequest;
     }
-
-
-
 }

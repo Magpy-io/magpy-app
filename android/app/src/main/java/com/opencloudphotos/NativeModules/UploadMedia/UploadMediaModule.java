@@ -1,14 +1,6 @@
 package com.opencloudphotos.NativeModules.UploadMedia;
 
-import static com.opencloudphotos.Workers.UploadWorker.UPLOADED_PHOTO_MEDIA_ID;
-
-import android.util.Log;
-
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.lifecycle.Observer;
-import androidx.work.Data;
-import androidx.work.WorkInfo;
 
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -70,7 +62,6 @@ public class UploadMediaModule extends ReactContextBaseJavaModule {
             mPromise.reject("Error", "photosIds should be an array of strings.");
             return;
         }
-        
         uploadWorkerManager.StartWorker(url, serverToken, deviceId, photosIds, mediaId -> {
             WritableMap params = new WritableNativeMap();
             params.putString("mediaId", mediaId);

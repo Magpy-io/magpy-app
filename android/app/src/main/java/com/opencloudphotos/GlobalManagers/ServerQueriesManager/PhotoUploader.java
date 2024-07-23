@@ -2,10 +2,9 @@ package com.opencloudphotos.GlobalManagers.ServerQueriesManager;
 
 import android.content.Context;
 
-import androidx.core.graphics.drawable.IconCompat;
-
 import com.opencloudphotos.GlobalManagers.HttpManager;
 import com.opencloudphotos.GlobalManagers.ServerQueriesManager.Common.PhotoData;
+import com.opencloudphotos.GlobalManagers.ServerQueriesManager.Common.ResponseNotOkException;
 import com.opencloudphotos.Utils.FileOperations;
 
 import org.json.JSONException;
@@ -23,6 +22,7 @@ public class PhotoUploader {
     protected String deviceId;
     protected String serverToken;
     protected Context context;
+    ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
 
     public PhotoUploader(Context context, String url, String serverToken, String deviceId){
         this.context = context;
@@ -31,61 +31,45 @@ public class PhotoUploader {
         this.serverToken = serverToken;
     }
 
-    public boolean uploadPhoto(PhotoData photo) throws IOException {
-
-        String transferId;
-
-        JSONObject jsonRequest = new JSONObject();
-        JSONObject jsonResponse;
-
+    public void uploadPhoto(PhotoData photo) throws ResponseNotOkException, IOException {
         byte[] image64 = FileOperations.getBase64FromUri(context, photo.uri);
 
-        try {
-            jsonRequest.put("name", photo.name);
-            jsonRequest.put("fileSize", photo.fileSize);
-            jsonRequest.put("width", photo.width);
-            jsonRequest.put("height", photo.height);
-            jsonRequest.put("mediaId", photo.mediaId);
-            jsonRequest.put("date", photo.date);
-            jsonRequest.put("image64Len", image64.length);
-            jsonRequest.put("deviceUniqueId", deviceId);
-        } catch (Exception e) {
-            throw new RuntimeException("Error creating JSON request object.", e);
-        }
+        JSONObject jsonRequest = formatJsonRequestAddPhotoInit(photo, image64);
+        JSONObject jsonResponse = HttpManager.SendRequest(url + "/addPhotoInit", jsonRequest, serverToken);
 
-        jsonResponse = HttpManager.SendRequest(url + "/addPhotoInit", jsonRequest, serverToken);
-
+        String transferId;
         try {
             boolean ok = jsonResponse.getBoolean("ok");
             if(!ok){
-                return false;
+                String errorCode = jsonResponse.getString("errorCode");
+                String message = jsonResponse.getString("message");
+                throw new ResponseNotOkException(errorCode, message);
             }
 
             JSONObject data = jsonResponse.getJSONObject("data");
             transferId = data.getString("id");
         } catch (JSONException e) {
-            throw new RuntimeException("Error parsing json response, expected properties not found.");
+            throw new RuntimeException("Error parsing json response, expected properties not found.", e);
         }
 
 
         List<byte[]> parts = splitBytes(image64);
 
-        for(int i = 0; i<parts.size(); i++){
-
-            byte[] part = parts.get(i);
+        int partNumber = 0;
+        for(byte[] part:parts){
             jsonRequest = new JSONObject();
             try {
                 jsonRequest.put("id", transferId);
-                jsonRequest.put("partNumber", i);
+                jsonRequest.put("partNumber", partNumber);
                 jsonRequest.put("partSize", part.length);
                 jsonRequest.put("photoPart", "");
-            } catch (Exception e) {
-                throw new RuntimeException("Error creating JSON request object.");
+            } catch (JSONException e) {
+                throw new RuntimeException("Error creating JSON request object.", e);
             }
 
             byte[] jsonRequestByteArray = jsonRequest.toString().getBytes();
 
-            ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
+            byteBuffer.reset();
 
             byteBuffer.write(jsonRequestByteArray, 0, jsonRequestByteArray.length - 2);
             byteBuffer.write(part);
@@ -97,18 +81,19 @@ public class PhotoUploader {
             try {
                 boolean ok = jsonResponse.getBoolean("ok");
                 if(!ok){
-                    return false;
+                    String errorCode = jsonResponse.getString("errorCode");
+                    String message = jsonResponse.getString("message");
+                    throw new ResponseNotOkException(errorCode, message);
                 }
             } catch (JSONException e) {
-                throw new RuntimeException("Error parsing json response, expected properties not found.");
+                throw new RuntimeException("Error parsing json response, expected properties not found.", e);
             }
 
+            partNumber++;
         }
-
-        return true;
     }
 
-    protected List<byte[]> splitBytes(byte[] bytes){
+    private List<byte[]> splitBytes(byte[] bytes){
         int partSize = 100000;
         int numberOfParts = (int)(bytes.length / partSize);
 
@@ -123,6 +108,24 @@ public class PhotoUploader {
         }
 
         return parts;
+    }
+
+    private JSONObject formatJsonRequestAddPhotoInit(PhotoData photo, byte[] image64){
+        JSONObject jsonRequest = new JSONObject();
+
+        try {
+            jsonRequest.put("name", photo.name);
+            jsonRequest.put("fileSize", photo.fileSize);
+            jsonRequest.put("width", photo.width);
+            jsonRequest.put("height", photo.height);
+            jsonRequest.put("mediaId", photo.mediaId);
+            jsonRequest.put("date", photo.date);
+            jsonRequest.put("image64Len", image64.length);
+            jsonRequest.put("deviceUniqueId", deviceId);
+        } catch (JSONException e) {
+            throw new RuntimeException("Error creating JSON request object.", e);
+        }
+        return jsonRequest;
     }
 
 }

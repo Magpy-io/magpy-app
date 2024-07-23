@@ -28,12 +28,14 @@ import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.opencloudphotos.GlobalManagers.ExecutorsManager;
 import com.opencloudphotos.GlobalManagers.ServerQueriesManager.Common.PhotoData;
+import com.opencloudphotos.GlobalManagers.ServerQueriesManager.Common.ResponseNotOkException;
 import com.opencloudphotos.GlobalManagers.ServerQueriesManager.GetPhotos;
 import com.opencloudphotos.GlobalManagers.ServerQueriesManager.PhotoUploader;
 import com.opencloudphotos.NativeModules.MediaManagement.Utils.Definitions;
 import com.opencloudphotos.NativeModules.MediaManagement.Utils.GetMediaTask;
 import com.opencloudphotos.R;
 import com.opencloudphotos.Utils.FileOperations;
+import com.opencloudphotos.Utils.MediaParser;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
@@ -83,19 +85,18 @@ public class AutoBackupWorker extends Worker {
     public Result doWork() {
         Log.d("AutoBackupWorker", "Work started.");
 
-        boolean dataParsed = parseInputData();
-        if(!dataParsed) {
-            return Result.failure();
-        }
-
-        Context context = getApplicationContext();
-
-        WritableArray include = Arguments.createArray();
-        include.pushString("fileSize");
-        include.pushString("filename");
-        include.pushString("imageSize");
-
         try {
+            if(!parseInputData()) {
+                return Result.failure();
+            }
+
+            Context context = getApplicationContext();
+
+            WritableArray include = Arguments.createArray();
+            include.pushString("fileSize");
+            include.pushString("filename");
+            include.pushString("imageSize");
+
             WritableMap result = new GetMediaTask(
                     context,
                     null,
@@ -111,15 +112,20 @@ public class AutoBackupWorker extends Worker {
 
             treatReturnedMedia(result);
 
+            // Wait time to avoid the worker finishing before the progress is received by the AutoBackupWorkerManager
+            sleep(500);
+            Log.d("AutoBackupWorker", "Work finished.");
             return Result.success();
-
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        }catch(Exception e){
+            Log.e("AutoBackupWorker", "Exception thrown: ", e);
+            return Result.failure();
+        }finally {
+            getApplicationContext().getSystemService(NotificationManager.class).cancel(NOTIFICATION_ID);
         }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    private void treatReturnedMedia(WritableMap result) throws IOException {
+    private void treatReturnedMedia(WritableMap result) throws Exception {
         String[] ids = getIdsFromGetMedia(result);
 
         GetPhotos getPhotos = new GetPhotos(
@@ -129,11 +135,7 @@ public class AutoBackupWorker extends Worker {
 
         boolean[] photosExist;
 
-        try {
-            photosExist = getPhotos.getPhotosExistById(ids);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        photosExist = getPhotos.getPhotosExistById(ids);
 
         List<PhotoData> missingPhotos = getPhotosDataFromGetMediaIfNotInServer(result, photosExist, MAX_MISSING_PHOTOS_TO_UPLOAD);
 
@@ -149,33 +151,72 @@ public class AutoBackupWorker extends Worker {
                 serverToken,
                 deviceId);
 
-        for (int i=0; i<missingPhotos.size(); i++) {
-            PhotoData photoData = missingPhotos.get(i);
+        int progress = 0;
+        for (PhotoData photoData:missingPhotos) {
 
             if(isStopped()){
-                Log.d("AutoBackupWorker", "Stopped");
-                getApplicationContext().getSystemService(NotificationManager.class).cancel(NOTIFICATION_ID);
+                Log.d("AutoBackupWorker", "Worker stopped");
                 break;
             }
 
-            notificationBuilder.setContentText("Backed up " + i + " photos out of " + missingPhotos.size());
-            getApplicationContext().getSystemService(NotificationManager.class).notify(NOTIFICATION_ID, notificationBuilder.build());
+            updateNotification(progress, missingPhotos.size());
 
-            try {
+            try{
                 photoUploader.uploadPhoto(photoData);
-
                 setProgressAsync(new Data.Builder().putString(UPLOADED_PHOTO_MEDIA_ID, photoData.mediaId).build());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+            }catch (ResponseNotOkException e){
+                Log.e("UploadWorker", "Failed upload of photo with mediaId: " + photoData.mediaId, e);
+            }
+
+            progress++;
+        }
+    }
+
+    public String[] getIdsFromGetMedia(WritableMap result){
+        ReadableArray edges = result.getArray("edges");
+
+        if(edges == null){
+            throw new RuntimeException("AutoBackupWorker: edges found null.");
+        }
+
+        String[] ids = new String[edges.size()];
+
+        for(int i = 0; i< edges.size(); i++){
+            ReadableMap item = edges.getMap(i);
+            ReadableMap node = item.getMap("node");
+            if(node == null){
+                throw new RuntimeException("AutoBackupWorker: node found null.");
+            }
+
+            ids[i] = node.getString("id");
+        }
+        return ids;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public List<PhotoData> getPhotosDataFromGetMediaIfNotInServer(WritableMap result, boolean[] photosExist, int numberOfPhotosToReturn) {
+        ReadableArray edges = result.getArray("edges");
+        if(edges == null){
+            throw new RuntimeException("AutoBackupWorker: edges found null.");
+        }
+
+        List<PhotoData> missingPhotos = new ArrayList<>();
+
+        for(int i = 0; i< photosExist.length; i++) {
+            boolean exists = photosExist[i];
+            if(!exists){
+                ReadableMap item = edges.getMap(i);
+                ReadableMap node = item.getMap("node");
+
+                PhotoData photoData = MediaParser.parsePhotoData(node);
+                missingPhotos.add(photoData);
+
+                if(missingPhotos.size() >= numberOfPhotosToReturn){
+                    break;
+                }
             }
         }
-
-        // Wait time to avoid the worker finishing before the progress is received by the AutoBackupWorkerManager
-        try {
-            sleep(500);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        return missingPhotos;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -187,60 +228,6 @@ public class AutoBackupWorker extends Worker {
         );
 
         getApplicationContext().getSystemService(NotificationManager.class).createNotificationChannel(channel);
-    }
-
-    public String[] getIdsFromGetMedia(WritableMap result){
-        ReadableArray edges = result.getArray("edges");
-
-        String[] ids = new String[edges.size()];
-
-        for(int i = 0; i< edges.size(); i++){
-            ReadableMap item = edges.getMap(i);
-            ReadableMap node = item.getMap("node");
-            String id = node.getString("id");
-            ids[i] = id;
-        }
-        return ids;
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    public List<PhotoData> getPhotosDataFromGetMediaIfNotInServer(WritableMap result, boolean[] photosExist, int numberOfPhotosToReturn) {
-        ReadableArray edges = result.getArray("edges");
-
-        List<PhotoData> missingPhotos = new ArrayList<>();
-
-        for(int i = 0; i< photosExist.length; i++) {
-            boolean exists = photosExist[i];
-            if(!exists){
-                ReadableMap item = edges.getMap(i);
-                ReadableMap node = item.getMap("node");
-                ReadableMap image = node.getMap("image");
-                PhotoData photoData = new PhotoData();
-
-                double timestamp = node.getDouble("timestamp");
-                double modificationTimestamp = node.getDouble("modificationTimestamp");
-
-                double correctTimestamp = Math.min(timestamp, modificationTimestamp);
-
-                Instant instant = Instant.ofEpochSecond((long)correctTimestamp);
-                String timestampAsIso = instant.toString();
-
-                photoData.mediaId = node.getString("id");
-                photoData.uri = image.getString("uri");
-                photoData.fileSize = image.getDouble("fileSize");
-                photoData.height = image.getDouble("height");
-                photoData.width = image.getDouble("width");
-                photoData.name = image.getString("filename");
-                photoData.date = timestampAsIso;
-
-                missingPhotos.add(photoData);
-
-                if(missingPhotos.size() >= numberOfPhotosToReturn){
-                    break;
-                }
-            }
-        }
-        return missingPhotos;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -265,4 +252,11 @@ public class AutoBackupWorker extends Worker {
 
         setForegroundAsync(new ForegroundInfo(NOTIFICATION_ID, notificationBuilder.build()));
     }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void updateNotification(int progress, int total){
+        notificationBuilder.setContentText("Backed up " + progress + " photos out of " + total);
+        getApplicationContext().getSystemService(NotificationManager.class).notify(NOTIFICATION_ID, notificationBuilder.build());
+    }
+
 }

@@ -52,7 +52,7 @@ public class AutoBackupWorkerManager {
                 WorkManager.getInstance(context).enqueueUniquePeriodicWork(AutoBackupWorker.WORKER_NAME, ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE, uploadRequest).getResult().get();
                 SetupWorkerObserver(observer);
             } catch (ExecutionException | InterruptedException e) {
-                mPromise.reject("Error", e.toString());
+                mPromise.reject("Error", e);
             }
         });
     }
@@ -72,7 +72,7 @@ public class AutoBackupWorkerManager {
                     }
                 }));
             } catch (ExecutionException | InterruptedException e) {
-                mPromise.reject("Error", e.toString());
+                mPromise.reject("Error", e);
             }
             mPromise.resolve(null);
         });
@@ -107,7 +107,7 @@ public class AutoBackupWorkerManager {
                 }
                 mPromise.resolve(false);
             } catch (ExecutionException | InterruptedException e) {
-                mPromise.reject("Error", e.toString());
+                mPromise.reject("Error", e);
             }
         });
     }
@@ -118,7 +118,7 @@ public class AutoBackupWorkerManager {
                 WorkManager.getInstance(context).cancelUniqueWork(AutoBackupWorker.WORKER_NAME).getResult().get();
                 mPromise.resolve(null);
             } catch (ExecutionException | InterruptedException e) {
-                mPromise.reject("Error", e.toString());
+                mPromise.reject("Error", e);
             }
         });
     }

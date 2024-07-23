@@ -26,12 +26,14 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.opencloudphotos.GlobalManagers.ServerQueriesManager.Common.PhotoData;
+import com.opencloudphotos.GlobalManagers.ServerQueriesManager.Common.ResponseNotOkException;
 import com.opencloudphotos.GlobalManagers.ServerQueriesManager.GetPhotos;
 import com.opencloudphotos.GlobalManagers.ServerQueriesManager.PhotoUploader;
 import com.opencloudphotos.NativeModules.MediaManagement.Utils.Definitions;
 import com.opencloudphotos.NativeModules.MediaManagement.Utils.GetMediaTask;
 import com.opencloudphotos.R;
 import com.opencloudphotos.Utils.FileOperations;
+import com.opencloudphotos.Utils.MediaParser;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
@@ -82,11 +84,119 @@ public class UploadWorker extends Worker {
     public Result doWork() {
         Log.d("UploadWorker", "Work started.");
 
-        boolean dataParsed = parseInputData();
-        if(!dataParsed) {
+        try{
+            if(!parseInputData()) {
+                return Result.failure();
+            }
+
+            Context context = getApplicationContext();
+
+            createNotification();
+
+            PhotoUploader photoUploader = new PhotoUploader(
+                    getApplicationContext(),
+                    url,
+                    serverToken,
+                    deviceId);
+
+            WritableArray include = Arguments.createArray();
+            include.pushString("fileSize");
+            include.pushString("filename");
+            include.pushString("imageSize");
+
+            for (int i=0; i<photosIds.length; i++) {
+
+                if(isStopped()){
+                    Log.d("UploadWorker", "Work stopped");
+                    break;
+                }
+
+                String mediaId = photosIds[i];
+                updateNotification(i);
+
+                WritableMap result = new GetMediaTask(
+                        context,
+                        mediaId,
+                        1,
+                        null,
+                        null,
+                        null,
+                        Definitions.ASSET_TYPE_PHOTOS,
+                        0,
+                        0,
+                        include)
+                        .execute();
+
+                PhotoData photoData = parseResult(result);
+
+                if(photoData == null){
+                    Log.d("UploadWorker", "PhotoData not found for photo with mediaId: " + mediaId);
+                    continue;
+                }
+
+                try{
+                    photoUploader.uploadPhoto(photoData);
+                    setProgressAsync(new Data.Builder().putString(UPLOADED_PHOTO_MEDIA_ID, mediaId).build());
+                }catch (ResponseNotOkException e){
+                    Log.e("UploadWorker", "Failed upload of photo with mediaId: " + mediaId, e);
+                }
+            }
+
+            // Wait time to avoid the worker finishing before the progress is received by the UploadWorkerManager
+            sleep(500);
+            Log.d("UploadWorker", "Work finished.");
+            return Result.success();
+        }catch(Exception e){
+            Log.e("UploadWorker", "Exception thrown: ", e);
             return Result.failure();
+        }finally {
+            getApplicationContext().getSystemService(NotificationManager.class).cancel(NOTIFICATION_ID);
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private PhotoData parseResult(WritableMap result)  {
+        ReadableArray edges = result.getArray("edges");
+
+        if(edges == null){
+            throw new RuntimeException("UploadWorker: edges found null.");
         }
 
+        if(edges.size() == 0){
+            return null;
+        }
+
+        if(edges.size() > 1){
+            Log.i("UploadWorker", "Found more than on result for a mediaId");
+        }
+
+        ReadableMap item = edges.getMap(0);
+        ReadableMap node = item.getMap("node");
+        if(node == null){
+            throw new RuntimeException("UploadWorker: node found null.");
+        }
+
+        ReadableMap image = node.getMap("image");
+        if(image == null){
+            throw new RuntimeException("UploadWorker: image found null.");
+        }
+
+        return MediaParser.parsePhotoData(node);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void createChannel() {
+        NotificationChannel channel = new NotificationChannel(
+                CHANNEL_ID,
+                CHANNEL_ID,
+                NotificationManager.IMPORTANCE_HIGH
+        );
+
+        getApplicationContext().getSystemService(NotificationManager.class).createNotificationChannel(channel);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void createNotification(){
         Context context = getApplicationContext();
 
         PendingIntent cancelIntent = WorkManager.getInstance(context)
@@ -107,121 +217,12 @@ public class UploadWorker extends Worker {
                 .addAction(android.R.drawable.ic_delete, cancel, cancelIntent);
 
         setForegroundAsync(new ForegroundInfo(NOTIFICATION_ID, notificationBuilder.build()));
-
-        WritableArray include = Arguments.createArray();
-        include.pushString("fileSize");
-        include.pushString("filename");
-        include.pushString("imageSize");
-
-        PhotoUploader photoUploader = new PhotoUploader(
-                getApplicationContext(),
-                url,
-                serverToken,
-                deviceId);
-
-        for (int i=0; i<photosIds.length; i++) {
-            String mediaId = photosIds[i];
-
-            notificationBuilder.setContentText("Uploaded " + i + " photo out of " + photosIds.length);
-            getApplicationContext().getSystemService(NotificationManager.class).notify(NOTIFICATION_ID, notificationBuilder.build());
-
-            try {
-                WritableMap result = new GetMediaTask(
-                        context,
-                        mediaId,
-                        1,
-                        null,
-                        null,
-                        null,
-                        Definitions.ASSET_TYPE_PHOTOS,
-                        0,
-                        0,
-                        include)
-                        .execute();
-
-                PhotoData photoData = parseResult(result);
-
-                if(photoData == null){
-                    continue;
-                }
-
-                if(isStopped()){
-                    Log.d("UploadWorker", "Stopped");
-                    getApplicationContext().getSystemService(NotificationManager.class).cancel(NOTIFICATION_ID);
-                    break;
-                }
-
-                photoUploader.uploadPhoto(photoData);
-                setProgressAsync(new Data.Builder().putString(UPLOADED_PHOTO_MEDIA_ID, mediaId).build());
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-
-        }
-        // Wait time to avoid the worker finishing before the progress is received by the AutoBackupWorkerManager
-        try {
-            sleep(500);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-
-        return Result.success();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    private PhotoData parseResult(WritableMap result) throws IOException {
-        ReadableArray edges = result.getArray("edges");
-
-        if(edges == null){
-            throw new RuntimeException("UploadWorker: in parseResult edges found null.");
-        }
-
-        if(edges.size() == 0){
-            return null;
-        }
-
-        if(edges.size() > 1){
-            throw new RuntimeException("UploadWorker: in parseResult found more than on result for a mediaId");
-        }
-
-        ReadableMap item = edges.getMap(0);
-        ReadableMap node = item.getMap("node");
-
-        if(node == null){
-            throw new RuntimeException("UploadWorker: in parseResult node found null.");
-        }
-
-        ReadableMap image = node.getMap("image");
-        PhotoData photoData = new PhotoData();
-
-        double timestamp = node.getDouble("timestamp");
-        double modificationTimestamp = node.getDouble("modificationTimestamp");
-
-        double correctTimestamp = Math.min(timestamp, modificationTimestamp);
-
-        Instant instant = Instant.ofEpochSecond((long)correctTimestamp);
-        String timestampAsIso = instant.toString();
-
-        photoData.mediaId = node.getString("id");
-        photoData.uri = image.getString("uri");
-        photoData.fileSize = image.getDouble("fileSize");
-        photoData.height = image.getDouble("height");
-        photoData.width = image.getDouble("width");
-        photoData.name = image.getString("filename");
-        photoData.date = timestampAsIso;
-
-        return photoData;
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    private void createChannel() {
-        NotificationChannel channel = new NotificationChannel(
-                CHANNEL_ID,
-                CHANNEL_ID,
-                NotificationManager.IMPORTANCE_HIGH
-        );
-
-        getApplicationContext().getSystemService(NotificationManager.class).createNotificationChannel(channel);
+    private void updateNotification(int progress){
+        notificationBuilder.setContentText("Uploaded " + progress + " photo out of " + photosIds.length);
+        getApplicationContext().getSystemService(NotificationManager.class).notify(NOTIFICATION_ID, notificationBuilder.build());
     }
 
 }
