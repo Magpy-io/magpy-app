@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { produce } from 'immer';
@@ -8,7 +8,6 @@ import BottomModal from '~/Components/CommonComponents/BottomModal';
 import { PrimaryButton } from '~/Components/CommonComponents/Buttons';
 import { CloseIcon } from '~/Components/CommonComponents/Icons';
 import { usePhotoGalleryContext } from '~/Components/PhotoComponents/PhotoGalleryContext';
-import useEffectOnChange from '~/Hooks/useEffectOnChange';
 import { useStyles } from '~/Hooks/useStyles';
 import { colorsType } from '~/Styles/colors';
 import { spacing } from '~/Styles/spacing';
@@ -31,9 +30,15 @@ export default function FilterModal({ visible, onRequestClose }: FilterModalProp
   const styles = useStyles(makeStyles);
   const [filters, setFilters] = useState<FilterObjectType[]>([]);
 
-  useEffectOnChange(visible, () => {
-    setFilters(storeFilters);
-  });
+  const lastVisibleRef = useRef(visible);
+
+  useEffect(() => {
+    if (lastVisibleRef.current !== visible) {
+      console.log('setFilters');
+      setFilters(storeFilters);
+    }
+    lastVisibleRef.current = visible;
+  }, [storeFilters, visible, lastVisibleRef]);
 
   const onSubmit = () => {
     onRequestClose();
