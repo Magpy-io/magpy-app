@@ -2,7 +2,8 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { StyleSheet, View } from 'react-native';
 
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
-import { FullScreenEvents, FullScreenModule } from '~/NativeModules/FullScreenModule';
+import { useIsFullScreen } from '~/Hooks/useIsFullScreen';
+import { FullScreenModule } from '~/NativeModules/FullScreenModule';
 
 import { useCustomBackPress } from '../../../Hooks/useCustomBackPress';
 import ToolBarPhotos from '../common/ToolBarPhotos';
@@ -20,6 +21,8 @@ const PhotoSliderController = React.forwardRef<PhotoSliderComponentRefType, Prop
     const [flatListCurrentIndex, setFlatListCurrentIndex] = useState(0);
     const flatListCurrentIndexRef = useRef<number>(0);
 
+    const isFullScreenReal = useIsFullScreen();
+
     const [isFullScreen, setIsFullScreen] = useState(false);
 
     const currentPhoto = photos[flatListCurrentIndex] as PhotoGalleryType | undefined;
@@ -31,16 +34,8 @@ const PhotoSliderController = React.forwardRef<PhotoSliderComponentRefType, Prop
     }, [isSlidingPhotos, photos.length, onSwitchMode]);
 
     useEffect(() => {
-      const subscription = FullScreenEvents.subscribeOnFullScreenChanged(
-        ({ isFullScreen }) => {
-          setIsFullScreen(isFullScreen);
-        },
-      );
-
-      return () => {
-        subscription.remove();
-      };
-    }, []);
+      setIsFullScreen(isFullScreenReal);
+    }, [isFullScreenReal]);
 
     const onCurrentIndexChanged = useCallback((index: number) => {
       flatListCurrentIndexRef.current = index;
