@@ -40,11 +40,10 @@ export function useLocalServersFunctions() {
   }, []);
 
   const searchAsync = useCallback(async () => {
-    if (isScanningRef.current) {
-      MdnsServiceModule.stop();
+    if (!isScanningRef.current) {
+      setLocalServers([]);
+      MdnsServiceModule.scan('http', 'tcp', 'local.');
     }
-    setLocalServers([]);
-    MdnsServiceModule.scan('http', 'tcp', 'local.');
 
     return new Promise((resolve: (value: Server[]) => void) => {
       setTimeout(() => {
