@@ -6,6 +6,10 @@ import android.net.nsd.NsdManager;
 import android.net.nsd.NsdServiceInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
+import android.util.Log;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReadableMap;
@@ -14,10 +18,13 @@ import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.bridge.WritableNativeMap;
+import com.opencloudphotos.GlobalManagers.ExecutorsManager;
 
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -29,10 +36,13 @@ public class MdnsServiceManager {
     private MdnsServiceModule zeroconfModule;
     private ReactApplicationContext reactApplicationContext;
 
+    private List<MdnsServiceResolver> registeredServiceResolvers;
+
     public MdnsServiceManager(MdnsServiceModule zeroconfModule, ReactApplicationContext reactApplicationContext) {
         this.zeroconfModule = zeroconfModule;
         this.reactApplicationContext = reactApplicationContext;
-        mPublishedServices = new HashMap<String, NsdManager.RegistrationListener>();
+        mPublishedServices = new HashMap<>();
+        registeredServiceResolvers = new ArrayList<>();
     }
 
     public void scan(String type, String protocol, String domain) {
@@ -43,7 +53,7 @@ public class MdnsServiceManager {
         this.stop();
 
         if (multicastLock == null) {
-            @SuppressLint("WifiManagerLeak") WifiManager wifi = (WifiManager) getReactApplicationContext().getSystemService(Context.WIFI_SERVICE);
+             WifiManager wifi = (WifiManager) getReactApplicationContext().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
             multicastLock = wifi.createMulticastLock("multicastLock");
             multicastLock.setReferenceCounted(true);
             multicastLock.acquire();
@@ -74,6 +84,7 @@ public class MdnsServiceManager {
                 zeroconfModule.sendEvent(getReactApplicationContext(), MdnsServiceModule.EVENT_STOP, null);
             }
 
+            @RequiresApi(api = Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
             @Override
             public void onServiceFound(NsdServiceInfo serviceInfo) {
                 System.out.println("On Service Found");
@@ -81,7 +92,9 @@ public class MdnsServiceManager {
                 service.putString(MdnsServiceModule.KEY_SERVICE_NAME, serviceInfo.getServiceName());
 
                 zeroconfModule.sendEvent(getReactApplicationContext(), MdnsServiceModule.EVENT_FOUND, service);
-                mNsdManager.resolveService(serviceInfo, new MdnsServiceManager.ZeroResolveListener());
+                MdnsServiceResolver resolver = new MdnsServiceResolver();
+                registeredServiceResolvers.add(resolver);
+                mNsdManager.registerServiceInfoCallback(serviceInfo, ExecutorsManager.executorService, resolver);
             }
 
             @Override
@@ -97,7 +110,13 @@ public class MdnsServiceManager {
         mNsdManager.discoverServices(serviceType, NsdManager.PROTOCOL_DNS_SD, mDiscoveryListener);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     public void stop() {
+        for(var resolver:registeredServiceResolvers){
+            mNsdManager.unregisterServiceInfoCallback(resolver);
+        }
+        registeredServiceResolvers.clear();
+
         if (mDiscoveryListener != null) {
             mNsdManager.stopServiceDiscovery(mDiscoveryListener);
         }
@@ -153,21 +172,28 @@ public class MdnsServiceManager {
         return reactApplicationContext;
     }
 
-    private class ZeroResolveListener implements NsdManager.ResolveListener {
+    @RequiresApi(api = Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+    private class MdnsServiceResolver implements NsdManager.ServiceInfoCallback{
+
         @Override
-        public void onResolveFailed(NsdServiceInfo serviceInfo, int errorCode) {
-            if (errorCode == NsdManager.FAILURE_ALREADY_ACTIVE) {
-                mNsdManager.resolveService(serviceInfo, this);
-            } else {
-                String error = "Resolving service failed with code: " + errorCode;
-                zeroconfModule.sendEvent(getReactApplicationContext(), MdnsServiceModule.EVENT_ERROR, error);
-            }
+        public void onServiceInfoCallbackRegistrationFailed(int errorCode) {
+            Log.e("MdnsServiceModule", "onServiceInfoCallbackRegistrationFailed");
         }
 
         @Override
-        public void onServiceResolved(NsdServiceInfo serviceInfo) {
+        public void onServiceUpdated(@NonNull NsdServiceInfo serviceInfo) {
             WritableMap service = serviceInfoToMap(serviceInfo);
             zeroconfModule.sendEvent(getReactApplicationContext(), MdnsServiceModule.EVENT_RESOLVE, service);
+        }
+
+        @Override
+        public void onServiceLost() {
+
+        }
+
+        @Override
+        public void onServiceInfoCallbackUnregistered() {
+
         }
     }
 

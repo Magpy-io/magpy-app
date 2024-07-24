@@ -28,11 +28,13 @@ export const LocalServersEffects: React.FC<PropsType> = props => {
         setLocalServers(oldServers => {
           return [
             ...oldServers,
-            {
-              name: service.name.replace(serverMdnsPrefix, ''),
-              ip: service.addresses[0],
-              port: service.port.toString(),
-            },
+            ...service.addresses.map(address => {
+              return {
+                name: service.name.replace(serverMdnsPrefix, ''),
+                ip: address,
+                port: service.port.toString(),
+              };
+            }),
           ];
         });
       }
