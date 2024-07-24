@@ -1,10 +1,11 @@
 import { useCallback, useRef } from 'react';
 
+import { MdnsServiceModule } from '~/NativeModules/MdnsServiceModule';
+
 import {
   Server,
   useLocalServersContext,
   useLocalServersContextSetters,
-  zeroconf,
 } from './LocalServersContext';
 
 export function useLocalServersFunctions() {
@@ -22,29 +23,29 @@ export function useLocalServersFunctions() {
 
   const refreshData = useCallback(() => {
     if (isScanningRef.current) {
-      zeroconf.stop();
+      MdnsServiceModule.stop();
     }
     setLocalServers([]);
-    zeroconf.scan('http', 'tcp', 'local.');
+    MdnsServiceModule.scan('http', 'tcp', 'local.', '');
     setTimeout(() => {
-      zeroconf.stop();
+      MdnsServiceModule.stop();
     }, 5000);
   }, [isScanningRef, setLocalServers]);
 
   const stopSearch = () => {
-    zeroconf.stop();
+    MdnsServiceModule.stop();
   };
 
   const searchAsync = useCallback(async () => {
     if (isScanningRef.current) {
-      zeroconf.stop();
+      MdnsServiceModule.stop();
     }
     setLocalServers([]);
-    zeroconf.scan('http', 'tcp', 'local.');
+    MdnsServiceModule.scan('http', 'tcp', 'local.', '');
 
     return new Promise((resolve: (value: Server[]) => void) => {
       setTimeout(() => {
-        zeroconf.stop();
+        MdnsServiceModule.stop();
         resolve(localServersRef.current);
       }, 1000);
     });

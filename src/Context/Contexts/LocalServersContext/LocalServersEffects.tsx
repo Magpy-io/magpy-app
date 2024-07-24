@@ -1,8 +1,10 @@
 import React, { ReactNode, useEffect } from 'react';
 
 import { serverMdnsPrefix } from '~/Config/config';
+import { MdnsServiceModule } from '~/NativeModules/MdnsServiceModule';
+import { NativeEventEmitterWrapper } from '~/NativeModules/NativeModulesEventNames';
 
-import { useLocalServersContextSetters, zeroconf } from './LocalServersContext';
+import { useLocalServersContextSetters } from './LocalServersContext';
 
 type PropsType = {
   children: ReactNode;
@@ -14,13 +16,17 @@ export const LocalServersEffects: React.FC<PropsType> = props => {
   const { setLocalServers, setIsScanning } = localServersContextSetters;
 
   useEffect(() => {
-    zeroconf.on('start', () => {
+    const emmiter = new NativeEventEmitterWrapper();
+
+    const subStart = emmiter.subscribeOnSearchStarted(() => {
       setIsScanning(true);
     });
-    zeroconf.on('stop', () => {
+
+    const subStop = emmiter.subscribeOnSearchStopped(() => {
       setIsScanning(false);
     });
-    zeroconf.on('resolved', service => {
+
+    const subResolved = emmiter.subscribeOnServiceResolved(service => {
       if (service.name.startsWith(serverMdnsPrefix) && service.addresses[0]) {
         setLocalServers(oldServers => {
           return [
@@ -34,12 +40,12 @@ export const LocalServersEffects: React.FC<PropsType> = props => {
         });
       }
     });
-    zeroconf.on('error', err => {
-      setIsScanning(false);
-      console.log('[Error]', err);
-    });
+
     return () => {
-      zeroconf.removeDeviceListeners();
+      subStart.remove();
+      subStop.remove();
+      subResolved.remove();
+      MdnsServiceModule.removeDeviceListeners();
     };
   }, [setIsScanning, setLocalServers]);
 
