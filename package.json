@@ -47,7 +47,7 @@
     "react-native-safe-area-context": "^4.8.2",
     "react-native-safe-area-view": "^1.1.1",
     "react-native-screens": "^3.29.0",
-    "react-native-section-list-get-item-layout": "https://github.com/IssamEPA/rn-section-list-get-item-layout.git#commit=21af950984be03715d86f141accf5d8985952c63",
+    "react-native-section-list-get-item-layout": "https://github.com/issamBenelgada/rn-section-list-get-item-layout.git#commit=21af950984be03715d86f141accf5d8985952c63",
     "react-native-svg": "^14.1.0",
     "react-native-tab-view": "^3.5.2",
     "react-native-toast-message": "^2.2.0",
