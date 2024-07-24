@@ -2,8 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { StyleSheet, View } from 'react-native';
 
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
-import { FullScreenModule } from '~/NativeModules/FullScreenModule';
-import { NativeEventEmitterWrapper } from '~/NativeModules/NativeModulesEventNames';
+import { FullScreenEvents, FullScreenModule } from '~/NativeModules/FullScreenModule';
 
 import { useCustomBackPress } from '../../../Hooks/useCustomBackPress';
 import ToolBarPhotos from '../common/ToolBarPhotos';
@@ -32,10 +31,11 @@ const PhotoSliderController = React.forwardRef<PhotoSliderComponentRefType, Prop
     }, [isSlidingPhotos, photos.length, onSwitchMode]);
 
     useEffect(() => {
-      const emitter = new NativeEventEmitterWrapper();
-      const subscription = emitter.subscribeOnFullScreenChanged(({ isFullScreen }) => {
-        setIsFullScreen(isFullScreen);
-      });
+      const subscription = FullScreenEvents.subscribeOnFullScreenChanged(
+        ({ isFullScreen }) => {
+          setIsFullScreen(isFullScreen);
+        },
+      );
 
       return () => {
         subscription.remove();

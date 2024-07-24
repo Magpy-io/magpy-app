@@ -1,7 +1,5 @@
-import { PhotoIdentifier } from '@react-native-camera-roll/camera-roll';
-
 import { PhotoLocalType } from '~/Context/ReduxStore/Slices/Photos/Photos';
-import { MediaManagementModule } from '~/NativeModules/MediaManagementModule';
+import { MediaManagementModule, PhotoIdentifier } from '~/NativeModules/MediaManagementModule';
 
 export async function GalleryGetPhotos(
   n: number,

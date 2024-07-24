@@ -13,10 +13,10 @@ import { colorsType } from '~/Styles/colors';
 import { spacing } from '~/Styles/spacing';
 import { typography } from '~/Styles/typography';
 
-import DateFilterComponent, { DateFilterObjectType } from '../filters/DateFilter';
+import DateFilterComponent from '../filters/DateFilter';
 import { FilterNameType, FilterObjectType } from '../filters/Filter';
-import { StatusFilterComponent, StatusFilterObjectType } from '../filters/StatusFilter';
-import { TypeFilterComponent, TypeFilterObjectType } from '../filters/TypeFilter';
+import { StatusFilterComponent } from '../filters/StatusFilter';
+import { TypeFilterComponent } from '../filters/TypeFilter';
 import { filterPhotos } from '../filters/functions';
 
 type FilterModalProps = {
@@ -45,17 +45,11 @@ export default function FilterModal({ visible, onRequestClose }: FilterModalProp
     addFilters(filters);
   };
 
-  const TypeFilterObject = filters?.find(f => f.type === 'Type') as
-    | TypeFilterObjectType
-    | undefined;
+  const TypeFilterObject = filters?.find(f => f.type === 'Type');
 
-  const StatusFilterObject = filters?.find(f => f.type === 'Status') as
-    | StatusFilterObjectType
-    | undefined;
+  const StatusFilterObject = filters?.find(f => f.type === 'Status');
 
-  const DateFilterObject = filters?.find(f => f.type === 'Date') as
-    | DateFilterObjectType
-    | undefined;
+  const DateFilterObject = filters?.find(f => f.type === 'Date');
 
   const addOrEditFilter = useCallback((filter: FilterObjectType) => {
     setFilters(

@@ -32,9 +32,9 @@ export function useLocalServersFunctions() {
     }, 5000);
   }, [isScanningRef, setLocalServers]);
 
-  const stopSearch = () => {
+  const stopSearch = useCallback(() => {
     MdnsServiceModule.stop();
-  };
+  }, []);
 
   const searchAsync = useCallback(async () => {
     if (isScanningRef.current) {
