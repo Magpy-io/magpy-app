@@ -2,7 +2,7 @@ import { NativeEventEmitter, NativeModules } from 'react-native';
 
 const { UploadMediaModule } = NativeModules;
 
-const PHOTO_UPLOADED_EVENT_NAME = 'PhotoUploaded';
+const PHOTO_UPLOADED_EVENT_NAME = 'PHOTO_UPLOADED_EVENT_NAME';
 
 export interface UploadMediaModuleType {
   StartUploadWorker: (data: {

@@ -14,12 +14,12 @@ import javax.annotation.Nullable;
 
 public class MdnsServiceModule extends ReactContextBaseJavaModule {
 
-    public static final String EVENT_START = "RNZeroconfStart";
-    public static final String EVENT_STOP = "RNZeroconfStop";
-    public static final String EVENT_ERROR = "RNZeroconfError";
-    public static final String EVENT_FOUND = "RNZeroconfFound";
-    public static final String EVENT_REMOVE = "RNZeroconfRemove";
-    public static final String EVENT_RESOLVE = "RNZeroconfResolved";
+    public static final String EVENT_START = "MDNS_DISCOVERY_STARTED_EVENT_NAME";
+    public static final String EVENT_STOP = "MDNS_DISCOVERY_STOPPED_EVENT_NAME";
+    public static final String EVENT_ERROR = "MDNS_ERROR_EVENT_NAME";
+    public static final String EVENT_FOUND = "MDNS_DEVICE_FOUND_EVENT_NAME";
+    public static final String EVENT_REMOVE = "MDNS_DEVICE_REMOVED_EVENT_NAME";
+    public static final String EVENT_RESOLVE = "MDNS_DEVICE_RESOLVED_EVENT_NAME";
 
     public static final String EVENT_PUBLISHED = "RNZeroconfServiceRegistered";
     public static final String EVENT_UNREGISTERED = "RNZeroconfServiceUnregistered";
@@ -44,7 +44,7 @@ public class MdnsServiceModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void scan(String type, String protocol, String domain, String implType) {
+    public void scan(String type, String protocol, String domain) {
         try {
             mdnsServiceManager.scan(type, protocol, domain);
         } catch (Throwable e) {
@@ -65,7 +65,7 @@ public class MdnsServiceModule extends ReactContextBaseJavaModule {
 
 
     @ReactMethod
-    public void registerService(String type, String protocol, String domain, String name, int port, ReadableMap txt, String implType) {
+    public void registerService(String type, String protocol, String domain, String name, int port, ReadableMap txt) {
         try {
             mdnsServiceManager.registerService(type, protocol, domain, name, port, txt);
         } catch (Throwable e) {
@@ -75,7 +75,7 @@ public class MdnsServiceModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void unregisterService(String serviceName, String implType) {
+    public void unregisterService(String serviceName) {
         try {
             mdnsServiceManager.unregisterService(serviceName);
         } catch (Throwable e) {

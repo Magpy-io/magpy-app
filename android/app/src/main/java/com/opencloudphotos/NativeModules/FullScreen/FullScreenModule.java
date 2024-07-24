@@ -15,6 +15,9 @@ import com.facebook.react.bridge.WritableNativeMap;
 
 
 public class FullScreenModule extends ReactContextBaseJavaModule {
+
+    public static final String EVENT_FULL_SCREEN_CHANGED = "FULL_SCREEN_CHANGED_EVENT";
+
     public FullScreenModule(ReactApplicationContext context) {
         super(context);
     }

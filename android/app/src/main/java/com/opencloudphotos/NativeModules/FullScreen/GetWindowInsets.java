@@ -79,7 +79,7 @@ public class GetWindowInsets{
             if (reactContext != null) {
                 WritableMap params = new WritableNativeMap();
                 params.putBoolean("isFullScreen", isFullScreen);
-                BridgeFunctions.sendEvent(reactContext, "FullScreenChanged", params);
+                BridgeFunctions.sendEvent(reactContext, FullScreenModule.EVENT_FULL_SCREEN_CHANGED, params);
             }else{
                 Log.e("GetWindowInsets", "React context is null.");
             }

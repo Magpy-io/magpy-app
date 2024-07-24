@@ -2,7 +2,7 @@ import { NativeEventEmitter, NativeModules } from 'react-native';
 
 const { FullScreenModule } = NativeModules;
 
-const FULL_SCREEN_CHANGED_EVENT_NAME = 'FullScreenChanged';
+const FULL_SCREEN_CHANGED_EVENT_NAME = 'FULL_SCREEN_CHANGED_EVENT';
 
 export interface FullScreenModuleType {
   disableFullScreen: () => Promise<void>;

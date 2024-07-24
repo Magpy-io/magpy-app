@@ -26,7 +26,7 @@ export function useLocalServersFunctions() {
       MdnsServiceModule.stop();
     }
     setLocalServers([]);
-    MdnsServiceModule.scan('http', 'tcp', 'local.', '');
+    MdnsServiceModule.scan('http', 'tcp', 'local.');
     setTimeout(() => {
       MdnsServiceModule.stop();
     }, 5000);
@@ -41,13 +41,13 @@ export function useLocalServersFunctions() {
       MdnsServiceModule.stop();
     }
     setLocalServers([]);
-    MdnsServiceModule.scan('http', 'tcp', 'local.', '');
+    MdnsServiceModule.scan('http', 'tcp', 'local.');
 
     return new Promise((resolve: (value: Server[]) => void) => {
       setTimeout(() => {
         MdnsServiceModule.stop();
         resolve(localServersRef.current);
-      }, 1000);
+      }, 2000);
     });
   }, [setLocalServers, localServersRef]);
 

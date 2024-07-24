@@ -13,6 +13,9 @@ import com.facebook.react.bridge.WritableNativeMap;
 import com.opencloudphotos.Utils.BridgeFunctions;
 
 public class UploadMediaModule extends ReactContextBaseJavaModule {
+
+    public static final String EVENT_PHOTO_UPLOADED = "PHOTO_UPLOADED_EVENT_NAME";
+
     public UploadMediaModule(ReactApplicationContext context) {
         super(context);
     }
@@ -65,7 +68,7 @@ public class UploadMediaModule extends ReactContextBaseJavaModule {
         uploadWorkerManager.StartWorker(url, serverToken, deviceId, photosIds, mediaId -> {
             WritableMap params = new WritableNativeMap();
             params.putString("mediaId", mediaId);
-            BridgeFunctions.sendEvent(getReactApplicationContext(), "PhotoUploaded", params);
+            BridgeFunctions.sendEvent(getReactApplicationContext(), EVENT_PHOTO_UPLOADED, params);
         });
     }
 
