@@ -22,6 +22,7 @@ import com.opencloudphotos.GlobalManagers.ExecutorsManager;
 
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -45,6 +46,7 @@ public class MdnsServiceManager {
         registeredServiceResolvers = new ArrayList<>();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     public void scan(String type, String protocol, String domain) {
         if (mNsdManager == null) {
             mNsdManager = (NsdManager) getReactApplicationContext().getSystemService(Context.NSD_SERVICE);
@@ -252,17 +254,10 @@ public class MdnsServiceManager {
 
         WritableMap txtRecords = new WritableNativeMap();
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Map<String, byte[]> attributes = serviceInfo.getAttributes();
-            for (String key : attributes.keySet()) {
-                try {
-                    byte[] recordValue = attributes.get(key);
-                    txtRecords.putString(String.format(Locale.getDefault(), "%s", key), String.format(Locale.getDefault(), "%s", recordValue != null ? new String(recordValue, "UTF_8") : ""));
-                } catch (UnsupportedEncodingException e) {
-                    String error = "Failed to encode txtRecord: " + e;
-                    zeroconfModule.sendEvent(getReactApplicationContext(), MdnsServiceModule.EVENT_ERROR, error);
-                }
-            }
+        Map<String, byte[]> attributes = serviceInfo.getAttributes();
+        for (String key : attributes.keySet()) {
+            byte[] recordValue = attributes.get(key);
+            txtRecords.putString(String.format(Locale.getDefault(), "%s", key), String.format(Locale.getDefault(), "%s", recordValue != null ? new String(recordValue, StandardCharsets.UTF_8) : ""));
         }
 
         service.putMap(MdnsServiceModule.KEY_SERVICE_TXT, txtRecords);

@@ -1,6 +1,9 @@
 package com.opencloudphotos.NativeModules.MdnsService;
 
+import android.os.Build;
 import android.util.Log;
+
+import androidx.annotation.RequiresApi;
 
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContext;
@@ -53,6 +56,7 @@ public class MdnsServiceModule extends ReactContextBaseJavaModule {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     @ReactMethod
     public void stop() {
         try {
@@ -92,6 +96,7 @@ public class MdnsServiceModule extends ReactContextBaseJavaModule {
                 .emit(eventName, params);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     @Override
     public void onCatalystInstanceDestroy() {
         super.onCatalystInstanceDestroy();
