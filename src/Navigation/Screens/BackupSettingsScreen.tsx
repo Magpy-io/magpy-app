@@ -73,7 +73,7 @@ export default function BackupSettingsScreen() {
           onPopupDismissed().catch(console.log);
         }}
         title="Notification Permission Needed"
-        content="dfjlk fdlksj flksdjf lkjsdlf jlsdjmfj"
+        content="Allow Magpy to display notifications. This will be used to display the progress of the backing up of your photos."
         ok="Ok"
       />
     </>
