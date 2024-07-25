@@ -1,27 +1,45 @@
 import { useCallback } from 'react';
-import { PermissionsAndroid } from 'react-native';
 
-import { usePermissionsContextInner } from './PermissionsContext';
+import {
+  askAndroidPermissionNotifications,
+  askAndroidPermissionReadMedia,
+} from '~/Helpers/GetPermissionsAndroid';
+
+import {
+  usePermissionsContextInner,
+  usePermissionsContextSettersInner,
+} from './PermissionsContext';
 
 export function usePermissionsContextFunctions() {}
 
 export function usePermissionsContext() {
-  const { mediaPermissionStatus, setMediaPermissionStatus } = usePermissionsContextInner();
+  const { mediaPermissionStatus, notificationsPermissionStatus } =
+    usePermissionsContextInner();
+  const { setMediaPermissionStatus, setNotificationsPermissionStatus } =
+    usePermissionsContextSettersInner();
 
   const askMediaPermission = useCallback(async () => {
-    const result = await PermissionsAndroid.requestMultiple([
-      PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
-      PermissionsAndroid.PERMISSIONS.READ_MEDIA_VIDEO,
-    ]);
+    const permissionsGranted = await askAndroidPermissionReadMedia();
 
-    const permissionsGranted =
-      result[PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES] ==
-        PermissionsAndroid.RESULTS.GRANTED &&
-      result[PermissionsAndroid.PERMISSIONS.READ_MEDIA_VIDEO] ==
-        PermissionsAndroid.RESULTS.GRANTED;
+    const permissionStatus = permissionsGranted ? 'GRANTED' : 'REJECTED';
 
-    setMediaPermissionStatus(permissionsGranted ? 'GRANTED' : 'REJECTED');
+    setMediaPermissionStatus(permissionStatus);
+    return permissionStatus;
   }, [setMediaPermissionStatus]);
 
-  return { mediaPermissionStatus, askMediaPermission };
+  const askNotificationsPermission = useCallback(async () => {
+    const permissionsGranted = await askAndroidPermissionNotifications();
+
+    const permissionStatus = permissionsGranted ? 'GRANTED' : 'REJECTED';
+
+    setNotificationsPermissionStatus(permissionStatus);
+    return permissionStatus;
+  }, [setNotificationsPermissionStatus]);
+
+  return {
+    mediaPermissionStatus,
+    askMediaPermission,
+    notificationsPermissionStatus,
+    askNotificationsPermission,
+  };
 }

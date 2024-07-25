@@ -1,6 +1,6 @@
 import { Permission, PermissionsAndroid, Platform } from 'react-native';
 
-async function hasAndroidPermissionReadMedia() {
+export async function hasAndroidPermissionReadMedia() {
   const imagesPermission = await hasAndroidAnyPermission(
     PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
   );
@@ -11,6 +11,40 @@ async function hasAndroidPermissionReadMedia() {
   return imagesPermission && videosPermission;
 }
 
+export async function askAndroidPermissionReadMedia() {
+  const result = await PermissionsAndroid.requestMultiple([
+    PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
+    PermissionsAndroid.PERMISSIONS.READ_MEDIA_VIDEO,
+  ]);
+
+  const permissionsGranted =
+    result[PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES] ==
+      PermissionsAndroid.RESULTS.GRANTED &&
+    result[PermissionsAndroid.PERMISSIONS.READ_MEDIA_VIDEO] ==
+      PermissionsAndroid.RESULTS.GRANTED;
+
+  return permissionsGranted;
+}
+
+export async function hasAndroidPermissionNotifications() {
+  return await hasAndroidAnyPermission(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
+}
+
+export async function askAndroidPermissionNotifications() {
+  const result = await PermissionsAndroid.request(
+    PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
+    {
+      title: 'title',
+      message: 'message',
+      buttonPositive: 'ok',
+      buttonNegative: 'no',
+      buttonNeutral: 'meh',
+    },
+  );
+
+  return result == PermissionsAndroid.RESULTS.GRANTED;
+}
+
 async function hasAndroidAnyPermission(permission: Permission) {
   if (Platform.OS !== 'android') {
     throw new Error('Only use hasAndroidPermission on Android, Platform.OS == ' + Platform.OS);
@@ -18,5 +52,3 @@ async function hasAndroidAnyPermission(permission: Permission) {
   const hasPermission = await PermissionsAndroid.check(permission);
   return hasPermission;
 }
-
-export { hasAndroidPermissionReadMedia };

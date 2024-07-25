@@ -1,25 +1,39 @@
 import React, { ReactNode, useEffect } from 'react';
 import { AppState } from 'react-native';
 
-import { hasAndroidPermissionReadMedia } from '~/Helpers/GetPermissionsAndroid';
+import {
+  hasAndroidPermissionNotifications,
+  hasAndroidPermissionReadMedia,
+} from '~/Helpers/GetPermissionsAndroid';
 
-import { usePermissionsContextInner } from './PermissionsContext';
+import {
+  usePermissionsContextInner,
+  usePermissionsContextSettersInner,
+} from './PermissionsContext';
 
 type PropsType = {
   children: ReactNode;
 };
 
 export const PermissionsContextEffect: React.FC<PropsType> = props => {
-  const { setMediaPermissionStatus, mediaPermissionStatus } = usePermissionsContextInner();
+  const { mediaPermissionStatus } = usePermissionsContextInner();
+  const { setMediaPermissionStatus, setNotificationsPermissionStatus } =
+    usePermissionsContextSettersInner();
 
   // Set the permission on launch
   useEffect(() => {
-    hasAndroidPermissionReadMedia()
-      .then(hasPermission => setMediaPermissionStatus(hasPermission ? 'GRANTED' : 'PENDING'))
-      .catch(console.log);
-  }, [setMediaPermissionStatus]);
+    async function innerAsync() {
+      const hasPermissionMedia = await hasAndroidPermissionReadMedia();
+      const hasPermissionNotifications = await hasAndroidPermissionNotifications();
 
-  // Update the permission after launch if user leaves and comes back to the app
+      setMediaPermissionStatus(hasPermissionMedia ? 'GRANTED' : 'PENDING');
+      setNotificationsPermissionStatus(hasPermissionNotifications ? 'GRANTED' : 'PENDING');
+    }
+
+    innerAsync().catch(console.log);
+  }, [setMediaPermissionStatus, setNotificationsPermissionStatus]);
+
+  // Update the media permission if user leaves and comes back to the app
   useEffect(() => {
     const subscription = AppState.addEventListener('focus', () => {
       if (mediaPermissionStatus == 'PENDING') {

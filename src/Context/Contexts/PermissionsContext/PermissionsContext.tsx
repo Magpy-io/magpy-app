@@ -8,15 +8,27 @@ export type PermissionStates = 'GRANTED' | 'PENDING' | 'REJECTED';
 
 export type PermissionsContextDataType = {
   mediaPermissionStatus: PermissionStates;
+  notificationsPermissionStatus: PermissionStates;
+};
+
+export type PermissionsContextSettersType = {
   setMediaPermissionStatus: SetStateType<PermissionStates>;
+  setNotificationsPermissionStatus: SetStateType<PermissionStates>;
 };
 
-const initialState: PermissionsContextDataType = {
+const initialStateData: PermissionsContextDataType = {
   mediaPermissionStatus: 'PENDING',
-  setMediaPermissionStatus: () => {},
+  notificationsPermissionStatus: 'PENDING',
 };
 
-const PermissionsContext = createContext<PermissionsContextDataType>(initialState);
+const initialStateSetters: PermissionsContextSettersType = {
+  setMediaPermissionStatus: () => {},
+  setNotificationsPermissionStatus: () => {},
+};
+
+const PermissionsContext = createContext<PermissionsContextDataType>(initialStateData);
+const PermissionsContextSetters =
+  createContext<PermissionsContextSettersType>(initialStateSetters);
 
 type PropsType = {
   children: ReactNode;
@@ -25,16 +37,32 @@ type PropsType = {
 export const PermissionsContextProvider: React.FC<PropsType> = props => {
   const [mediaPermissionStatus, setMediaPermissionStatus] =
     useState<PermissionStates>('PENDING');
+  const [notificationsPermissionStatus, setNotificationsPermissionStatus] =
+    useState<PermissionStates>('PENDING');
 
   return (
-    <PermissionsContext.Provider value={{ mediaPermissionStatus, setMediaPermissionStatus }}>
-      <PermissionsContextEffect>{props.children}</PermissionsContextEffect>
+    <PermissionsContext.Provider
+      value={{ mediaPermissionStatus, notificationsPermissionStatus }}>
+      <PermissionsContextSetters.Provider
+        value={{ setMediaPermissionStatus, setNotificationsPermissionStatus }}>
+        <PermissionsContextEffect>{props.children}</PermissionsContextEffect>
+      </PermissionsContextSetters.Provider>
     </PermissionsContext.Provider>
   );
 };
 
 export function usePermissionsContextInner(): PermissionsContextDataType {
   const context = useContext(PermissionsContext);
+
+  if (!context) {
+    throw new Error('PermissionsContext not defined');
+  }
+
+  return context;
+}
+
+export function usePermissionsContextSettersInner(): PermissionsContextSettersType {
+  const context = useContext(PermissionsContextSetters);
 
   if (!context) {
     throw new Error('PermissionsContext not defined');
