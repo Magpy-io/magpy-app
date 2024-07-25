@@ -9,6 +9,7 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeMap;
+import com.opencloudphotos.NativeModules.UploadMedia.UploadMediaModule;
 import com.opencloudphotos.Utils.BridgeFunctions;
 
 public class AutoBackupModule extends ReactContextBaseJavaModule {
@@ -47,7 +48,7 @@ public class AutoBackupModule extends ReactContextBaseJavaModule {
         autoBackupWorkerManager.StartWorker(url, serverToken, deviceId, mediaId -> {
             WritableMap params = new WritableNativeMap();
             params.putString("mediaId", mediaId);
-            BridgeFunctions.sendEvent(getReactApplicationContext(), "PhotoUploaded", params);
+            BridgeFunctions.sendEvent(getReactApplicationContext(), UploadMediaModule.EVENT_PHOTO_UPLOADED, params);
         });
     }
 
