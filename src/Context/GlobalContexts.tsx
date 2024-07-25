@@ -10,6 +10,7 @@ import { UploadWorkerContextProvider } from '~/Context/Contexts/UploadWorkerCont
 import { BackupWorkerContextProvider } from './Contexts/BackupWorkerContext';
 import { LocalAccountContextProvider } from './Contexts/LocalAccountContext';
 import { MainContextProvider } from './Contexts/MainContext';
+import { PermissionsContextProvider } from './Contexts/PermissionsContext';
 
 type PropsType = {
   children: ReactNode;
@@ -17,22 +18,26 @@ type PropsType = {
 
 export const GlobalContexts: React.FC<PropsType> = props => {
   return (
-    <MainContextProvider>
-      <AuthContextProvider>
-        <LocalServersContextProvider>
-          <UploadWorkerContextProvider>
-            <ServerClaimContextProvider>
-              <ServerContextProvider>
-                <LocalAccountContextProvider>
-                  <PhotosDownloadingContextProvider>
-                    <BackupWorkerContextProvider>{props.children}</BackupWorkerContextProvider>
-                  </PhotosDownloadingContextProvider>
-                </LocalAccountContextProvider>
-              </ServerContextProvider>
-            </ServerClaimContextProvider>
-          </UploadWorkerContextProvider>
-        </LocalServersContextProvider>
-      </AuthContextProvider>
-    </MainContextProvider>
+    <PermissionsContextProvider>
+      <MainContextProvider>
+        <AuthContextProvider>
+          <LocalServersContextProvider>
+            <UploadWorkerContextProvider>
+              <ServerClaimContextProvider>
+                <ServerContextProvider>
+                  <LocalAccountContextProvider>
+                    <PhotosDownloadingContextProvider>
+                      <BackupWorkerContextProvider>
+                        {props.children}
+                      </BackupWorkerContextProvider>
+                    </PhotosDownloadingContextProvider>
+                  </LocalAccountContextProvider>
+                </ServerContextProvider>
+              </ServerClaimContextProvider>
+            </UploadWorkerContextProvider>
+          </LocalServersContextProvider>
+        </AuthContextProvider>
+      </MainContextProvider>
+    </PermissionsContextProvider>
   );
 };
