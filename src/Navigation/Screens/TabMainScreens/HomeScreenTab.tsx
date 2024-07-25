@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import PhotoGallery from '~/Components/PhotoComponents/PhotoGallery';
 import { PhotoGalleryContextProvider } from '~/Components/PhotoComponents/PhotoGalleryContext';
@@ -6,11 +6,17 @@ import PermissionNeededView from '~/Components/PhotoComponents/permissionNeeded/
 import { usePermissionsContext } from '~/Context/Contexts/PermissionsContext';
 
 export default function HomeScreenTab() {
-  const { hasMediaPermission } = usePermissionsContext();
+  const { mediaPermissionStatus, askMediaPermission } = usePermissionsContext();
+
+  useEffect(() => {
+    if (mediaPermissionStatus == 'PENDING') {
+      askMediaPermission().catch(console.log);
+    }
+  }, [askMediaPermission, mediaPermissionStatus]);
 
   return (
     <>
-      {hasMediaPermission ? (
+      {mediaPermissionStatus != 'REJECTED' ? (
         <PhotoGalleryContextProvider isServer={false}>
           <PhotoGallery key={'AllPhotos'} title="All photos" isInTabScreen />
         </PhotoGalleryContextProvider>

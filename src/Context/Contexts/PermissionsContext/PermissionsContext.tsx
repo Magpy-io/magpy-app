@@ -4,14 +4,16 @@ import { PermissionsContextEffect } from './PermissionsContextEffect';
 
 type SetStateType<T> = React.Dispatch<React.SetStateAction<T>>;
 
+export type PermissionStates = 'GRANTED' | 'PENDING' | 'REJECTED';
+
 export type PermissionsContextDataType = {
-  hasMediaPermission: boolean;
-  setHasMediaPermission: SetStateType<boolean>;
+  mediaPermissionStatus: PermissionStates;
+  setMediaPermissionStatus: SetStateType<PermissionStates>;
 };
 
 const initialState: PermissionsContextDataType = {
-  hasMediaPermission: true,
-  setHasMediaPermission: () => {},
+  mediaPermissionStatus: 'PENDING',
+  setMediaPermissionStatus: () => {},
 };
 
 const PermissionsContext = createContext<PermissionsContextDataType>(initialState);
@@ -21,10 +23,11 @@ type PropsType = {
 };
 
 export const PermissionsContextProvider: React.FC<PropsType> = props => {
-  const [hasMediaPermission, setHasMediaPermission] = useState(true);
+  const [mediaPermissionStatus, setMediaPermissionStatus] =
+    useState<PermissionStates>('PENDING');
 
   return (
-    <PermissionsContext.Provider value={{ hasMediaPermission, setHasMediaPermission }}>
+    <PermissionsContext.Provider value={{ mediaPermissionStatus, setMediaPermissionStatus }}>
       <PermissionsContextEffect>{props.children}</PermissionsContextEffect>
     </PermissionsContext.Provider>
   );

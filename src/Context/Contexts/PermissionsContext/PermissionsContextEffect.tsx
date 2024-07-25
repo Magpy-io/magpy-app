@@ -10,23 +10,33 @@ type PropsType = {
 };
 
 export const PermissionsContextEffect: React.FC<PropsType> = props => {
-  const { setHasMediaPermission } = usePermissionsContextInner();
+  const { setMediaPermissionStatus, mediaPermissionStatus } = usePermissionsContextInner();
 
+  // Set the permission on launch
   useEffect(() => {
     hasAndroidPermissionReadMedia()
-      .then(hasPermission => setHasMediaPermission(hasPermission))
+      .then(hasPermission => setMediaPermissionStatus(hasPermission ? 'GRANTED' : 'PENDING'))
       .catch(console.log);
+  }, [setMediaPermissionStatus]);
 
+  // Update the permission after launch if user leaves and comes back to the app
+  useEffect(() => {
     const subscription = AppState.addEventListener('focus', () => {
+      if (mediaPermissionStatus == 'PENDING') {
+        return;
+      }
+
       hasAndroidPermissionReadMedia()
-        .then(hasPermission => setHasMediaPermission(hasPermission))
+        .then(hasPermission => {
+          setMediaPermissionStatus(hasPermission ? 'GRANTED' : 'REJECTED');
+        })
         .catch(console.log);
     });
 
     return () => {
       subscription.remove();
     };
-  }, [setHasMediaPermission]);
+  }, [mediaPermissionStatus, setMediaPermissionStatus]);
 
   return props.children;
 };

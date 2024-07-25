@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef } from 'react';
 
 import { Promise as BluebirdPromise } from 'bluebird';
 
+import { usePermissionsContext } from '~/Context/Contexts/PermissionsContext';
 import { useServerContext } from '~/Context/Contexts/ServerContext';
 import { useUploadWorkerFunctions } from '~/Context/Contexts/UploadWorkerContext';
 import {
@@ -246,7 +247,9 @@ export function usePhotosStoreEffect() {
   const { RefreshAllPhotos } = usePhotosFunctionsStore();
   const { isServerReachable } = useServerContext();
 
+  const { mediaPermissionStatus } = usePermissionsContext();
+
   useEffect(() => {
     RefreshAllPhotos(5000, 5000).catch(console.log);
-  }, [RefreshAllPhotos, isServerReachable]);
+  }, [RefreshAllPhotos, isServerReachable, mediaPermissionStatus]);
 }
