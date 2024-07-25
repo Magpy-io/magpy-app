@@ -33,13 +33,6 @@ export async function hasAndroidPermissionNotifications() {
 export async function askAndroidPermissionNotifications() {
   const result = await PermissionsAndroid.request(
     PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
-    {
-      title: 'title',
-      message: 'message',
-      buttonPositive: 'ok',
-      buttonNegative: 'no',
-      buttonNeutral: 'meh',
-    },
   );
 
   return result == PermissionsAndroid.RESULTS.GRANTED;
