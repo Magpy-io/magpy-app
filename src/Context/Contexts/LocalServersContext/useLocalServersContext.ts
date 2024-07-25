@@ -1,10 +1,14 @@
 import { useCallback, useRef } from 'react';
 
+import { isIP } from 'validator';
+
+import { serverMdnsPrefix } from '~/Config/config';
+import { MdnsServiceModule, Service } from '~/NativeModules/MdnsServiceModule';
+
 import {
   Server,
   useLocalServersContext,
   useLocalServersContextSetters,
-  zeroconf,
 } from './LocalServersContext';
 
 export function useLocalServersFunctions() {
@@ -22,37 +26,68 @@ export function useLocalServersFunctions() {
 
   const refreshData = useCallback(() => {
     if (isScanningRef.current) {
-      zeroconf.stop();
+      MdnsServiceModule.stop();
     }
     setLocalServers([]);
-    zeroconf.scan('http', 'tcp', 'local.');
+    MdnsServiceModule.scan('http', 'tcp', 'local.');
     setTimeout(() => {
-      zeroconf.stop();
+      MdnsServiceModule.stop();
     }, 5000);
   }, [isScanningRef, setLocalServers]);
 
-  const stopSearch = () => {
-    zeroconf.stop();
-  };
+  const stopSearch = useCallback(() => {
+    MdnsServiceModule.stop();
+  }, []);
 
   const searchAsync = useCallback(async () => {
-    if (isScanningRef.current) {
-      zeroconf.stop();
+    if (!isScanningRef.current) {
+      setLocalServers([]);
+      MdnsServiceModule.scan('http', 'tcp', 'local.');
     }
-    setLocalServers([]);
-    zeroconf.scan('http', 'tcp', 'local.');
 
     return new Promise((resolve: (value: Server[]) => void) => {
       setTimeout(() => {
-        zeroconf.stop();
+        MdnsServiceModule.stop();
         resolve(localServersRef.current);
-      }, 1000);
+      }, 2000);
     });
   }, [setLocalServers, localServersRef]);
+
+  const addService = useCallback(
+    (service: Service) => {
+      if (service.name.startsWith(serverMdnsPrefix) && service.addresses[0]) {
+        setLocalServers(oldServers => {
+          const newServers = [...oldServers];
+
+          const discoveredServers = service.addresses
+            .map(address => {
+              if (!isIP(address, '4')) {
+                return null;
+              }
+              return {
+                name: service.name.replace(serverMdnsPrefix, ''),
+                ip: address,
+                port: service.port.toString(),
+              };
+            })
+            .filter(v => v != null);
+
+          discoveredServers.forEach(server => {
+            if (!oldServers.find(s => s.ip == server.ip && s.port == server.port)) {
+              newServers.push(server);
+            }
+          });
+          return newServers;
+        });
+      }
+    },
+    [setLocalServers],
+  );
 
   return {
     refreshData,
     stopSearch,
     searchAsync,
+    addService,
   };
 }

@@ -5,7 +5,7 @@ import { ParseApiPhoto } from '~/Context/ReduxStore/Slices/Photos/Functions';
 import { addPhotosFromLocalToServer } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { useAppDispatch } from '~/Context/ReduxStore/Store';
 import { GetPhotosByMediaId } from '~/Helpers/ServerQueries';
-import { NativeEventEmitterWrapper } from '~/NativeModules/NativeModulesEventNames';
+import { UploadMediaEvents } from '~/NativeModules/UploadMediaModule';
 
 type PropsType = {
   children: ReactNode;
@@ -23,8 +23,7 @@ export const UploadWorkerEffects: React.FC<PropsType> = props => {
       setRerunEffect(s => !s);
     }, 2000);
 
-    const emitter = new NativeEventEmitterWrapper();
-    const subscription = emitter.subscribeOnPhotoUploaded(({ mediaId }) => {
+    const subscription = UploadMediaEvents.subscribeOnPhotoUploaded(({ mediaId }) => {
       photosUploadedRef.current.push(mediaId);
     });
 

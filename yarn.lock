@@ -3149,15 +3149,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-native-zeroconf@npm:^0.12.3":
-  version: 0.12.3
-  resolution: "@types/react-native-zeroconf@npm:0.12.3"
-  dependencies:
-    "@types/node": "npm:*"
-  checksum: 99edab84d345328cb08f4a67deead2b0017947709bdb44d22ca8444a01fb31c00a253a1020748ff4c7ad8486a8efe02e62a95d43f6cc280bec8dc3e9496517e5
-  languageName: node
-  linkType: hard
-
 "@types/react-native@npm:^0.70":
   version: 0.70.19
   resolution: "@types/react-native@npm:0.70.19"
@@ -3557,7 +3548,6 @@ __metadata:
     "@types/jest": "npm:^29.5.11"
     "@types/react": "npm:^18.2.6"
     "@types/react-native": "npm:^0.73.0"
-    "@types/react-native-zeroconf": "npm:^0.12.3"
     "@types/react-redux": "npm:^7.1.33"
     "@types/react-test-renderer": "npm:^18.0.7"
     "@types/text-encoding": "npm:^0.0.39"
@@ -3607,7 +3597,6 @@ __metadata:
     react-native-toast-message: "npm:^2.2.0"
     react-native-vector-icons: "npm:^10.0.3"
     react-native-version-info: "npm:^1.1.1"
-    react-native-zeroconf: "npm:^0.13.8"
     react-redux: "npm:^9.1.0"
     react-test-renderer: "npm:^18.2.0"
     text-encoding: "npm:^0.7.0"
@@ -6016,13 +6005,6 @@ __metadata:
   version: 5.0.1
   resolution: "event-target-shim@npm:5.0.1"
   checksum: 0255d9f936215fd206156fd4caa9e8d35e62075d720dc7d847e89b417e5e62cf1ce6c9b4e0a1633a9256de0efefaf9f8d26924b1f3c8620cffb9db78e7d3076b
-  languageName: node
-  linkType: hard
-
-"events@npm:^3.0.0":
-  version: 3.3.0
-  resolution: "events@npm:3.3.0"
-  checksum: d6b6f2adbccbcda74ddbab52ed07db727ef52e31a61ed26db9feb7dc62af7fc8e060defa65e5f8af9449b86b52cc1a1f6a79f2eafcf4e62add2b7a1fa4a432f6
   languageName: node
   linkType: hard
 
@@ -10187,17 +10169,6 @@ __metadata:
   peerDependencies:
     react-native: ">= 0.60.2"
   checksum: a6e4fb72a553c39940f8c3c3d0e4e71746404c1bb3da1167a8f422c65837eb0898ccab4108fdcf6c5a7b8b216fd20ddd79ef7e7a18c70401e0e295637eb8f2d9
-  languageName: node
-  linkType: hard
-
-"react-native-zeroconf@npm:^0.13.8":
-  version: 0.13.8
-  resolution: "react-native-zeroconf@npm:0.13.8"
-  dependencies:
-    events: "npm:^3.0.0"
-  peerDependencies:
-    react-native: ">=0.60"
-  checksum: bd765eed3cbbd23967a761ca2ae7af8a004b2f942ff0d87078fb11fb97f9eb734cedd968ee85c3fbdffc0ea0f11666166852308ae861e24ee355361430caa5d6
   languageName: node
   linkType: hard
 

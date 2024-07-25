@@ -1,13 +1,8 @@
 import React, { ReactNode, createContext, useContext, useState } from 'react';
 
-import Zeroconf from 'react-native-zeroconf';
-
 import { LocalServersEffects } from './LocalServersEffects';
 
 type SetStateType<T> = React.Dispatch<React.SetStateAction<T>>;
-
-export const zeroconf = new Zeroconf();
-console.log('Zeroconf initialized.');
 
 export type Server = { name: string; ip: string; port: string };
 

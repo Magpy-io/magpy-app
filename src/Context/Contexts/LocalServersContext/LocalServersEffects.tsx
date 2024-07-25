@@ -1,47 +1,38 @@
 import React, { ReactNode, useEffect } from 'react';
 
-import { serverMdnsPrefix } from '~/Config/config';
+import { MdnsServiceEvents } from '~/NativeModules/MdnsServiceModule';
 
-import { useLocalServersContextSetters, zeroconf } from './LocalServersContext';
+import { useLocalServersContextSetters } from './LocalServersContext';
+import { useLocalServersFunctions } from './useLocalServersContext';
 
 type PropsType = {
   children: ReactNode;
 };
 
 export const LocalServersEffects: React.FC<PropsType> = props => {
-  const localServersContextSetters = useLocalServersContextSetters();
+  const { setIsScanning } = useLocalServersContextSetters();
 
-  const { setLocalServers, setIsScanning } = localServersContextSetters;
+  const { addService } = useLocalServersFunctions();
 
   useEffect(() => {
-    zeroconf.on('start', () => {
+    const subStart = MdnsServiceEvents.subscribeOnSearchStarted(() => {
       setIsScanning(true);
     });
-    zeroconf.on('stop', () => {
+
+    const subStop = MdnsServiceEvents.subscribeOnSearchStopped(() => {
       setIsScanning(false);
     });
-    zeroconf.on('resolved', service => {
-      if (service.name.startsWith(serverMdnsPrefix) && service.addresses[0]) {
-        setLocalServers(oldServers => {
-          return [
-            ...oldServers,
-            {
-              name: service.name.replace(serverMdnsPrefix, ''),
-              ip: service.addresses[0],
-              port: service.port.toString(),
-            },
-          ];
-        });
-      }
+
+    const subResolved = MdnsServiceEvents.subscribeOnServiceResolved(service => {
+      addService(service);
     });
-    zeroconf.on('error', err => {
-      setIsScanning(false);
-      console.log('[Error]', err);
-    });
+
     return () => {
-      zeroconf.removeDeviceListeners();
+      subStart.remove();
+      subStop.remove();
+      subResolved.remove();
     };
-  }, [setIsScanning, setLocalServers]);
+  }, [addService, setIsScanning]);
 
   return props.children;
 };

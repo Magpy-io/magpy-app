@@ -1,6 +1,8 @@
-import { NativeModules } from 'react-native';
+import { NativeEventEmitter, NativeModules } from 'react-native';
 
 const { UploadMediaModule } = NativeModules;
+
+const PHOTO_UPLOADED_EVENT_NAME = 'PHOTO_UPLOADED_EVENT_NAME';
 
 export interface UploadMediaModuleType {
   StartUploadWorker: (data: {
@@ -12,6 +14,14 @@ export interface UploadMediaModuleType {
   IsWorkerAlive: () => Promise<boolean>;
   StopWorker: () => Promise<void>;
 }
+
+const emitter = new NativeEventEmitter();
+
+export const UploadMediaEvents = {
+  subscribeOnPhotoUploaded: (f: (event: { mediaId: string }) => void) => {
+    return emitter.addListener(PHOTO_UPLOADED_EVENT_NAME, f);
+  },
+};
 
 const Module = UploadMediaModule as UploadMediaModuleType;
 
