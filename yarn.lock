@@ -1654,15 +1654,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@notifee/react-native@npm:^7.8.2":
-  version: 7.8.2
-  resolution: "@notifee/react-native@npm:7.8.2"
-  peerDependencies:
-    react-native: "*"
-  checksum: 1559caa74ccc057aa4a4a6fe15bcaf0fe0371ece045a0923c051fcef312e4c2b3e2f38e5032a15d2be327fd707492d014f2f074405123ed561ba368906413f29
-  languageName: node
-  linkType: hard
-
 "@npmcli/agent@npm:^2.0.0":
   version: 2.2.2
   resolution: "@npmcli/agent@npm:2.2.2"
@@ -3526,7 +3517,6 @@ __metadata:
     "@babel/plugin-transform-template-literals": "npm:^7.23.3"
     "@babel/runtime": "npm:^7.20.0"
     "@jest/globals": "npm:^29.7.0"
-    "@notifee/react-native": "npm:^7.8.2"
     "@react-native-async-storage/async-storage": "npm:^1.21.0"
     "@react-native-camera-roll/camera-roll": "npm:^7.4.0"
     "@react-native/babel-preset": "npm:^0.73.19"
