@@ -93,28 +93,28 @@ export default function ServerDetails() {
       {!hasServer && (
         <PrimaryButton
           title={'Add a server'}
-          buttonStyle={{ marginTop: 5 }}
+          buttonStyle={{ marginTop: spacing.spacing_xxs }}
           onPress={OnAddServerPress}
         />
       )}
       {hasServer && error && (
         <PrimaryButton
           title={'Reconnect To Server'}
-          buttonStyle={{ marginTop: 5 }}
+          buttonStyle={{ marginTop: spacing.spacing_xxs }}
           onPress={OnReconnectPress}
         />
       )}
       {hasServer && error == 'SERVER_NOT_REACHABLE' && (
         <PrimaryButton
           title={'Find Server'}
-          buttonStyle={{ marginTop: 5 }}
+          buttonStyle={{ marginTop: spacing.spacing_xxs }}
           onPress={() => navigate('ServerSelect')}
         />
       )}
       {hasServer && (
         <PrimaryButton
           title={'Forget Server'}
-          buttonStyle={{ marginTop: 5 }}
+          buttonStyle={{ marginTop: spacing.spacing_xxs }}
           onPress={() => {
             OnForgetServerPress().catch(console.log);
           }}
