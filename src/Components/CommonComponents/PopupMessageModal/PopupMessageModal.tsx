@@ -21,14 +21,14 @@ export default function PopupMessageModal({
   onDismissed,
   title,
   content,
-  ok,
+  ok = 'Ok',
   cancel,
 }: {
   isVisible: boolean;
   onDismissed: (userAction: 'Ok' | 'Cancel' | 'Dismiss') => void;
   title: string;
   content: string;
-  ok: string;
+  ok?: string;
   cancel?: string;
 }) {
   const styles = useStyles(makeStyles);

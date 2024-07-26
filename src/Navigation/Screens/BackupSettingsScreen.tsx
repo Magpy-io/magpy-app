@@ -1,7 +1,7 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 
 import { UploadIcon } from '~/Components/CommonComponents/Icons';
-import PopupMessageModal from '~/Components/CommonComponents/PopupMessageModal/PopupMessageModal';
+import { usePopupMessageModal } from '~/Components/CommonComponents/PopupMessageModal';
 import SettingsPageComponent, {
   SettingsListType,
 } from '~/Components/SettingsComponents/SettingsPageComponent';
@@ -15,35 +15,44 @@ import { useServerContext } from '~/Context/Contexts/ServerContext';
 export default function BackupSettingsScreen() {
   const { StartAutoBackup, StopAutoBackup } = useBackupWorkerContextFunctions();
   const { autobackupEnabled } = useBackupWorkerContext();
-
-  const [isVisiblePopups, setIsVisblePopup] = useState(false);
-
   const { isServerReachable } = useServerContext();
 
   const { notificationsPermissionStatus, askNotificationsPermission } =
     usePermissionsContext();
 
-  const onPopupDismissed = useCallback(async () => {
-    setIsVisblePopup(false);
-
-    await askNotificationsPermission();
-    await StartAutoBackup();
-  }, [StartAutoBackup, askNotificationsPermission]);
+  const { displayPopup } = usePopupMessageModal();
 
   const onBackupPressAsync = useCallback(
     async (autoBackupEnabled: boolean) => {
       if (autoBackupEnabled) {
         if (notificationsPermissionStatus == 'PENDING') {
-          setIsVisblePopup(true);
-          return;
-        }
+          const onDismissed = async () => {
+            await askNotificationsPermission();
+            await StartAutoBackup();
+          };
 
-        await StartAutoBackup();
+          displayPopup({
+            title: 'Notification Permission Needed',
+            content:
+              'Allow Magpy to display notifications. This will be used to display the progress of the backing up of your photos.',
+            onDismissed: () => {
+              onDismissed().catch(console.log);
+            },
+          });
+        } else {
+          await StartAutoBackup();
+        }
       } else {
         await StopAutoBackup();
       }
     },
-    [StartAutoBackup, StopAutoBackup, notificationsPermissionStatus],
+    [
+      StartAutoBackup,
+      StopAutoBackup,
+      askNotificationsPermission,
+      displayPopup,
+      notificationsPermissionStatus,
+    ],
   );
 
   const data: SettingsListType = [
@@ -64,18 +73,5 @@ export default function BackupSettingsScreen() {
     },
   ];
 
-  return (
-    <>
-      <SettingsPageComponent data={data} />
-      <PopupMessageModal
-        isVisible={isVisiblePopups}
-        onDismissed={() => {
-          onPopupDismissed().catch(console.log);
-        }}
-        title="Notification Permission Needed"
-        content="Allow Magpy to display notifications. This will be used to display the progress of the backing up of your photos."
-        ok="Ok"
-      />
-    </>
-  );
+  return <SettingsPageComponent data={data} />;
 }
