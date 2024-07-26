@@ -34,7 +34,6 @@ export default function PhotoMenu(props: PhotoMenuProps) {
     <MenuModal visible={props.visible} onRequestClose={props.onRequestClose}>
       <View>
         <Filter onPress={onPressFilter} />
-        <Sort />
         <Group onRequestClose={props.onRequestClose} />
       </View>
     </MenuModal>
