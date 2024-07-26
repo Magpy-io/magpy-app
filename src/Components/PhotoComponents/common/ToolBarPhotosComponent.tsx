@@ -7,7 +7,6 @@ import {
   DeleteIcon,
   DownloadIcon,
   InfoIcon,
-  ShareIcon,
   UploadIcon,
 } from '~/Components/CommonComponents/Icons';
 import { useStyles } from '~/Hooks/useStyles';
@@ -46,7 +45,6 @@ function ToolBarPhotosComponent(props: ToolBarPhotosComponentProps) {
     onDeleteFromDevice,
     onDownload,
     onInfo,
-    onShare,
     showInfo,
     onDeleteFromServer,
   } = props;
@@ -56,16 +54,6 @@ function ToolBarPhotosComponent(props: ToolBarPhotosComponentProps) {
 
   return (
     <ScrollView horizontal contentContainerStyle={styles.scrollviewContent}>
-      {nbPhotos > 0 && (
-        <ToolComponent
-          icon={ShareIcon}
-          text="Share"
-          onPress={onShare}
-          showNumber={showNumber}
-          number={nbPhotos}
-        />
-      )}
-
       {nbPhotosToBackUp > 0 && (
         <ToolComponent
           icon={UploadIcon}
