@@ -1,34 +1,27 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { Text } from 'react-native';
+import React, { useEffect } from 'react';
 
 import PhotoGallery from '~/Components/PhotoComponents/PhotoGallery';
 import { PhotoGalleryContextProvider } from '~/Components/PhotoComponents/PhotoGalleryContext';
-import * as AndroidPermissions from '~/Helpers/GetPermissionsAndroid';
+import PermissionNeededView from '~/Components/PhotoComponents/permissionNeeded/PermissionNeededView';
+import { usePermissionsContext } from '~/Context/Contexts/PermissionsContext';
 
 export default function HomeScreenTab() {
-  const [hasPermissions, setHasPermissions] = useState<boolean>(true);
-
-  const getPermissions = useCallback(async () => {
-    const hasPerm = await AndroidPermissions.hasAndroidPermissionWriteExternalStorage();
-    if (hasPerm) {
-      setHasPermissions(hasPerm);
-    }
-  }, []);
+  const { mediaPermissionStatus, askMediaPermission } = usePermissionsContext();
 
   useEffect(() => {
-    getPermissions().catch(e => {
-      console.log('Error getting permissions', e);
-    });
-  }, [getPermissions]);
+    if (mediaPermissionStatus == 'PENDING') {
+      askMediaPermission().catch(console.log);
+    }
+  }, [askMediaPermission, mediaPermissionStatus]);
 
   return (
     <>
-      {hasPermissions ? (
+      {mediaPermissionStatus != 'REJECTED' ? (
         <PhotoGalleryContextProvider isServer={false}>
           <PhotoGallery key={'AllPhotos'} title="All photos" isInTabScreen />
         </PhotoGalleryContextProvider>
       ) : (
-        <Text>Permissions needed</Text>
+        <PermissionNeededView />
       )}
     </>
   );

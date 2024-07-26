@@ -1,6 +1,9 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
+import { usePopupMessageModal } from '~/Components/CommonComponents/PopupMessageModal';
+import { useMainContext, useMainContextFunctions } from '~/Context/Contexts/MainContext';
+import { usePermissionsContext } from '~/Context/Contexts/PermissionsContext';
 import { usePhotosDownloadingFunctions } from '~/Context/Contexts/PhotosDownloadingContext/usePhotosDownloadingContext';
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { usePhotosFunctionsStore } from '~/Context/ReduxStore/Slices/Photos/PhotosFunctions';
@@ -20,6 +23,14 @@ type ToolBarProps = {
 function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) {
   const styles = useStyles(makeStyles);
   const [modalVisible, setModalVisible] = useState(false);
+
+  const { askedForNotificationPermissionBefore } = useMainContext();
+  const { setAskedForNotificationPermissionBefore } = useMainContextFunctions();
+
+  const { notificationsPermissionStatus, askNotificationsPermission } =
+    usePermissionsContext();
+
+  const { displayPopupMessage } = usePopupMessageModal();
 
   const onRequestClose = useCallback(() => setModalVisible(false), []);
   const showModal = useCallback(() => setModalVisible(true), []);
@@ -92,8 +103,35 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
   const atleastOneServerAndOneLocal = atleastOneLocal && atleastOneServer;
 
   const onBackup = useCallback(() => {
+    if (notificationsPermissionStatus == 'PENDING' && !askedForNotificationPermissionBefore) {
+      setAskedForNotificationPermissionBefore(true);
+
+      const onDismissed = async () => {
+        await askNotificationsPermission();
+        await UploadPhotos(selectedLocalOnlyPhotos);
+      };
+
+      displayPopupMessage({
+        title: 'Notification Permission Needed',
+        content:
+          'Allow Magpy to display notifications. This will be used to display the progress of the backing up of your photos.',
+        onDismissed: () => {
+          onDismissed().catch(console.log);
+        },
+      });
+      return;
+    }
+
     UploadPhotos(selectedLocalOnlyPhotos).catch(console.log);
-  }, [UploadPhotos, selectedLocalOnlyPhotos]);
+  }, [
+    UploadPhotos,
+    askNotificationsPermission,
+    askedForNotificationPermissionBefore,
+    displayPopupMessage,
+    notificationsPermissionStatus,
+    selectedLocalOnlyPhotos,
+    setAskedForNotificationPermissionBefore,
+  ]);
 
   const onDownload = useCallback(
     () => StartPhotosDownload(selectedServerOnlyPhotosIds),

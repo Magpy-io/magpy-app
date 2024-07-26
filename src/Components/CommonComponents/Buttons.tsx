@@ -45,6 +45,19 @@ export function OutlineButtonSmall(props: ButtonProps) {
   );
 }
 
+export function OutlineButton(props: ButtonProps) {
+  const styles = useStyles(makeStyles);
+
+  return (
+    <Button
+      {...props}
+      containerStyle={[styles.containerStyle, props.containerStyle]}
+      buttonStyle={[styles.outlineButtonStyle, props.buttonStyle]}
+      titleStyle={styles.outlineTitleStyleSmall}
+    />
+  );
+}
+
 export function PrimaryButtonWide(props: ButtonProps) {
   const styles = useStyles(makeStyles);
 
@@ -94,6 +107,8 @@ const makeStyles = (colors: colorsType) =>
       borderRadius: borderRadius.button,
       paddingVertical: spacing.spacing_s,
       paddingHorizontal: spacing.spacing_xl,
+      borderColor: colors.PRIMARY,
+      borderWidth: 1.2,
     },
     containerStyle: {
       alignSelf: 'center',
@@ -110,6 +125,14 @@ const makeStyles = (colors: colorsType) =>
       backgroundColor: colors.TRANSPARENT,
       borderRadius: borderRadius.small,
       paddingVertical: spacing.spacing_xxs,
+      paddingHorizontal: spacing.spacing_l,
+      borderColor: colors.PRIMARY,
+      borderWidth: 1.2,
+    },
+    outlineButtonStyle: {
+      backgroundColor: colors.TRANSPARENT,
+      borderRadius: borderRadius.button,
+      paddingVertical: spacing.spacing_s,
       paddingHorizontal: spacing.spacing_l,
       borderColor: colors.PRIMARY,
       borderWidth: 1.2,
