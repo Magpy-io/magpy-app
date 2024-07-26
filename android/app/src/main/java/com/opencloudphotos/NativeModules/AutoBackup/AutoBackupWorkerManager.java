@@ -7,8 +7,10 @@ import android.content.Context;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ProcessLifecycleOwner;
 import androidx.work.Configuration;
+import androidx.work.Constraints;
 import androidx.work.Data;
 import androidx.work.ExistingPeriodicWorkPolicy;
+import androidx.work.NetworkType;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
@@ -32,6 +34,11 @@ public class AutoBackupWorkerManager {
     }
 
     public void StartWorker(String url, String serverToken, String deviceId, Observer<String> observer){
+
+        Constraints constraints = new Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.UNMETERED)
+                .build();
+
         PeriodicWorkRequest uploadRequest =
                 new PeriodicWorkRequest.Builder(AutoBackupWorker.class, 15, TimeUnit.MINUTES)
                         .setInputData(
@@ -41,6 +48,7 @@ public class AutoBackupWorkerManager {
                                         .putString(AutoBackupWorker.DATA_KEY_DEVICE_UNIQUE_ID, deviceId)
                                         .build()
                         )
+                        .setConstraints(constraints)
                         .build();
 
         ExecutorsManager.ExecuteOnBackgroundThread(() -> {
