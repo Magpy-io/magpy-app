@@ -64,7 +64,7 @@ export function usePopupMessageModal() {
 
   const { setPopupParameters, setIsVisible } = context;
 
-  const displayPopup = useCallback(
+  const displayPopupMessage = useCallback(
     (popupParameters: PopupParameters) => {
       setPopupParameters(popupParameters);
       setIsVisible(true);
@@ -72,5 +72,5 @@ export function usePopupMessageModal() {
     [setIsVisible, setPopupParameters],
   );
 
-  return { displayPopup };
+  return { displayPopupMessage };
 }

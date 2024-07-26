@@ -20,7 +20,7 @@ export default function BackupSettingsScreen() {
   const { notificationsPermissionStatus, askNotificationsPermission } =
     usePermissionsContext();
 
-  const { displayPopup } = usePopupMessageModal();
+  const { displayPopupMessage } = usePopupMessageModal();
 
   const onBackupPressAsync = useCallback(
     async (autoBackupEnabled: boolean) => {
@@ -31,7 +31,7 @@ export default function BackupSettingsScreen() {
             await StartAutoBackup();
           };
 
-          displayPopup({
+          displayPopupMessage({
             title: 'Notification Permission Needed',
             content:
               'Allow Magpy to display notifications. This will be used to display the progress of the backing up of your photos.',
@@ -50,7 +50,7 @@ export default function BackupSettingsScreen() {
       StartAutoBackup,
       StopAutoBackup,
       askNotificationsPermission,
-      displayPopup,
+      displayPopupMessage,
       notificationsPermissionStatus,
     ],
   );
