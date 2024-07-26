@@ -1,5 +1,6 @@
 package com.opencloudphotos.Workers;
 
+import static android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC;
 import static java.lang.Thread.sleep;
 
 import android.app.NotificationChannel;
@@ -44,6 +45,7 @@ import java.io.InputStream;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class AutoBackupWorker extends Worker {
     final int NOTIFICATION_ID = 1002;
@@ -79,7 +81,7 @@ public class AutoBackupWorker extends Worker {
         return url != null && serverToken != null && deviceId != null;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+    @RequiresApi(api = Build.VERSION_CODES.Q)
     @NonNull
     @Override
     public Result doWork() {
@@ -124,7 +126,7 @@ public class AutoBackupWorker extends Worker {
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+    @RequiresApi(api = Build.VERSION_CODES.Q)
     private void treatReturnedMedia(WritableMap result) throws Exception {
         String[] ids = getIdsFromGetMedia(result);
 
@@ -224,38 +226,39 @@ public class AutoBackupWorker extends Worker {
         NotificationChannel channel = new NotificationChannel(
                 CHANNEL_ID,
                 CHANNEL_ID,
-                NotificationManager.IMPORTANCE_HIGH
+                NotificationManager.IMPORTANCE_MIN
         );
 
         getApplicationContext().getSystemService(NotificationManager.class).createNotificationChannel(channel);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+    @RequiresApi(api = Build.VERSION_CODES.Q)
     private void createNotification(){
         Context context = getApplicationContext();
         PendingIntent cancelIntent = WorkManager.getInstance(context)
                 .createCancelPendingIntent(getId());
 
-        String title = "Backing up your media";
-        String cancel = "Cancel";
-
         createChannel();
 
         notificationBuilder = new NotificationCompat.Builder(context, CHANNEL_ID)
+                .setProgress(0, 0, true)
                 .setOnlyAlertOnce(true)
-                .setContentTitle(title)
-                .setSilent(true)
-                .setContentText("Starting backup of your media.")
+                .setContentTitle("Backing up your media")
                 .setSmallIcon(R.drawable.ic_notification)
+                .setSilent(true)
                 .setOngoing(true)
-                .addAction(android.R.drawable.ic_delete, cancel, cancelIntent);
+                .addAction(android.R.drawable.ic_delete, "Cancel", cancelIntent);
 
-        setForegroundAsync(new ForegroundInfo(NOTIFICATION_ID, notificationBuilder.build()));
+        try {
+            setForegroundAsync(new ForegroundInfo(NOTIFICATION_ID, notificationBuilder.build())).get();
+        } catch (ExecutionException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void updateNotification(int progress, int total){
-        notificationBuilder.setContentText("Backed up " + progress + " photos out of " + total).setSilent(true);
+        notificationBuilder.setProgress(total, progress, false);
         getApplicationContext().getSystemService(NotificationManager.class).notify(NOTIFICATION_ID, notificationBuilder.build());
     }
 

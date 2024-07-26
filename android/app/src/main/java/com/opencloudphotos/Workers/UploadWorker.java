@@ -189,7 +189,7 @@ public class UploadWorker extends Worker {
         NotificationChannel channel = new NotificationChannel(
                 CHANNEL_ID,
                 CHANNEL_ID,
-                NotificationManager.IMPORTANCE_HIGH
+                NotificationManager.IMPORTANCE_MIN
         );
 
         getApplicationContext().getSystemService(NotificationManager.class).createNotificationChannel(channel);
@@ -202,26 +202,25 @@ public class UploadWorker extends Worker {
         PendingIntent cancelIntent = WorkManager.getInstance(context)
                 .createCancelPendingIntent(getId());
 
-        String title = "Uploading photos";
-        String cancel = "Cancel";
-
         createChannel();
 
         notificationBuilder = new NotificationCompat.Builder(context, CHANNEL_ID)
+                .setProgress(0,0,true)
                 .setOnlyAlertOnce(true)
-                .setContentTitle(title)
-                .setTicker(title)
-                .setContentText("Staring photos upload")
+                .setContentTitle("Uploading photos")
                 .setSmallIcon(R.drawable.ic_notification)
                 .setOngoing(true)
-                .addAction(android.R.drawable.ic_delete, cancel, cancelIntent);
+                .setSilent(true)
+                .addAction(android.R.drawable.ic_delete, "Cancel", cancelIntent);
 
         setForegroundAsync(new ForegroundInfo(NOTIFICATION_ID, notificationBuilder.build()));
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void updateNotification(int progress){
-        notificationBuilder.setContentText("Uploaded " + progress + " photo out of " + photosIds.length).setSilent(true);
+        boolean intermediate = photosIds.length == 1;
+
+        notificationBuilder.setProgress(photosIds.length, progress, intermediate);
         getApplicationContext().getSystemService(NotificationManager.class).notify(NOTIFICATION_ID, notificationBuilder.build());
     }
 
