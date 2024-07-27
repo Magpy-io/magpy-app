@@ -1,0 +1,24 @@
+export * as AddPhoto from './EndpointsApi/addPhoto';
+export * as AddPhotoInit from './EndpointsApi/addPhotoInit';
+export * as AddPhotoPart from './EndpointsApi/addPhotoPart';
+export * as ClaimServer from './EndpointsApi/claimServer';
+export * as ClaimServerLocal from './EndpointsApi/claimServerLocal';
+export * as DeletePhotosById from './EndpointsApi/deletePhotosById';
+export * as GetLastWarning from './EndpointsApi/getLastWarning';
+export * as GetNumberPhotos from './EndpointsApi/getNumberPhotos';
+export * as GetPhotoPartById from './EndpointsApi/getPhotoPartById';
+export * as GetPhotos from './EndpointsApi/getPhotos';
+export * as GetPhotosById from './EndpointsApi/getPhotosById';
+export * as GetPhotosByMediaId from './EndpointsApi/getPhotosByMediaId';
+export * as GetServerInfo from './EndpointsApi/getServerInfo';
+export * as GetToken from './EndpointsApi/getToken';
+export * as GetTokenLocal from './EndpointsApi/getTokenLocal';
+export * as UnclaimServer from './EndpointsApi/unclaimServer';
+export * as UpdatePhotoMediaId from './EndpointsApi/updatePhotoMediaId';
+export * as UpdateServerName from './EndpointsApi/updateServerName';
+export * as UpdateServerPath from './EndpointsApi/updateServerPath';
+export * as WhoAmI from './EndpointsApi/whoAmI';
+export * as Status from './EndpointsApi/status';
+export * as IsClaimed from './EndpointsApi/isClaimed';
+
+export * from './Types';

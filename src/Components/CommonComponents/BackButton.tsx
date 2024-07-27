@@ -1,47 +1,45 @@
-import React, { useState, useEffect } from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  FlatList,
-  TouchableWithoutFeedback,
-  SafeAreaView,
-  Image,
-} from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import { Icon } from "@rneui/themed";
-import colors from "~/colors";
+import React from 'react';
+import { StyleSheet, View, ViewStyle } from 'react-native';
+import { TouchableHighlight } from 'react-native';
 
-type BackButtonProps = {
-  style?: any;
+import { useNavigation } from '@react-navigation/native';
+import { Icon } from '@rneui/themed';
+
+import { useTheme } from '~/Context/Contexts/ThemeContext';
+
+type PropsType = {
+  style?: ViewStyle;
+  onPress?: () => void;
 };
 
-export default function BackButton(props: BackButtonProps) {
+export default function BackButton(props: PropsType) {
   const navigation = useNavigation();
+  const { colors } = useTheme();
   return (
-    <View style={[styles.backButtonStyle, props.style]}>
-      <Icon
-        name="arrow-back-ios"
-        color={"black"}
-        size={22}
-        style={styles.backIconStyle}
+    <View>
+      <TouchableHighlight
+        style={[styles.backButtonStyle, props.style]}
         onPress={() => {
-          navigation.goBack();
+          if (props.onPress) {
+            props.onPress();
+          } else {
+            navigation.goBack();
+          }
         }}
-        underlayColor={colors.underlayColor}
-      />
+        underlayColor={colors.UNDERLAY}>
+        <Icon
+          name="chevron-back"
+          type="ionicon"
+          color={colors.TEXT}
+          size={26}
+          style={styles.backIconStyle}
+        />
+      </TouchableHighlight>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  backIconStyle: {
-    padding: 15,
-  },
-  backButtonStyle: {
-    margin: 10,
-    position: "absolute",
-    top: 0,
-    left: 0,
-  },
+  backButtonStyle: { padding: 14 },
+  backIconStyle: {},
 });
