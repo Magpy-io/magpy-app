@@ -76,7 +76,6 @@ export default function LoginForm() {
                 value={values.password}
                 error={errors.password}
               />
-              <ForgotPassword />
             </>
           </ViewWithGap>
           <PrimaryButtonExtraWide
