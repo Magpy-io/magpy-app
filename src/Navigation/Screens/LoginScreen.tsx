@@ -6,7 +6,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import KeyboardDismissingView from '~/Components/CommonComponents/KeyboardDismissingView';
 import ScreenTitle from '~/Components/CommonComponents/ScreenTitle';
-import GoogleSignIn from '~/Components/LoginComponents/GoogleSignIn';
 import LoginForm from '~/Components/LoginComponents/LoginForm';
 import { useMainContext, useMainContextFunctions } from '~/Context/Contexts/MainContext';
 import { useTheme } from '~/Context/Contexts/ThemeContext';
@@ -40,7 +39,6 @@ function LoginFooter() {
 
   return (
     <View style={styles.loginFooterStyle}>
-      <GoogleSignIn />
       <View
         style={{
           flexDirection: 'row',
@@ -60,7 +58,7 @@ function LoginFooter() {
         style={{
           flexDirection: 'row',
           alignItems: 'center',
-          marginTop: spacing.spacing_xxl_3,
+          marginTop: spacing.spacing_l,
         }}>
         <TouchableOpacity
           onPress={() => {
@@ -70,8 +68,7 @@ function LoginFooter() {
             } else {
               navigate('Tabs');
             }
-          }}
-          style={{ paddingVertical: spacing.spacing_s }}>
+          }}>
           <Text style={{ color: colors.TEXT, fontWeight: 'bold' }}>
             Continue Without Account
           </Text>
