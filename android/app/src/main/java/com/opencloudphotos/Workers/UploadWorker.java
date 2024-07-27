@@ -137,8 +137,14 @@ public class UploadWorker extends Worker {
                 try{
                     photoUploader.uploadPhoto(photoData);
                     setProgressAsync(new Data.Builder().putString(UPLOADED_PHOTO_MEDIA_ID, mediaId).build());
-                }catch (ResponseNotOkException e){
-                    Log.e("UploadWorker", "Failed upload of photo with mediaId: " + mediaId, e);
+                }
+                catch (ResponseNotOkException e){
+                    if(e.GetErrorCode().equals("PHOTO_EXISTS")){
+                        setProgressAsync(new Data.Builder().putString(UPLOADED_PHOTO_MEDIA_ID, mediaId).build());
+                        Log.i("UploadWorker", "Failed upload of photo with mediaId: " + mediaId + " because it already exists in server.", e);
+                    }else{
+                        Log.e("UploadWorker", "Failed upload of photo with mediaId: " + mediaId, e);
+                    }
                 }
             }
 

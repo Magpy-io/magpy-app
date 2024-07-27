@@ -167,7 +167,12 @@ public class AutoBackupWorker extends Worker {
                 photoUploader.uploadPhoto(photoData);
                 setProgressAsync(new Data.Builder().putString(UPLOADED_PHOTO_MEDIA_ID, photoData.mediaId).build());
             }catch (ResponseNotOkException e){
-                Log.e("UploadWorker", "Failed upload of photo with mediaId: " + photoData.mediaId, e);
+                if(e.GetErrorCode().equals("PHOTO_EXISTS")){
+                    setProgressAsync(new Data.Builder().putString(UPLOADED_PHOTO_MEDIA_ID, photoData.mediaId).build());
+                    Log.i("AutoBackupWorker", "Failed upload of photo with mediaId: " + photoData.mediaId + " because it already exists in server.", e);
+                }else{
+                    Log.e("AutoBackupWorker", "Failed upload of photo with mediaId: " + photoData.mediaId, e);
+                }
             }
 
             progress++;

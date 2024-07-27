@@ -11,6 +11,10 @@ public class ResponseNotOkException extends Exception{
         mMessage = message;
     }
 
+    public String GetErrorCode(){
+        return mErrorCode;
+    }
+
     @Nullable
     @Override
     public String getMessage() {
