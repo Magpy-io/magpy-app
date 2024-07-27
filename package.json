@@ -1,6 +1,6 @@
 {
   "name": "OpenCloudPhotos",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
     "android": "react-native run-android",
@@ -10,7 +10,8 @@
     "lint": "eslint ./src && echo No lint errors",
     "format": "prettier --write ./src",
     "types:check": "tsc --noEmit && echo No typescript errors found",
-    "build-prod": "react-native run-android --mode=release"
+    "run-prod": "react-native run-android --mode=release",
+    "build-prod": "react-native build-android --mode=release"
   },
   "dependencies": {
     "@babel/plugin-transform-template-literals": "^7.23.3",
