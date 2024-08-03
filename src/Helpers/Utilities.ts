@@ -32,3 +32,11 @@ export function memoDebugger(a: any, b: any) {
   console.log('props are same :', equal);
   return equal;
 }
+
+export async function sleep(time: number) {
+  return new Promise(res => {
+    setTimeout(() => {
+      res(null);
+    }, time);
+  });
+}
