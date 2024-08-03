@@ -50,6 +50,7 @@
     "react-native-svg": "^14.1.0",
     "react-native-tab-view": "^3.5.2",
     "react-native-toast-message": "^2.2.0",
+    "react-native-udp": "https://github.com/issamBenelgada/react-native-udp.git#commit=163b757ced1458d3e0165d656c455c760e276a1d",
     "react-native-vector-icons": "^10.0.3",
     "react-native-version-info": "^1.1.1",
     "react-redux": "^9.1.0",
