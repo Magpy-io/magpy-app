@@ -1,9 +1,6 @@
 import { useCallback, useRef } from 'react';
 
-import { isIP } from 'validator';
-
-import { serverMdnsPrefix } from '~/Config/config';
-import { MdnsServiceModule, Service } from '~/NativeModules/MdnsServiceModule';
+import { ServerDiscovery } from '~/Helpers/ServerDiscovery';
 
 import {
   Server,
@@ -11,12 +8,16 @@ import {
   useLocalServersContextSetters,
 } from './LocalServersContext';
 
+const serverDiscovery = new ServerDiscovery();
+
 export function useLocalServersFunctions() {
   const localServersContextSetters = useLocalServersContextSetters();
   const localServersContext = useLocalServersContext();
 
   const { isScanning, localServers } = localServersContext;
-  const { setLocalServers } = localServersContextSetters;
+  const { setLocalServers, setIsScanning } = localServersContextSetters;
+
+  const lastTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const isScanningRef = useRef(isScanning);
   isScanningRef.current = isScanning;
@@ -25,69 +26,85 @@ export function useLocalServersFunctions() {
   localServersRef.current = localServers;
 
   const refreshData = useCallback(() => {
-    if (isScanningRef.current) {
-      MdnsServiceModule.stop();
+    if (serverDiscovery.state == 'starting') {
+      return;
     }
+
+    if (serverDiscovery.state == 'listening') {
+      if (lastTimeoutRef.current != null) {
+        clearTimeout(lastTimeoutRef.current);
+      }
+      setIsScanning(false);
+      serverDiscovery.stop();
+    }
+
+    if (serverDiscovery.state != 'stopped') {
+      return;
+    }
+
     setLocalServers([]);
-    MdnsServiceModule.scan('http', 'tcp', 'local.');
-    setTimeout(() => {
-      MdnsServiceModule.stop();
-    }, 5000);
-  }, [isScanningRef, setLocalServers]);
-
-  const stopSearch = useCallback(() => {
-    MdnsServiceModule.stop();
-  }, []);
-
-  const searchAsync = useCallback(async () => {
-    if (!isScanningRef.current) {
-      setLocalServers([]);
-      MdnsServiceModule.scan('http', 'tcp', 'local.');
-    }
-
-    return new Promise((resolve: (value: Server[]) => void) => {
-      setTimeout(() => {
-        MdnsServiceModule.stop();
-        resolve(localServersRef.current);
-      }, 2000);
-    });
-  }, [setLocalServers, localServersRef]);
-
-  const addService = useCallback(
-    (service: Service) => {
-      if (service.name.startsWith(serverMdnsPrefix) && service.addresses[0]) {
+    setIsScanning(true);
+    serverDiscovery
+      .launchDiscovery(server => {
         setLocalServers(oldServers => {
           const newServers = [...oldServers];
 
-          const discoveredServers = service.addresses
-            .map(address => {
-              if (!isIP(address, '4')) {
-                return null;
-              }
-              return {
-                name: service.name.replace(serverMdnsPrefix, ''),
-                ip: address,
-                port: service.port.toString(),
-              };
-            })
-            .filter(v => v != null);
-
-          discoveredServers.forEach(server => {
-            if (!oldServers.find(s => s.ip == server.ip && s.port == server.port)) {
-              newServers.push(server);
-            }
-          });
+          if (!oldServers.find(s => s.ip == server.ip && s.port == server.port)) {
+            newServers.push(server);
+          }
           return newServers;
         });
+      })
+      .then(() => {
+        lastTimeoutRef.current = setTimeout(() => {
+          setIsScanning(false);
+          serverDiscovery.stop();
+        }, 3000);
+      })
+      .catch(console.log);
+  }, [setLocalServers, setIsScanning]);
+
+  const searchAsync = useCallback(async () => {
+    if (serverDiscovery.state == 'starting') {
+      return [];
+    }
+
+    if (serverDiscovery.state == 'listening') {
+      if (lastTimeoutRef.current != null) {
+        clearTimeout(lastTimeoutRef.current);
       }
-    },
-    [setLocalServers],
-  );
+      setIsScanning(false);
+      serverDiscovery.stop();
+    }
+
+    if (serverDiscovery.state != 'stopped') {
+      return [];
+    }
+
+    setLocalServers([]);
+    setIsScanning(true);
+    await serverDiscovery.launchDiscovery(server => {
+      setLocalServers(oldServers => {
+        const newServers = [...oldServers];
+
+        if (!oldServers.find(s => s.ip == server.ip && s.port == server.port)) {
+          newServers.push(server);
+        }
+        return newServers;
+      });
+    });
+
+    return new Promise((res: (servers: Server[]) => void) => {
+      lastTimeoutRef.current = setTimeout(() => {
+        setIsScanning(false);
+        serverDiscovery.stop();
+        res(localServersRef.current);
+      }, 1000);
+    });
+  }, [setLocalServers, setIsScanning]);
 
   return {
     refreshData,
-    stopSearch,
     searchAsync,
-    addService,
   };
 }

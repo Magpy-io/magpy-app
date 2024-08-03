@@ -3366,6 +3366,7 @@ __metadata:
     react-native-svg-transformer: "npm:^1.3.0"
     react-native-tab-view: "npm:^3.5.2"
     react-native-toast-message: "npm:^2.2.0"
+    react-native-udp: "https://github.com/issamBenelgada/react-native-udp.git#commit=163b757ced1458d3e0165d656c455c760e276a1d"
     react-native-vector-icons: "npm:^10.0.3"
     react-native-version-info: "npm:^1.1.1"
     react-redux: "npm:^9.1.0"
@@ -3996,7 +3997,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"buffer@npm:^5.5.0":
+"buffer@npm:^5.5.0, buffer@npm:^5.6.0":
   version: 5.7.1
   resolution: "buffer@npm:5.7.1"
   dependencies:
@@ -5700,6 +5701,13 @@ __metadata:
   version: 5.0.1
   resolution: "event-target-shim@npm:5.0.1"
   checksum: 0255d9f936215fd206156fd4caa9e8d35e62075d720dc7d847e89b417e5e62cf1ce6c9b4e0a1633a9256de0efefaf9f8d26924b1f3c8620cffb9db78e7d3076b
+  languageName: node
+  linkType: hard
+
+"events@npm:^3.1.0":
+  version: 3.3.0
+  resolution: "events@npm:3.3.0"
+  checksum: d6b6f2adbccbcda74ddbab52ed07db727ef52e31a61ed26db9feb7dc62af7fc8e060defa65e5f8af9449b86b52cc1a1f6a79f2eafcf4e62add2b7a1fa4a432f6
   languageName: node
   linkType: hard
 
@@ -9720,6 +9728,16 @@ __metadata:
     react: "*"
     react-native: "*"
   checksum: 02c2507efba0875a85cecde616e60144daea4ea6b9e7f153f23b3f513a8f3c6c90181ee2d10aeb8093605957ba5bd415c4fa3ae8ed06691810c2f4b9599ea0c8
+  languageName: node
+  linkType: hard
+
+"react-native-udp@https://github.com/issamBenelgada/react-native-udp.git#commit=163b757ced1458d3e0165d656c455c760e276a1d":
+  version: 4.1.7
+  resolution: "react-native-udp@https://github.com/issamBenelgada/react-native-udp.git#commit=163b757ced1458d3e0165d656c455c760e276a1d"
+  dependencies:
+    buffer: "npm:^5.6.0"
+    events: "npm:^3.1.0"
+  checksum: 9d9a75cb75713f75a2b777de6ae8e7911faa18d72032ce38111a39a66616e10c561ca4c48c7cff2652f0bdca4274acb82a3f05198aa68a1dce98fe23fd9a540e
   languageName: node
   linkType: hard
 
