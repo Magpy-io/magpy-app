@@ -39,10 +39,10 @@ export class ServerDiscovery {
   }
 
   async launchDiscovery(onServerDiscovered: (response: Server) => void) {
-    console.log('Discovery started.....................');
+    console.log('Discovery started');
 
     if (this.state != 'stopped') {
-      console.log('Discovery already running.....................');
+      console.log('Discovery already running');
       throw new Error('Cannot start new discovery while a discovery is still running.');
     }
 
@@ -57,14 +57,14 @@ export class ServerDiscovery {
 
       await this.bindSocket();
 
-      console.log('Socket binded, listening started............................');
+      console.log('Discovery socket binded, listening started');
       if (!this.socket) {
-        console.log('Listening aborted............................');
+        console.log('Discovery listening aborted');
         return;
       }
 
       const address = this.socket.address();
-      console.log('UDP socket listening on ' + address.address + ':' + address.port);
+      console.log('Discovery UDP socket listening on ' + address.address + ':' + address.port);
 
       // Should call setBroadcast on socket but I'm not doing it because I'm using a forked version
       // of the react-native-udp package and changed it to setBroadcast by default on socket bind
@@ -84,9 +84,9 @@ export class ServerDiscovery {
   }
 
   stop() {
-    console.log('Stop Called.........................');
+    console.log('Discovery stop Called');
     if (this.state == 'starting') {
-      console.log('Discovery is stating up, cannot stop yet.....................');
+      console.log('Discovery is stating up, cannot stop yet');
       throw new Error('Cannot stop discovery while starting up discovery.');
     }
 
