@@ -68,7 +68,7 @@ export function useFindServerFunctions() {
     let serverResponded: { responded: boolean; token: string } | null = null;
     let serverErrorToSet: ConnectingToServerError = 'SERVER_NOT_REACHABLE';
     // Start search for local mdns servers
-    const serversPromise = searchAsync();
+    const serversPromise = searchAsync().catch(console.log);
 
     // Try saved server if present
     if (serverNetwork?.currentIp && serverNetwork.currentPort) {
@@ -115,50 +115,52 @@ export function useFindServerFunctions() {
     // Try discovered servers
     const servers = await serversPromise;
 
-    const serversTriedPromises = servers.map(server => {
-      return TryServerRemote(server.ip, server.port, backendToken).then(response => {
-        if (response.token) {
-          return { server, response };
-        } else {
-          throw 'NO_RESPONSE';
-        }
+    if (servers) {
+      const serversTriedPromises = servers.map(server => {
+        return TryServerRemote(server.ip, server.port, backendToken).then(response => {
+          if (response.token) {
+            return { server, response };
+          } else {
+            throw 'NO_RESPONSE';
+          }
+        });
       });
-    });
 
-    let anyServerResponded:
-      | {
-          server: Server;
-          response: {
-            responded: boolean;
-            token: string;
-          };
-        }
-      | undefined;
+      let anyServerResponded:
+        | {
+            server: Server;
+            response: {
+              responded: boolean;
+              token: string;
+            };
+          }
+        | undefined;
 
-    try {
-      anyServerResponded = await Promise.any(serversTriedPromises);
-    } catch (error) {
-      if (error instanceof AggregateError) {
-        const allErrorsNoResponse = error.errors.reduce((p: boolean, c) => {
-          return p && c === 'NO_RESPONSE';
-        }, true);
+      try {
+        anyServerResponded = await Promise.any(serversTriedPromises);
+      } catch (error) {
+        if (error instanceof AggregateError) {
+          const allErrorsNoResponse = error.errors.reduce((p: boolean, c) => {
+            return p && c === 'NO_RESPONSE';
+          }, true);
 
-        if (!allErrorsNoResponse) {
+          if (!allErrorsNoResponse) {
+            console.log(error);
+          }
+        } else {
           console.log(error);
         }
-      } else {
-        console.log(error);
       }
-    }
 
-    if (anyServerResponded?.response.token) {
-      setReachableServer({
-        ip: anyServerResponded.server.ip,
-        port: anyServerResponded.server.port,
-        token: anyServerResponded.response.token,
-      });
-      setFindingServer(false);
-      return;
+      if (anyServerResponded?.response.token) {
+        setReachableServer({
+          ip: anyServerResponded.server.ip,
+          port: anyServerResponded.server.port,
+          token: anyServerResponded.response.token,
+        });
+        setFindingServer(false);
+        return;
+      }
     }
 
     // No need to try public address because a local one was already found
