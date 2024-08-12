@@ -2,6 +2,7 @@ package com.opencloudphotos.GlobalManagers.ServerQueriesManager;
 
 import androidx.annotation.NonNull;
 
+import com.google.common.primitives.Booleans;
 import com.opencloudphotos.GlobalManagers.HttpManager;
 import com.opencloudphotos.GlobalManagers.ServerQueriesManager.Common.ResponseNotOkException;
 
@@ -10,6 +11,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class GetPhotos {
 
@@ -70,6 +74,31 @@ public class GetPhotos {
         } catch (JSONException e) {
             throw new RuntimeException("Error parsing json response, expected properties not found.", e);
         }
+    }
+
+    public boolean[] getPhotosExistByIdBatched(String[] photosIds) throws ResponseNotOkException, IOException {
+        int BATCH_SIZE = 500;
+
+        ArrayList<Boolean> ret = new ArrayList<>(photosIds.length);
+
+        int nbBatches = photosIds.length / BATCH_SIZE;
+
+        for(int i = 0; i<nbBatches; i++){
+            boolean[] ret_i = getPhotosExistById(Arrays.copyOfRange(photosIds, i * BATCH_SIZE, (i+1) * BATCH_SIZE));
+            for (boolean b:ret_i){
+                ret.add(b);
+            }
+        }
+
+        int leftOvers = photosIds.length % BATCH_SIZE;
+
+        if(leftOvers != 0){
+            boolean[] ret_i = getPhotosExistById(Arrays.copyOfRange(photosIds, nbBatches * BATCH_SIZE, photosIds.length));
+            for (boolean b:ret_i){
+                ret.add(b);
+            }
+        }
+        return Booleans.toArray(ret);
     }
 
     private @NonNull JSONObject formatJsonRequest(String[] photosIds) {

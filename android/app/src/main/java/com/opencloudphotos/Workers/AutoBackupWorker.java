@@ -135,9 +135,7 @@ public class AutoBackupWorker extends Worker {
                 serverToken,
                 deviceId);
 
-        boolean[] photosExist;
-
-        photosExist = getPhotos.getPhotosExistById(ids);
+        boolean[] photosExist = getPhotos.getPhotosExistByIdBatched(ids);
 
         List<PhotoData> missingPhotos = getPhotosDataFromGetMediaIfNotInServer(result, photosExist, MAX_MISSING_PHOTOS_TO_UPLOAD);
 
