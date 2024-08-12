@@ -12,7 +12,8 @@ import {
   photoCompressedExistsInCache,
 } from '~/Helpers/GalleryFunctions/Functions';
 import { GalleryGetPhotos } from '~/Helpers/GalleryFunctions/GetGalleryPhotos';
-import { DeletePhotosById, GetPhotos, GetPhotosById } from '~/Helpers/ServerQueries';
+import { getPhotosBatched } from '~/Helpers/Queries';
+import { DeletePhotosById, GetPhotosById } from '~/Helpers/ServerQueries';
 
 import { useAppDispatch } from '../../Store';
 import { ParseApiPhoto } from './Functions';
@@ -49,7 +50,7 @@ export function usePhotosFunctionsStore() {
 
   const RefreshServerPhotos = useCallback(
     async (n: number) => {
-      const photosFromServer = await GetPhotos.Post({
+      const photosFromServer = await getPhotosBatched({
         number: n,
         offset: 0,
         photoType: 'data',
