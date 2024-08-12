@@ -245,12 +245,29 @@ export function usePhotosFunctionsStore() {
 }
 
 export function usePhotosStoreEffect() {
-  const { RefreshAllPhotos } = usePhotosFunctionsStore();
+  const { RefreshLocalPhotos, RefreshServerPhotos, ClearServerPhotos } =
+    usePhotosFunctionsStore();
   const { isServerReachable } = useServerContext();
 
   const { mediaPermissionStatus } = usePermissionsContext();
 
   useEffect(() => {
-    RefreshAllPhotos(5000, 5000).catch(console.log);
-  }, [RefreshAllPhotos, isServerReachable, mediaPermissionStatus]);
+    async function innerEffect() {
+      if (mediaPermissionStatus) {
+        await RefreshLocalPhotos(5000);
+      }
+    }
+    innerEffect().catch(console.log);
+  }, [RefreshLocalPhotos, mediaPermissionStatus]);
+
+  useEffect(() => {
+    async function innerEffect() {
+      if (isServerReachable) {
+        await RefreshServerPhotos(5000);
+      } else {
+        ClearServerPhotos();
+      }
+    }
+    innerEffect().catch(console.log);
+  }, [ClearServerPhotos, RefreshServerPhotos, isServerReachable]);
 }
