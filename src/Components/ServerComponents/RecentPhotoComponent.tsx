@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Image, StyleSheet } from 'react-native';
+import { Image, StyleSheet, View } from 'react-native';
 
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { usePhotosFunctionsStore } from '~/Context/ReduxStore/Slices/Photos/PhotosFunctions';
@@ -36,7 +36,7 @@ export default function RecentPhotoComponent({
   } else if (serverPhoto?.uriThumbnail) {
     uriSource = serverPhoto.uriThumbnail;
   }
-  return (
+  return uriSource ? (
     <Image
       source={{ uri: uriSource }}
       resizeMode="cover"
@@ -44,6 +44,8 @@ export default function RecentPhotoComponent({
       height={size ?? default_size}
       style={styles.imageStyle}
     />
+  ) : (
+    <View style={styles.imageStyle} />
   );
 }
 
