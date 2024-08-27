@@ -94,6 +94,8 @@ public class AutoBackupWorker extends Worker {
 
             Context context = getApplicationContext();
 
+            createNotification();
+
             WritableArray include = Arguments.createArray();
             include.pushString("fileSize");
             include.pushString("filename");
@@ -142,8 +144,6 @@ public class AutoBackupWorker extends Worker {
         if(missingPhotos.isEmpty()){
             return;
         }
-
-        createNotification();
 
         PhotoUploader photoUploader = new PhotoUploader(
                 getApplicationContext(),
