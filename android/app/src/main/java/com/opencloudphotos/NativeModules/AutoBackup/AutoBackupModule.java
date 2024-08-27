@@ -91,6 +91,7 @@ public class AutoBackupModule extends ReactContextBaseJavaModule {
         ExecutorsManager.ExecuteOnBackgroundThread(() -> {
             try {
                 autoBackupWorkerManager.StopWorker();
+                mPromise.resolve(null);
             } catch (Exception e) {
                 mPromise.reject("Error", e);
             }
@@ -111,9 +112,9 @@ public class AutoBackupModule extends ReactContextBaseJavaModule {
                 }
 
                 WritableMap workInfoObject = new WritableNativeMap();
-                workInfoObject.putDouble("nextScheduleMillis", workInfo.getNextScheduleTimeMillis());
-                workInfoObject.putDouble("repeatIntervalMillis", workInfo.getPeriodicityInfo() != null ? workInfo.getPeriodicityInfo().getRepeatIntervalMillis() : -1);
                 workInfoObject.putString("state", workInfo.getState().name());
+                workInfoObject.putDouble("nextScheduleMillis", workInfo.getState() == WorkInfo.State.ENQUEUED ? workInfo.getNextScheduleTimeMillis() : -1);
+                workInfoObject.putDouble("repeatIntervalMillis", workInfo.getPeriodicityInfo() != null ? workInfo.getPeriodicityInfo().getRepeatIntervalMillis() : -1);
                 workInfoObject.putDouble("stopReason", workInfo.getStopReason());
 
                 mPromise.resolve(workInfoObject);
