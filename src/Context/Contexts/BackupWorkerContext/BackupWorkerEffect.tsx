@@ -25,7 +25,7 @@ export const BackupWorkerEffect: React.FC<PropsType> = props => {
   }, [serverPath, token]);
 
   const lastServerInfoRef = useRef(serverInfo);
-  const lastIsServerREachable = useRef(isServerReachable);
+  const lastIsServerReachable = useRef(isServerReachable);
 
   // This effect will update the server network data of worker
   // whenever the server network data changes or the reachable status goes from false to true
@@ -34,12 +34,12 @@ export const BackupWorkerEffect: React.FC<PropsType> = props => {
       isServerReachable &&
       autobackupEnabled &&
       (lastServerInfoRef.current !== serverInfo ||
-        lastIsServerREachable.current !== isServerReachable)
+        lastIsServerReachable.current !== isServerReachable)
     ) {
       StartAutoBackup().catch(console.log);
     }
     lastServerInfoRef.current = serverInfo;
-    lastIsServerREachable.current = isServerReachable;
+    lastIsServerReachable.current = isServerReachable;
   }, [StartAutoBackup, autobackupEnabled, isServerReachable, serverInfo]);
 
   useEffect(() => {
