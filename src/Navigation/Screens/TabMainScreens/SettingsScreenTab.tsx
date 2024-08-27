@@ -88,6 +88,14 @@ export default function SettingsScreenTab() {
     });
   }
 
+  data[0].data.push({
+    type: 'Button',
+    title: 'Debug menu',
+    onPress: () => {
+      navigate('Debug');
+    },
+  });
+
   return (
     <SettingsPageComponent
       data={data}

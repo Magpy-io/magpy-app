@@ -9,6 +9,7 @@ import { useTheme } from '~/Context/Contexts/ThemeContext';
 import AboutSettingsScreen from '../Screens/AboutSettingsScreen';
 import AccountSettingsScreen from '../Screens/AccountSettingsScreen';
 import BackupSettingsScreen from '../Screens/BackupSettingsScreen';
+import DebugScreen from '../Screens/DebugScreen';
 import LoginScreen from '../Screens/LoginScreen';
 import PreferencesSettingsScreen from '../Screens/PreferencesSettingsScreen';
 import RegisterScreen from '../Screens/RegisterScreen';
@@ -32,6 +33,7 @@ export type MainStackParamList = {
   BackupSettings: undefined;
   PreferencesSettings: undefined;
   AboutSettings: undefined;
+  Debug: undefined;
 };
 
 const Stack = createNativeStackNavigator<MainStackParamList>();
@@ -62,6 +64,7 @@ export function MainStackNavigator({ initialScreen }: propsType) {
       <Stack.Screen name="BackupSettings" component={BackupSettingsScreen} />
       <Stack.Screen name="PreferencesSettings" component={PreferencesSettingsScreen} />
       <Stack.Screen name="AboutSettings" component={AboutSettingsScreen} />
+      <Stack.Screen name="Debug" component={DebugScreen} />
     </Stack.Navigator>
   );
 }

@@ -48,3 +48,38 @@ export function formatYear(date: string) {
   const dt = StringToDate(date);
   return yearFormatter.format(dt);
 }
+
+// Converts a time difference in millis to readable
+export function parseMillisecondsIntoReadableTime(milliseconds: number) {
+  //Get hours from milliseconds
+  const hours = milliseconds / (1000 * 60 * 60);
+  const absoluteHours = Math.floor(hours);
+  const hoursString =
+    absoluteHours == 0 ? '' : absoluteHours == 1 ? '1 hour ' : absoluteHours + ' hours ';
+
+  //Get remainder from hours and convert to minutes
+  const minutes = milliseconds / (1000 * 60);
+  const remainderMinutes = minutes - absoluteHours * 60;
+  const absoluteMinutes = Math.floor(remainderMinutes);
+  const minutesString =
+    absoluteMinutes == 0
+      ? ''
+      : absoluteMinutes == 1
+        ? '1 minute '
+        : absoluteMinutes + ' minutes ';
+
+  //Get remainder from minutes and convert to seconds
+  const seconds = milliseconds / 1000;
+  const remainderSeconds = seconds - absoluteMinutes * 60 - absoluteHours * 60 * 60;
+  const absoluteSeconds = Math.floor(remainderSeconds);
+  const secondsString =
+    absoluteSeconds == 0
+      ? ''
+      : absoluteSeconds == 1
+        ? '1 second'
+        : absoluteSeconds + ' seconds';
+
+  const ret = hoursString + minutesString + secondsString;
+
+  return ret ?? 'None';
+}

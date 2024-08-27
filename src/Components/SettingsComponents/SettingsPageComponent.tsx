@@ -150,14 +150,6 @@ export default function SettingsPageComponent({
 
 const makeStyles = (colors: colorsType) =>
   StyleSheet.create({
-    header: {
-      paddingTop: spacing.spacing_xl,
-      gap: spacing.spacing_xl,
-    },
-    logoutText: {
-      ...typography(colors).mediumTextBold,
-      color: colors.ERROR,
-    },
     title: {
       ...typography(colors).sectionTitle,
       paddingVertical: spacing.spacing_l,
