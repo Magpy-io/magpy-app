@@ -3,6 +3,7 @@ package com.opencloudphotos.NativeModules.AutoBackup;
 import static com.opencloudphotos.Workers.AutoBackupWorker.UPLOADED_PHOTO_MEDIA_ID;
 
 import android.content.Context;
+import android.util.Log;
 
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ProcessLifecycleOwner;
@@ -17,6 +18,7 @@ import androidx.work.WorkManager;
 
 import com.opencloudphotos.GlobalManagers.ExecutorsManager;
 import com.opencloudphotos.Workers.AutoBackupWorker;
+import com.opencloudphotos.Workers.UploadWorker;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -58,16 +60,22 @@ public class AutoBackupWorkerManager {
 
     private void SetupWorkerObserver(Observer<String> observer) throws ExecutionException, InterruptedException {
         WorkInfo result = GetWorker();
-        WorkManager.getInstance(context).getWorkInfoByIdLiveData(result.getId()).observe(ProcessLifecycleOwner.get(), (workInfo -> {
-            if (workInfo != null) {
-                Data progress = workInfo.getProgress();
-                String uploadedMediaId = progress.getString(UPLOADED_PHOTO_MEDIA_ID);
+        ExecutorsManager.ExecuteOnMainThread(() -> {
+            try{
+                WorkManager.getInstance(context).getWorkInfoByIdLiveData(result.getId()).observe(ProcessLifecycleOwner.get(), (workInfo -> {
+                    if (workInfo != null) {
+                        Data progress = workInfo.getProgress();
+                        String uploadedMediaId = progress.getString(UPLOADED_PHOTO_MEDIA_ID);
 
-                if(uploadedMediaId != null){
-                    observer.onChanged(uploadedMediaId);
-                }
+                        if(uploadedMediaId != null){
+                            observer.onChanged(uploadedMediaId);
+                        }
+                    }
+                }));
+            }catch (Exception e){
+                Log.d("AutoBackupWorker", e.toString());
             }
-        }));
+        });
     }
 
     public WorkInfo GetWorker() throws ExecutionException, InterruptedException {

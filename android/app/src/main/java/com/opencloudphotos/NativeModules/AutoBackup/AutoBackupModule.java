@@ -121,6 +121,5 @@ public class AutoBackupModule extends ReactContextBaseJavaModule {
                 mPromise.reject("Error", e);
             }
         });
-
     }
 }
