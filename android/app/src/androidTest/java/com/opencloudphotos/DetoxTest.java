@@ -1,4 +1,4 @@
-package com.opencloudphotos;
+package com.magpy;
 
 import com.wix.detox.Detox;
 import com.wix.detox.config.DetoxConfig;
