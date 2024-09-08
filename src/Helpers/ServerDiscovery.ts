@@ -1,11 +1,8 @@
-import { EventArg, EventEmitter } from '@react-navigation/native';
 import dgram from 'react-native-udp';
 import UdpSocket from 'react-native-udp/lib/types/UdpSocket';
 import { isIP, isPort } from 'validator';
 
 import { serverDiscoveryPort } from '~/Config/config';
-
-import { sleep } from './Utilities';
 
 export type DiscoveryResponse = {
   domain: 'magpy-discovery';

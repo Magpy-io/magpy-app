@@ -1,7 +1,7 @@
 import { makeGalleryPhoto } from '~/Context/ReduxStore/Slices/Photos/__tests__/MockValues';
 
-import { DateFilter } from '../DateFilter';
-import { StatusFilter } from '../StatusFilter';
+import { DateFilter } from '../Filters/DateFilter';
+import { StatusFilter } from '../Filters/StatusFilter';
 
 describe('Tests for StatusFilter class', () => {
   const inServerFilter = new StatusFilter({ value: 'inServer' });

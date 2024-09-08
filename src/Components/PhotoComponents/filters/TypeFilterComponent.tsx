@@ -3,44 +3,12 @@ import { View } from 'react-native';
 
 import { Text } from 'react-native-elements';
 
-import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { useStyles } from '~/Hooks/useStyles';
 
 import Element from './Element';
-import { Filter, FilterNameType, FilterObjectType } from './Filter';
 import { makeFilterStyles } from './FilterStyle';
-
-export type TypeFilterName = 'Type';
-export type TypeFilterValue = 'photos' | 'videos';
-export type TypeFilterParams = { value: TypeFilterValue };
-
-export type TypeFilterObjectType = {
-  type: TypeFilterName;
-  params: TypeFilterParams;
-};
-
-export class TypeFilter implements Filter {
-  type: TypeFilterName;
-  value: TypeFilterValue;
-
-  constructor(params: TypeFilterParams) {
-    this.type = 'Type';
-    this.value = params.value;
-  }
-
-  filter(photos: PhotoGalleryType[]) {
-    switch (this.value) {
-      case 'photos':
-        return photos;
-      case 'videos':
-        return [];
-    }
-  }
-
-  toObject() {
-    return { type: this.type, params: { value: this.value } };
-  }
-}
+import { FilterNameType, FilterObjectType } from './Filters/Filter';
+import { TypeFilterObjectType, TypeFilterValue } from './Filters/TypeFilter';
 
 type TypeProps = {
   filter: TypeFilterObjectType | undefined;

@@ -13,10 +13,10 @@ import { colorsType } from '~/Styles/colors';
 import { spacing } from '~/Styles/spacing';
 import { typography } from '~/Styles/typography';
 
-import DateFilterComponent from '../filters/DateFilter';
-import { FilterNameType, FilterObjectType } from '../filters/Filter';
-import { StatusFilterComponent } from '../filters/StatusFilter';
-import { TypeFilterComponent } from '../filters/TypeFilter';
+import DateFilterComponent from '../filters/DateFilterComponent';
+import { FilterNameType, FilterObjectType } from '../filters/Filters/Filter';
+import { StatusFilterComponent } from '../filters/StatusFilterComponent';
+import { TypeFilterComponent } from '../filters/TypeFilterComponent';
 import { filterPhotos } from '../filters/functions';
 
 type FilterModalProps = {

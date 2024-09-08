@@ -1,7 +1,7 @@
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
 
-import { FilterObjectType } from './Filter';
-import { FilterFactory } from './FilterFactory';
+import { FilterObjectType } from './Filters/Filter';
+import { FilterFactory } from './Filters/FilterFactory';
 
 export function filterPhotos(photos: PhotoGalleryType[], filters: FilterObjectType[]) {
   const Factory = new FilterFactory();

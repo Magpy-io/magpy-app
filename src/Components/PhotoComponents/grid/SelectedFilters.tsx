@@ -11,10 +11,10 @@ import { colorsType } from '~/Styles/colors';
 import { borderRadius, spacing } from '~/Styles/spacing';
 import { typography } from '~/Styles/typography';
 
-import { DateFilterObjectType } from '../filters/DateFilter';
-import { FilterObjectType } from '../filters/Filter';
-import { StatusFilterObjectType } from '../filters/StatusFilter';
-import { TypeFilterObjectType } from '../filters/TypeFilter';
+import { DateFilterObjectType } from '../filters/Filters/DateFilter';
+import { FilterObjectType } from '../filters/Filters/Filter';
+import { StatusFilterObjectType } from '../filters/Filters/StatusFilter';
+import { TypeFilterObjectType } from '../filters/Filters/TypeFilter';
 
 export default function SelectedFilters() {
   const { filters } = usePhotoGalleryContext();
