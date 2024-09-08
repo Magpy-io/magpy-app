@@ -44,8 +44,6 @@ describe('Tests for RangeSplitterExponential class', () => {
 
       const ranges = rangeSplitter.splitRange(n);
 
-      console.log(ranges.map(r => r.end - r.start));
-
       expect(ranges.map(r => r.end - r.start)).toEqual(expected);
 
       testRangesStartAndEndAreCorrect({ a: 0, b: n, rangeSplitter, ranges });
