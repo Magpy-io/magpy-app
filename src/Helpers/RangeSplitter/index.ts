@@ -1,2 +1,2 @@
-export * from './RangeSplitter';
-export * from './RangeSplitterLinear';
+export { RangeSplitter } from './RangeSplitter';
+export { RangeSplitterLinear } from './RangeSplitterLinear';

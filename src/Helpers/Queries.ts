@@ -1,6 +1,7 @@
 import { uniqueDeviceId } from '~/Config/config';
 import { AddPhotoInit, AddPhotoPart, GetPhotoPartById } from '~/Helpers/ServerQueries';
 
+import { RangeSplitterLinear } from './RangeSplitter';
 import { GetPhotos } from './ServerQueries';
 import { APIPhoto } from './ServerQueries/Types';
 
@@ -87,19 +88,9 @@ export async function addPhotoWithProgress(
 }
 
 function splitString(str: string) {
-  const partSize = 100000;
-  const len = str.length;
-  const numberOfParts = Math.floor(len / partSize);
-  const parts = [];
-
-  for (let i = 0; i < numberOfParts; i++) {
-    parts.push(str.substring(i * partSize, (i + 1) * partSize));
-  }
-  if (len % partSize != 0) {
-    parts.push(str.substring(partSize * numberOfParts, len));
-  }
-
-  return parts;
+  return new RangeSplitterLinear(100000)
+    .splitRange(str.length)
+    .map(range => str.substring(range.start, range.end));
 }
 
 export async function getPhotosBatched({
