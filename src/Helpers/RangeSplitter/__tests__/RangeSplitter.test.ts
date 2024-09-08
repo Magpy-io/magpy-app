@@ -1,4 +1,4 @@
-import { RangeSplitterLinear } from '../RangeSplitter';
+import { RangeSplitterLinear } from '../RangeSplitterLinear';
 
 describe('Tests for RangeSplitterLinear classe', () => {
   test(`RangeSplitterLinear.split(10) should return 2 correct ranges when using a segment lenght of 5`, () => {
