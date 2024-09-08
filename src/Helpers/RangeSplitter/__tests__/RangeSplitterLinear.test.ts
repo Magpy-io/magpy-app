@@ -1,7 +1,7 @@
 import { RangeSplitterLinear } from '../RangeSplitterLinear';
 
-describe('Tests for RangeSplitterLinear classe', () => {
-  test(`RangeSplitterLinear.split(10) should return 2 correct ranges when using a segment lenght of 5`, () => {
+describe('Tests for RangeSplitterLinear class', () => {
+  test(`RangeSplitterLinear.split(10) should return 2 correct ranges when using a segment length of 5`, () => {
     const rangeSplitter = new RangeSplitterLinear(5);
 
     const ret = rangeSplitter.splitRange(10);
@@ -17,7 +17,7 @@ describe('Tests for RangeSplitterLinear classe', () => {
     expect(range2.end).toBe(10);
   });
 
-  test(`RangeSplitterLinear.split(10) should return 4 correct ranges when using a segment lenght of 3`, () => {
+  test(`RangeSplitterLinear.split(10) should return 4 correct ranges when using a segment length of 3`, () => {
     const rangeSplitter = new RangeSplitterLinear(3);
 
     const ret = rangeSplitter.splitRange(10);
@@ -41,7 +41,7 @@ describe('Tests for RangeSplitterLinear classe', () => {
     expect(range4.end).toBe(10);
   });
 
-  test(`RangeSplitterLinear.split(1, 10) should return 3 correct ranges when using a segment lenght of 3`, () => {
+  test(`RangeSplitterLinear.split(1, 10) should return 3 correct ranges when using a segment length of 3`, () => {
     const rangeSplitter = new RangeSplitterLinear(3);
 
     const ret = rangeSplitter.splitRange(1, 10);
