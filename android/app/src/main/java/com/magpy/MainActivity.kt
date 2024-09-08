@@ -1,7 +1,6 @@
 package com.magpy
 
 import android.os.Bundle
-import androidx.core.view.WindowCompat
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.fabricEnabled
@@ -15,9 +14,6 @@ class MainActivity : ReactActivity() {
         super.onCreate(savedInstanceState)
 
         ActivityResultLauncherWrapper.init(this);
-
-        // Set app fullscreen
-        WindowCompat.setDecorFitsSystemWindows(window, false);
     }
 
     override fun onResume() {
