@@ -20,8 +20,8 @@ function App(): React.JSX.Element {
     <Provider store={store}>
       <GlobalContexts>
         <GlobalEffects>
-          <GestureHandlerRootView style={{ flex: 1 }}>
-            <SafeAreaProvider>
+          <SafeAreaProvider>
+            <GestureHandlerRootView style={{ flex: 1 }}>
               <ThemeContextProvider>
                 <PopupMessageModalContextProvider>
                   <StatusBar backgroundColor={'transparent'} translucent />
@@ -29,8 +29,8 @@ function App(): React.JSX.Element {
                   <Toast />
                 </PopupMessageModalContextProvider>
               </ThemeContextProvider>
-            </SafeAreaProvider>
-          </GestureHandlerRootView>
+            </GestureHandlerRootView>
+          </SafeAreaProvider>
         </GlobalEffects>
       </GlobalContexts>
     </Provider>

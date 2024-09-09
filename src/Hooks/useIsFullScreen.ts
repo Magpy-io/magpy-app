@@ -1,6 +1,19 @@
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useEffect, useState } from 'react';
+
+import { FullScreenModuleEvents } from '~/NativeModules/FullScreenModule';
 
 export function useIsFullScreen() {
-  const insets = useSafeAreaInsets();
-  return insets.top == 0 && insets.bottom == 0;
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  useEffect(() => {
+    const subscription = FullScreenModuleEvents.subscribeOnFullscreenChanged(e => {
+      setIsFullscreen(e.isFullScreen);
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
+
+  return isFullscreen;
 }
