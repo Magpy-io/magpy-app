@@ -13,46 +13,41 @@ export function mergePhotos(photosState: {
   const { photosLocal, photosLocalIdsOrdered, photosServer, photosServerIdsOrdered } =
     photosState;
 
-  const photosServerGallery: PhotoGalleryType[] = [];
-  const photosLocalGallery: PhotoGalleryType[] = [];
-
   const photosLocalAlreadyAdded: Set<string> = new Set();
 
-  for (const photoServerId of photosServerIdsOrdered) {
+  const photosServerGallery: PhotoGalleryType[] = photosServerIdsOrdered.map(photoServerId => {
     const photoServer = photosServer[photoServerId];
 
     const photoLocalAssociatedId = photosLocal[photoServer.mediaId ?? ''];
 
     if (photoLocalAssociatedId) {
       photosLocalAlreadyAdded.add(photoServer.mediaId ?? '');
-      photosServerGallery.push({
+      return {
         key: photoServerId,
         date: photoServer.date,
         serverId: photoServerId,
         mediaId: photoServer.mediaId,
-      });
+      };
     } else {
-      photosServerGallery.push({
+      return {
         key: photoServerId,
         date: photoServer.date,
         serverId: photoServerId,
         mediaId: undefined,
-      });
+      };
     }
-  }
+  });
 
-  for (const photoLocalId of photosLocalIdsOrdered) {
-    const mergedWithServerPhoto = photosLocalAlreadyAdded.has(photoLocalId);
-
-    if (!mergedWithServerPhoto) {
-      photosLocalGallery.push({
+  const photosLocalGallery: PhotoGalleryType[] = photosLocalIdsOrdered
+    .filter(photoLocalId => !photosLocalAlreadyAdded.has(photoLocalId))
+    .map(photoLocalId => {
+      return {
         key: photoLocalId,
         date: photosLocal[photoLocalId].date,
         serverId: undefined,
         mediaId: photoLocalId,
-      });
-    }
-  }
+      };
+    });
 
   const galleryPhotos: PhotoGalleryType[] = [];
 
