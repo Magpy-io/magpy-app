@@ -10,6 +10,12 @@ export interface AutoBackupModuleType {
   }) => Promise<void>;
   IsWorkerAlive: () => Promise<boolean>;
   StopWorker: () => Promise<void>;
+  GetWorkerInfo: () => Promise<{
+    state: string;
+    nextScheduleMillis: number;
+    repeatIntervalMillis: number;
+    stopReason: number;
+  }>;
 }
 
 const Module = AutoBackupModule as AutoBackupModuleType;

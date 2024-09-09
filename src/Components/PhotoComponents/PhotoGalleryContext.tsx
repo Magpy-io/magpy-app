@@ -1,6 +1,6 @@
 import React, { ReactNode, createContext, useContext, useState } from 'react';
 
-import { FilterObjectType } from '~/Components/PhotoComponents/filters/Filter';
+import { FilterObjectType } from '~/Components/PhotoComponents/filters/Filters/Filter';
 
 import {
   addGalleryFilters,

@@ -1,7 +1,14 @@
 import { uniqueDeviceId } from '~/Config/config';
 import { AddPhotoInit, AddPhotoPart, GetPhotoPartById } from '~/Helpers/ServerQueries';
 
-async function getPhotoWithProgress(id: string, f?: (progess: number, total: number) => void) {
+import { RangeSplitterLinear } from './RangeSplitter';
+import { GetPhotos } from './ServerQueries';
+import { APIPhoto } from './ServerQueries/Types';
+
+export async function getPhotoWithProgress(
+  id: string,
+  f?: (progess: number, total: number) => void,
+) {
   const response = await GetPhotoPartById.Post({ id: id, part: 0 });
 
   if (!response.ok) {
@@ -29,7 +36,7 @@ async function getPhotoWithProgress(id: string, f?: (progess: number, total: num
   return response;
 }
 
-async function addPhotoWithProgress(
+export async function addPhotoWithProgress(
   photo: {
     date: string;
     fileSize: number;
@@ -81,19 +88,40 @@ async function addPhotoWithProgress(
 }
 
 function splitString(str: string) {
-  const partSize = 100000;
-  const len = str.length;
-  const numberOfParts = Math.floor(len / partSize);
-  const parts = [];
-
-  for (let i = 0; i < numberOfParts; i++) {
-    parts.push(str.substring(i * partSize, (i + 1) * partSize));
-  }
-  if (len % partSize != 0) {
-    parts.push(str.substring(partSize * numberOfParts, len));
-  }
-
-  return parts;
+  return new RangeSplitterLinear(100000)
+    .splitRange(str.length)
+    .map(range => str.substring(range.start, range.end));
 }
 
-export { getPhotoWithProgress, addPhotoWithProgress };
+export async function getPhotosBatched({
+  number,
+  offset,
+  photoType,
+}: GetPhotos.RequestData): Promise<GetPhotos.ResponseType> {
+  const BATCH_SIZE = 500;
+
+  let photosLeft = number;
+  let endReached = false;
+  const photos: APIPhoto[] = [];
+  let warning = false;
+
+  while (photosLeft > 0 && !endReached) {
+    const ret: GetPhotos.ResponseType = await GetPhotos.Post({
+      number: photosLeft > BATCH_SIZE ? BATCH_SIZE : photosLeft,
+      offset: offset + photos.length,
+      photoType,
+    });
+
+    if (!ret.ok) {
+      return ret;
+    }
+
+    warning ||= ret.warning;
+    endReached = ret.data.endReached;
+    photos.push(...ret.data.photos);
+
+    photosLeft -= BATCH_SIZE;
+  }
+
+  return { ok: true, data: { endReached, photos, number: photos.length }, warning };
+}

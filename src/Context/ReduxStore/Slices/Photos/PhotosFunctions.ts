@@ -12,6 +12,7 @@ import {
   photoCompressedExistsInCache,
 } from '~/Helpers/GalleryFunctions/Functions';
 import { GalleryGetPhotos } from '~/Helpers/GalleryFunctions/GetGalleryPhotos';
+import { RangeSplitterExponential } from '~/Helpers/RangeSplitter/RangeSplitterExponential';
 import { DeletePhotosById, GetPhotos, GetPhotosById } from '~/Helpers/ServerQueries';
 
 import { useAppDispatch } from '../../Store';
@@ -21,6 +22,7 @@ import {
   PhotoLocalType,
   PhotoServerType,
   addCompressedPhotoById,
+  addPhotosServer,
   addThumbnailPhotoById,
   deletePhotos,
   deletePhotosFromLocal,
@@ -49,52 +51,62 @@ export function usePhotosFunctionsStore() {
 
   const RefreshServerPhotos = useCallback(
     async (n: number) => {
-      const photosFromServer = await GetPhotos.Post({
-        number: n,
-        offset: 0,
-        photoType: 'data',
-      });
+      const rangeSplitter = new RangeSplitterExponential(10, 500, 5);
 
-      if (!photosFromServer.ok) {
-        console.log('failed to get photos from server');
-        return;
+      const ranges = rangeSplitter.splitRange(n);
+
+      for (const { start, end } of ranges) {
+        const photosFromServer = await GetPhotos.Post({
+          number: end - start,
+          offset: start,
+          photoType: 'data',
+        });
+
+        if (!photosFromServer.ok) {
+          console.log('failed to get photos from server');
+          return;
+        }
+
+        // BluebirdPromise is used because Promise.all gives a warning when too many promises are created simultaneously
+        // Excessive number of pending callbacks: 501. Some pending callbacks that might have leaked by never being called from native code
+        // BluebirdPromise allows to set a limit on how many concurrent promises are created
+
+        const photosThumbnailExistsInCache = await BluebirdPromise.map(
+          photosFromServer.data.photos,
+          photo => {
+            return photoCompressedExistsInCache(photo.id);
+          },
+          { concurrency: 100 },
+        );
+        const photosCompressedExistsInCache = await BluebirdPromise.map(
+          photosFromServer.data.photos,
+          photo => {
+            return photoCompressedExistsInCache(photo.id);
+          },
+          { concurrency: 100 },
+        );
+
+        const photos: PhotoServerType[] = photosFromServer.data.photos.map((photo, index) => {
+          const photoThumbnailExistsInCache = photosThumbnailExistsInCache[index];
+          const photoCompressedExistsInCache = photosCompressedExistsInCache[index];
+
+          const parsedPhoto = ParseApiPhoto(photo);
+          parsedPhoto.uriThumbnail = photoThumbnailExistsInCache.exists
+            ? photoThumbnailExistsInCache.uri
+            : undefined;
+          parsedPhoto.uriCompressed = photoCompressedExistsInCache.exists
+            ? photoCompressedExistsInCache.uri
+            : undefined;
+
+          return parsedPhoto;
+        });
+
+        dispatch(addPhotosServer(photos));
+
+        if (photosFromServer.data.endReached) {
+          break;
+        }
       }
-
-      // BluebirdPromise is used because Promise.all gives a warning when too many promises are created simultaneously
-      // Excessive number of pending callbacks: 501. Some pending callbacks that might have leaked by never being called from native code
-      // BluebirdPromise allows to set a limit on how many concurrent promises are created
-
-      const photosThumbnailExistsInCache = await BluebirdPromise.map(
-        photosFromServer.data.photos,
-        photo => {
-          return photoCompressedExistsInCache(photo.id);
-        },
-        { concurrency: 100 },
-      );
-      const photosCompressedExistsInCache = await BluebirdPromise.map(
-        photosFromServer.data.photos,
-        photo => {
-          return photoCompressedExistsInCache(photo.id);
-        },
-        { concurrency: 100 },
-      );
-
-      const photos: PhotoServerType[] = photosFromServer.data.photos.map((photo, index) => {
-        const photoThumbnailExistsInCache = photosThumbnailExistsInCache[index];
-        const photoCompressedExistsInCache = photosCompressedExistsInCache[index];
-
-        const parsedPhoto = ParseApiPhoto(photo);
-        parsedPhoto.uriThumbnail = photoThumbnailExistsInCache.exists
-          ? photoThumbnailExistsInCache.uri
-          : undefined;
-        parsedPhoto.uriCompressed = photoCompressedExistsInCache.exists
-          ? photoCompressedExistsInCache.uri
-          : undefined;
-
-        return parsedPhoto;
-      });
-
-      dispatch(setPhotosServer(photos));
     },
     [dispatch],
   );
@@ -244,12 +256,29 @@ export function usePhotosFunctionsStore() {
 }
 
 export function usePhotosStoreEffect() {
-  const { RefreshAllPhotos } = usePhotosFunctionsStore();
+  const { RefreshLocalPhotos, RefreshServerPhotos, ClearServerPhotos } =
+    usePhotosFunctionsStore();
   const { isServerReachable } = useServerContext();
 
   const { mediaPermissionStatus } = usePermissionsContext();
 
   useEffect(() => {
-    RefreshAllPhotos(5000, 5000).catch(console.log);
-  }, [RefreshAllPhotos, isServerReachable, mediaPermissionStatus]);
+    async function innerEffect() {
+      if (mediaPermissionStatus) {
+        await RefreshLocalPhotos(5000);
+      }
+    }
+    innerEffect().catch(console.log);
+  }, [RefreshLocalPhotos, mediaPermissionStatus]);
+
+  useEffect(() => {
+    async function innerEffect() {
+      if (isServerReachable) {
+        await RefreshServerPhotos(5000);
+      } else {
+        ClearServerPhotos();
+      }
+    }
+    innerEffect().catch(console.log);
+  }, [ClearServerPhotos, RefreshServerPhotos, isServerReachable]);
 }

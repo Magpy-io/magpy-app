@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import FastImage from 'react-native-fast-image';
 
@@ -7,12 +7,14 @@ import { borderRadius } from '~/Styles/spacing';
 
 const ImageForGrid = ({ uri }: { uri: string | undefined }) => {
   //console.log('ImageFOrGrid render', uri);
-  return (
+  return uri ? (
     <FastImage
       source={{ uri: uri }}
       resizeMode={FastImage.resizeMode.cover}
       style={styles.imageStyle}
     />
+  ) : (
+    <View style={styles.imageStyle} />
   );
 };
 

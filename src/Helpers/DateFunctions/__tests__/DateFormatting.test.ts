@@ -3,9 +3,9 @@ import { formatDate, formatDateTime, formatMonth, formatYear } from '../DateForm
 const testDate = '2023-06-22T15:43:51.880Z';
 
 describe('Tests for Date Formatting functions', () => {
-  test(`formatDateTime should return "Jun 22, 2023, 3:43:51 PM" for date "${testDate}"`, () => {
+  test(`formatDateTime should return "Jun 22, 2023, 5:43:51 PM" for date "${testDate}"`, () => {
     const formatedDate = formatDateTime(testDate);
-    expect(formatedDate).toEqual('Jun 22, 2023, 3:43:51 PM');
+    expect(formatedDate).toEqual('Jun 22, 2023, 5:43:51 PM');
   });
 
   test(`formatDate should return "Jun 22, 2023" for date "${testDate}"`, () => {

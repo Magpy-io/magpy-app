@@ -6,7 +6,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import KeyboardDismissingView from '~/Components/CommonComponents/KeyboardDismissingView';
 import ScreenTitle from '~/Components/CommonComponents/ScreenTitle';
-import GoogleSignIn from '~/Components/LoginComponents/GoogleSignIn';
 import RegisterForm from '~/Components/LoginComponents/RegisterForm';
 import { useTheme } from '~/Context/Contexts/ThemeContext';
 import { useStyles } from '~/Hooks/useStyles';
@@ -35,7 +34,6 @@ function RegisterFooter() {
   const { colors } = useTheme();
   return (
     <View style={styles.loginFooterStyle}>
-      <GoogleSignIn />
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
         <Text style={{ color: colors.TEXT }}>Already a client ? </Text>
         <TouchableOpacity
