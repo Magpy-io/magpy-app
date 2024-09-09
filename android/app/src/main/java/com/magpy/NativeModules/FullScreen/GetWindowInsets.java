@@ -50,6 +50,8 @@ public class GetWindowInsets{
         ViewCompat.setOnApplyWindowInsetsListener(activity.getWindow().getDecorView().findViewById(android.R.id.content), (v, windowInsets) -> {
             Insets insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
 
+            boolean isStatusBarVisible = windowInsets.isVisible(WindowInsetsCompat.Type.statusBars());
+
             if(insets.top != 0){
                 top = insets.top;
             }
@@ -61,7 +63,7 @@ public class GetWindowInsets{
             right = insets.right;
             left = insets.left;
 
-            isFullScreen = insets.bottom == 0 && insets.top == 0;
+            isFullScreen = !isStatusBarVisible;
 
             ReactContext reactContext;
 

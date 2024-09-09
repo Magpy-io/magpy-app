@@ -3,6 +3,7 @@ import { StyleSheet, View } from 'react-native';
 
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { useIsFullScreen } from '~/Hooks/useIsFullScreen';
+import { useTimeLastChanged } from '~/Hooks/useTimeLastChanged';
 import { FullScreenModule } from '~/NativeModules/FullScreenModule';
 
 import { useCustomBackPress } from '../../../Hooks/useCustomBackPress';
@@ -21,9 +22,9 @@ const PhotoSliderController = React.forwardRef<PhotoSliderComponentRefType, Prop
     const [flatListCurrentIndex, setFlatListCurrentIndex] = useState(0);
     const flatListCurrentIndexRef = useRef<number>(0);
 
-    const isFullScreenReal = useIsFullScreen();
+    const isFullScreen = useIsFullScreen();
 
-    const [isFullScreen, setIsFullScreen] = useState(false);
+    const { timeSinceLastChange } = useTimeLastChanged(isFullScreen);
 
     const currentPhoto = photos[flatListCurrentIndex] as PhotoGalleryType | undefined;
 
@@ -33,10 +34,6 @@ const PhotoSliderController = React.forwardRef<PhotoSliderComponentRefType, Prop
       }
     }, [isSlidingPhotos, photos.length, onSwitchMode]);
 
-    useEffect(() => {
-      setIsFullScreen(isFullScreenReal);
-    }, [isFullScreenReal]);
-
     const onCurrentIndexChanged = useCallback((index: number) => {
       flatListCurrentIndexRef.current = index;
       setFlatListCurrentIndex(index);
@@ -44,16 +41,19 @@ const PhotoSliderController = React.forwardRef<PhotoSliderComponentRefType, Prop
 
     const onPressPhoto = useCallback(() => {
       const onPressAsync = async () => {
+        if (timeSinceLastChange() < 200) {
+          return;
+        }
+
         if (isFullScreen) {
           await FullScreenModule.disableFullScreen();
         } else {
           await FullScreenModule.enableFullScreen();
         }
-        setIsFullScreen(f => !f);
       };
 
       onPressAsync().catch(console.log);
-    }, [isFullScreen]);
+    }, [isFullScreen, timeSinceLastChange]);
 
     const backPressAction = useCallback(() => {
       onSwitchMode(false, flatListCurrentIndexRef.current);
