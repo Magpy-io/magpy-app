@@ -16,12 +16,15 @@ export function mergePhotos(photosState: {
   const photosServerGallery: PhotoGalleryType[] = [];
   const photosLocalGallery: PhotoGalleryType[] = [];
 
+  const photosLocalAlreadyAdded: Set<string> = new Set();
+
   for (const photoServerId of photosServerIdsOrdered) {
     const photoServer = photosServer[photoServerId];
 
     const photoLocalAssociatedId = photosLocal[photoServer.mediaId ?? ''];
 
     if (photoLocalAssociatedId) {
+      photosLocalAlreadyAdded.add(photoServer.mediaId ?? '');
       photosServerGallery.push({
         key: photoServerId,
         date: photoServer.date,
@@ -39,9 +42,7 @@ export function mergePhotos(photosState: {
   }
 
   for (const photoLocalId of photosLocalIdsOrdered) {
-    const mergedWithServerPhoto = photosServerGallery.find(
-      photoServerGallery => photoServerGallery.mediaId == photoLocalId,
-    );
+    const mergedWithServerPhoto = photosLocalAlreadyAdded.has(photoLocalId);
 
     if (!mergedWithServerPhoto) {
       photosLocalGallery.push({
