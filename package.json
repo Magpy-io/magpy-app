@@ -15,7 +15,7 @@
     "increment-version:base": "node ./scripts/incrementVersion.js ./android/app/build.gradle",
     "increment-version:patch": "yarn increment-version:base patch",
     "increment-version:minor": "yarn increment-version:base minor",
-    "increment-version:major": "yarn increment-version:base major" 
+    "increment-version:major": "yarn increment-version:base major"
   },
   "dependencies": {
     "@babel/plugin-transform-template-literals": "^7.23.3",
