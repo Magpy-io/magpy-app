@@ -1,5 +1,6 @@
 package com.magpy.Workers;
 
+import static android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC;
 import static java.lang.Thread.sleep;
 
 import android.app.NotificationChannel;
@@ -242,7 +243,7 @@ public class AutoBackupWorker extends Worker {
                 .addAction(android.R.drawable.ic_delete, "Cancel", cancelIntent);
 
         try {
-            setForegroundAsync(new ForegroundInfo(NOTIFICATION_ID, notificationBuilder.build())).get();
+            setForegroundAsync(new ForegroundInfo(NOTIFICATION_ID, notificationBuilder.build(), FOREGROUND_SERVICE_TYPE_DATA_SYNC)).get();
         } catch (ExecutionException | InterruptedException e) {
             throw new RuntimeException(e);
         }

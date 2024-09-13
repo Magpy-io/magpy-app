@@ -1,5 +1,6 @@
 package com.magpy.Workers;
 
+import static android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC;
 import static java.lang.Thread.sleep;
 
 import android.app.NotificationChannel;
@@ -66,7 +67,7 @@ public class UploadWorker extends Worker {
         return url != null && serverToken != null && deviceId != null && photosIds != null;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+    @RequiresApi(api = Build.VERSION_CODES.Q)
     @NonNull
     @Override
     public Result doWork() {
@@ -189,7 +190,7 @@ public class UploadWorker extends Worker {
         getApplicationContext().getSystemService(NotificationManager.class).createNotificationChannel(channel);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+    @RequiresApi(api = Build.VERSION_CODES.Q)
     private void createNotification(){
         Context context = getApplicationContext();
 
@@ -207,7 +208,7 @@ public class UploadWorker extends Worker {
                 .setSilent(true)
                 .addAction(android.R.drawable.ic_delete, "Cancel", cancelIntent);
 
-        setForegroundAsync(new ForegroundInfo(NOTIFICATION_ID, notificationBuilder.build()));
+        setForegroundAsync(new ForegroundInfo(NOTIFICATION_ID, notificationBuilder.build(), FOREGROUND_SERVICE_TYPE_DATA_SYNC));
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
