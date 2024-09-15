@@ -48,7 +48,7 @@ export async function addPhotoToDevice(photo: {
 }): Promise<PhotoLocalType> {
   const imageName = await getFirstPossibleFileName(photo.fileName);
 
-  const cachePhotoPath = RNFS.ExternalCachesDirectoryPath + `/${imageName}`;
+  const cachePhotoPath = PhotosCacheFolder() + `/${imageName}`;
   await RNFS.writeFile(cachePhotoPath, photo.image64, 'base64');
 
   const imageData = await MediaManagementModule.saveToCameraRoll(cachePhotoPath, {
@@ -61,35 +61,39 @@ export async function addPhotoToDevice(photo: {
 }
 
 export async function addPhotoThumbnailToCache(id: string, image: string) {
-  const cachePhotoPath = RNFS.ExternalCachesDirectoryPath + `/thumbnail_${id}`;
+  const cachePhotoPath = PhotosCacheFolder() + `/thumbnail_${id}`;
   await RNFS.writeFile(cachePhotoPath, image, 'base64');
   return 'file://' + cachePhotoPath;
 }
 
 export async function addPhotoCompressedToCache(id: string, image: string) {
-  const cachePhotoPath = RNFS.ExternalCachesDirectoryPath + `/compressed_${id}`;
+  const cachePhotoPath = PhotosCacheFolder() + `/compressed_${id}`;
   await RNFS.writeFile(cachePhotoPath, image, 'base64');
   return 'file://' + cachePhotoPath;
 }
 
 export async function photoThumbnailExistsInCache(id: string) {
-  const cachePhotoPath = RNFS.ExternalCachesDirectoryPath + `/thumbnail_${id}`;
+  const cachePhotoPath = PhotosCacheFolder() + `/thumbnail_${id}`;
   const exists = await RNFS.exists(cachePhotoPath);
 
   return { exists: exists, uri: 'file://' + cachePhotoPath };
 }
 
 export async function photoCompressedExistsInCache(id: string) {
-  const cachePhotoPath = RNFS.ExternalCachesDirectoryPath + `/compressed_${id}`;
+  const cachePhotoPath = PhotosCacheFolder() + `/compressed_${id}`;
   const exists = await RNFS.exists(cachePhotoPath);
 
   return { exists: exists, uri: 'file://' + cachePhotoPath };
 }
 
 export async function clearCache() {
-  const results = await RNFS.readDir(RNFS.ExternalCachesDirectoryPath);
+  const results = await RNFS.readDir(PhotosCacheFolder());
 
   for (let i = 0; i < results.length; i++) {
     await RNFS.unlink(results[i].path);
   }
+}
+
+function PhotosCacheFolder() {
+  return RNFS.ExternalCachesDirectoryPath + '/CachedPhotos';
 }
