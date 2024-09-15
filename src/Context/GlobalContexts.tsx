@@ -11,6 +11,7 @@ import { BackupWorkerContextProvider } from './Contexts/BackupWorkerContext';
 import { LocalAccountContextProvider } from './Contexts/LocalAccountContext';
 import { MainContextProvider } from './Contexts/MainContext';
 import { PermissionsContextProvider } from './Contexts/PermissionsContext';
+import { ServerQueriesProvider } from './Contexts/ServerQueriesContext';
 
 type PropsType = {
   children: ReactNode;
@@ -28,7 +29,7 @@ export const GlobalContexts: React.FC<PropsType> = props => {
                   <LocalAccountContextProvider>
                     <PhotosDownloadingContextProvider>
                       <BackupWorkerContextProvider>
-                        {props.children}
+                        <ServerQueriesProvider>{props.children}</ServerQueriesProvider>
                       </BackupWorkerContextProvider>
                     </PhotosDownloadingContextProvider>
                   </LocalAccountContextProvider>
