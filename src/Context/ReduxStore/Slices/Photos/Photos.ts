@@ -83,19 +83,6 @@ const photosServerSlice = createSlice({
       state.photosGallery = mergePhotos(state);
     },
 
-    addPhotosServer: (state, action: { payload: PhotoServerType[] }) => {
-      state.photosServer = action.payload.reduce((accumulator: PhotosServerType, photo) => {
-        accumulator[photo.id] = photo;
-        return accumulator;
-      }, state.photosServer);
-
-      state.photosServerIdsOrdered = [
-        ...state.photosServerIdsOrdered,
-        ...action.payload.map(photo => photo.id),
-      ];
-      state.photosGallery = mergePhotos(state);
-    },
-
     addCompressedPhotoById: (state, action: { payload: { id: string; uri: string } }) => {
       state.photosServer[action.payload.id].uriCompressed = action.payload.uri;
     },
@@ -219,7 +206,6 @@ const photosServerSlice = createSlice({
 
 export const {
   setPhotosServer,
-  addPhotosServer,
   setPhotosLocal,
   addCompressedPhotoById,
   addThumbnailPhotoById,
