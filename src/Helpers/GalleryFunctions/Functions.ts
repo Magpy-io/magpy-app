@@ -61,12 +61,14 @@ export async function addPhotoToDevice(photo: {
 }
 
 export async function addPhotoThumbnailToCache(id: string, image: string) {
+  await CheckPhotosCacheFolderExists();
   const cachePhotoPath = PhotosCacheFolder() + `/thumbnail_${id}`;
   await RNFS.writeFile(cachePhotoPath, image, 'base64');
   return 'file://' + cachePhotoPath;
 }
 
 export async function addPhotoCompressedToCache(id: string, image: string) {
+  await CheckPhotosCacheFolderExists();
   const cachePhotoPath = PhotosCacheFolder() + `/compressed_${id}`;
   await RNFS.writeFile(cachePhotoPath, image, 'base64');
   return 'file://' + cachePhotoPath;
@@ -91,6 +93,14 @@ export async function clearCache() {
 
   for (let i = 0; i < results.length; i++) {
     await RNFS.unlink(results[i].path);
+  }
+}
+
+async function CheckPhotosCacheFolderExists() {
+  try {
+    await RNFS.readDir(PhotosCacheFolder());
+  } catch {
+    await RNFS.mkdir(PhotosCacheFolder());
   }
 }
 
