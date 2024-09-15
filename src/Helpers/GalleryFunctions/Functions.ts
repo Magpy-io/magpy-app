@@ -97,9 +97,9 @@ export async function clearCache() {
 }
 
 async function CheckPhotosCacheFolderExists() {
-  try {
-    await RNFS.readDir(PhotosCacheFolder());
-  } catch {
+  const exists = await RNFS.exists(PhotosCacheFolder());
+
+  if (!exists) {
     await RNFS.mkdir(PhotosCacheFolder());
   }
 }

@@ -9,6 +9,7 @@ import { photoCompressedExistsInCache } from '~/Helpers/GalleryFunctions/Functio
 import { getPhotosBatched } from '~/Helpers/Queries';
 
 import { useServerQueriesContextInner } from './ServerQueriesContext';
+import { CacheServerPhotos } from './useCachingServerQueries';
 
 export function useServerQueriesContext() {
   const dispatch = useAppDispatch();
@@ -76,6 +77,8 @@ export function useServerQueriesContext() {
         });
 
         dispatch(setPhotosServer(photos));
+
+        await CacheServerPhotos(photos);
 
         setResultStatus('Success');
       } catch (e) {

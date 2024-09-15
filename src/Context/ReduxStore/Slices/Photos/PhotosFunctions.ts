@@ -34,6 +34,7 @@ export function usePhotosFunctionsStore() {
   isServerReachableRef.current = isServerReachable;
 
   const { UploadPhotosWorker } = useUploadWorkerFunctions();
+  const { RefreshServerPhotos } = useServerQueriesContext();
 
   const RefreshLocalPhotos = useCallback(
     async (n: number) => {
@@ -162,8 +163,21 @@ export function usePhotosFunctionsStore() {
     [dispatch],
   );
 
+  const RefreshAllPhotos = useCallback(
+    async (nLocal: number, nServer: number) => {
+      await RefreshLocalPhotos(nLocal);
+      if (isServerReachableRef.current) {
+        await RefreshServerPhotos(nServer);
+      } else {
+        ClearServerPhotos();
+      }
+    },
+    [RefreshLocalPhotos, RefreshServerPhotos, ClearServerPhotos],
+  );
+
   return {
     RefreshLocalPhotos,
+    RefreshAllPhotos,
     AddPhotoThumbnailIfMissing,
     AddPhotoCompressedIfMissing,
     UploadPhotos,
@@ -193,7 +207,6 @@ export function usePhotosStoreEffect() {
 
   useEffect(() => {
     async function innerEffect() {
-      console.log(serverNetwork);
       if (serverNetwork) {
         await RefreshServerPhotos(5000);
       } else {
