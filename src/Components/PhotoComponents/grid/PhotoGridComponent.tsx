@@ -33,10 +33,9 @@ type PhotoGridComponentProps = {
   isSelecting: boolean;
   isSelected: (photo: PhotoGalleryType) => boolean;
   selectGroup: (photos: PhotoGalleryType[]) => void;
-  ref: React.MutableRefObject<PhotoGridComponentRefType | null>;
 };
 
-const PhotoGridComponent = forwardRef(
+const PhotoGridComponent = forwardRef<PhotoGridComponentRefType, PhotoGridComponentProps>(
   (
     {
       photos,
@@ -59,30 +58,26 @@ const PhotoGridComponent = forwardRef(
     const numberOfColumns = getGridNumberOfColumns(groupType);
     const { sections, indexToSectionLocation } = usePhotosGrouped(photos, groupType);
 
-    useImperativeHandle(
-      ref,
-      () => {
-        return {
-          scrollToIndex(params) {
-            if (photos.length <= 0) {
-              return;
-            }
+    useImperativeHandle(ref, () => {
+      return {
+        scrollToIndex(params) {
+          if (photos.length <= 0) {
+            return;
+          }
 
-            const indexClamped = clamp(params.index, photos.length - 1);
-            const currentPhoto = photos[indexClamped];
+          const indexClamped = clamp(params.index, photos.length - 1);
+          const currentPhoto = photos[indexClamped];
 
-            const { sectionIndex, itemIndex } = indexToSectionLocation(currentPhoto);
+          const { sectionIndex, itemIndex } = indexToSectionLocation(currentPhoto);
 
-            sectionlistRef.current?.scrollToLocation({
-              sectionIndex: sectionIndex,
-              itemIndex: itemIndex,
-              animated: params.animated,
-            });
-          },
-        };
-      },
-      [indexToSectionLocation, photos],
-    );
+          sectionlistRef.current?.scrollToLocation({
+            sectionIndex: sectionIndex,
+            itemIndex: itemIndex,
+            animated: params.animated,
+          });
+        },
+      };
+    }, [indexToSectionLocation, photos]);
 
     const renderItem = useCallback(
       ({ item }: { item: PhotoGalleryType }) => {
