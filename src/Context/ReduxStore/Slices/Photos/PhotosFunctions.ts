@@ -165,6 +165,11 @@ export function usePhotosFunctionsStore() {
         throw new Error(ret.errorCode);
       }
 
+      for (const serverId of serverIds) {
+        await deletePhotoThumbnailFromCache(serverId).catch(console.log);
+        await deletePhotoCompressedFromCache(serverId).catch(console.log);
+      }
+
       dispatch(deletePhotos({ photos }));
     },
     [dispatch],
