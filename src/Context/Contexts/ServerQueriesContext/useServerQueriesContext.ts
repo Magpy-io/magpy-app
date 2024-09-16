@@ -7,7 +7,10 @@ export function useServerQueriesContext() {
 
   const RefreshServerPhotos = useCallback(() => {
     setPendingMutations(p => {
-      return [...p, { name: 'PhotosChangedAll' }];
+      if (!p.find(mutation => mutation.name == 'PhotosChangedAll')) {
+        return [...p, { name: 'PhotosChangedAll' }];
+      }
+      return p;
     });
   }, [setPendingMutations]);
 
