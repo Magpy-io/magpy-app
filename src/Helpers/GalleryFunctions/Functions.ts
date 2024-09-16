@@ -88,6 +88,24 @@ export async function photoCompressedExistsInCache(id: string) {
   return { exists: exists, uri: 'file://' + cachePhotoPath };
 }
 
+export async function deletePhotoThumbnailFromCache(id: string) {
+  const cachePhotoPath = PhotosCacheFolder() + `/thumbnail_${id}`;
+  const exists = await RNFS.exists(cachePhotoPath);
+
+  if (exists) {
+    await RNFS.unlink(cachePhotoPath);
+  }
+}
+
+export async function deletePhotoCompressedFromCache(id: string) {
+  const cachePhotoPath = PhotosCacheFolder() + `/compressed_${id}`;
+  const exists = await RNFS.exists(cachePhotoPath);
+
+  if (exists) {
+    await RNFS.unlink(cachePhotoPath);
+  }
+}
+
 export async function clearCache() {
   const results = await RNFS.readDir(PhotosCacheFolder());
 

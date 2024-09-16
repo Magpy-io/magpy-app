@@ -7,7 +7,9 @@ import { useUploadWorkerFunctions } from '~/Context/Contexts/UploadWorkerContext
 import {
   addPhotoCompressedToCache,
   addPhotoThumbnailToCache,
+  deletePhotoCompressedFromCache,
   deletePhotoFromDevice,
+  deletePhotoThumbnailFromCache,
 } from '~/Helpers/GalleryFunctions/Functions';
 import { GalleryGetPhotos } from '~/Helpers/GalleryFunctions/GetGalleryPhotos';
 import { DeletePhotosById, GetPhotosById } from '~/Helpers/ServerQueries';
@@ -126,6 +128,11 @@ export function usePhotosFunctionsStore() {
 
       if (!ret.ok) {
         throw new Error(ret.errorCode);
+      }
+
+      for (const serverId of serverIds) {
+        await deletePhotoThumbnailFromCache(serverId).catch(console.log);
+        await deletePhotoCompressedFromCache(serverId).catch(console.log);
       }
 
       dispatch(deletePhotosFromServer({ serverIds }));
