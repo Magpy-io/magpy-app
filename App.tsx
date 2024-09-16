@@ -1,39 +1,104 @@
 import React from 'react';
-import { StatusBar } from 'react-native';
+import { View } from 'react-native';
 
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
-import Toast from 'react-native-toast-message';
-import { Provider } from 'react-redux';
+import {
+  QueryClient,
+  QueryClientProvider,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
+import { Button, Text } from 'react-native-elements';
 
-import { PopupMessageModalContextProvider } from '~/Components/CommonComponents/PopupMessageModal/PopupMessageModalContext';
-import { ConfigModules } from '~/Config/configModules';
-import { ThemeContextProvider } from '~/Context/Contexts/ThemeContext';
-import { GlobalContexts } from '~/Context/GlobalContexts';
-import { GlobalEffects } from '~/Context/GlobalEffects';
-import { store } from '~/Context/ReduxStore/Store';
-import Navigation from '~/Navigation/Navigation';
+const todos: string[] = [];
 
-function App(): React.JSX.Element {
-  ConfigModules();
+// Create a client
+const queryClient = new QueryClient();
+
+function App() {
   return (
-    <Provider store={store}>
-      <GlobalContexts>
-        <GlobalEffects>
-          <SafeAreaProvider>
-            <GestureHandlerRootView style={{ flex: 1 }}>
-              <ThemeContextProvider>
-                <PopupMessageModalContextProvider>
-                  <StatusBar backgroundColor={'transparent'} translucent />
-                  <Navigation />
-                  <Toast />
-                </PopupMessageModalContextProvider>
-              </ThemeContextProvider>
-            </GestureHandlerRootView>
-          </SafeAreaProvider>
-        </GlobalEffects>
-      </GlobalContexts>
-    </Provider>
+    <QueryClientProvider client={queryClient}>
+      <Todos />
+    </QueryClientProvider>
+  );
+}
+
+function Todos() {
+  // Access the client
+  const queryClient = useQueryClient();
+
+  // Queries
+  const query = useQuery({
+    queryKey: ['todos'],
+    queryFn: async () => {
+      const newTodos = [...todos];
+      await new Promise<void>(res => {
+        setTimeout(() => {
+          res();
+        }, 4000);
+      });
+      return newTodos;
+    },
+    refetchInterval: 5000,
+  });
+
+  const queryElement = useQuery({
+    queryKey: ['todos', 'byIndex'],
+    queryFn: async (index: number) => {
+      const todo = todos[index];
+      await new Promise<void>(res => {
+        setTimeout(() => {
+          res();
+        }, 500);
+      });
+      return todo;
+    },
+  });
+
+  // Mutations
+  const mutation = useMutation({
+    mutationFn: async (s: string) => {
+      todos.push(s);
+      return s;
+    },
+    onSuccess: async (s: string) => {
+      const newData = [...query.data, s];
+      queryClient.setQueryData(['todos'], newData);
+    },
+  });
+
+  console.log(query.fetchStatus);
+
+  const mutation1 = useMutation({
+    mutationFn: async (s: string) => {
+      todos.push(s);
+    },
+    onSuccess: (a, b) => {
+      const newData = [...query.data, b];
+      queryClient.setQueryData(['todos'], newData);
+    },
+  });
+
+  return (
+    <View>
+      <Text>
+        {query.data?.reduce((s, n) => {
+          return s + '\n' + n;
+        }, '')}
+      </Text>
+      <Button
+        title={'Button'}
+        onPress={() => {
+          mutation.mutate(query.data?.length.toString() ?? 'new');
+        }}
+      />
+      <Button
+        title={'Button2'}
+        onPress={() => {
+          mutation1.mutate('new data');
+        }}
+      />
+    </View>
   );
 }
 
