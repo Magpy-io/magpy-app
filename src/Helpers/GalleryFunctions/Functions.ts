@@ -5,7 +5,7 @@ import { MediaManagementModule } from '~/NativeModules/MediaManagementModule';
 
 import { parsePhotoIdentifierToPhotoLocalType } from './GetGalleryPhotos';
 
-export async function deletePhotoFromDevice(mediaIds: string[]) {
+export async function deletePhotosFromDevice(mediaIds: string[]) {
   await MediaManagementModule.deleteMedia(mediaIds);
 }
 

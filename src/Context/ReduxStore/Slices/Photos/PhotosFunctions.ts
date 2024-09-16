@@ -8,8 +8,8 @@ import {
   addPhotoCompressedToCache,
   addPhotoThumbnailToCache,
   deletePhotoCompressedFromCache,
-  deletePhotoFromDevice,
   deletePhotoThumbnailFromCache,
+  deletePhotosFromDevice,
 } from '~/Helpers/GalleryFunctions/Functions';
 import { GalleryGetPhotos } from '~/Helpers/GalleryFunctions/GetGalleryPhotos';
 import { DeletePhotosById, GetPhotosById } from '~/Helpers/ServerQueries';
@@ -114,7 +114,7 @@ export function usePhotosFunctionsStore() {
 
   const DeletePhotosLocal = useCallback(
     async (mediaIds: string[]) => {
-      await deletePhotoFromDevice(mediaIds);
+      await deletePhotosFromDevice(mediaIds);
       dispatch(deletePhotosFromLocal({ mediaIds }));
     },
     [dispatch],
@@ -155,7 +155,7 @@ export function usePhotosFunctionsStore() {
         }
       });
 
-      await deletePhotoFromDevice(mediaIds);
+      await deletePhotosFromDevice(mediaIds);
 
       const ret = await DeletePhotosById.Post({
         ids: serverIds,
