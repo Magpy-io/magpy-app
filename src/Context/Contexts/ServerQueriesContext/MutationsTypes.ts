@@ -1,11 +1,13 @@
+import { PhotoLocalType } from '~/Context/ReduxStore/Slices/Photos/Photos';
+
 export type MutationPhotosUploaded = {
   name: 'PhotosUploaded';
   payload: { mediaIds: string[] };
 };
 
-export type MutationPhotosChanged = {
-  name: 'PhotosChanged';
-  payload: { serverIds: string[] };
+export type MutationPhotoDownloaded = {
+  name: 'PhotoDownloaded';
+  payload: { localPhoto: PhotoLocalType; serverId: string };
 };
 
 export type MutationPhotosChangedAll = {
@@ -14,5 +16,5 @@ export type MutationPhotosChangedAll = {
 
 export type Mutation =
   | MutationPhotosUploaded
-  | MutationPhotosChanged
+  | MutationPhotoDownloaded
   | MutationPhotosChangedAll;

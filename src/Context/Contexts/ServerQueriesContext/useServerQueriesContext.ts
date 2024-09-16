@@ -1,5 +1,7 @@
 import { useCallback } from 'react';
 
+import { PhotoLocalType } from '~/Context/ReduxStore/Slices/Photos/Photos';
+
 import { useServerQueriesContextInner } from './ServerQueriesContext';
 
 export function useServerQueriesContext() {
@@ -23,5 +25,14 @@ export function useServerQueriesContext() {
     [setPendingMutations],
   );
 
-  return { RefreshServerPhotos, UploadServerPhotos };
+  const DownloadServerPhoto = useCallback(
+    (data: { localPhoto: PhotoLocalType; serverId: string }) => {
+      setPendingMutations(p => {
+        return [...p, { name: 'PhotoDownloaded', payload: data }];
+      });
+    },
+    [setPendingMutations],
+  );
+
+  return { RefreshServerPhotos, UploadServerPhotos, DownloadServerPhoto };
 }

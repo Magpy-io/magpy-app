@@ -5,14 +5,16 @@ import { Promise as BluebirdPromise } from 'bluebird';
 import { uniqueDeviceId } from '~/Config/config';
 import { ParseApiPhoto } from '~/Context/ReduxStore/Slices/Photos/Functions';
 import {
+  PhotoLocalType,
   PhotoServerType,
+  addPhotoFromServerToLocal,
   addPhotosFromLocalToServer,
   setPhotosServer,
 } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { useAppDispatch } from '~/Context/ReduxStore/Store';
 import { photoCompressedExistsInCache } from '~/Helpers/GalleryFunctions/Functions';
 import { getPhotosBatched } from '~/Helpers/Queries';
-import { GetPhotosByMediaId } from '~/Helpers/ServerQueries';
+import { GetPhotosById, GetPhotosByMediaId } from '~/Helpers/ServerQueries';
 
 import { CacheServerPhotos } from './useCachingServerQueries';
 
@@ -28,9 +30,9 @@ export function useServerRequestsInner() {
       });
 
       if (!photosFromServer.ok) {
-        console.log('failed to get photos from server');
+        console.log('RefreshServerPhotosRequest: failed to get photos from server');
         throw new Error(
-          'failed to get photos from server, ' +
+          'RefreshServerPhotosRequest: failed to get photos from server, ' +
             photosFromServer.errorCode +
             ', ' +
             photosFromServer.message,
@@ -79,9 +81,9 @@ export function useServerRequestsInner() {
   );
 
   const UploadPhotosRequest = useCallback(
-    async (mediaIdsUploaded: string[]) => {
+    async ({ mediaIds }: { mediaIds: string[] }) => {
       const ret = await GetPhotosByMediaId.Post({
-        photosData: mediaIdsUploaded.map(mediaId => {
+        photosData: mediaIds.map(mediaId => {
           return { mediaId };
         }),
         photoType: 'data',
@@ -89,14 +91,19 @@ export function useServerRequestsInner() {
       });
 
       if (!ret.ok) {
-        console.log('UploadWorkerEffects: Error retrieving photos');
-        return;
+        console.log('UploadPhotosRequest: failed to get photos from server');
+        throw new Error(
+          'UploadPhotosRequest: failed to get photos from server, ' +
+            ret.errorCode +
+            ', ' +
+            ret.message,
+        );
       }
 
       const photos = [];
-      const mediaIds = [];
+      const mediaIdsThatExistsInServer = [];
 
-      for (let i = 0; i < mediaIdsUploaded.length; i++) {
+      for (let i = 0; i < mediaIds.length; i++) {
         const retPhoto = ret.data.photos[i];
         if (!retPhoto.exists) {
           console.log(
@@ -107,18 +114,50 @@ export function useServerRequestsInner() {
         }
 
         photos.push(ParseApiPhoto(retPhoto.photo));
-        mediaIds.push(retPhoto.mediaId);
+        mediaIdsThatExistsInServer.push(retPhoto.mediaId);
       }
 
       dispatch(
         addPhotosFromLocalToServer({
           photosServer: photos,
-          mediaIds: mediaIds,
+          mediaIds: mediaIdsThatExistsInServer,
         }),
       );
     },
     [dispatch],
   );
 
-  return { RefreshServerPhotosRequest, UploadPhotosRequest };
+  const PhotoDownloadRequest = useCallback(
+    async ({ localPhoto, serverId }: { localPhoto: PhotoLocalType; serverId: string }) => {
+      const ret = await GetPhotosById.Post({ ids: [serverId], photoType: 'data' });
+
+      if (!ret.ok) {
+        console.log('PhotoDownloadRequest: failed to get photos from server');
+        throw new Error(
+          'PhotoDownloadRequest: failed to get photos from server, ' +
+            ret.errorCode +
+            ', ' +
+            ret.message,
+        );
+      }
+
+      let mediaIdAddedToServer = false;
+      if (ret.data.photos[0].exists) {
+        const photoMediaId = ret.data.photos[0].photo.meta.mediaIds.find(
+          v => v.deviceUniqueId == uniqueDeviceId,
+        );
+
+        if (photoMediaId && photoMediaId.mediaId == localPhoto.id) {
+          mediaIdAddedToServer = true;
+        }
+      }
+
+      if (mediaIdAddedToServer) {
+        dispatch(addPhotoFromServerToLocal({ photoLocal: localPhoto, serverId }));
+      }
+    },
+    [dispatch],
+  );
+
+  return { RefreshServerPhotosRequest, UploadPhotosRequest, PhotoDownloadRequest };
 }

@@ -91,29 +91,6 @@ const photosServerSlice = createSlice({
       state.photosServer[action.payload.id].uriThumbnail = action.payload.uri;
     },
 
-    addMediaIdToServerPhoto: (state, action: { payload: { id: string; mediaId: string } }) => {
-      state.photosServer[action.payload.id].mediaId = action.payload.mediaId;
-    },
-
-    addPhotoFromLocalToServer: (
-      state,
-      action: { payload: { photoServer: PhotoServerType; mediaId: string } },
-    ) => {
-      state.photosServer[action.payload.photoServer.id] = action.payload.photoServer;
-
-      insertPhotoKeyWithOrder(
-        state.photosServer,
-        state.photosServerIdsOrdered,
-        action.payload.photoServer,
-      );
-
-      const galleryPhoto = state.photosGallery.find(p => p.mediaId == action.payload.mediaId);
-
-      if (galleryPhoto) {
-        galleryPhoto.serverId = action.payload.photoServer.id;
-      }
-    },
-
     addPhotosFromLocalToServer: (
       state,
       action: { payload: { photosServer: PhotoServerType[]; mediaIds: string[] } },
@@ -145,6 +122,8 @@ const photosServerSlice = createSlice({
         state.photosLocalIdsOrdered,
         action.payload.photoLocal,
       );
+
+      state.photosServer[action.payload.serverId].mediaId = action.payload.photoLocal.id;
 
       const galleryPhoto = state.photosGallery.find(
         p => p.serverId == action.payload.serverId,
@@ -209,8 +188,6 @@ export const {
   setPhotosLocal,
   addCompressedPhotoById,
   addThumbnailPhotoById,
-  addMediaIdToServerPhoto,
-  addPhotoFromLocalToServer,
   addPhotosFromLocalToServer,
   addPhotoFromServerToLocal,
   deletePhotosFromLocal,
