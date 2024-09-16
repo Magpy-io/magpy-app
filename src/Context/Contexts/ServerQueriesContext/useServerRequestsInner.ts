@@ -9,6 +9,7 @@ import {
   PhotoServerType,
   addPhotoFromServerToLocal,
   addPhotosFromLocalToServer,
+  deletePhotosFromServer,
   setPhotosServer,
 } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { useAppDispatch } from '~/Context/ReduxStore/Store';
@@ -159,5 +160,37 @@ export function useServerRequestsInner() {
     [dispatch],
   );
 
-  return { RefreshServerPhotosRequest, UploadPhotosRequest, PhotoDownloadRequest };
+  const DeletePhotosServerRequest = useCallback(
+    async ({ serverIds }: { serverIds: string[] }) => {
+      const ret = await GetPhotosById.Post({ ids: serverIds, photoType: 'data' });
+
+      if (!ret.ok) {
+        console.log('DeletePhotosServerRequest: failed to get photos from server');
+        throw new Error(
+          'DeletePhotosServerRequest: failed to get photos from server, ' +
+            ret.errorCode +
+            ', ' +
+            ret.message,
+        );
+      }
+
+      const serverIdsDeleted: string[] = [];
+
+      ret.data.photos.forEach(e => {
+        if (!e.exists) {
+          serverIdsDeleted.push(e.id);
+        }
+      });
+
+      dispatch(deletePhotosFromServer({ serverIds: serverIdsDeleted }));
+    },
+    [dispatch],
+  );
+
+  return {
+    RefreshServerPhotosRequest,
+    UploadPhotosRequest,
+    PhotoDownloadRequest,
+    DeletePhotosServerRequest,
+  };
 }

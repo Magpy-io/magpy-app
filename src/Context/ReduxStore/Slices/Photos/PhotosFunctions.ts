@@ -21,9 +21,7 @@ import {
   PhotoServerType,
   addCompressedPhotoById,
   addThumbnailPhotoById,
-  deletePhotos,
   deletePhotosFromLocal,
-  deletePhotosFromServer,
   setPhotosLocal,
   setPhotosServer,
 } from './Photos';
@@ -36,7 +34,7 @@ export function usePhotosFunctionsStore() {
   isServerReachableRef.current = isServerReachable;
 
   const { UploadPhotosWorker } = useUploadWorkerFunctions();
-  const { RefreshServerPhotos } = useServerQueriesContext();
+  const { RefreshServerPhotos, DeleteServerPhotos } = useServerQueriesContext();
 
   const RefreshLocalPhotos = useCallback(
     async (n: number) => {
@@ -135,9 +133,9 @@ export function usePhotosFunctionsStore() {
         await deletePhotoCompressedFromCache(serverId).catch(console.log);
       }
 
-      dispatch(deletePhotosFromServer({ serverIds }));
+      DeleteServerPhotos({ serverIds });
     },
-    [dispatch],
+    [DeleteServerPhotos],
   );
 
   const DeletePhotosEverywhere = useCallback(
@@ -156,6 +154,7 @@ export function usePhotosFunctionsStore() {
       });
 
       await deletePhotosFromDevice(mediaIds);
+      dispatch(deletePhotosFromLocal({ mediaIds }));
 
       const ret = await DeletePhotosById.Post({
         ids: serverIds,
@@ -170,9 +169,9 @@ export function usePhotosFunctionsStore() {
         await deletePhotoCompressedFromCache(serverId).catch(console.log);
       }
 
-      dispatch(deletePhotos({ photos }));
+      DeleteServerPhotos({ serverIds });
     },
-    [dispatch],
+    [dispatch, DeleteServerPhotos],
   );
 
   const RefreshAllPhotos = useCallback(

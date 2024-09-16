@@ -157,29 +157,6 @@ const photosServerSlice = createSlice({
 
       state.photosGallery = mergePhotos(state);
     },
-
-    deletePhotos: (state, action: { payload: { photos: PhotoGalleryType[] } }) => {
-      const mediaIds = action.payload.photos.map(p => p.mediaId);
-      const serverIds = action.payload.photos.map(p => p.serverId);
-
-      mediaIds.forEach(mediaId => {
-        delete state.photosLocal[mediaId ?? ''];
-      });
-
-      serverIds.forEach(serverId => {
-        delete state.photosServer[serverId ?? ''];
-      });
-
-      state.photosLocalIdsOrdered = state.photosLocalIdsOrdered.filter(mediaId => {
-        return !mediaIds.includes(mediaId);
-      });
-
-      state.photosServerIdsOrdered = state.photosServerIdsOrdered.filter(serverId => {
-        return !serverIds.includes(serverId);
-      });
-
-      state.photosGallery = mergePhotos(state);
-    },
   },
 });
 
@@ -192,7 +169,6 @@ export const {
   addPhotoFromServerToLocal,
   deletePhotosFromLocal,
   deletePhotosFromServer,
-  deletePhotos,
 } = photosServerSlice.actions;
 
 export default photosServerSlice.reducer;

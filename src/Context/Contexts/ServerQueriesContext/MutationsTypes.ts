@@ -14,7 +14,13 @@ export type MutationPhotosChangedAll = {
   name: 'PhotosChangedAll';
 };
 
+export type MutationPhotosDeleted = {
+  name: 'PhotosDeleted';
+  payload: { serverIds: string[] };
+};
+
 export type Mutation =
   | MutationPhotosUploaded
   | MutationPhotoDownloaded
-  | MutationPhotosChangedAll;
+  | MutationPhotosChangedAll
+  | MutationPhotosDeleted;

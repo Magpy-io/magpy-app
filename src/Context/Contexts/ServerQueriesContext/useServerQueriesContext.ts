@@ -34,5 +34,14 @@ export function useServerQueriesContext() {
     [setPendingMutations],
   );
 
-  return { RefreshServerPhotos, UploadServerPhotos, DownloadServerPhoto };
+  const DeleteServerPhotos = useCallback(
+    (data: { serverIds: string[] }) => {
+      setPendingMutations(p => {
+        return [...p, { name: 'PhotosDeleted', payload: data }];
+      });
+    },
+    [setPendingMutations],
+  );
+
+  return { RefreshServerPhotos, UploadServerPhotos, DownloadServerPhoto, DeleteServerPhotos };
 }
