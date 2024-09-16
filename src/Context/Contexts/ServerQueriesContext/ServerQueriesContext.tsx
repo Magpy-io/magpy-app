@@ -1,5 +1,6 @@
 import React, { ReactNode, createContext, useContext, useRef, useState } from 'react';
 
+import { Mutation } from './MutationsTypes';
 import { ServerQueriesEffects } from './ServerQueriesEffects';
 
 type SetStateType<T> = React.Dispatch<React.SetStateAction<T>>;
@@ -13,6 +14,8 @@ export type ServerQueriesDataType = {
   setFetchingStatus: SetStateType<FetchingStatus>;
   setResultStatus: SetStateType<ResultStatus>;
   isFetchingRef: React.MutableRefObject<boolean>;
+  pendingMutations: Mutation[];
+  setPendingMutations: SetStateType<Mutation[]>;
 };
 
 const initialState: ServerQueriesDataType = {
@@ -21,6 +24,8 @@ const initialState: ServerQueriesDataType = {
   setFetchingStatus: () => {},
   setResultStatus: () => {},
   isFetchingRef: { current: false },
+  pendingMutations: [],
+  setPendingMutations: () => {},
 };
 
 const ServerQueriesContext = createContext<ServerQueriesDataType>(initialState);
@@ -33,6 +38,7 @@ export const ServerQueriesProvider: React.FC<PropsType> = props => {
   const [resultStatus, setResultStatus] = useState<ResultStatus>('Pending');
   const [fetchingStatus, setFetchingStatus] = useState<FetchingStatus>('Idle');
   const isFetchingRef = useRef(false);
+  const [pendingMutations, setPendingMutations] = useState<Mutation[]>([]);
 
   return (
     <ServerQueriesContext.Provider
@@ -42,6 +48,8 @@ export const ServerQueriesProvider: React.FC<PropsType> = props => {
         setResultStatus,
         setFetchingStatus,
         isFetchingRef,
+        pendingMutations,
+        setPendingMutations,
       }}>
       <ServerQueriesEffects>{props.children}</ServerQueriesEffects>
     </ServerQueriesContext.Provider>

@@ -21,23 +21,25 @@ export const GlobalContexts: React.FC<PropsType> = props => {
   return (
     <PermissionsContextProvider>
       <MainContextProvider>
-        <AuthContextProvider>
-          <LocalServersContextProvider>
-            <UploadWorkerContextProvider>
-              <ServerClaimContextProvider>
-                <ServerContextProvider>
-                  <LocalAccountContextProvider>
-                    <PhotosDownloadingContextProvider>
-                      <BackupWorkerContextProvider>
-                        <ServerQueriesProvider>{props.children}</ServerQueriesProvider>
-                      </BackupWorkerContextProvider>
-                    </PhotosDownloadingContextProvider>
-                  </LocalAccountContextProvider>
-                </ServerContextProvider>
-              </ServerClaimContextProvider>
-            </UploadWorkerContextProvider>
-          </LocalServersContextProvider>
-        </AuthContextProvider>
+        <ServerQueriesProvider>
+          <AuthContextProvider>
+            <LocalServersContextProvider>
+              <UploadWorkerContextProvider>
+                <ServerClaimContextProvider>
+                  <ServerContextProvider>
+                    <LocalAccountContextProvider>
+                      <PhotosDownloadingContextProvider>
+                        <BackupWorkerContextProvider>
+                          {props.children}
+                        </BackupWorkerContextProvider>
+                      </PhotosDownloadingContextProvider>
+                    </LocalAccountContextProvider>
+                  </ServerContextProvider>
+                </ServerClaimContextProvider>
+              </UploadWorkerContextProvider>
+            </LocalServersContextProvider>
+          </AuthContextProvider>
+        </ServerQueriesProvider>
       </MainContextProvider>
     </PermissionsContextProvider>
   );
