@@ -1,32 +1,27 @@
 import { useCallback, useEffect, useRef } from 'react';
 
-import { Promise as BluebirdPromise } from 'bluebird';
-
 import { usePermissionsContext } from '~/Context/Contexts/PermissionsContext';
 import { useServerContext } from '~/Context/Contexts/ServerContext';
+import { useServerQueriesContext } from '~/Context/Contexts/ServerQueriesContext';
 import { useUploadWorkerFunctions } from '~/Context/Contexts/UploadWorkerContext';
 import {
   addPhotoCompressedToCache,
   addPhotoThumbnailToCache,
-  deletePhotoFromDevice,
-  photoCompressedExistsInCache,
+  deletePhotoCompressedFromCache,
+  deletePhotoThumbnailFromCache,
+  deletePhotosFromDevice,
 } from '~/Helpers/GalleryFunctions/Functions';
 import { GalleryGetPhotos } from '~/Helpers/GalleryFunctions/GetGalleryPhotos';
-import { RangeSplitterExponential } from '~/Helpers/RangeSplitter/RangeSplitterExponential';
-import { DeletePhotosById, GetPhotos, GetPhotosById } from '~/Helpers/ServerQueries';
+import { DeletePhotosById, GetPhotosById } from '~/Helpers/ServerQueries';
 
 import { useAppDispatch } from '../../Store';
-import { ParseApiPhoto } from './Functions';
 import {
   PhotoGalleryType,
   PhotoLocalType,
   PhotoServerType,
   addCompressedPhotoById,
-  addPhotosServer,
   addThumbnailPhotoById,
-  deletePhotos,
   deletePhotosFromLocal,
-  deletePhotosFromServer,
   setPhotosLocal,
   setPhotosServer,
 } from './Photos';
@@ -39,74 +34,13 @@ export function usePhotosFunctionsStore() {
   isServerReachableRef.current = isServerReachable;
 
   const { UploadPhotosWorker } = useUploadWorkerFunctions();
+  const { RefreshServerPhotos, DeleteServerPhotos } = useServerQueriesContext();
 
   const RefreshLocalPhotos = useCallback(
     async (n: number) => {
       const photosFromDevice: PhotoLocalType[] = await GalleryGetPhotos(n);
 
       dispatch(setPhotosLocal(photosFromDevice));
-    },
-    [dispatch],
-  );
-
-  const RefreshServerPhotos = useCallback(
-    async (n: number) => {
-      const rangeSplitter = new RangeSplitterExponential(10, 500, 5);
-
-      const ranges = rangeSplitter.splitRange(n);
-
-      for (const { start, end } of ranges) {
-        const photosFromServer = await GetPhotos.Post({
-          number: end - start,
-          offset: start,
-          photoType: 'data',
-        });
-
-        if (!photosFromServer.ok) {
-          console.log('failed to get photos from server');
-          return;
-        }
-
-        // BluebirdPromise is used because Promise.all gives a warning when too many promises are created simultaneously
-        // Excessive number of pending callbacks: 501. Some pending callbacks that might have leaked by never being called from native code
-        // BluebirdPromise allows to set a limit on how many concurrent promises are created
-
-        const photosThumbnailExistsInCache = await BluebirdPromise.map(
-          photosFromServer.data.photos,
-          photo => {
-            return photoCompressedExistsInCache(photo.id);
-          },
-          { concurrency: 100 },
-        );
-        const photosCompressedExistsInCache = await BluebirdPromise.map(
-          photosFromServer.data.photos,
-          photo => {
-            return photoCompressedExistsInCache(photo.id);
-          },
-          { concurrency: 100 },
-        );
-
-        const photos: PhotoServerType[] = photosFromServer.data.photos.map((photo, index) => {
-          const photoThumbnailExistsInCache = photosThumbnailExistsInCache[index];
-          const photoCompressedExistsInCache = photosCompressedExistsInCache[index];
-
-          const parsedPhoto = ParseApiPhoto(photo);
-          parsedPhoto.uriThumbnail = photoThumbnailExistsInCache.exists
-            ? photoThumbnailExistsInCache.uri
-            : undefined;
-          parsedPhoto.uriCompressed = photoCompressedExistsInCache.exists
-            ? photoCompressedExistsInCache.uri
-            : undefined;
-
-          return parsedPhoto;
-        });
-
-        dispatch(addPhotosServer(photos));
-
-        if (photosFromServer.data.endReached) {
-          break;
-        }
-      }
     },
     [dispatch],
   );
@@ -165,18 +99,6 @@ export function usePhotosFunctionsStore() {
     [dispatch],
   );
 
-  const RefreshAllPhotos = useCallback(
-    async (nLocal: number, nServer: number) => {
-      await RefreshLocalPhotos(nLocal);
-      if (isServerReachableRef.current) {
-        await RefreshServerPhotos(nServer);
-      } else {
-        ClearServerPhotos();
-      }
-    },
-    [RefreshLocalPhotos, RefreshServerPhotos, ClearServerPhotos],
-  );
-
   const UploadPhotos = useCallback(
     async (photos: PhotoLocalType[]) => {
       if (photos.length == 0) {
@@ -190,7 +112,7 @@ export function usePhotosFunctionsStore() {
 
   const DeletePhotosLocal = useCallback(
     async (mediaIds: string[]) => {
-      await deletePhotoFromDevice(mediaIds);
+      await deletePhotosFromDevice(mediaIds);
       dispatch(deletePhotosFromLocal({ mediaIds }));
     },
     [dispatch],
@@ -206,9 +128,14 @@ export function usePhotosFunctionsStore() {
         throw new Error(ret.errorCode);
       }
 
-      dispatch(deletePhotosFromServer({ serverIds }));
+      for (const serverId of serverIds) {
+        await deletePhotoThumbnailFromCache(serverId).catch(console.log);
+        await deletePhotoCompressedFromCache(serverId).catch(console.log);
+      }
+
+      DeleteServerPhotos({ serverIds });
     },
-    [dispatch],
+    [DeleteServerPhotos],
   );
 
   const DeletePhotosEverywhere = useCallback(
@@ -226,7 +153,8 @@ export function usePhotosFunctionsStore() {
         }
       });
 
-      await deletePhotoFromDevice(mediaIds);
+      await deletePhotosFromDevice(mediaIds);
+      dispatch(deletePhotosFromLocal({ mediaIds }));
 
       const ret = await DeletePhotosById.Post({
         ids: serverIds,
@@ -236,14 +164,30 @@ export function usePhotosFunctionsStore() {
         throw new Error(ret.errorCode);
       }
 
-      dispatch(deletePhotos({ photos }));
+      for (const serverId of serverIds) {
+        await deletePhotoThumbnailFromCache(serverId).catch(console.log);
+        await deletePhotoCompressedFromCache(serverId).catch(console.log);
+      }
+
+      DeleteServerPhotos({ serverIds });
     },
-    [dispatch],
+    [dispatch, DeleteServerPhotos],
+  );
+
+  const RefreshAllPhotos = useCallback(
+    async (nLocal: number) => {
+      await RefreshLocalPhotos(nLocal);
+      if (isServerReachableRef.current) {
+        RefreshServerPhotos();
+      } else {
+        ClearServerPhotos();
+      }
+    },
+    [RefreshLocalPhotos, RefreshServerPhotos, ClearServerPhotos],
   );
 
   return {
     RefreshLocalPhotos,
-    RefreshServerPhotos,
     RefreshAllPhotos,
     AddPhotoThumbnailIfMissing,
     AddPhotoCompressedIfMissing,
@@ -256,9 +200,10 @@ export function usePhotosFunctionsStore() {
 }
 
 export function usePhotosStoreEffect() {
-  const { RefreshLocalPhotos, RefreshServerPhotos, ClearServerPhotos } =
-    usePhotosFunctionsStore();
-  const { isServerReachable } = useServerContext();
+  const { RefreshLocalPhotos, ClearServerPhotos } = usePhotosFunctionsStore();
+  const { RefreshServerPhotos } = useServerQueriesContext();
+
+  const { serverNetwork } = useServerContext();
 
   const { mediaPermissionStatus } = usePermissionsContext();
 
@@ -272,13 +217,22 @@ export function usePhotosStoreEffect() {
   }, [RefreshLocalPhotos, mediaPermissionStatus]);
 
   useEffect(() => {
-    async function innerEffect() {
-      if (isServerReachable) {
-        await RefreshServerPhotos(5000);
-      } else {
-        ClearServerPhotos();
-      }
+    if (serverNetwork) {
+      RefreshServerPhotos();
+    } else {
+      ClearServerPhotos();
     }
-    innerEffect().catch(console.log);
-  }, [ClearServerPhotos, RefreshServerPhotos, isServerReachable]);
+  }, [ClearServerPhotos, RefreshServerPhotos, serverNetwork]);
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      if (serverNetwork) {
+        RefreshServerPhotos();
+      }
+    }, 1000 * 60);
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [RefreshServerPhotos, serverNetwork]);
 }

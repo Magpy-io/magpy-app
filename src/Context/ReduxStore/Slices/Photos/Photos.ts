@@ -83,48 +83,12 @@ const photosServerSlice = createSlice({
       state.photosGallery = mergePhotos(state);
     },
 
-    addPhotosServer: (state, action: { payload: PhotoServerType[] }) => {
-      state.photosServer = action.payload.reduce((accumulator: PhotosServerType, photo) => {
-        accumulator[photo.id] = photo;
-        return accumulator;
-      }, state.photosServer);
-
-      state.photosServerIdsOrdered = [
-        ...state.photosServerIdsOrdered,
-        ...action.payload.map(photo => photo.id),
-      ];
-      state.photosGallery = mergePhotos(state);
-    },
-
     addCompressedPhotoById: (state, action: { payload: { id: string; uri: string } }) => {
       state.photosServer[action.payload.id].uriCompressed = action.payload.uri;
     },
 
     addThumbnailPhotoById: (state, action: { payload: { id: string; uri: string } }) => {
       state.photosServer[action.payload.id].uriThumbnail = action.payload.uri;
-    },
-
-    addMediaIdToServerPhoto: (state, action: { payload: { id: string; mediaId: string } }) => {
-      state.photosServer[action.payload.id].mediaId = action.payload.mediaId;
-    },
-
-    addPhotoFromLocalToServer: (
-      state,
-      action: { payload: { photoServer: PhotoServerType; mediaId: string } },
-    ) => {
-      state.photosServer[action.payload.photoServer.id] = action.payload.photoServer;
-
-      insertPhotoKeyWithOrder(
-        state.photosServer,
-        state.photosServerIdsOrdered,
-        action.payload.photoServer,
-      );
-
-      const galleryPhoto = state.photosGallery.find(p => p.mediaId == action.payload.mediaId);
-
-      if (galleryPhoto) {
-        galleryPhoto.serverId = action.payload.photoServer.id;
-      }
     },
 
     addPhotosFromLocalToServer: (
@@ -159,6 +123,8 @@ const photosServerSlice = createSlice({
         action.payload.photoLocal,
       );
 
+      state.photosServer[action.payload.serverId].mediaId = action.payload.photoLocal.id;
+
       const galleryPhoto = state.photosGallery.find(
         p => p.serverId == action.payload.serverId,
       );
@@ -191,45 +157,18 @@ const photosServerSlice = createSlice({
 
       state.photosGallery = mergePhotos(state);
     },
-
-    deletePhotos: (state, action: { payload: { photos: PhotoGalleryType[] } }) => {
-      const mediaIds = action.payload.photos.map(p => p.mediaId);
-      const serverIds = action.payload.photos.map(p => p.serverId);
-
-      mediaIds.forEach(mediaId => {
-        delete state.photosLocal[mediaId ?? ''];
-      });
-
-      serverIds.forEach(serverId => {
-        delete state.photosServer[serverId ?? ''];
-      });
-
-      state.photosLocalIdsOrdered = state.photosLocalIdsOrdered.filter(mediaId => {
-        return !mediaIds.includes(mediaId);
-      });
-
-      state.photosServerIdsOrdered = state.photosServerIdsOrdered.filter(serverId => {
-        return !serverIds.includes(serverId);
-      });
-
-      state.photosGallery = mergePhotos(state);
-    },
   },
 });
 
 export const {
   setPhotosServer,
-  addPhotosServer,
   setPhotosLocal,
   addCompressedPhotoById,
   addThumbnailPhotoById,
-  addMediaIdToServerPhoto,
-  addPhotoFromLocalToServer,
   addPhotosFromLocalToServer,
   addPhotoFromServerToLocal,
   deletePhotosFromLocal,
   deletePhotosFromServer,
-  deletePhotos,
 } = photosServerSlice.actions;
 
 export default photosServerSlice.reducer;
