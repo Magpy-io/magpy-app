@@ -223,4 +223,16 @@ export function usePhotosStoreEffect() {
       ClearServerPhotos();
     }
   }, [ClearServerPhotos, RefreshServerPhotos, serverNetwork]);
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      if (serverNetwork) {
+        RefreshServerPhotos();
+      }
+    }, 1000 * 60);
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [RefreshServerPhotos, serverNetwork]);
 }
