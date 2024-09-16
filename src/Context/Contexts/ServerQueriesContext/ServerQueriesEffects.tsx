@@ -55,12 +55,11 @@ export const ServerQueriesEffects: React.FC<PropsType> = props => {
           setResultStatus('Failed');
           console.log(e);
         }
-
+      } finally {
         setPendingMutations(pm => {
           const [, ...remainingMutations] = pm;
           return remainingMutations;
         });
-      } finally {
         isFetchingRef.current = false;
         setFetchingStatus('Idle');
       }

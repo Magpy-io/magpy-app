@@ -39,14 +39,14 @@ export const PhotosDownloadingEffects: React.FC<PropsType> = props => {
         return;
       }
 
+      if (photosDownloading.length == 0) {
+        return;
+      }
+
       try {
         isEffectRunning.current = true;
 
-        if (photosDownloading.length == 0) {
-          return;
-        }
-
-        const photoDownloading = photosDownloading[0];
+        const [photoDownloading] = photosDownloading;
 
         const serverPhotoMediaId = photosServer[photoDownloading.serverId].mediaId;
 
@@ -73,7 +73,6 @@ export const PhotosDownloadingEffects: React.FC<PropsType> = props => {
         if (!result.ok) {
           console.log(result.errorCode);
           // TODO manage retries
-          photosDownloadingDispatch(PhotosDownloadingActions.shift());
           return;
         }
 
@@ -95,14 +94,12 @@ export const PhotosDownloadingEffects: React.FC<PropsType> = props => {
         if (!result1.ok) {
           console.log('Error updating uri on server');
           console.log(result1.errorCode);
-          photosDownloadingDispatch(PhotosDownloadingActions.shift());
           return;
         }
 
         DownloadServerPhoto({ localPhoto, serverId: photoServer.id });
-
-        photosDownloadingDispatch(PhotosDownloadingActions.shift());
       } finally {
+        photosDownloadingDispatch(PhotosDownloadingActions.shift());
         isEffectRunning.current = false;
       }
     }
