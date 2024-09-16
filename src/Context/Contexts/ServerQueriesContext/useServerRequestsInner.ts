@@ -2,11 +2,17 @@ import { useCallback } from 'react';
 
 import { Promise as BluebirdPromise } from 'bluebird';
 
+import { uniqueDeviceId } from '~/Config/config';
 import { ParseApiPhoto } from '~/Context/ReduxStore/Slices/Photos/Functions';
-import { PhotoServerType, setPhotosServer } from '~/Context/ReduxStore/Slices/Photos/Photos';
+import {
+  PhotoServerType,
+  addPhotosFromLocalToServer,
+  setPhotosServer,
+} from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { useAppDispatch } from '~/Context/ReduxStore/Store';
 import { photoCompressedExistsInCache } from '~/Helpers/GalleryFunctions/Functions';
 import { getPhotosBatched } from '~/Helpers/Queries';
+import { GetPhotosByMediaId } from '~/Helpers/ServerQueries';
 
 import { CacheServerPhotos } from './useCachingServerQueries';
 
@@ -72,5 +78,47 @@ export function useServerRequestsInner() {
     [dispatch],
   );
 
-  return { RefreshServerPhotosRequest };
+  const UploadPhotosRequest = useCallback(
+    async (mediaIdsUploaded: string[]) => {
+      const ret = await GetPhotosByMediaId.Post({
+        photosData: mediaIdsUploaded.map(mediaId => {
+          return { mediaId };
+        }),
+        photoType: 'data',
+        deviceUniqueId: uniqueDeviceId,
+      });
+
+      if (!ret.ok) {
+        console.log('UploadWorkerEffects: Error retrieving photos');
+        return;
+      }
+
+      const photos = [];
+      const mediaIds = [];
+
+      for (let i = 0; i < mediaIdsUploaded.length; i++) {
+        const retPhoto = ret.data.photos[i];
+        if (!retPhoto.exists) {
+          console.log(
+            'UploadWorkerEffects: photo just added but not found on server, mediaId: ',
+            retPhoto.mediaId,
+          );
+          continue;
+        }
+
+        photos.push(ParseApiPhoto(retPhoto.photo));
+        mediaIds.push(retPhoto.mediaId);
+      }
+
+      dispatch(
+        addPhotosFromLocalToServer({
+          photosServer: photos,
+          mediaIds: mediaIds,
+        }),
+      );
+    },
+    [dispatch],
+  );
+
+  return { RefreshServerPhotosRequest, UploadPhotosRequest };
 }

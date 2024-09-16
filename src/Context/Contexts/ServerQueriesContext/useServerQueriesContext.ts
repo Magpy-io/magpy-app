@@ -11,5 +11,14 @@ export function useServerQueriesContext() {
     });
   }, [setPendingMutations]);
 
-  return { RefreshServerPhotos };
+  const UploadServerPhotos = useCallback(
+    (mediaIds: string[]) => {
+      setPendingMutations(p => {
+        return [...p, { name: 'PhotosUploaded', payload: { mediaIds } }];
+      });
+    },
+    [setPendingMutations],
+  );
+
+  return { RefreshServerPhotos, UploadServerPhotos };
 }
