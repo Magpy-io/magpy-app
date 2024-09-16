@@ -10,7 +10,6 @@ export type MutationPhotosChanged = {
 
 export type MutationPhotosChangedAll = {
   name: 'PhotosChangedAll';
-  payload: null;
 };
 
 export type Mutation =

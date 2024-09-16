@@ -171,10 +171,10 @@ export function usePhotosFunctionsStore() {
   );
 
   const RefreshAllPhotos = useCallback(
-    async (nLocal: number, nServer: number) => {
+    async (nLocal: number) => {
       await RefreshLocalPhotos(nLocal);
       if (isServerReachableRef.current) {
-        await RefreshServerPhotos(nServer);
+        RefreshServerPhotos();
       } else {
         ClearServerPhotos();
       }
@@ -213,13 +213,10 @@ export function usePhotosStoreEffect() {
   }, [RefreshLocalPhotos, mediaPermissionStatus]);
 
   useEffect(() => {
-    async function innerEffect() {
-      if (serverNetwork) {
-        await RefreshServerPhotos(5000);
-      } else {
-        ClearServerPhotos();
-      }
+    if (serverNetwork) {
+      RefreshServerPhotos();
+    } else {
+      ClearServerPhotos();
     }
-    innerEffect().catch(console.log);
   }, [ClearServerPhotos, RefreshServerPhotos, serverNetwork]);
 }
