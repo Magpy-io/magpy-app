@@ -1,8 +1,16 @@
 import React, { ReactNode, useEffect, useRef, useState } from 'react';
 
-import { UploadMediaEvents } from '~/NativeModules/UploadMediaModule';
+import { uniqueDeviceId } from '~/Config/config';
+import {
+  UploadMediaEvents,
+  UploadMediaModule,
+  WorkerStatus,
+  isWorkerStatusFinished,
+} from '~/NativeModules/UploadMediaModule';
 
+import { useServerContext } from '../ServerContext';
 import { useServerQueriesContext } from '../ServerQueriesContext';
+import { useUploadWorkerContext } from './UploadWorkerContext';
 
 type PropsType = {
   children: ReactNode;
@@ -11,7 +19,13 @@ type PropsType = {
 export const UploadWorkerEffects: React.FC<PropsType> = props => {
   const photosUploadedRef = useRef<string[]>([]);
 
+  const { serverPath, token } = useServerContext();
   const [rerunEffect, setRerunEffect] = useState(false);
+
+  const [workerStatus, setWorkerStatus] = useState<WorkerStatus>('WORKER_SUCCESS');
+
+  const { queuedPhotosToUpload, setCurrentPhotosUploading, setQueuedPhotosToUpload } =
+    useUploadWorkerContext();
 
   useEffect(() => {
     // The interval is used to batch store updates when photos are uploaded,
@@ -25,8 +39,15 @@ export const UploadWorkerEffects: React.FC<PropsType> = props => {
       photosUploadedRef.current.push(mediaId);
     });
 
+    const subscriptionWorkerStatus = UploadMediaEvents.subscribeOnWorkerStatusChanged(
+      ({ status }) => {
+        setWorkerStatus(status);
+      },
+    );
+
     return () => {
       subscription.remove();
+      subscriptionWorkerStatus.remove();
       clearInterval(interval);
     };
   }, []);
@@ -57,6 +78,37 @@ export const UploadWorkerEffects: React.FC<PropsType> = props => {
       isEffectRunning.current = false;
     }
   }, [UploadServerPhotos, rerunEffect]);
+
+  useEffect(() => {
+    async function asyncInner() {
+      if (!isWorkerStatusFinished(workerStatus)) {
+        return;
+      }
+
+      if (queuedPhotosToUpload.size == 0) {
+        return;
+      }
+
+      setQueuedPhotosToUpload(new Set());
+      setCurrentPhotosUploading(queuedPhotosToUpload);
+
+      await UploadMediaModule.StartUploadWorker({
+        url: serverPath ?? '',
+        deviceId: uniqueDeviceId,
+        serverToken: token ?? '',
+        photosIds: Array.from(queuedPhotosToUpload),
+      });
+    }
+
+    asyncInner().catch(console.log);
+  }, [
+    queuedPhotosToUpload,
+    serverPath,
+    setCurrentPhotosUploading,
+    setQueuedPhotosToUpload,
+    token,
+    workerStatus,
+  ]);
 
   return props.children;
 };

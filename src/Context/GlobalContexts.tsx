@@ -24,9 +24,9 @@ export const GlobalContexts: React.FC<PropsType> = props => {
         <ServerQueriesProvider>
           <AuthContextProvider>
             <LocalServersContextProvider>
-              <UploadWorkerContextProvider>
-                <ServerClaimContextProvider>
-                  <ServerContextProvider>
+              <ServerClaimContextProvider>
+                <ServerContextProvider>
+                  <UploadWorkerContextProvider>
                     <LocalAccountContextProvider>
                       <PhotosDownloadingContextProvider>
                         <BackupWorkerContextProvider>
@@ -34,9 +34,9 @@ export const GlobalContexts: React.FC<PropsType> = props => {
                         </BackupWorkerContextProvider>
                       </PhotosDownloadingContextProvider>
                     </LocalAccountContextProvider>
-                  </ServerContextProvider>
-                </ServerClaimContextProvider>
-              </UploadWorkerContextProvider>
+                  </UploadWorkerContextProvider>
+                </ServerContextProvider>
+              </ServerClaimContextProvider>
             </LocalServersContextProvider>
           </AuthContextProvider>
         </ServerQueriesProvider>

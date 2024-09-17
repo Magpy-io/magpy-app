@@ -12,6 +12,14 @@ export type WorkerStatus =
   | 'WORKER_SUCCESS'
   | 'WORKER_CANCELED';
 
+export function isWorkerStatusFinished(workerStatus: WorkerStatus) {
+  return (
+    workerStatus == 'WORKER_CANCELED' ||
+    workerStatus == 'WORKER_FAILED' ||
+    workerStatus == 'WORKER_SUCCESS'
+  );
+}
+
 export interface UploadMediaModuleType {
   StartUploadWorker: (data: {
     url: string;
