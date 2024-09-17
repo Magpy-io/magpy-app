@@ -31,7 +31,7 @@ public class UploadWorkerManager {
         this.mPromise = promise;
     }
 
-    public void StartWorker(String url, String serverToken, String deviceId, String[] photosIds, Observer<String> observer){
+    public void StartWorker(String url, String serverToken, String deviceId, String[] photosIds, Observer<ObserverData> observer){
 
         if(photosIds.length == 0){
             mPromise.resolve(null);
@@ -65,18 +65,23 @@ public class UploadWorkerManager {
         });
     }
 
-    private void SetupWorkerObserver(Observer<String> observer){
+    private void SetupWorkerObserver(Observer<ObserverData> observer){
         ExecutorsManager.ExecuteOnMainThread(() -> {
             try {
                 WorkInfo result = GetWorker();
                 WorkManager.getInstance(context).getWorkInfoByIdLiveData(result.getId()).observe(ProcessLifecycleOwner.get(), (workInfo -> {
                     if (workInfo != null) {
+
+                        ObserverData data = new ObserverData();
+                        data.workerState = workInfo.getState();
+
                         Data progress = workInfo.getProgress();
                         String uploadedMediaId = progress.getString(UPLOADED_PHOTO_MEDIA_ID);
-
                         if(uploadedMediaId != null){
-                            observer.onChanged(uploadedMediaId);
+                            data.mediaId = uploadedMediaId;
                         }
+
+                        observer.onChanged(data);
                     }
                 }));
             } catch (ExecutionException | InterruptedException e) {
@@ -129,6 +134,12 @@ public class UploadWorkerManager {
                 mPromise.reject("Error", e);
             }
         });
+    }
+
+
+    public class ObserverData{
+        public String mediaId;
+        public WorkInfo.State workerState;
     }
 
 }
