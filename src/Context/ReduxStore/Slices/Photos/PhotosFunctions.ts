@@ -225,11 +225,14 @@ export function usePhotosStoreEffect() {
   }, [ClearServerPhotos, RefreshServerPhotos, serverNetwork]);
 
   useEffect(() => {
-    const intervalId = setInterval(() => {
-      if (serverNetwork) {
-        RefreshServerPhotos();
-      }
-    }, 1000 * 60);
+    const intervalId = setInterval(
+      () => {
+        if (serverNetwork) {
+          RefreshServerPhotos();
+        }
+      },
+      1000 * 60 * 2,
+    );
 
     return () => {
       clearInterval(intervalId);
