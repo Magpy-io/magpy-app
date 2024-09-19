@@ -1,7 +1,6 @@
 import React, { ReactNode, useEffect } from 'react';
 
 import { useServerQueriesContextInner } from './ServerQueriesContext';
-import { useCachingServerQueries } from './useCachingServerQueries';
 import { useServerRequestsInner } from './useServerRequestsInner';
 
 type PropsType = {
@@ -9,12 +8,6 @@ type PropsType = {
 };
 
 export const ServerQueriesEffects: React.FC<PropsType> = props => {
-  const { LoadCachedServerPhotos } = useCachingServerQueries();
-
-  useEffect(() => {
-    LoadCachedServerPhotos().catch(console.log);
-  }, [LoadCachedServerPhotos]);
-
   const {
     RefreshServerPhotosRequest,
     UploadPhotosRequest,

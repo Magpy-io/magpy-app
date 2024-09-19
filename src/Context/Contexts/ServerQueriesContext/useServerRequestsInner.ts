@@ -17,8 +17,6 @@ import { photoCompressedExistsInCache } from '~/Helpers/GalleryFunctions/Functio
 import { getPhotosBatched } from '~/Helpers/Queries';
 import { GetPhotosById, GetPhotosByMediaId } from '~/Helpers/ServerQueries';
 
-import { CacheServerPhotos } from './useCachingServerQueries';
-
 export function useServerRequestsInner() {
   const dispatch = useAppDispatch();
 
@@ -75,8 +73,6 @@ export function useServerRequestsInner() {
       });
 
       dispatch(setPhotosServer(photos));
-
-      await CacheServerPhotos(photos);
     },
     [dispatch],
   );
