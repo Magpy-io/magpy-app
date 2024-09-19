@@ -100,12 +100,12 @@ export function usePhotosFunctionsStore() {
   );
 
   const UploadPhotos = useCallback(
-    async (photos: PhotoLocalType[]) => {
+    (photos: PhotoLocalType[]) => {
       if (photos.length == 0) {
         return;
       }
 
-      await UploadPhotosWorker(photos.map(photo => photo.id));
+      UploadPhotosWorker(photos.map(photo => photo.id));
     },
     [UploadPhotosWorker],
   );

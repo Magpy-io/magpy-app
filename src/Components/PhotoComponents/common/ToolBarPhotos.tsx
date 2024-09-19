@@ -108,7 +108,7 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
 
       const onDismissed = async () => {
         await askNotificationsPermission();
-        await UploadPhotos(selectedLocalOnlyPhotos);
+        UploadPhotos(selectedLocalOnlyPhotos);
       };
 
       displayPopupMessage({
@@ -122,7 +122,7 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
       return;
     }
 
-    UploadPhotos(selectedLocalOnlyPhotos).catch(console.log);
+    UploadPhotos(selectedLocalOnlyPhotos);
   }, [
     UploadPhotos,
     askNotificationsPermission,

@@ -13,7 +13,10 @@ import {
   setPhotosServer,
 } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { useAppDispatch } from '~/Context/ReduxStore/Store';
-import { photoCompressedExistsInCache } from '~/Helpers/GalleryFunctions/Functions';
+import {
+  photoCompressedExistsInCache,
+  photoThumbnailExistsInCache,
+} from '~/Helpers/GalleryFunctions/Functions';
 import { getPhotosBatched } from '~/Helpers/Queries';
 import { GetPhotosById, GetPhotosByMediaId } from '~/Helpers/ServerQueries';
 
@@ -45,7 +48,7 @@ export function useServerRequestsInner() {
       const photosThumbnailExistsInCache = await BluebirdPromise.map(
         photosFromServer.data.photos,
         photo => {
-          return photoCompressedExistsInCache(photo.id);
+          return photoThumbnailExistsInCache(photo.id);
         },
         { concurrency: 100 },
       );
