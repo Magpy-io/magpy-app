@@ -3749,7 +3749,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bluebird@npm:^3.5.4, bluebird@npm:^3.7.2":
+"bluebird@npm:^3.5.4":
   version: 3.7.2
   resolution: "bluebird@npm:3.7.2"
   checksum: 869417503c722e7dc54ca46715f70e15f4d9c602a423a02c825570862d12935be59ed9c7ba34a9b31f186c017c23cac6b54e35446f8353059c101da73eac22ef
@@ -7975,7 +7975,6 @@ __metadata:
     babel-jest: ^29.7.0
     babel-plugin-module-resolver: ^5.0.0
     big-integer: ^1.6.52
-    bluebird: ^3.7.2
     detox: ^20.17.0
     eslint: ^8.56.0
     eslint-config-standard-with-typescript: ^43.0.1

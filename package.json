@@ -31,7 +31,6 @@
     "@types/react-redux": "^7.1.33",
     "axios": "^1.6.5",
     "big-integer": "^1.6.52",
-    "bluebird": "^3.7.2",
     "formik": "^2.4.5",
     "immer": "^10.0.3",
     "react": "^18.3.1",

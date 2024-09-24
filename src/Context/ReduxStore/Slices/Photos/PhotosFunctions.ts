@@ -10,6 +10,8 @@ import {
   deletePhotoCompressedFromCache,
   deletePhotoThumbnailFromCache,
   deletePhotosFromDevice,
+  photoCompressedExistsInCache,
+  photoThumbnailExistsInCache,
 } from '~/Helpers/GalleryFunctions/Functions';
 import { GalleryGetPhotos } from '~/Helpers/GalleryFunctions/GetGalleryPhotos';
 import { DeletePhotosById, GetPhotosById } from '~/Helpers/ServerQueries';
@@ -51,50 +53,59 @@ export function usePhotosFunctionsStore() {
 
   const AddPhotoThumbnailIfMissing = useCallback(
     async (serverPhoto: PhotoServerType) => {
-      if (serverPhoto.uriThumbnail) {
-        return;
+      const photoThumbnailStatus = await photoThumbnailExistsInCache(serverPhoto.id);
+
+      let uri = '';
+
+      if (photoThumbnailStatus.exists) {
+        console.log('thumbnail exists not downloading');
+        uri = photoThumbnailStatus.uri;
+      } else {
+        console.log('thumbnail missing, downloading...');
+        const res = await GetPhotosById.Post({
+          ids: [serverPhoto.id],
+          photoType: 'thumbnail',
+        });
+
+        if (!res.ok || !res.data.photos[0].exists) {
+          throw new Error('Could not get photo by id');
+        }
+
+        uri = await addPhotoThumbnailToCache(serverPhoto.id, res.data.photos[0].photo.image64);
       }
 
-      const res = await GetPhotosById.Post({
-        ids: [serverPhoto.id],
-        photoType: 'thumbnail',
-      });
-
-      if (!res.ok || !res.data.photos[0].exists) {
-        throw new Error('Could not get photo by id');
-      }
-
-      const uri = await addPhotoThumbnailToCache(
-        serverPhoto.id,
-        res.data.photos[0].photo.image64,
-      );
-
-      dispatch(addThumbnailPhotoById({ id: serverPhoto.id, uri: uri }));
+      dispatch(addThumbnailPhotoById({ id: serverPhoto.id, uri }));
     },
     [dispatch],
   );
 
   const AddPhotoCompressedIfMissing = useCallback(
     async (serverPhoto: PhotoServerType) => {
-      if (serverPhoto.uriCompressed) {
-        return;
+      const photoCompressedStatus = await photoCompressedExistsInCache(serverPhoto.id);
+
+      let uri = '';
+
+      if (photoCompressedStatus.exists) {
+        console.log('compressed exists not downloading');
+        uri = photoCompressedStatus.uri;
+      } else {
+        console.log('compressed missing, downloading...');
+        const res = await GetPhotosById.Post({
+          ids: [serverPhoto.id],
+          photoType: 'compressed',
+        });
+
+        if (!res.ok || !res.data.photos[0].exists) {
+          throw new Error('Could not get photo by id');
+        }
+
+        uri = await addPhotoCompressedToCache(
+          serverPhoto.id,
+          res.data.photos[0].photo.image64,
+        );
       }
 
-      const res = await GetPhotosById.Post({
-        ids: [serverPhoto.id],
-        photoType: 'compressed',
-      });
-
-      if (!res.ok || !res.data.photos[0].exists) {
-        throw new Error('Could not get photo by id');
-      }
-
-      const uri = await addPhotoCompressedToCache(
-        serverPhoto.id,
-        res.data.photos[0].photo.image64,
-      );
-
-      dispatch(addCompressedPhotoById({ id: serverPhoto.id, uri: uri }));
+      dispatch(addCompressedPhotoById({ id: serverPhoto.id, uri }));
     },
     [dispatch],
   );
