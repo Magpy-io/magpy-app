@@ -58,10 +58,8 @@ export function usePhotosFunctionsStore() {
       let uri = '';
 
       if (photoThumbnailStatus.exists) {
-        console.log('thumbnail exists not downloading');
         uri = photoThumbnailStatus.uri;
       } else {
-        console.log('thumbnail missing, downloading...');
         const res = await GetPhotosById.Post({
           ids: [serverPhoto.id],
           photoType: 'thumbnail',
@@ -86,10 +84,8 @@ export function usePhotosFunctionsStore() {
       let uri = '';
 
       if (photoCompressedStatus.exists) {
-        console.log('compressed exists not downloading');
         uri = photoCompressedStatus.uri;
       } else {
-        console.log('compressed missing, downloading...');
         const res = await GetPhotosById.Post({
           ids: [serverPhoto.id],
           photoType: 'compressed',
