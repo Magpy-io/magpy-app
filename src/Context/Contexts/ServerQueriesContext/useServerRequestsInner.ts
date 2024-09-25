@@ -3,9 +3,7 @@ import { useCallback } from 'react';
 import { uniqueDeviceId } from '~/Config/config';
 import { ParseApiPhoto } from '~/Context/ReduxStore/Slices/Photos/Functions';
 import {
-  PhotoLocalType,
   PhotoServerType,
-  addPhotoFromServerToLocal,
   addPhotosFromLocalToServer,
   setPhotosServer,
   updatePhotosServer,
@@ -89,38 +87,6 @@ export function useServerRequestsInner() {
     [dispatch],
   );
 
-  const PhotoDownloadRequest = useCallback(
-    async ({ localPhoto, serverId }: { localPhoto: PhotoLocalType; serverId: string }) => {
-      const ret = await GetPhotosById.Post({ ids: [serverId], photoType: 'data' });
-
-      if (!ret.ok) {
-        console.log('PhotoDownloadRequest: failed to get photos from server');
-        throw new Error(
-          'PhotoDownloadRequest: failed to get photos from server, ' +
-            ret.errorCode +
-            ', ' +
-            ret.message,
-        );
-      }
-
-      let mediaIdAddedToServer = false;
-      if (ret.data.photos[0].exists) {
-        const photoMediaId = ret.data.photos[0].photo.meta.mediaIds.find(
-          v => v.deviceUniqueId == uniqueDeviceId,
-        );
-
-        if (photoMediaId && photoMediaId.mediaId == localPhoto.id) {
-          mediaIdAddedToServer = true;
-        }
-      }
-
-      if (mediaIdAddedToServer) {
-        dispatch(addPhotoFromServerToLocal({ photoLocal: localPhoto, serverId }));
-      }
-    },
-    [dispatch],
-  );
-
   const UpdatePhotoInfoRequest = useCallback(
     async (payload: { serverIds: string[] }) => {
       const ret = await GetPhotosById.Post({ ids: payload.serverIds, photoType: 'data' });
@@ -153,7 +119,7 @@ export function useServerRequestsInner() {
   return {
     RefreshServerPhotosRequest,
     UploadPhotosRequest,
-    PhotoDownloadRequest,
+
     UpdatePhotoInfoRequest,
   };
 }

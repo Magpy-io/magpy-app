@@ -8,13 +8,8 @@ type PropsType = {
 };
 
 export const ServerQueriesEffects: React.FC<PropsType> = props => {
-  const {
-    RefreshServerPhotosRequest,
-    UploadPhotosRequest,
-    PhotoDownloadRequest,
-
-    UpdatePhotoInfoRequest,
-  } = useServerRequestsInner();
+  const { RefreshServerPhotosRequest, UploadPhotosRequest, UpdatePhotoInfoRequest } =
+    useServerRequestsInner();
   const {
     isFetchingRef,
     setFetchingStatus,
@@ -44,8 +39,6 @@ export const ServerQueriesEffects: React.FC<PropsType> = props => {
             await RefreshServerPhotosRequest(5000);
           } else if (currentMutation.name == 'PhotosUploaded') {
             await UploadPhotosRequest(currentMutation.payload);
-          } else if (currentMutation.name == 'PhotoDownloaded') {
-            await PhotoDownloadRequest(currentMutation.payload);
           } else if (currentMutation.name == 'PhotosInvalidated') {
             await UpdatePhotoInfoRequest(currentMutation.payload);
           }
@@ -67,7 +60,6 @@ export const ServerQueriesEffects: React.FC<PropsType> = props => {
 
     innerAsync().catch(console.log);
   }, [
-    PhotoDownloadRequest,
     RefreshServerPhotosRequest,
     UploadPhotosRequest,
     isFetchingRef,
