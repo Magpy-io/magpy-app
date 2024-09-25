@@ -14,7 +14,7 @@ export function useServerQueriesContext() {
     });
   }, [setPendingMutations]);
 
-  const UploadServerPhotos = useCallback(
+  const PhotosAddedInvalidation = useCallback(
     (mediaIds: string[]) => {
       setPendingMutations(p => {
         return [...p, { name: 'PhotosUploaded', payload: { mediaIds } }];
@@ -32,5 +32,5 @@ export function useServerQueriesContext() {
     [setPendingMutations],
   );
 
-  return { RefreshServerPhotos, UploadServerPhotos, InvalidatePhotos };
+  return { RefreshServerPhotos, PhotosAddedInvalidation, InvalidatePhotos };
 }

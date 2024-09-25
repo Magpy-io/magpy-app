@@ -54,7 +54,7 @@ export const UploadWorkerEffects: React.FC<PropsType> = props => {
 
   const isEffectRunning = useRef(false);
 
-  const { UploadServerPhotos } = useServerQueriesContext();
+  const { PhotosAddedInvalidation } = useServerQueriesContext();
 
   useEffect(() => {
     if (isEffectRunning.current) {
@@ -71,13 +71,13 @@ export const UploadWorkerEffects: React.FC<PropsType> = props => {
       const currentPhotosUploaded = [...photosUploadedRef.current];
       const nbCurrentPhotos = currentPhotosUploaded.length;
 
-      UploadServerPhotos(currentPhotosUploaded);
+      PhotosAddedInvalidation(currentPhotosUploaded);
 
       photosUploadedRef.current = photosUploadedRef.current.slice(nbCurrentPhotos);
     } finally {
       isEffectRunning.current = false;
     }
-  }, [UploadServerPhotos, rerunEffect]);
+  }, [PhotosAddedInvalidation, rerunEffect]);
 
   useEffect(() => {
     async function asyncInner() {
