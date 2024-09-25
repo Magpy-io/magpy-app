@@ -1,11 +1,12 @@
 import React, { ReactNode, useEffect, useRef } from 'react';
 
 import { uniqueDeviceId } from '~/Config/config';
+import { addPhotoFromServerToLocal } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import {
   photosLocalSelector,
   photosServerSelector,
 } from '~/Context/ReduxStore/Slices/Photos/Selectors';
-import { useAppSelector } from '~/Context/ReduxStore/Store';
+import { useAppDispatch, useAppSelector } from '~/Context/ReduxStore/Store';
 import { addPhotoToDevice } from '~/Helpers/GalleryFunctions/Functions';
 import * as Queries from '~/Helpers/Queries';
 import { UpdatePhotoMediaId } from '~/Helpers/ServerQueries';
@@ -32,6 +33,8 @@ export const PhotosDownloadingEffects: React.FC<PropsType> = props => {
   const isEffectRunning = useRef(false);
 
   const { DownloadServerPhoto } = useServerQueriesContext();
+
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     async function innerAsync() {
@@ -97,6 +100,9 @@ export const PhotosDownloadingEffects: React.FC<PropsType> = props => {
           return;
         }
 
+        dispatch(
+          addPhotoFromServerToLocal({ photoLocal: localPhoto, serverId: photoServer.id }),
+        );
         DownloadServerPhoto({ localPhoto, serverId: photoServer.id });
       } finally {
         photosDownloadingDispatch(PhotosDownloadingActions.shift());
@@ -111,6 +117,7 @@ export const PhotosDownloadingEffects: React.FC<PropsType> = props => {
     photosDownloading,
     photosServer,
     photosLocal,
+    dispatch,
   ]);
 
   return props.children;

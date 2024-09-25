@@ -19,8 +19,14 @@ export type MutationPhotosDeleted = {
   payload: { serverIds: string[] };
 };
 
+export type InvalidatePhotos = {
+  name: 'PhotosInvalidated';
+  payload: { serverIds: string[] };
+};
+
 export type Mutation =
   | MutationPhotosUploaded
   | MutationPhotoDownloaded
   | MutationPhotosChangedAll
-  | MutationPhotosDeleted;
+  | MutationPhotosDeleted
+  | InvalidatePhotos;

@@ -83,6 +83,45 @@ const photosServerSlice = createSlice({
       state.photosGallery = mergePhotos(state);
     },
 
+    updatePhotosServer: (
+      state,
+      action: { payload: { id: string; photo: PhotoServerType | null }[] },
+    ) => {
+      action.payload.forEach(v => {
+        const photoServer = state.photosServer[v.id];
+
+        // Photo was deleted
+        if (photoServer && !v.photo) {
+          delete state.photosServer[v.id];
+
+          state.photosServerIdsOrdered = state.photosServerIdsOrdered.filter(serverId => {
+            return serverId != v.id;
+          });
+          return;
+        }
+
+        // Photo was added
+        if (!photoServer && v.photo) {
+          state.photosServer[v.id] = photoServer;
+
+          insertPhotoKeyWithOrder(
+            state.photosServer,
+            state.photosServerIdsOrdered,
+            photoServer,
+          );
+          return;
+        }
+
+        // Update photo if changed, assumes that only value that can change is mediaId
+        if (photoServer && v.photo) {
+          photoServer.mediaId = v.photo.mediaId;
+          return;
+        }
+      });
+
+      state.photosGallery = mergePhotos(state);
+    },
+
     addCompressedPhotoById: (state, action: { payload: { id: string; uri: string } }) => {
       state.photosServer[action.payload.id].uriCompressed = action.payload.uri;
     },
@@ -163,6 +202,7 @@ const photosServerSlice = createSlice({
 export const {
   setPhotosServer,
   setPhotosLocal,
+  updatePhotosServer,
   addCompressedPhotoById,
   addThumbnailPhotoById,
   addPhotosFromLocalToServer,

@@ -13,6 +13,7 @@ export const ServerQueriesEffects: React.FC<PropsType> = props => {
     UploadPhotosRequest,
     PhotoDownloadRequest,
     DeletePhotosServerRequest,
+    UpdatePhotoInfoRequest,
   } = useServerRequestsInner();
   const {
     isFetchingRef,
@@ -47,6 +48,8 @@ export const ServerQueriesEffects: React.FC<PropsType> = props => {
             await PhotoDownloadRequest(currentMutation.payload);
           } else if (currentMutation.name == 'PhotosDeleted') {
             await DeletePhotosServerRequest(currentMutation.payload);
+          } else if (currentMutation.name == 'PhotosInvalidated') {
+            await UpdatePhotoInfoRequest(currentMutation.payload);
           }
 
           setResultStatus('Success');
@@ -75,6 +78,7 @@ export const ServerQueriesEffects: React.FC<PropsType> = props => {
     setFetchingStatus,
     setPendingMutations,
     setResultStatus,
+    UpdatePhotoInfoRequest,
   ]);
 
   return props.children;
