@@ -32,7 +32,7 @@ export const PhotosDownloadingEffects: React.FC<PropsType> = props => {
 
   const isEffectRunning = useRef(false);
 
-  const { DownloadServerPhoto } = useServerQueriesContext();
+  const { InvalidatePhotos } = useServerQueriesContext();
 
   const dispatch = useAppDispatch();
 
@@ -103,7 +103,7 @@ export const PhotosDownloadingEffects: React.FC<PropsType> = props => {
         dispatch(
           addPhotoFromServerToLocal({ photoLocal: localPhoto, serverId: photoServer.id }),
         );
-        DownloadServerPhoto({ localPhoto, serverId: photoServer.id });
+        InvalidatePhotos({ serverIds: [photoServer.id] });
       } finally {
         photosDownloadingDispatch(PhotosDownloadingActions.shift());
         isEffectRunning.current = false;
@@ -113,7 +113,7 @@ export const PhotosDownloadingEffects: React.FC<PropsType> = props => {
     innerAsync().catch(console.log);
   }, [
     photosDownloadingDispatch,
-    DownloadServerPhoto,
+    InvalidatePhotos,
     photosDownloading,
     photosServer,
     photosLocal,
