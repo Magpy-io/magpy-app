@@ -14,11 +14,6 @@ export type MutationPhotosChangedAll = {
   name: 'PhotosChangedAll';
 };
 
-export type MutationPhotosDeleted = {
-  name: 'PhotosDeleted';
-  payload: { serverIds: string[] };
-};
-
 export type InvalidatePhotos = {
   name: 'PhotosInvalidated';
   payload: { serverIds: string[] };
@@ -28,5 +23,4 @@ export type Mutation =
   | MutationPhotosUploaded
   | MutationPhotoDownloaded
   | MutationPhotosChangedAll
-  | MutationPhotosDeleted
   | InvalidatePhotos;
