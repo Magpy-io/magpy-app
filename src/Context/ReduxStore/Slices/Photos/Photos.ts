@@ -102,13 +102,8 @@ const photosServerSlice = createSlice({
 
         // Photo was added
         if (!photoServer && v.photo) {
-          state.photosServer[v.id] = photoServer;
-
-          insertPhotoKeyWithOrder(
-            state.photosServer,
-            state.photosServerIdsOrdered,
-            photoServer,
-          );
+          state.photosServer[v.id] = v.photo;
+          insertPhotoKeyWithOrder(state.photosServer, state.photosServerIdsOrdered, v.photo);
           return;
         }
 
