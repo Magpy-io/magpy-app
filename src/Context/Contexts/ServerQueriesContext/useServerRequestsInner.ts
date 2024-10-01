@@ -1,16 +1,14 @@
 import { useCallback } from 'react';
 
-import { uniqueDeviceId } from '~/Config/config';
 import { ParseApiPhoto } from '~/Context/ReduxStore/Slices/Photos/Functions';
 import {
   PhotoServerType,
-  addPhotosFromLocalToServer,
   setPhotosServer,
   updatePhotosServer,
 } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { useAppDispatch } from '~/Context/ReduxStore/Store';
 import { getPhotosBatched } from '~/Helpers/Queries';
-import { GetPhotosById, GetPhotosByMediaId } from '~/Helpers/ServerQueries';
+import { GetPhotosById } from '~/Helpers/ServerQueries';
 
 export function useServerRequestsInner() {
   const dispatch = useAppDispatch();
@@ -36,53 +34,6 @@ export function useServerRequestsInner() {
       const photos: PhotoServerType[] = photosFromServer.data.photos.map(ParseApiPhoto);
 
       dispatch(setPhotosServer(photos));
-    },
-    [dispatch],
-  );
-
-  const UploadPhotosRequest = useCallback(
-    async ({ mediaIds }: { mediaIds: string[] }) => {
-      const ret = await GetPhotosByMediaId.Post({
-        photosData: mediaIds.map(mediaId => {
-          return { mediaId };
-        }),
-        photoType: 'data',
-        deviceUniqueId: uniqueDeviceId,
-      });
-
-      if (!ret.ok) {
-        console.log('UploadPhotosRequest: failed to get photos from server');
-        throw new Error(
-          'UploadPhotosRequest: failed to get photos from server, ' +
-            ret.errorCode +
-            ', ' +
-            ret.message,
-        );
-      }
-
-      const photos = [];
-      const mediaIdsThatExistsInServer = [];
-
-      for (let i = 0; i < mediaIds.length; i++) {
-        const retPhoto = ret.data.photos[i];
-        if (!retPhoto.exists) {
-          console.log(
-            'UploadWorkerEffects: photo just added but not found on server, mediaId: ',
-            retPhoto.mediaId,
-          );
-          continue;
-        }
-
-        photos.push(ParseApiPhoto(retPhoto.photo));
-        mediaIdsThatExistsInServer.push(retPhoto.mediaId);
-      }
-
-      dispatch(
-        addPhotosFromLocalToServer({
-          photosServer: photos,
-          mediaIds: mediaIdsThatExistsInServer,
-        }),
-      );
     },
     [dispatch],
   );
@@ -118,8 +69,6 @@ export function useServerRequestsInner() {
 
   return {
     RefreshServerPhotosRequest,
-    UploadPhotosRequest,
-
     UpdatePhotoInfoRequest,
   };
 }

@@ -1,8 +1,3 @@
-export type MutationPhotosUploaded = {
-  name: 'PhotosUploaded';
-  payload: { mediaIds: string[] };
-};
-
 export type MutationPhotosChangedAll = {
   name: 'PhotosChangedAll';
 };
@@ -12,4 +7,4 @@ export type InvalidatePhotos = {
   payload: { serverIds: string[] };
 };
 
-export type Mutation = MutationPhotosUploaded | MutationPhotosChangedAll | InvalidatePhotos;
+export type Mutation = MutationPhotosChangedAll | InvalidatePhotos;

@@ -1,6 +1,10 @@
 import React, { ReactNode, useEffect, useRef, useState } from 'react';
 
 import { uniqueDeviceId } from '~/Config/config';
+import { ParseApiPhoto } from '~/Context/ReduxStore/Slices/Photos/Functions';
+import { addPhotosFromLocalToServer } from '~/Context/ReduxStore/Slices/Photos/Photos';
+import { useAppDispatch } from '~/Context/ReduxStore/Store';
+import { GetPhotosByMediaId } from '~/Helpers/ServerQueries';
 import {
   UploadMediaEvents,
   UploadMediaModule,
@@ -18,6 +22,8 @@ type PropsType = {
 
 export const UploadWorkerEffects: React.FC<PropsType> = props => {
   const photosUploadedRef = useRef<string[]>([]);
+
+  const dispatch = useAppDispatch();
 
   const { serverPath, token } = useServerContext();
   const [rerunEffect, setRerunEffect] = useState(false);
@@ -54,30 +60,77 @@ export const UploadWorkerEffects: React.FC<PropsType> = props => {
 
   const isEffectRunning = useRef(false);
 
-  const { PhotosAddedInvalidation } = useServerQueriesContext();
+  const { InvalidatePhotos } = useServerQueriesContext();
 
   useEffect(() => {
-    if (isEffectRunning.current) {
-      return;
-    }
-
-    try {
-      isEffectRunning.current = true;
-
-      if (photosUploadedRef.current.length == 0) {
+    async function asyncInner() {
+      if (isEffectRunning.current) {
         return;
       }
 
-      const currentPhotosUploaded = [...photosUploadedRef.current];
-      const nbCurrentPhotos = currentPhotosUploaded.length;
+      try {
+        isEffectRunning.current = true;
 
-      PhotosAddedInvalidation(currentPhotosUploaded);
+        if (photosUploadedRef.current.length == 0) {
+          return;
+        }
 
-      photosUploadedRef.current = photosUploadedRef.current.slice(nbCurrentPhotos);
-    } finally {
-      isEffectRunning.current = false;
+        const currentPhotosUploaded = [...photosUploadedRef.current];
+        const nbCurrentPhotos = currentPhotosUploaded.length;
+
+        const ret = await GetPhotosByMediaId.Post({
+          photosData: currentPhotosUploaded.map(mediaId => {
+            return { mediaId };
+          }),
+          photoType: 'data',
+          deviceUniqueId: uniqueDeviceId,
+        });
+
+        if (!ret.ok) {
+          console.log('Failed to get photos from server');
+          throw new Error(
+            'Failed to get photos from server, ' + ret.errorCode + ', ' + ret.message,
+          );
+        }
+
+        const photos = [];
+        const mediaIdsThatExistsInServer = [];
+
+        for (let i = 0; i < currentPhotosUploaded.length; i++) {
+          const retPhoto = ret.data.photos[i];
+          if (!retPhoto.exists) {
+            console.log(
+              'UploadWorkerEffects: photo just added but not found on server, mediaId: ',
+              retPhoto.mediaId,
+            );
+            continue;
+          }
+
+          photos.push(ParseApiPhoto(retPhoto.photo));
+          mediaIdsThatExistsInServer.push(retPhoto.mediaId);
+        }
+
+        dispatch(
+          addPhotosFromLocalToServer({
+            photosServer: photos,
+            mediaIds: mediaIdsThatExistsInServer,
+          }),
+        );
+
+        InvalidatePhotos({
+          serverIds: photos.map(photo => {
+            return photo.id;
+          }),
+        });
+
+        photosUploadedRef.current = photosUploadedRef.current.slice(nbCurrentPhotos);
+      } finally {
+        isEffectRunning.current = false;
+      }
     }
-  }, [PhotosAddedInvalidation, rerunEffect]);
+
+    asyncInner().catch(console.log);
+  }, [dispatch, InvalidatePhotos, rerunEffect]);
 
   useEffect(() => {
     async function asyncInner() {
