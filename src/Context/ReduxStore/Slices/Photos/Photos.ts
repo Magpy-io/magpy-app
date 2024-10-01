@@ -87,6 +87,8 @@ const photosServerSlice = createSlice({
       state,
       action: { payload: { id: string; photo: PhotoServerType | null }[] },
     ) => {
+      let anyChanged = false;
+
       action.payload.forEach(v => {
         const photoServer = state.photosServer[v.id];
 
@@ -97,6 +99,7 @@ const photosServerSlice = createSlice({
           state.photosServerIdsOrdered = state.photosServerIdsOrdered.filter(serverId => {
             return serverId != v.id;
           });
+          anyChanged = true;
           return;
         }
 
@@ -104,17 +107,25 @@ const photosServerSlice = createSlice({
         if (!photoServer && v.photo) {
           state.photosServer[v.id] = v.photo;
           insertPhotoKeyWithOrder(state.photosServer, state.photosServerIdsOrdered, v.photo);
+          anyChanged = true;
           return;
         }
 
         // Update photo if changed, assumes that only value that can change is mediaId
         if (photoServer && v.photo) {
+          if (photoServer.mediaId == v.photo.mediaId) {
+            return; // no change
+          }
+
           photoServer.mediaId = v.photo.mediaId;
+          anyChanged = true;
           return;
         }
       });
 
-      state.photosGallery = mergePhotos(state);
+      if (anyChanged) {
+        state.photosGallery = mergePhotos(state);
+      }
     },
 
     addCompressedPhotoById: (state, action: { payload: { id: string; uri: string } }) => {
