@@ -1,21 +1,21 @@
 import React, { ReactNode, useEffect } from 'react';
 
-import { useServerQueriesContextInner } from './ServerQueriesContext';
+import { useServerInvalidationContextInner } from './ServerInvalidationContext';
 import { useServerRequestsInner } from './useServerRequestsInner';
 
 type PropsType = {
   children: ReactNode;
 };
 
-export const ServerQueriesEffects: React.FC<PropsType> = props => {
+export const ServerInvalidationEffects: React.FC<PropsType> = props => {
   const { RefreshServerPhotosRequest, UpdatePhotoInfoRequest } = useServerRequestsInner();
   const {
     isFetchingRef,
     setFetchingStatus,
     setResultStatus,
-    pendingMutations,
-    setPendingMutations,
-  } = useServerQueriesContextInner();
+    pendingInvalidations,
+    setPendingInvalidations,
+  } = useServerInvalidationContextInner();
 
   useEffect(() => {
     async function innerAsync() {
@@ -23,7 +23,7 @@ export const ServerQueriesEffects: React.FC<PropsType> = props => {
         return;
       }
 
-      if (pendingMutations.length == 0) {
+      if (pendingInvalidations.length == 0) {
         return;
       }
 
@@ -31,13 +31,13 @@ export const ServerQueriesEffects: React.FC<PropsType> = props => {
         isFetchingRef.current = true;
         setFetchingStatus('Fetching');
 
-        const [currentMutation] = pendingMutations;
+        const [currentInvalidation] = pendingInvalidations;
 
         try {
-          if (currentMutation.name == 'PhotosChangedAll') {
+          if (currentInvalidation.name == 'PhotosInvalidateAll') {
             await RefreshServerPhotosRequest(5000);
-          } else if (currentMutation.name == 'PhotosInvalidated') {
-            await UpdatePhotoInfoRequest(currentMutation.payload);
+          } else if (currentInvalidation.name == 'PhotosInvalidated') {
+            await UpdatePhotoInfoRequest(currentInvalidation.payload);
           }
 
           setResultStatus('Success');
@@ -46,9 +46,9 @@ export const ServerQueriesEffects: React.FC<PropsType> = props => {
           console.log(e);
         }
       } finally {
-        setPendingMutations(pm => {
-          const [, ...remainingMutations] = pm;
-          return remainingMutations;
+        setPendingInvalidations(pm => {
+          const [, ...remainingInvalidations] = pm;
+          return remainingInvalidations;
         });
         isFetchingRef.current = false;
         setFetchingStatus('Idle');
@@ -59,9 +59,9 @@ export const ServerQueriesEffects: React.FC<PropsType> = props => {
   }, [
     RefreshServerPhotosRequest,
     isFetchingRef,
-    pendingMutations,
+    pendingInvalidations,
     setFetchingStatus,
-    setPendingMutations,
+    setPendingInvalidations,
     setResultStatus,
     UpdatePhotoInfoRequest,
   ]);

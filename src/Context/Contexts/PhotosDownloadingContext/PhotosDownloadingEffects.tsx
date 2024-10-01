@@ -11,7 +11,7 @@ import { addPhotoToDevice } from '~/Helpers/GalleryFunctions/Functions';
 import * as Queries from '~/Helpers/Queries';
 import { UpdatePhotoMediaId } from '~/Helpers/ServerQueries';
 
-import { useServerQueriesContext } from '../ServerQueriesContext';
+import { useServerInvalidationContext } from '../ServerInvalidationContext';
 import * as PhotosDownloadingActions from './PhotosDownloadingActions';
 import {
   usePhotosDownloadingContext,
@@ -32,7 +32,7 @@ export const PhotosDownloadingEffects: React.FC<PropsType> = props => {
 
   const isEffectRunning = useRef(false);
 
-  const { InvalidatePhotos } = useServerQueriesContext();
+  const { InvalidatePhotos } = useServerInvalidationContext();
 
   const dispatch = useAppDispatch();
 

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef } from 'react';
 
 import { usePermissionsContext } from '~/Context/Contexts/PermissionsContext';
 import { useServerContext } from '~/Context/Contexts/ServerContext';
-import { useServerQueriesContext } from '~/Context/Contexts/ServerQueriesContext';
+import { useServerInvalidationContext } from '~/Context/Contexts/ServerInvalidationContext';
 import { useUploadWorkerFunctions } from '~/Context/Contexts/UploadWorkerContext';
 import {
   addPhotoCompressedToCache,
@@ -37,7 +37,7 @@ export function usePhotosFunctionsStore() {
   isServerReachableRef.current = isServerReachable;
 
   const { UploadPhotosWorker } = useUploadWorkerFunctions();
-  const { RefreshServerPhotos, InvalidatePhotos } = useServerQueriesContext();
+  const { RefreshServerPhotos, InvalidatePhotos } = useServerInvalidationContext();
 
   const RefreshLocalPhotos = useCallback(
     async (n: number) => {
@@ -211,7 +211,7 @@ export function usePhotosFunctionsStore() {
 
 export function usePhotosStoreEffect() {
   const { RefreshLocalPhotos, ClearServerPhotos } = usePhotosFunctionsStore();
-  const { RefreshServerPhotos } = useServerQueriesContext();
+  const { RefreshServerPhotos } = useServerInvalidationContext();
 
   const { serverNetwork } = useServerContext();
 

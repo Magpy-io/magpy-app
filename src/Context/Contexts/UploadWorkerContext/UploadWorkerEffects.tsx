@@ -13,7 +13,7 @@ import {
 } from '~/NativeModules/UploadMediaModule';
 
 import { useServerContext } from '../ServerContext';
-import { useServerQueriesContext } from '../ServerQueriesContext';
+import { useServerInvalidationContext } from '../ServerInvalidationContext';
 import { useUploadWorkerContext } from './UploadWorkerContext';
 
 type PropsType = {
@@ -60,7 +60,7 @@ export const UploadWorkerEffects: React.FC<PropsType> = props => {
 
   const isEffectRunning = useRef(false);
 
-  const { InvalidatePhotos } = useServerQueriesContext();
+  const { InvalidatePhotos } = useServerInvalidationContext();
 
   useEffect(() => {
     async function asyncInner() {
