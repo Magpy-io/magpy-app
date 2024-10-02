@@ -74,31 +74,25 @@ export async function addPhotoCompressedToCache(id: string, image: string) {
   return 'file://' + cachePhotoPath;
 }
 
-export async function photoThumbnailExistsInCache(id: string): Promise<{
-  exists: boolean;
-  uri?: string;
-}> {
+export async function photoThumbnailExistsInCache(id: string): Promise<string | null> {
   const cachePhotoPath = PhotosCacheFolder() + `/thumbnail_${id}`;
   const exists = await RNFS.exists(cachePhotoPath);
 
   if (exists) {
-    return { exists: true, uri: 'file://' + cachePhotoPath };
+    return 'file://' + cachePhotoPath;
   } else {
-    return { exists: false, uri: undefined };
+    return null;
   }
 }
 
-export async function photoCompressedExistsInCache(id: string): Promise<{
-  exists: boolean;
-  uri?: string;
-}> {
+export async function photoCompressedExistsInCache(id: string): Promise<string | null> {
   const cachePhotoPath = PhotosCacheFolder() + `/compressed_${id}`;
   const exists = await RNFS.exists(cachePhotoPath);
 
   if (exists) {
-    return { exists: true, uri: 'file://' + cachePhotoPath };
+    return 'file://' + cachePhotoPath;
   } else {
-    return { exists: false, uri: undefined };
+    return null;
   }
 }
 

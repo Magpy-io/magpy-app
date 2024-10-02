@@ -5,21 +5,17 @@ import { useServerContext } from '~/Context/Contexts/ServerContext';
 import { useServerInvalidationContext } from '~/Context/Contexts/ServerInvalidationContext';
 import { useUploadWorkerFunctions } from '~/Context/Contexts/UploadWorkerContext';
 import {
-  addPhotoCompressedToCache,
   deletePhotoCompressedFromCache,
   deletePhotoThumbnailFromCache,
   deletePhotosFromDevice,
-  photoCompressedExistsInCache,
 } from '~/Helpers/GalleryFunctions/Functions';
 import { GalleryGetPhotos } from '~/Helpers/GalleryFunctions/GetGalleryPhotos';
-import { DeletePhotosById, GetPhotosById } from '~/Helpers/ServerQueries';
+import { DeletePhotosById } from '~/Helpers/ServerQueries';
 
 import { useAppDispatch } from '../../Store';
 import {
   PhotoGalleryType,
   PhotoLocalType,
-  PhotoServerType,
-  addCompressedPhotoById,
   deletePhotosFromLocal,
   deletePhotosFromServer,
   setPhotosLocal,
@@ -48,35 +44,6 @@ export function usePhotosFunctionsStore() {
   const ClearServerPhotos = useCallback(() => {
     dispatch(setPhotosServer([]));
   }, [dispatch]);
-
-  const AddPhotoCompressedIfMissing = useCallback(
-    async (serverPhoto: PhotoServerType) => {
-      const photoCompressedStatus = await photoCompressedExistsInCache(serverPhoto.id);
-
-      let uri = '';
-
-      if (photoCompressedStatus.exists) {
-        uri = photoCompressedStatus.uri;
-      } else {
-        const res = await GetPhotosById.Post({
-          ids: [serverPhoto.id],
-          photoType: 'compressed',
-        });
-
-        if (!res.ok || !res.data.photos[0].exists) {
-          throw new Error('Could not get photo by id');
-        }
-
-        uri = await addPhotoCompressedToCache(
-          serverPhoto.id,
-          res.data.photos[0].photo.image64,
-        );
-      }
-
-      dispatch(addCompressedPhotoById({ id: serverPhoto.id, uri }));
-    },
-    [dispatch],
-  );
 
   const UploadPhotos = useCallback(
     (photos: PhotoLocalType[]) => {
@@ -170,8 +137,6 @@ export function usePhotosFunctionsStore() {
   return {
     RefreshLocalPhotos,
     RefreshAllPhotos,
-
-    AddPhotoCompressedIfMissing,
     UploadPhotos,
     DeletePhotosLocal,
     DeletePhotosServer,
