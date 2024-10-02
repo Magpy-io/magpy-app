@@ -6,12 +6,10 @@ import { useServerInvalidationContext } from '~/Context/Contexts/ServerInvalidat
 import { useUploadWorkerFunctions } from '~/Context/Contexts/UploadWorkerContext';
 import {
   addPhotoCompressedToCache,
-  addPhotoThumbnailToCache,
   deletePhotoCompressedFromCache,
   deletePhotoThumbnailFromCache,
   deletePhotosFromDevice,
   photoCompressedExistsInCache,
-  photoThumbnailExistsInCache,
 } from '~/Helpers/GalleryFunctions/Functions';
 import { GalleryGetPhotos } from '~/Helpers/GalleryFunctions/GetGalleryPhotos';
 import { DeletePhotosById, GetPhotosById } from '~/Helpers/ServerQueries';
@@ -22,7 +20,6 @@ import {
   PhotoLocalType,
   PhotoServerType,
   addCompressedPhotoById,
-  addThumbnailPhotoById,
   deletePhotosFromLocal,
   deletePhotosFromServer,
   setPhotosLocal,
@@ -51,32 +48,6 @@ export function usePhotosFunctionsStore() {
   const ClearServerPhotos = useCallback(() => {
     dispatch(setPhotosServer([]));
   }, [dispatch]);
-
-  const AddPhotoThumbnailIfMissing = useCallback(
-    async (serverPhoto: PhotoServerType) => {
-      const photoThumbnailStatus = await photoThumbnailExistsInCache(serverPhoto.id);
-
-      let uri = '';
-
-      if (photoThumbnailStatus.exists) {
-        uri = photoThumbnailStatus.uri;
-      } else {
-        const res = await GetPhotosById.Post({
-          ids: [serverPhoto.id],
-          photoType: 'thumbnail',
-        });
-
-        if (!res.ok || !res.data.photos[0].exists) {
-          throw new Error('Could not get photo by id');
-        }
-
-        uri = await addPhotoThumbnailToCache(serverPhoto.id, res.data.photos[0].photo.image64);
-      }
-
-      dispatch(addThumbnailPhotoById({ id: serverPhoto.id, uri }));
-    },
-    [dispatch],
-  );
 
   const AddPhotoCompressedIfMissing = useCallback(
     async (serverPhoto: PhotoServerType) => {
@@ -199,7 +170,7 @@ export function usePhotosFunctionsStore() {
   return {
     RefreshLocalPhotos,
     RefreshAllPhotos,
-    AddPhotoThumbnailIfMissing,
+
     AddPhotoCompressedIfMissing,
     UploadPhotos,
     DeletePhotosLocal,

@@ -1,14 +1,18 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { StyleSheet, TouchableHighlight, View } from 'react-native';
 
 import { useTheme } from '~/Context/Contexts/ThemeContext';
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
-import { usePhotosFunctionsStore } from '~/Context/ReduxStore/Slices/Photos/PhotosFunctions';
 import {
   photoLocalSelector,
   photoServerSelector,
 } from '~/Context/ReduxStore/Slices/Photos/Selectors';
 import { useAppSelector } from '~/Context/ReduxStore/Store';
+import {
+  addPhotoThumbnailToCache,
+  photoThumbnailExistsInCache,
+} from '~/Helpers/GalleryFunctions/Functions';
+import { GetPhotosById } from '~/Helpers/ServerQueries';
 
 import ImageForGrid from './ImageForGrid';
 import SelectionIconForGrid from './SelectionIconForGrid';
@@ -29,13 +33,45 @@ function PhotoComponentForGrid(props: PropsType) {
   const localPhoto = useAppSelector(photoLocalSelector(photo.mediaId));
   const serverPhoto = useAppSelector(photoServerSelector(photo.serverId));
 
-  const { AddPhotoThumbnailIfMissing } = usePhotosFunctionsStore();
+  const [photoThumbnailCacheStatus, setPhotoThumbnailCacheStatus] = useState<{
+    exists: boolean;
+    uri: string;
+  } | null>(null);
 
   useEffect(() => {
-    if (serverPhoto && !localPhoto && !serverPhoto.uriThumbnail) {
-      AddPhotoThumbnailIfMissing(serverPhoto).catch(console.log);
+    async function innerAsync() {
+      if (serverPhoto) {
+        const photoThumbnailStatus = await photoThumbnailExistsInCache(serverPhoto?.id);
+        setPhotoThumbnailCacheStatus(photoThumbnailStatus);
+      }
     }
-  }, [AddPhotoThumbnailIfMissing, localPhoto, serverPhoto]);
+
+    innerAsync().catch(console.log);
+  }, [serverPhoto]);
+
+  useEffect(() => {
+    async function innerAsync() {
+      if (serverPhoto && !localPhoto && photoThumbnailCacheStatus?.exists === false) {
+        const res = await GetPhotosById.Post({
+          ids: [serverPhoto.id],
+          photoType: 'thumbnail',
+        });
+
+        if (!res.ok || !res.data.photos[0].exists) {
+          throw new Error('Could not get photo by id');
+        }
+
+        const uri = await addPhotoThumbnailToCache(
+          serverPhoto.id,
+          res.data.photos[0].photo.image64,
+        );
+
+        setPhotoThumbnailCacheStatus({ exists: true, uri });
+      }
+    }
+
+    innerAsync().catch(console.log);
+  }, [localPhoto, photoThumbnailCacheStatus, serverPhoto]);
 
   const onPressPhoto = useCallback(() => onPress(photo), [onPress, photo]);
   const onLongPressPhoto = useCallback(() => onLongPress(photo), [onLongPress, photo]);
@@ -44,8 +80,8 @@ function PhotoComponentForGrid(props: PropsType) {
 
   if (localPhoto) {
     uriSource = localPhoto.uri;
-  } else if (serverPhoto?.uriThumbnail) {
-    uriSource = serverPhoto.uriThumbnail;
+  } else if (photoThumbnailCacheStatus?.exists) {
+    uriSource = photoThumbnailCacheStatus.uri;
   }
 
   return (

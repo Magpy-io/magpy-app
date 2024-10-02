@@ -11,7 +11,6 @@ export type PhotoServerType = {
   date: string;
   syncDate: string;
   mediaId: string | undefined;
-  uriThumbnail: string | undefined;
   uriCompressed: string | undefined;
 };
 
@@ -132,10 +131,6 @@ const photosServerSlice = createSlice({
       state.photosServer[action.payload.id].uriCompressed = action.payload.uri;
     },
 
-    addThumbnailPhotoById: (state, action: { payload: { id: string; uri: string } }) => {
-      state.photosServer[action.payload.id].uriThumbnail = action.payload.uri;
-    },
-
     addPhotosFromLocalToServer: (
       state,
       action: { payload: { photosServer: PhotoServerType[]; mediaIds: string[] } },
@@ -210,7 +205,6 @@ export const {
   setPhotosLocal,
   updatePhotosServer,
   addCompressedPhotoById,
-  addThumbnailPhotoById,
   addPhotosFromLocalToServer,
   addPhotoFromServerToLocal,
   deletePhotosFromLocal,
