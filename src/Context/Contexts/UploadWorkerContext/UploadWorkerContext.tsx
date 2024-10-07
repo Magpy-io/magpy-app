@@ -41,7 +41,7 @@ export const UploadWorkerContextProvider: React.FC<PropsType> = props => {
   );
 };
 
-export function useUploadWorkerContext(): UploadWorkerDataType {
+export function useUploadWorkerContextInner(): UploadWorkerDataType {
   const context = useContext(UploadWorkerContext);
 
   if (!context) {

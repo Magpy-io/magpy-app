@@ -1,9 +1,10 @@
 import { useCallback } from 'react';
 
-import { useUploadWorkerContext } from './UploadWorkerContext';
+import { useUploadWorkerContextInner } from './UploadWorkerContext';
 
-export function useUploadWorkerFunctions() {
-  const { setQueuedPhotosToUpload } = useUploadWorkerContext();
+export function useUploadWorkerContext() {
+  const { setQueuedPhotosToUpload, currentPhotosUploading, queuedPhotosToUpload } =
+    useUploadWorkerContextInner();
 
   const UploadPhotosWorker = useCallback(
     (mediaIds: string[]) => {
@@ -14,5 +15,5 @@ export function useUploadWorkerFunctions() {
     [setQueuedPhotosToUpload],
   );
 
-  return { UploadPhotosWorker };
+  return { UploadPhotosWorker, currentPhotosUploading, queuedPhotosToUpload };
 }

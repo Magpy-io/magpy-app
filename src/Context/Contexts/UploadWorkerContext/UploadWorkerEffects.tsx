@@ -15,7 +15,7 @@ import {
 
 import { useServerContext } from '../ServerContext';
 import { useServerInvalidationContext } from '../ServerInvalidationContext';
-import { useUploadWorkerContext } from './UploadWorkerContext';
+import { useUploadWorkerContextInner } from './UploadWorkerContext';
 
 type PropsType = {
   children: ReactNode;
@@ -30,7 +30,6 @@ export const UploadWorkerEffects: React.FC<PropsType> = props => {
   const [rerunEffect, setRerunEffect] = useState(false);
 
   const [workerStatus, setWorkerStatus] = useState<WorkerStatus>('WORKER_SUCCESS');
-
   const workerStatusChanged = useHasValueChanged(workerStatus, 'WORKER_SUCCESS');
 
   const {
@@ -38,7 +37,7 @@ export const UploadWorkerEffects: React.FC<PropsType> = props => {
     currentPhotosUploading,
     setCurrentPhotosUploading,
     setQueuedPhotosToUpload,
-  } = useUploadWorkerContext();
+  } = useUploadWorkerContextInner();
 
   useEffect(() => {
     // The interval is used to batch store updates when photos are uploaded,

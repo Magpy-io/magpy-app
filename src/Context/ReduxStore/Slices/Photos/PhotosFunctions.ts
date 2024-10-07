@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef } from 'react';
 import { usePermissionsContext } from '~/Context/Contexts/PermissionsContext';
 import { useServerContext } from '~/Context/Contexts/ServerContext';
 import { useServerInvalidationContext } from '~/Context/Contexts/ServerInvalidationContext';
-import { useUploadWorkerFunctions } from '~/Context/Contexts/UploadWorkerContext';
+import { useUploadWorkerContext } from '~/Context/Contexts/UploadWorkerContext';
 import {
   deletePhotoCompressedFromCache,
   deletePhotoThumbnailFromCache,
@@ -29,7 +29,7 @@ export function usePhotosFunctionsStore() {
   const isServerReachableRef = useRef(false);
   isServerReachableRef.current = isServerReachable;
 
-  const { UploadPhotosWorker } = useUploadWorkerFunctions();
+  const { UploadPhotosWorker } = useUploadWorkerContext();
   const { RefreshServerPhotos, InvalidatePhotos } = useServerInvalidationContext();
 
   const RefreshLocalPhotos = useCallback(
