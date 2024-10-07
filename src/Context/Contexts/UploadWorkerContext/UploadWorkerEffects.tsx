@@ -45,7 +45,7 @@ export const UploadWorkerEffects: React.FC<PropsType> = props => {
     // This improves performance significantly specially when backing up large amount of photos
     const interval = setInterval(() => {
       setRerunEffect(s => !s);
-    }, 2000);
+    }, 500);
 
     const subscription = UploadMediaEvents.subscribeOnPhotoUploaded(eventData => {
       photosUploadedRef.current.push(eventData);
