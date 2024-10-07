@@ -1,66 +1,66 @@
 import React, { ReactNode, createContext, useContext, useRef, useState } from 'react';
 
-import { Mutation } from './MutationsTypes';
-import { ServerQueriesEffects } from './ServerQueriesEffects';
+import { Invalidation } from './InvalidationTypes';
+import { ServerInvalidationEffects } from './ServerInvalidationEffects';
 
 type SetStateType<T> = React.Dispatch<React.SetStateAction<T>>;
 
 export type FetchingStatus = 'Idle' | 'Fetching';
 export type ResultStatus = 'Pending' | 'Success' | 'Failed';
 
-export type ServerQueriesDataType = {
+export type ServerInvalidationDataType = {
   fetchingStatus: FetchingStatus;
   resultStatus: ResultStatus;
   setFetchingStatus: SetStateType<FetchingStatus>;
   setResultStatus: SetStateType<ResultStatus>;
   isFetchingRef: React.MutableRefObject<boolean>;
-  pendingMutations: Mutation[];
-  setPendingMutations: SetStateType<Mutation[]>;
+  pendingInvalidations: Invalidation[];
+  setPendingInvalidations: SetStateType<Invalidation[]>;
 };
 
-const initialState: ServerQueriesDataType = {
+const initialState: ServerInvalidationDataType = {
   fetchingStatus: 'Idle',
   resultStatus: 'Pending',
   setFetchingStatus: () => {},
   setResultStatus: () => {},
   isFetchingRef: { current: false },
-  pendingMutations: [],
-  setPendingMutations: () => {},
+  pendingInvalidations: [],
+  setPendingInvalidations: () => {},
 };
 
-const ServerQueriesContext = createContext<ServerQueriesDataType>(initialState);
+const ServerInvalidationContext = createContext<ServerInvalidationDataType>(initialState);
 
 type PropsType = {
   children: ReactNode;
 };
 
-export const ServerQueriesProvider: React.FC<PropsType> = props => {
+export const ServerInvalidationContextProvider: React.FC<PropsType> = props => {
   const [resultStatus, setResultStatus] = useState<ResultStatus>('Pending');
   const [fetchingStatus, setFetchingStatus] = useState<FetchingStatus>('Idle');
   const isFetchingRef = useRef(false);
-  const [pendingMutations, setPendingMutations] = useState<Mutation[]>([]);
+  const [pendingInvalidations, setPendingInvalidations] = useState<Invalidation[]>([]);
 
   return (
-    <ServerQueriesContext.Provider
+    <ServerInvalidationContext.Provider
       value={{
         resultStatus,
         fetchingStatus,
         setResultStatus,
         setFetchingStatus,
         isFetchingRef,
-        pendingMutations,
-        setPendingMutations,
+        pendingInvalidations,
+        setPendingInvalidations,
       }}>
-      <ServerQueriesEffects>{props.children}</ServerQueriesEffects>
-    </ServerQueriesContext.Provider>
+      <ServerInvalidationEffects>{props.children}</ServerInvalidationEffects>
+    </ServerInvalidationContext.Provider>
   );
 };
 
-export function useServerQueriesContextInner(): ServerQueriesDataType {
-  const context = useContext(ServerQueriesContext);
+export function useServerInvalidationContextInner(): ServerInvalidationDataType {
+  const context = useContext(ServerInvalidationContext);
 
   if (!context) {
-    throw new Error('ServerQueriesContext not defined');
+    throw new Error('ServerInvalidationContext not defined');
   }
 
   return context;

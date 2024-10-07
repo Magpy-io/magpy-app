@@ -2,28 +2,22 @@ import { useCallback, useEffect, useRef } from 'react';
 
 import { usePermissionsContext } from '~/Context/Contexts/PermissionsContext';
 import { useServerContext } from '~/Context/Contexts/ServerContext';
-import { useServerQueriesContext } from '~/Context/Contexts/ServerQueriesContext';
+import { useServerInvalidationContext } from '~/Context/Contexts/ServerInvalidationContext';
 import { useUploadWorkerFunctions } from '~/Context/Contexts/UploadWorkerContext';
 import {
-  addPhotoCompressedToCache,
-  addPhotoThumbnailToCache,
   deletePhotoCompressedFromCache,
   deletePhotoThumbnailFromCache,
   deletePhotosFromDevice,
-  photoCompressedExistsInCache,
-  photoThumbnailExistsInCache,
 } from '~/Helpers/GalleryFunctions/Functions';
 import { GalleryGetPhotos } from '~/Helpers/GalleryFunctions/GetGalleryPhotos';
-import { DeletePhotosById, GetPhotosById } from '~/Helpers/ServerQueries';
+import { DeletePhotosById } from '~/Helpers/ServerQueries';
 
 import { useAppDispatch } from '../../Store';
 import {
   PhotoGalleryType,
   PhotoLocalType,
-  PhotoServerType,
-  addCompressedPhotoById,
-  addThumbnailPhotoById,
   deletePhotosFromLocal,
+  deletePhotosFromServer,
   setPhotosLocal,
   setPhotosServer,
 } from './Photos';
@@ -36,7 +30,7 @@ export function usePhotosFunctionsStore() {
   isServerReachableRef.current = isServerReachable;
 
   const { UploadPhotosWorker } = useUploadWorkerFunctions();
-  const { RefreshServerPhotos, DeleteServerPhotos } = useServerQueriesContext();
+  const { RefreshServerPhotos, InvalidatePhotos } = useServerInvalidationContext();
 
   const RefreshLocalPhotos = useCallback(
     async (n: number) => {
@@ -50,61 +44,6 @@ export function usePhotosFunctionsStore() {
   const ClearServerPhotos = useCallback(() => {
     dispatch(setPhotosServer([]));
   }, [dispatch]);
-
-  const AddPhotoThumbnailIfMissing = useCallback(
-    async (serverPhoto: PhotoServerType) => {
-      const photoThumbnailStatus = await photoThumbnailExistsInCache(serverPhoto.id);
-
-      let uri = '';
-
-      if (photoThumbnailStatus.exists) {
-        uri = photoThumbnailStatus.uri;
-      } else {
-        const res = await GetPhotosById.Post({
-          ids: [serverPhoto.id],
-          photoType: 'thumbnail',
-        });
-
-        if (!res.ok || !res.data.photos[0].exists) {
-          throw new Error('Could not get photo by id');
-        }
-
-        uri = await addPhotoThumbnailToCache(serverPhoto.id, res.data.photos[0].photo.image64);
-      }
-
-      dispatch(addThumbnailPhotoById({ id: serverPhoto.id, uri }));
-    },
-    [dispatch],
-  );
-
-  const AddPhotoCompressedIfMissing = useCallback(
-    async (serverPhoto: PhotoServerType) => {
-      const photoCompressedStatus = await photoCompressedExistsInCache(serverPhoto.id);
-
-      let uri = '';
-
-      if (photoCompressedStatus.exists) {
-        uri = photoCompressedStatus.uri;
-      } else {
-        const res = await GetPhotosById.Post({
-          ids: [serverPhoto.id],
-          photoType: 'compressed',
-        });
-
-        if (!res.ok || !res.data.photos[0].exists) {
-          throw new Error('Could not get photo by id');
-        }
-
-        uri = await addPhotoCompressedToCache(
-          serverPhoto.id,
-          res.data.photos[0].photo.image64,
-        );
-      }
-
-      dispatch(addCompressedPhotoById({ id: serverPhoto.id, uri }));
-    },
-    [dispatch],
-  );
 
   const UploadPhotos = useCallback(
     (photos: PhotoLocalType[]) => {
@@ -140,9 +79,10 @@ export function usePhotosFunctionsStore() {
         await deletePhotoCompressedFromCache(serverId).catch(console.log);
       }
 
-      DeleteServerPhotos({ serverIds });
+      dispatch(deletePhotosFromServer({ serverIds }));
+      InvalidatePhotos({ serverIds });
     },
-    [DeleteServerPhotos],
+    [dispatch, InvalidatePhotos],
   );
 
   const DeletePhotosEverywhere = useCallback(
@@ -176,9 +116,10 @@ export function usePhotosFunctionsStore() {
         await deletePhotoCompressedFromCache(serverId).catch(console.log);
       }
 
-      DeleteServerPhotos({ serverIds });
+      dispatch(deletePhotosFromServer({ serverIds }));
+      InvalidatePhotos({ serverIds });
     },
-    [dispatch, DeleteServerPhotos],
+    [dispatch, InvalidatePhotos],
   );
 
   const RefreshAllPhotos = useCallback(
@@ -196,8 +137,6 @@ export function usePhotosFunctionsStore() {
   return {
     RefreshLocalPhotos,
     RefreshAllPhotos,
-    AddPhotoThumbnailIfMissing,
-    AddPhotoCompressedIfMissing,
     UploadPhotos,
     DeletePhotosLocal,
     DeletePhotosServer,
@@ -208,7 +147,7 @@ export function usePhotosFunctionsStore() {
 
 export function usePhotosStoreEffect() {
   const { RefreshLocalPhotos, ClearServerPhotos } = usePhotosFunctionsStore();
-  const { RefreshServerPhotos } = useServerQueriesContext();
+  const { RefreshServerPhotos } = useServerInvalidationContext();
 
   const { serverNetwork } = useServerContext();
 

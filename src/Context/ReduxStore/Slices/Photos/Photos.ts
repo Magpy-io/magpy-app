@@ -11,8 +11,6 @@ export type PhotoServerType = {
   date: string;
   syncDate: string;
   mediaId: string | undefined;
-  uriThumbnail: string | undefined;
-  uriCompressed: string | undefined;
 };
 
 export type PhotoLocalType = {
@@ -83,12 +81,50 @@ const photosServerSlice = createSlice({
       state.photosGallery = mergePhotos(state);
     },
 
-    addCompressedPhotoById: (state, action: { payload: { id: string; uri: string } }) => {
-      state.photosServer[action.payload.id].uriCompressed = action.payload.uri;
-    },
+    updatePhotosServer: (
+      state,
+      action: { payload: { id: string; photo: PhotoServerType | null }[] },
+    ) => {
+      let anyChanged = false;
 
-    addThumbnailPhotoById: (state, action: { payload: { id: string; uri: string } }) => {
-      state.photosServer[action.payload.id].uriThumbnail = action.payload.uri;
+      action.payload.forEach(v => {
+        const photoServer = state.photosServer[v.id];
+
+        // Photo was deleted
+        if (photoServer && !v.photo) {
+          delete state.photosServer[v.id];
+
+          state.photosServerIdsOrdered = state.photosServerIdsOrdered.filter(serverId => {
+            return serverId != v.id;
+          });
+          anyChanged = true;
+          return;
+        }
+
+        // Photo was added
+        if (!photoServer && v.photo) {
+          state.photosServer[v.id] = v.photo;
+          insertPhotoKeyWithOrder(state.photosServer, state.photosServerIdsOrdered, v.photo);
+          anyChanged = true;
+          return;
+        }
+
+        // Update photo if changed, assumes that only value that can change is mediaId
+        // This is the case when downloading a photo to device
+        if (photoServer && v.photo) {
+          if (photoServer.mediaId == v.photo.mediaId) {
+            return; // no change
+          }
+
+          photoServer.mediaId = v.photo.mediaId;
+          anyChanged = true;
+          return;
+        }
+      });
+
+      if (anyChanged) {
+        state.photosGallery = mergePhotos(state);
+      }
     },
 
     addPhotosFromLocalToServer: (
@@ -163,8 +199,7 @@ const photosServerSlice = createSlice({
 export const {
   setPhotosServer,
   setPhotosLocal,
-  addCompressedPhotoById,
-  addThumbnailPhotoById,
+  updatePhotosServer,
   addPhotosFromLocalToServer,
   addPhotoFromServerToLocal,
   deletePhotosFromLocal,

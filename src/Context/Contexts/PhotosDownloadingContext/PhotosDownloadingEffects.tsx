@@ -1,16 +1,17 @@
 import React, { ReactNode, useEffect, useRef } from 'react';
 
 import { uniqueDeviceId } from '~/Config/config';
+import { addPhotoFromServerToLocal } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import {
   photosLocalSelector,
   photosServerSelector,
 } from '~/Context/ReduxStore/Slices/Photos/Selectors';
-import { useAppSelector } from '~/Context/ReduxStore/Store';
+import { useAppDispatch, useAppSelector } from '~/Context/ReduxStore/Store';
 import { addPhotoToDevice } from '~/Helpers/GalleryFunctions/Functions';
 import * as Queries from '~/Helpers/Queries';
 import { UpdatePhotoMediaId } from '~/Helpers/ServerQueries';
 
-import { useServerQueriesContext } from '../ServerQueriesContext';
+import { useServerInvalidationContext } from '../ServerInvalidationContext';
 import * as PhotosDownloadingActions from './PhotosDownloadingActions';
 import {
   usePhotosDownloadingContext,
@@ -31,7 +32,9 @@ export const PhotosDownloadingEffects: React.FC<PropsType> = props => {
 
   const isEffectRunning = useRef(false);
 
-  const { DownloadServerPhoto } = useServerQueriesContext();
+  const { InvalidatePhotos } = useServerInvalidationContext();
+
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     async function innerAsync() {
@@ -97,7 +100,10 @@ export const PhotosDownloadingEffects: React.FC<PropsType> = props => {
           return;
         }
 
-        DownloadServerPhoto({ localPhoto, serverId: photoServer.id });
+        dispatch(
+          addPhotoFromServerToLocal({ photoLocal: localPhoto, serverId: photoServer.id }),
+        );
+        InvalidatePhotos({ serverIds: [photoServer.id] });
       } finally {
         photosDownloadingDispatch(PhotosDownloadingActions.shift());
         isEffectRunning.current = false;
@@ -107,10 +113,11 @@ export const PhotosDownloadingEffects: React.FC<PropsType> = props => {
     innerAsync().catch(console.log);
   }, [
     photosDownloadingDispatch,
-    DownloadServerPhoto,
+    InvalidatePhotos,
     photosDownloading,
     photosServer,
     photosLocal,
+    dispatch,
   ]);
 
   return props.children;

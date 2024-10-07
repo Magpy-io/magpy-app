@@ -1,9 +1,8 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback } from 'react';
 import { StyleSheet, TouchableHighlight, View } from 'react-native';
 
 import { useTheme } from '~/Context/Contexts/ThemeContext';
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
-import { usePhotosFunctionsStore } from '~/Context/ReduxStore/Slices/Photos/PhotosFunctions';
 import {
   photoLocalSelector,
   photoServerSelector,
@@ -12,6 +11,7 @@ import { useAppSelector } from '~/Context/ReduxStore/Store';
 
 import ImageForGrid from './ImageForGrid';
 import SelectionIconForGrid from './SelectionIconForGrid';
+import { useServerPhotoUri } from './useServerPhotoUri';
 
 type PropsType = {
   photo: PhotoGalleryType;
@@ -29,13 +29,7 @@ function PhotoComponentForGrid(props: PropsType) {
   const localPhoto = useAppSelector(photoLocalSelector(photo.mediaId));
   const serverPhoto = useAppSelector(photoServerSelector(photo.serverId));
 
-  const { AddPhotoThumbnailIfMissing } = usePhotosFunctionsStore();
-
-  useEffect(() => {
-    if (serverPhoto && !localPhoto && !serverPhoto.uriThumbnail) {
-      AddPhotoThumbnailIfMissing(serverPhoto).catch(console.log);
-    }
-  }, [AddPhotoThumbnailIfMissing, localPhoto, serverPhoto]);
+  const uriThumbnail = useServerPhotoUri(serverPhoto, !localPhoto, 'thumbnail');
 
   const onPressPhoto = useCallback(() => onPress(photo), [onPress, photo]);
   const onLongPressPhoto = useCallback(() => onLongPress(photo), [onLongPress, photo]);
@@ -44,8 +38,8 @@ function PhotoComponentForGrid(props: PropsType) {
 
   if (localPhoto) {
     uriSource = localPhoto.uri;
-  } else if (serverPhoto?.uriThumbnail) {
-    uriSource = serverPhoto.uriThumbnail;
+  } else if (uriThumbnail) {
+    uriSource = uriThumbnail;
   }
 
   return (
