@@ -52,9 +52,10 @@ public class AutoBackupModule extends ReactContextBaseJavaModule {
 
         ExecutorsManager.ExecuteOnBackgroundThread(() -> {
             try {
-                autoBackupWorkerManager.StartWorker(url, serverToken, deviceId, mediaId -> {
+                autoBackupWorkerManager.StartWorker(url, serverToken, deviceId, observerData -> {
                     WritableMap params = new WritableNativeMap();
-                    params.putString("mediaId", mediaId);
+                    params.putString(UploadMediaModule.EVENT_FIELD_NAME_MEDIA_ID, observerData.mediaId);
+                    params.putString(UploadMediaModule.EVENT_FIELD_NAME_PHOTO, observerData.photo);
                     BridgeFunctions.sendEvent(getReactApplicationContext(), UploadMediaModule.EVENT_PHOTO_UPLOADED, params);
                 });
                 mPromise.resolve(null);

@@ -31,7 +31,7 @@ public class PhotoUploader {
         this.serverToken = serverToken;
     }
 
-    public void uploadPhoto(PhotoData photo) throws ResponseNotOkException, IOException {
+    public String uploadPhoto(PhotoData photo) throws ResponseNotOkException, IOException {
         byte[] image64 = FileOperations.getBase64FromUri(context, photo.uri);
 
         JSONObject jsonRequest = formatJsonRequestAddPhotoInit(photo, image64);
@@ -47,7 +47,13 @@ public class PhotoUploader {
             }
 
             JSONObject data = jsonResponse.getJSONObject("data");
-            transferId = data.getString("id");
+            boolean photoExistsBefore = data.getBoolean("photoExistsBefore");
+
+            if(photoExistsBefore){
+                return data.getJSONObject("photo").toString();
+            }else{
+                transferId = data.getString("id");
+            }
         } catch (JSONException e) {
             throw new RuntimeException("Error parsing json response, expected properties not found.", e);
         }
@@ -91,11 +97,24 @@ public class PhotoUploader {
 
             partNumber++;
         }
+
+        try {
+            JSONObject data = jsonResponse.getJSONObject("data");
+            boolean done = data.getBoolean("done");
+
+            if(!done){
+                throw new RuntimeException("Error uploading photo, sent all parts but transfer not done.");
+            }
+
+            return data.getJSONObject("photo").toString();
+        } catch (JSONException e) {
+            throw new RuntimeException("Error parsing json response, expected properties not found.", e);
+        }
     }
 
     private List<byte[]> splitBytes(byte[] bytes){
         int partSize = 100000;
-        int numberOfParts = (int)(bytes.length / partSize);
+        int numberOfParts = bytes.length / partSize;
 
         List<byte[]> parts = new ArrayList<>();
 

@@ -25,8 +25,11 @@ public class UploadMediaModule extends ReactContextBaseJavaModule {
     public static final String WORKER_SUCCESS = "WORKER_SUCCESS";
     public static final String WORKER_CANCELED = "WORKER_CANCELED";
 
+    public static final String EVENT_FIELD_NAME_MEDIA_ID = "mediaId";
+    public static final String EVENT_FIELD_NAME_PHOTO = "photo";
+
+
     public String workerStatus = WORKER_SUCCESS;
-    public String lastSentMediaId = "";
 
     public UploadMediaModule(ReactApplicationContext context) {
         super(context);
@@ -77,11 +80,12 @@ public class UploadMediaModule extends ReactContextBaseJavaModule {
             mPromise.reject("Error", "photosIds should be an array of strings.");
             return;
         }
+
         uploadWorkerManager.StartWorker(url, serverToken, deviceId, photosIds, observerData -> {
-            if(observerData.mediaId != null && !Objects.equals(observerData.mediaId, lastSentMediaId)){
-                lastSentMediaId = observerData.mediaId;
+            if(observerData.mediaId != null){
                 WritableMap params = new WritableNativeMap();
-                params.putString("mediaId", lastSentMediaId);
+                params.putString(EVENT_FIELD_NAME_MEDIA_ID, observerData.mediaId);
+                params.putString(EVENT_FIELD_NAME_PHOTO, observerData.photo);
                 BridgeFunctions.sendEvent(getReactApplicationContext(), EVENT_PHOTO_UPLOADED, params);
             }
 

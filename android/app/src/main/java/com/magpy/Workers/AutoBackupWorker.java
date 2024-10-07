@@ -47,6 +47,7 @@ public class AutoBackupWorker extends Worker {
     public static final String DATA_KEY_DEVICE_UNIQUE_ID = "DEVICE_UNIQUE_ID";
 
     public static final String UPLOADED_PHOTO_MEDIA_ID = "UPLOADED_PHOTO_MEDIA_ID";
+    public static final String UPLOADED_PHOTO_STRING = "UPLOADED_PHOTO_STRING";
 
     protected final int MAX_MISSING_PHOTOS_TO_UPLOAD = 500;
     protected final int MAX_GALLERY_PHOTOS_TO_UPLOAD = 5000;
@@ -152,15 +153,15 @@ public class AutoBackupWorker extends Worker {
             updateNotification(progress, missingPhotos.size());
 
             try{
-                photoUploader.uploadPhoto(photoData);
-                setProgressAsync(new Data.Builder().putString(UPLOADED_PHOTO_MEDIA_ID, photoData.mediaId).build());
-            }catch (ResponseNotOkException e){
-                if(e.GetErrorCode().equals("PHOTO_EXISTS")){
-                    setProgressAsync(new Data.Builder().putString(UPLOADED_PHOTO_MEDIA_ID, photoData.mediaId).build());
-                    Log.i("AutoBackupWorker", "Failed upload of photo with mediaId: " + photoData.mediaId + " because it already exists in server.", e);
-                }else{
-                    Log.e("AutoBackupWorker", "Failed upload of photo with mediaId: " + photoData.mediaId, e);
-                }
+                String photoUploaded = photoUploader.uploadPhoto(photoData);
+                Data progressData = new Data.Builder()
+                        .putString(UPLOADED_PHOTO_MEDIA_ID, photoData.mediaId)
+                        .putString(UPLOADED_PHOTO_STRING, photoUploaded)
+                        .build();
+                setProgressAsync(progressData);
+            }
+            catch (ResponseNotOkException e){
+                Log.e("AutoBackupWorker", "Failed upload of photo with mediaId: " + photoData.mediaId, e);
             }
 
             progress++;
