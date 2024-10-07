@@ -110,6 +110,7 @@ const photosServerSlice = createSlice({
         }
 
         // Update photo if changed, assumes that only value that can change is mediaId
+        // This is the case when downloading a photo to device
         if (photoServer && v.photo) {
           if (photoServer.mediaId == v.photo.mediaId) {
             return; // no change

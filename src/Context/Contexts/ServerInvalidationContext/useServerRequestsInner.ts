@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 
+import { uniqueDeviceId } from '~/Config/config';
 import { ParseApiPhoto } from '~/Context/ReduxStore/Slices/Photos/Functions';
 import {
   PhotoServerType,
@@ -8,7 +9,7 @@ import {
 } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { useAppDispatch } from '~/Context/ReduxStore/Store';
 import { getPhotosBatched } from '~/Helpers/Queries';
-import { GetPhotosById } from '~/Helpers/ServerQueries';
+import { GetPhotosById, GetPhotosByMediaId } from '~/Helpers/ServerQueries';
 
 export function useServerRequestsInner() {
   const dispatch = useAppDispatch();
@@ -67,8 +68,44 @@ export function useServerRequestsInner() {
     [dispatch],
   );
 
+  const UpdatePhotoInfoByMediaIdRequest = useCallback(
+    async (payload: { mediaIds: string[] }) => {
+      const ret = await GetPhotosByMediaId.Post({
+        deviceUniqueId: uniqueDeviceId,
+        photoType: 'data',
+        photosData: payload.mediaIds.map(mediaId => {
+          return { mediaId };
+        }),
+      });
+
+      if (!ret.ok) {
+        console.log('UpdatePhotoInfoByMediaIdRequest: failed to get photos from server');
+        throw new Error(
+          'UpdatePhotoInfoByMediaIdRequest: failed to get photos from server, ' +
+            ret.errorCode +
+            ', ' +
+            ret.message,
+        );
+      }
+
+      const photos: { id: string; photo: PhotoServerType }[] = ret.data.photos
+        .map(photo => {
+          if (!photo.exists) {
+            return null;
+          }
+
+          return { id: photo.photo.id, photo: ParseApiPhoto(photo.photo) };
+        })
+        .filter(e => e != null);
+
+      dispatch(updatePhotosServer(photos));
+    },
+    [dispatch],
+  );
+
   return {
     RefreshServerPhotosRequest,
     UpdatePhotoInfoRequest,
+    UpdatePhotoInfoByMediaIdRequest,
   };
 }

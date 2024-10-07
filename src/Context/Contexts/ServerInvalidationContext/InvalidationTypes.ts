@@ -7,4 +7,9 @@ export type InvalidatePhotos = {
   payload: { serverIds: string[] };
 };
 
-export type Invalidation = InvalidateAllPhotos | InvalidatePhotos;
+export type InvalidatePhotosByMediaId = {
+  name: 'PhotosInvalidatedByMediaId';
+  payload: { mediaIds: string[] };
+};
+
+export type Invalidation = InvalidateAllPhotos | InvalidatePhotos | InvalidatePhotosByMediaId;

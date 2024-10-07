@@ -23,5 +23,14 @@ export function useServerInvalidationContext() {
     [setPendingInvalidations],
   );
 
-  return { RefreshServerPhotos, InvalidatePhotos };
+  const InvalidatePhotosByMediaId = useCallback(
+    (data: { mediaIds: string[] }) => {
+      setPendingInvalidations(p => {
+        return [...p, { name: 'PhotosInvalidatedByMediaId', payload: data }];
+      });
+    },
+    [setPendingInvalidations],
+  );
+
+  return { RefreshServerPhotos, InvalidatePhotos, InvalidatePhotosByMediaId };
 }

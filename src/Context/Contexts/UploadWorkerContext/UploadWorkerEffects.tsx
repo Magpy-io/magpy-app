@@ -30,8 +30,12 @@ export const UploadWorkerEffects: React.FC<PropsType> = props => {
 
   const [workerStatus, setWorkerStatus] = useState<WorkerStatus>('WORKER_SUCCESS');
 
-  const { queuedPhotosToUpload, setCurrentPhotosUploading, setQueuedPhotosToUpload } =
-    useUploadWorkerContext();
+  const {
+    queuedPhotosToUpload,
+    currentPhotosUploading,
+    setCurrentPhotosUploading,
+    setQueuedPhotosToUpload,
+  } = useUploadWorkerContext();
 
   useEffect(() => {
     // The interval is used to batch store updates when photos are uploaded,
@@ -60,7 +64,7 @@ export const UploadWorkerEffects: React.FC<PropsType> = props => {
 
   const isEffectRunning = useRef(false);
 
-  const { InvalidatePhotos } = useServerInvalidationContext();
+  const { InvalidatePhotos, InvalidatePhotosByMediaId } = useServerInvalidationContext();
 
   useEffect(() => {
     async function asyncInner() {
@@ -138,12 +142,19 @@ export const UploadWorkerEffects: React.FC<PropsType> = props => {
         return;
       }
 
+      // If worker finished, invalidate current photos uploading
+      if (currentPhotosUploading.size != 0) {
+        InvalidatePhotosByMediaId({
+          mediaIds: Array.from(currentPhotosUploading),
+        });
+      }
+
       if (queuedPhotosToUpload.size == 0) {
         return;
       }
 
-      setQueuedPhotosToUpload(new Set());
       setCurrentPhotosUploading(queuedPhotosToUpload);
+      setQueuedPhotosToUpload(new Set());
 
       await UploadMediaModule.StartUploadWorker({
         url: serverPath ?? '',
@@ -156,11 +167,13 @@ export const UploadWorkerEffects: React.FC<PropsType> = props => {
     asyncInner().catch(console.log);
   }, [
     queuedPhotosToUpload,
+    currentPhotosUploading,
     serverPath,
     setCurrentPhotosUploading,
     setQueuedPhotosToUpload,
     token,
     workerStatus,
+    InvalidatePhotosByMediaId,
   ]);
 
   return props.children;

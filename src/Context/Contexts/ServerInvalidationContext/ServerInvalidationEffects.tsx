@@ -8,7 +8,11 @@ type PropsType = {
 };
 
 export const ServerInvalidationEffects: React.FC<PropsType> = props => {
-  const { RefreshServerPhotosRequest, UpdatePhotoInfoRequest } = useServerRequestsInner();
+  const {
+    RefreshServerPhotosRequest,
+    UpdatePhotoInfoRequest,
+    UpdatePhotoInfoByMediaIdRequest,
+  } = useServerRequestsInner();
   const {
     isFetchingRef,
     setFetchingStatus,
@@ -38,6 +42,8 @@ export const ServerInvalidationEffects: React.FC<PropsType> = props => {
             await RefreshServerPhotosRequest(5000);
           } else if (currentInvalidation.name == 'PhotosInvalidated') {
             await UpdatePhotoInfoRequest(currentInvalidation.payload);
+          } else if (currentInvalidation.name == 'PhotosInvalidatedByMediaId') {
+            await UpdatePhotoInfoByMediaIdRequest(currentInvalidation.payload);
           }
 
           setResultStatus('Success');
@@ -64,6 +70,7 @@ export const ServerInvalidationEffects: React.FC<PropsType> = props => {
     setPendingInvalidations,
     setResultStatus,
     UpdatePhotoInfoRequest,
+    UpdatePhotoInfoByMediaIdRequest,
   ]);
 
   return props.children;
