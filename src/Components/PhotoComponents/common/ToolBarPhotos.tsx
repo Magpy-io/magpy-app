@@ -5,6 +5,7 @@ import { usePopupMessageModal } from '~/Components/CommonComponents/PopupMessage
 import { useMainContext, useMainContextFunctions } from '~/Context/Contexts/MainContext';
 import { usePermissionsContext } from '~/Context/Contexts/PermissionsContext';
 import { usePhotosDownloadingFunctions } from '~/Context/Contexts/PhotosDownloadingContext/usePhotosDownloadingContext';
+import { useUploadWorkerContext } from '~/Context/Contexts/UploadWorkerContext';
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { usePhotosFunctionsStore } from '~/Context/ReduxStore/Slices/Photos/PhotosFunctions';
 import { photosLocalSelector } from '~/Context/ReduxStore/Slices/Photos/Selectors';
@@ -42,6 +43,8 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
   const { UploadPhotos, DeletePhotosLocal, DeletePhotosServer, DeletePhotosEverywhere } =
     usePhotosFunctionsStore();
   const { StartPhotosDownload } = usePhotosDownloadingFunctions();
+
+  const { IsMediaIdUploadQueued } = useUploadWorkerContext();
 
   const selectedLocalOnlyPhotos = useMemo(() => {
     const selectedLocalOnlyPhotos = [];
@@ -101,6 +104,14 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
   const atleastOneServer = selectedGalleryPhotos.find(p => p.serverId);
 
   const atleastOneServerAndOneLocal = atleastOneLocal && atleastOneServer;
+
+  const isPhotoBeingUploaded = useMemo(() => {
+    if (isOnePhoto && atleastOneLocal) {
+      const selectedPhoto = selectedGalleryPhotos[0];
+      return IsMediaIdUploadQueued(selectedPhoto.mediaId ?? '');
+    }
+    return false;
+  }, [atleastOneLocal, IsMediaIdUploadQueued, isOnePhoto, selectedGalleryPhotos]);
 
   const onBackup = useCallback(() => {
     if (notificationsPermissionStatus == 'PENDING' && !askedForNotificationPermissionBefore) {
@@ -177,6 +188,7 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
         onShare={onShare}
         showInfo={isOnePhoto}
         onInfo={showModal}
+        isPhotoBeingUploaded={isPhotoBeingUploaded}
       />
       {isOnePhoto && (
         <PhotoDetailsModal

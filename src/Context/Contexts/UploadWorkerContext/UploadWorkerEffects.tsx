@@ -4,7 +4,7 @@ import { uniqueDeviceId } from '~/Config/config';
 import { ParseApiPhoto } from '~/Context/ReduxStore/Slices/Photos/Functions';
 import { addPhotosFromLocalToServer } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { useAppDispatch } from '~/Context/ReduxStore/Store';
-import { GetPhotosByMediaId } from '~/Helpers/ServerQueries';
+import { APIPhoto } from '~/Helpers/ServerQueries/Types';
 import { useHasValueChanged } from '~/Hooks/useHasValueChanged';
 import {
   UploadMediaEvents,
@@ -22,7 +22,7 @@ type PropsType = {
 };
 
 export const UploadWorkerEffects: React.FC<PropsType> = props => {
-  const photosUploadedRef = useRef<string[]>([]);
+  const photosUploadedRef = useRef<{ mediaId: string; photo: APIPhoto }[]>([]);
 
   const dispatch = useAppDispatch();
 
@@ -45,10 +45,10 @@ export const UploadWorkerEffects: React.FC<PropsType> = props => {
     // This improves performance significantly specially when backing up large amount of photos
     const interval = setInterval(() => {
       setRerunEffect(s => !s);
-    }, 2000);
+    }, 500);
 
-    const subscription = UploadMediaEvents.subscribeOnPhotoUploaded(({ mediaId }) => {
-      photosUploadedRef.current.push(mediaId);
+    const subscription = UploadMediaEvents.subscribeOnPhotoUploaded(eventData => {
+      photosUploadedRef.current.push(eventData);
     });
 
     const subscriptionWorkerStatus = UploadMediaEvents.subscribeOnWorkerStatusChanged(
@@ -69,73 +69,40 @@ export const UploadWorkerEffects: React.FC<PropsType> = props => {
   const { InvalidatePhotos, InvalidatePhotosByMediaId } = useServerInvalidationContext();
 
   useEffect(() => {
-    async function asyncInner() {
-      if (isEffectRunning.current) {
+    if (isEffectRunning.current) {
+      return;
+    }
+
+    try {
+      isEffectRunning.current = true;
+
+      if (photosUploadedRef.current.length == 0) {
         return;
       }
 
-      try {
-        isEffectRunning.current = true;
+      const currentPhotosUploaded = [...photosUploadedRef.current];
+      const nbCurrentPhotos = currentPhotosUploaded.length;
 
-        if (photosUploadedRef.current.length == 0) {
-          return;
-        }
+      const photos = currentPhotosUploaded.map(photo => ParseApiPhoto(photo.photo));
+      const mediaIds = currentPhotosUploaded.map(photo => photo.mediaId);
 
-        const currentPhotosUploaded = [...photosUploadedRef.current];
-        const nbCurrentPhotos = currentPhotosUploaded.length;
+      dispatch(
+        addPhotosFromLocalToServer({
+          photosServer: photos,
+          mediaIds,
+        }),
+      );
 
-        const ret = await GetPhotosByMediaId.Post({
-          photosData: currentPhotosUploaded.map(mediaId => {
-            return { mediaId };
-          }),
-          photoType: 'data',
-          deviceUniqueId: uniqueDeviceId,
-        });
+      InvalidatePhotos({
+        serverIds: photos.map(photo => {
+          return photo.id;
+        }),
+      });
 
-        if (!ret.ok) {
-          console.log('Failed to get photos from server');
-          throw new Error(
-            'Failed to get photos from server, ' + ret.errorCode + ', ' + ret.message,
-          );
-        }
-
-        const photos = [];
-        const mediaIdsThatExistsInServer = [];
-
-        for (let i = 0; i < currentPhotosUploaded.length; i++) {
-          const retPhoto = ret.data.photos[i];
-          if (!retPhoto.exists) {
-            console.log(
-              'UploadWorkerEffects: photo just added but not found on server, mediaId: ',
-              retPhoto.mediaId,
-            );
-            continue;
-          }
-
-          photos.push(ParseApiPhoto(retPhoto.photo));
-          mediaIdsThatExistsInServer.push(retPhoto.mediaId);
-        }
-
-        dispatch(
-          addPhotosFromLocalToServer({
-            photosServer: photos,
-            mediaIds: mediaIdsThatExistsInServer,
-          }),
-        );
-
-        InvalidatePhotos({
-          serverIds: photos.map(photo => {
-            return photo.id;
-          }),
-        });
-
-        photosUploadedRef.current = photosUploadedRef.current.slice(nbCurrentPhotos);
-      } finally {
-        isEffectRunning.current = false;
-      }
+      photosUploadedRef.current = photosUploadedRef.current.slice(nbCurrentPhotos);
+    } finally {
+      isEffectRunning.current = false;
     }
-
-    asyncInner().catch(console.log);
   }, [dispatch, InvalidatePhotos, rerunEffect]);
 
   useEffect(() => {

@@ -15,5 +15,15 @@ export function useUploadWorkerContext() {
     [setQueuedPhotosToUpload],
   );
 
-  return { UploadPhotosWorker, currentPhotosUploading, queuedPhotosToUpload };
+  const IsMediaIdUploadQueued = useCallback(
+    (mediaId: string) => {
+      return currentPhotosUploading.has(mediaId) || queuedPhotosToUpload.has(mediaId);
+    },
+    [currentPhotosUploading, queuedPhotosToUpload],
+  );
+
+  return {
+    UploadPhotosWorker,
+    IsMediaIdUploadQueued,
+  };
 }

@@ -47,7 +47,7 @@ export async function addPhotoWithProgress(
     image64: string;
   },
   f?: (progess: number, total: number) => void,
-) {
+): Promise<APIPhoto> {
   const base64Image = photo.image64;
 
   const base64ImageSplit = splitString(base64Image);
@@ -64,7 +64,11 @@ export async function addPhotoWithProgress(
   });
 
   if (!response.ok) {
-    return response;
+    throw new Error(response.errorCode);
+  }
+
+  if (response.data.photoExistsBefore) {
+    return response.data.photo;
   }
 
   const id = response.data.id;
@@ -79,12 +83,17 @@ export async function addPhotoWithProgress(
     });
 
     if (!responseI.ok) {
-      return responseI;
+      throw new Error(responseI.errorCode);
     }
 
     f?.(i, base64ImageSplit.length);
   }
-  return responseI as AddPhotoPart.ResponseType;
+
+  if (!responseI?.data.done) {
+    throw new Error('Sent all parts but photo transfer not done.');
+  }
+
+  return responseI.data.photo;
 }
 
 function splitString(str: string) {
