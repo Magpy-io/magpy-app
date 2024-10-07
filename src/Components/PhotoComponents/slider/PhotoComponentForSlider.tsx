@@ -83,7 +83,6 @@ function PhotoComponentForSlider(props: PropsType) {
     .onEnd(() => {
       positionYLast.value = positionY.value;
       positionLast.value = position.value;
-      console.log(positionLast.value, positionYLast.value);
     });
 
   const pinchGesture = Gesture.Pinch()
