@@ -5,6 +5,7 @@ import { ParseApiPhoto } from '~/Context/ReduxStore/Slices/Photos/Functions';
 import { addPhotosFromLocalToServer } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { useAppDispatch } from '~/Context/ReduxStore/Store';
 import { GetPhotosByMediaId } from '~/Helpers/ServerQueries';
+import { useHasValueChanged } from '~/Hooks/useHasValueChanged';
 import {
   UploadMediaEvents,
   UploadMediaModule,
@@ -29,6 +30,8 @@ export const UploadWorkerEffects: React.FC<PropsType> = props => {
   const [rerunEffect, setRerunEffect] = useState(false);
 
   const [workerStatus, setWorkerStatus] = useState<WorkerStatus>('WORKER_SUCCESS');
+
+  const workerStatusChanged = useHasValueChanged(workerStatus, 'WORKER_SUCCESS');
 
   const {
     queuedPhotosToUpload,
@@ -138,18 +141,7 @@ export const UploadWorkerEffects: React.FC<PropsType> = props => {
 
   useEffect(() => {
     async function asyncInner() {
-      if (!isWorkerStatusFinished(workerStatus)) {
-        return;
-      }
-
-      // If worker finished, invalidate current photos uploading
-      if (currentPhotosUploading.size != 0) {
-        InvalidatePhotosByMediaId({
-          mediaIds: Array.from(currentPhotosUploading),
-        });
-      }
-
-      if (queuedPhotosToUpload.size == 0) {
+      if (queuedPhotosToUpload.size == 0 || currentPhotosUploading.size != 0) {
         return;
       }
 
@@ -168,12 +160,38 @@ export const UploadWorkerEffects: React.FC<PropsType> = props => {
   }, [
     queuedPhotosToUpload,
     currentPhotosUploading,
-    serverPath,
     setCurrentPhotosUploading,
     setQueuedPhotosToUpload,
-    token,
-    workerStatus,
     InvalidatePhotosByMediaId,
+    serverPath,
+    token,
+  ]);
+
+  useEffect(() => {
+    if (!workerStatusChanged) {
+      return;
+    }
+
+    if (!isWorkerStatusFinished(workerStatus)) {
+      return;
+    }
+
+    // On worker finished
+
+    // Invalidate current photos uploading
+    if (currentPhotosUploading.size != 0) {
+      InvalidatePhotosByMediaId({
+        mediaIds: Array.from(currentPhotosUploading),
+      });
+    }
+
+    setCurrentPhotosUploading(new Set());
+  }, [
+    InvalidatePhotosByMediaId,
+    setCurrentPhotosUploading,
+    currentPhotosUploading,
+    workerStatus,
+    workerStatusChanged,
   ]);
 
   return props.children;
