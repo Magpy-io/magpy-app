@@ -1,10 +1,15 @@
 import { useCallback } from 'react';
 
 import * as PhotosDownloadingActions from './PhotosDownloadingActions';
-import { usePhotosDownloadingDispatch } from './PhotosDownloadingContext';
+import {
+  usePhotosDownloadingContext,
+  usePhotosDownloadingDispatch,
+} from './PhotosDownloadingContext';
 
 export function usePhotosDownloadingFunctions() {
   const photosDownloadingDispatch = usePhotosDownloadingDispatch();
+
+  const { photosDownloading } = usePhotosDownloadingContext();
 
   const StartPhotosDownload = useCallback(
     (photosServerId: string[]) => {
@@ -13,5 +18,12 @@ export function usePhotosDownloadingFunctions() {
     [photosDownloadingDispatch],
   );
 
-  return { StartPhotosDownload };
+  const IsDownloadQueued = useCallback(
+    (serverId: string) => {
+      return photosDownloading.find(v => v.serverId == serverId) != null;
+    },
+    [photosDownloading],
+  );
+
+  return { StartPhotosDownload, IsDownloadQueued };
 }

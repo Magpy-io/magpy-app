@@ -45,6 +45,7 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
   const { StartPhotosDownload } = usePhotosDownloadingFunctions();
 
   const { IsMediaIdUploadQueued } = useUploadWorkerContext();
+  const { IsDownloadQueued } = usePhotosDownloadingFunctions();
 
   const selectedLocalOnlyPhotos = useMemo(() => {
     const selectedLocalOnlyPhotos = [];
@@ -112,6 +113,14 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
     }
     return false;
   }, [atleastOneLocal, IsMediaIdUploadQueued, isOnePhoto, selectedGalleryPhotos]);
+
+  const isPhotoBeingDownloaded = useMemo(() => {
+    if (isOnePhoto && atleastOneServer) {
+      const selectedPhoto = selectedGalleryPhotos[0];
+      return IsDownloadQueued(selectedPhoto.serverId ?? '');
+    }
+    return false;
+  }, [atleastOneServer, IsDownloadQueued, isOnePhoto, selectedGalleryPhotos]);
 
   const onBackup = useCallback(() => {
     if (notificationsPermissionStatus == 'PENDING' && !askedForNotificationPermissionBefore) {
@@ -189,6 +198,7 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
         showInfo={isOnePhoto}
         onInfo={showModal}
         isPhotoBeingUploaded={isPhotoBeingUploaded}
+        isPhotoBeingDownloaded={isPhotoBeingDownloaded}
       />
       {isOnePhoto && (
         <PhotoDetailsModal
