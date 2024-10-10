@@ -8,7 +8,7 @@ export function useToast() {
     Toast.show({
       type: 'error',
       text1: text,
-      position: position ?? 'bottom',
+      position: position ?? 'top',
       bottomOffset: insets.bottom + 5,
     });
   };
