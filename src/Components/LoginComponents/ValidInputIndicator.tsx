@@ -9,7 +9,7 @@ export default function ValidInputIndicator() {
   const { colors } = useTheme();
   return (
     <View style={styles.viewStyle}>
-      <Icon name="check-circle" size={16} color={colors.ERROR} />
+      <Icon name="check-circle" size={16} color={colors.SUCCESS} />
     </View>
   );
 }
