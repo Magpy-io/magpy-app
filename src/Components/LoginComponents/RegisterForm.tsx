@@ -12,7 +12,8 @@ import { PasswordInput } from '~/Components/LoginComponents/PasswordInput';
 import { useAuthContextFunctions } from '~/Context/Contexts/AuthContext';
 import { useMainContext } from '~/Context/Contexts/MainContext';
 import { Login, Register } from '~/Helpers/BackendQueries';
-import { ErrorBackendUnreachable } from '~/Helpers/BackendQueries/ExceptionsManager';
+import { ErrorServerUnreachable } from '~/Helpers/ServerQueries/ExceptionsManager';
+import { useToast } from '~/Hooks/useToast';
 import { useMainStackNavigation } from '~/Navigation/Navigators/MainStackNavigator';
 import { spacing } from '~/Styles/spacing';
 
@@ -38,38 +39,57 @@ export default function RegisterForm() {
   const { isNewUser } = useMainContext();
   const { navigate } = useMainStackNavigation();
 
+  const { showToastError } = useToast();
+
   const onSubmit = async (values: { name: string; email: string; password: string }) => {
     try {
       const ret = await Register.Post(values);
       if (ret.ok) {
-        try {
-          const loginRet = await Login.Post({
-            email: values.email,
-            password: values.password,
-          });
-          console.log('login result', loginRet);
-          if (loginRet.ok) {
-            const authentificated = await authenticate();
+        const loginRet = await Login.Post({
+          email: values.email,
+          password: values.password,
+        });
+        console.log('login result', loginRet);
 
-            if (authentificated) {
-              if (isNewUser) {
-                navigate('ServerSelect');
-              } else {
-                navigate('Tabs');
-              }
+        let authentificated = false;
+
+        if (loginRet.ok) {
+          authentificated = await authenticate();
+
+          if (authentificated) {
+            if (isNewUser) {
+              navigate('ServerSelect');
+            } else {
+              navigate('Tabs');
             }
           }
-        } catch (err) {
-          console.log('login Err', err);
+        }
+
+        if (!authentificated) {
+          showToastError('Unexpected error while registering your account.');
         }
       } else {
-        console.log('Register error', ret.message);
+        console.log('Register error', ret);
+
+        if (
+          ret.errorCode == 'INVALID_EMAIL' ||
+          ret.errorCode == 'INVALID_NAME' ||
+          ret.errorCode == 'INVALID_PASSWORD'
+        ) {
+          showToastError('Invalid registration data, please re-check your inputs.');
+        } else if (ret.errorCode == 'EMAIL_TAKEN') {
+          showToastError('Email is already registered, please use a different one.');
+        } else {
+          showToastError('Unexpected error while connecting to server');
+        }
       }
     } catch (err) {
-      if (err instanceof ErrorBackendUnreachable) {
-        console.log('Backend unreachable');
+      console.log('Register Error', err);
+
+      if (err instanceof ErrorServerUnreachable) {
+        showToastError('Server unreachable');
       } else {
-        console.log(err);
+        showToastError('Unexpected error while connecting to server');
       }
     }
   };
