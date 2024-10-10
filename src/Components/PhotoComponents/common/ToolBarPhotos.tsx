@@ -123,7 +123,6 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
   }, [atleastOneServer, IsDownloadQueued, isOnePhoto, selectedGalleryPhotos]);
 
   const onBackup = useCallback(() => {
-    console.log(notificationsPermissionStatus);
     if (
       notificationsPermissionStatus == 'PENDING' &&
       !neverAskForNotificationPermissionAgain
