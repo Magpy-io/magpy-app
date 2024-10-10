@@ -38,22 +38,22 @@ export function ClaimServerForm() {
           navigate('Tabs');
         } else {
           console.log(loginRet.message);
-          showToastError('Unexpected error while connecting to server', 'top');
+          showToastError('Unexpected error while connecting to server');
         }
       } else {
         console.log(ret.message);
         if (ret.errorCode == 'SERVER_ALREADY_CLAIMED') {
-          showToastError('Server already claimed by another user.', 'top');
+          showToastError('Server already claimed by another user.');
         } else {
-          showToastError('Unexpected error while claiming server', 'top');
+          showToastError('Unexpected error while claiming server');
         }
       }
     } catch (err) {
       console.log(err);
       if (err instanceof ErrorServerUnreachable) {
-        showToastError('Server unreachable', 'top');
+        showToastError('Server unreachable');
       } else {
-        showToastError('Unexpected error while claiming server', 'top');
+        showToastError('Unexpected error while claiming server');
       }
     }
   };
