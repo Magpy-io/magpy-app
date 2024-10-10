@@ -174,10 +174,25 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
   }, [DeletePhotosEverywhere, clearSelection, selectedGalleryPhotos]);
 
   const onDeleteFromServer = useCallback(() => {
-    DeletePhotosServer(selectedServerPhotosIds)
-      .then(() => clearSelection?.())
-      .catch(console.log);
-  }, [DeletePhotosServer, clearSelection, selectedServerPhotosIds]);
+    const photosToDeleteCount = selectedServerPhotosIds.length;
+
+    const photosMessage =
+      photosToDeleteCount == 1 ? 'this photo' : photosToDeleteCount.toString() + ' photos';
+
+    displayPopupMessage({
+      title: 'Deletion confirmation',
+      ok: 'Yes',
+      cancel: 'Cancel',
+      content: 'Are you sure you want to delete ' + photosMessage + ' from server ?',
+      onDismissed: userAction => {
+        if (userAction == 'Ok') {
+          DeletePhotosServer(selectedServerPhotosIds)
+            .then(() => clearSelection?.())
+            .catch(console.log);
+        }
+      },
+    });
+  }, [DeletePhotosServer, clearSelection, displayPopupMessage, selectedServerPhotosIds]);
 
   const onDeleteFromDevice = useCallback(() => {
     DeletePhotosLocal(selectedLocalPhotosIds)
