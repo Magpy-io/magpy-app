@@ -11,13 +11,13 @@ import { MainContextEffect } from './MainContextEffect';
 export type MainContextDataType = {
   isNewUserState: StatePersistentType<boolean>;
   isUsingLocalAccountState: StatePersistentType<boolean>;
-  askedForNotificationPermissionBeforeState: StatePersistentType<boolean>;
+  neverAskForNotificationPermissionAgainState: StatePersistentType<boolean>;
 };
 
 const initialState: MainContextDataType = {
   isNewUserState: StatePersistentDefaultValue(true),
   isUsingLocalAccountState: StatePersistentDefaultValue(false),
-  askedForNotificationPermissionBeforeState: StatePersistentDefaultValue(false),
+  neverAskForNotificationPermissionAgainState: StatePersistentDefaultValue(false),
 };
 
 const MainContext = createContext<MainContextDataType>(initialState);
@@ -29,9 +29,9 @@ type PropsType = {
 export const MainContextProvider: React.FC<PropsType> = props => {
   const isNewUserState = useStatePersistent(true, 'IS_NEW_USER');
   const isUsingLocalAccountState = useStatePersistent(false, 'IS_USING_LOCAL_ACCOUNT');
-  const askedForNotificationPermissionBeforeState = useStatePersistent(
+  const neverAskForNotificationPermissionAgainState = useStatePersistent(
     false,
-    'ASKED_FOR_NOTIFICATION_PERMISSION_BEFORE',
+    'NEVER_ASK_FOR_NOTIFICATION_PERMISSION_AGAIN',
   );
 
   return (
@@ -39,7 +39,7 @@ export const MainContextProvider: React.FC<PropsType> = props => {
       value={{
         isNewUserState,
         isUsingLocalAccountState,
-        askedForNotificationPermissionBeforeState,
+        neverAskForNotificationPermissionAgainState,
       }}>
       <MainContextEffect>{props.children}</MainContextEffect>
     </MainContext.Provider>

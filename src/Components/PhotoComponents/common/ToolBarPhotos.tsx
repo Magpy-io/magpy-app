@@ -25,8 +25,8 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
   const styles = useStyles(makeStyles);
   const [modalVisible, setModalVisible] = useState(false);
 
-  const { askedForNotificationPermissionBefore } = useMainContext();
-  const { setAskedForNotificationPermissionBefore } = useMainContextFunctions();
+  const { neverAskForNotificationPermissionAgain } = useMainContext();
+  const { setNeverAskForNotificationPermissionAgain } = useMainContextFunctions();
 
   const { notificationsPermissionStatus, askNotificationsPermission } =
     usePermissionsContext();
@@ -123,20 +123,30 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
   }, [atleastOneServer, IsDownloadQueued, isOnePhoto, selectedGalleryPhotos]);
 
   const onBackup = useCallback(() => {
-    if (notificationsPermissionStatus == 'PENDING' && !askedForNotificationPermissionBefore) {
-      setAskedForNotificationPermissionBefore(true);
-
-      const onDismissed = async () => {
-        await askNotificationsPermission();
-        UploadPhotos(selectedLocalOnlyPhotos);
-      };
-
+    console.log(notificationsPermissionStatus);
+    if (
+      notificationsPermissionStatus == 'PENDING' &&
+      !neverAskForNotificationPermissionAgain
+    ) {
       displayPopupMessage({
         title: 'Notification Permission Needed',
+        cancel: 'Never ask again',
         content:
           'Allow Magpy to display notifications. This will be used to display the progress of the backing up of your photos.',
-        onDismissed: () => {
-          onDismissed().catch(console.log);
+        onDismissed: userAction => {
+          if (userAction == 'Cancel') {
+            setNeverAskForNotificationPermissionAgain(true);
+          }
+
+          if (userAction == 'Ok') {
+            askNotificationsPermission()
+              .then(() => {
+                UploadPhotos(selectedLocalOnlyPhotos);
+              })
+              .catch(console.log);
+          } else {
+            UploadPhotos(selectedLocalOnlyPhotos);
+          }
         },
       });
       return;
@@ -146,11 +156,11 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
   }, [
     UploadPhotos,
     askNotificationsPermission,
-    askedForNotificationPermissionBefore,
+    neverAskForNotificationPermissionAgain,
     displayPopupMessage,
     notificationsPermissionStatus,
     selectedLocalOnlyPhotos,
-    setAskedForNotificationPermissionBefore,
+    setNeverAskForNotificationPermissionAgain,
   ]);
 
   const onDownload = useCallback(

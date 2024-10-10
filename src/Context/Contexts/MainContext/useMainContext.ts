@@ -6,7 +6,7 @@ export function useMainContextFunctions() {
   const {
     isNewUserState,
     isUsingLocalAccountState,
-    askedForNotificationPermissionBeforeState,
+    neverAskForNotificationPermissionAgainState,
   } = useMainContextInner();
 
   const [, , setIsNewUser, clearIsNewUser] = isNewUserState;
@@ -14,20 +14,20 @@ export function useMainContextFunctions() {
   const [
     ,
     ,
-    setAskedForNotificationPermissionBefore,
-    clearAskedForNotificationPermissionBefore,
-  ] = askedForNotificationPermissionBeforeState;
+    setNeverAskForNotificationPermissionAgain,
+    clearNeverAskForNotificationPermissionAgain,
+  ] = neverAskForNotificationPermissionAgainState;
 
   const clearContext = useCallback(() => {
     clearIsNewUser();
     clearIsUsingLocalAccount();
-    clearAskedForNotificationPermissionBefore();
-  }, [clearIsNewUser, clearIsUsingLocalAccount, clearAskedForNotificationPermissionBefore]);
+    clearNeverAskForNotificationPermissionAgain();
+  }, [clearIsNewUser, clearIsUsingLocalAccount, clearNeverAskForNotificationPermissionAgain]);
 
   return {
     setIsNewUser,
     setIsUsingLocalAccount,
-    setAskedForNotificationPermissionBefore,
+    setNeverAskForNotificationPermissionAgain,
     clearContext,
   };
 }
@@ -36,12 +36,12 @@ export function useMainContext() {
   const {
     isNewUserState,
     isUsingLocalAccountState,
-    askedForNotificationPermissionBeforeState,
+    neverAskForNotificationPermissionAgainState,
   } = useMainContextInner();
 
   const [isNewUser, isNewUserLoaded] = isNewUserState;
   const [isUsingLocalAccount, isUsingLocalAccountLoaded] = isUsingLocalAccountState;
-  const [askedForNotificationPermissionBefore] = askedForNotificationPermissionBeforeState;
+  const [neverAskForNotificationPermissionAgain] = neverAskForNotificationPermissionAgainState;
 
   const isContextLoaded = isNewUserLoaded && isUsingLocalAccountLoaded;
 
@@ -51,6 +51,6 @@ export function useMainContext() {
     isUsingLocalAccount,
     isUsingLocalAccountLoaded,
     isContextLoaded,
-    askedForNotificationPermissionBefore,
+    neverAskForNotificationPermissionAgain,
   };
 }
