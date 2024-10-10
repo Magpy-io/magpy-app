@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { Formik } from 'formik';
@@ -38,6 +38,8 @@ export default function RegisterForm() {
   const { authenticate } = useAuthContextFunctions();
   const { isNewUser } = useMainContext();
   const { navigate } = useMainStackNavigation();
+
+  const [submitClicked, setSubmitClicked] = useState(false);
 
   const { showToastError } = useToast();
 
@@ -109,7 +111,7 @@ export default function RegisterForm() {
               value={values.name}
               error={errors.name}
               icon="person"
-              showValidation
+              submitClicked={submitClicked}
             />
             <LoginTextInput
               placeholder="Email"
@@ -118,7 +120,7 @@ export default function RegisterForm() {
               value={values.email}
               error={errors.email}
               icon="mail"
-              showValidation
+              submitClicked={submitClicked}
             />
             <PasswordInput
               onChangeText={handleChange('password')}
@@ -126,12 +128,13 @@ export default function RegisterForm() {
               value={values.password}
               error={errors.password}
               showPasswordRequirements
-              showValidation
+              submitClicked={submitClicked}
             />
           </ViewWithGap>
           <PrimaryButtonExtraWide
             title="Register"
             onPress={() => {
+              setSubmitClicked(true);
               handleSubmit();
             }}
           />
