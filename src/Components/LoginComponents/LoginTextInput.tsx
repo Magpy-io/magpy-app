@@ -15,6 +15,7 @@ type LoginTextInputProps = {
   error: string | undefined;
   icon: string;
   showValidation?: boolean;
+  submitClicked?: boolean;
 } & TextInputProps;
 
 export default function LoginTextInput(props: LoginTextInputProps) {
@@ -22,7 +23,9 @@ export default function LoginTextInput(props: LoginTextInputProps) {
   const { colors } = useTheme();
 
   const inputRef = useRef<TextInput>(null);
-  const showError = !inputRef?.current?.isFocused() && props.value !== '';
+  const showError =
+    (!inputRef?.current?.isFocused() && props.value !== '') || props.submitClicked;
+
   return (
     <View>
       <View style={styles.viewStyle}>

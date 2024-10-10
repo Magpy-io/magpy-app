@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
 import { Formik } from 'formik';
@@ -13,7 +13,9 @@ import { PasswordInput } from '~/Components/LoginComponents/PasswordInput';
 import { useAuthContextFunctions } from '~/Context/Contexts/AuthContext';
 import { useMainContext } from '~/Context/Contexts/MainContext';
 import { Login } from '~/Helpers/BackendQueries';
+import { ErrorServerUnreachable } from '~/Helpers/ServerQueries/ExceptionsManager';
 import { useStyles } from '~/Hooks/useStyles';
+import { useToast } from '~/Hooks/useToast';
 import { useMainStackNavigation } from '~/Navigation/Navigators/MainStackNavigator';
 import { colorsType } from '~/Styles/colors';
 import { spacing } from '~/Styles/spacing';
@@ -30,6 +32,8 @@ export default function LoginForm() {
   const { authenticate } = useAuthContextFunctions();
   const styles = useStyles(makeStyles);
   const { isNewUser } = useMainContext();
+
+  const [submitClicked, setSubmitClicked] = useState(false);
 
   const { navigate } = useMainStackNavigation();
 
@@ -84,6 +88,7 @@ export default function LoginForm() {
               value={values.email}
               error={errors.email}
               icon="mail"
+              submitClicked={submitClicked}
             />
             <>
               <PasswordInput
@@ -92,6 +97,7 @@ export default function LoginForm() {
                 onBlur={handleBlur('password')}
                 value={values.password}
                 error={errors.password}
+                submitClicked={submitClicked}
               />
             </>
           </ViewWithGap>
@@ -99,6 +105,7 @@ export default function LoginForm() {
             testID="loginButton"
             title="Sign In"
             onPress={() => {
+              setSubmitClicked(true);
               handleSubmit();
             }}
           />
