@@ -33,6 +33,8 @@ export default function LoginForm() {
 
   const { navigate } = useMainStackNavigation();
 
+  const { showToastError } = useToast();
+
   const onSubmit = async (values: { email: string; password: string }) => {
     try {
       const loginRet = await Login.Post(values);
@@ -46,11 +48,26 @@ export default function LoginForm() {
             navigate('Tabs');
           }
         }
+      } else {
+        console.log(loginRet);
+
+        if (loginRet.errorCode == 'INVALID_CREDENTIALS') {
+          showToastError('Invalid email or password');
+        } else {
+          showToastError('Unexpected error while connecting to server');
+        }
       }
     } catch (err) {
       console.log('Login Error', err);
+
+      if (err instanceof ErrorServerUnreachable) {
+        showToastError('Server unreachable');
+      } else {
+        showToastError('Unexpected error while connecting to server');
+      }
     }
   };
+
   return (
     <Formik
       initialValues={{ email: '', password: '' }}
