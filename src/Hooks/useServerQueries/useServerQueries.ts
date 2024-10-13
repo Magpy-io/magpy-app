@@ -5,6 +5,7 @@ import {
   GetPhotoPartById,
   GetPhotos,
   GetPhotosById,
+  GetPhotosByMediaId,
   GetServerInfo,
   UpdatePhotoMediaId,
 } from '~/Helpers/ServerQueries';
@@ -48,6 +49,7 @@ export function useServerQueries() {
   return useMemo(() => {
     return {
       GetPhotosByIdPost: transformFunction(GetPhotosById.Post),
+      GetPhotosByMediaIdPost: transformFunction(GetPhotosByMediaId.Post),
       GetServerInfoPost: transformFunction(GetServerInfo.Post),
       GetPhotosPost: transformFunction(GetPhotos.Post),
       GetPhotoPartByIdPost: transformFunction(GetPhotoPartById.Post),

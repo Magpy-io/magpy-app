@@ -1,5 +1,7 @@
 import React, { ReactNode, useEffect } from 'react';
 
+import { useToast } from '~/Hooks/useToast';
+
 import { useServerInvalidationContextInner } from './ServerInvalidationContext';
 import { useServerRequestsInner } from './useServerRequestsInner';
 
@@ -20,6 +22,8 @@ export const ServerInvalidationEffects: React.FC<PropsType> = props => {
     pendingInvalidations,
     setPendingInvalidations,
   } = useServerInvalidationContextInner();
+
+  const { showToastError } = useToast();
 
   useEffect(() => {
     async function innerAsync() {
@@ -49,7 +53,7 @@ export const ServerInvalidationEffects: React.FC<PropsType> = props => {
           setResultStatus('Success');
         } catch (e) {
           setResultStatus('Failed');
-          console.log(e);
+          throw e;
         }
       } finally {
         setPendingInvalidations(pm => {
@@ -61,7 +65,10 @@ export const ServerInvalidationEffects: React.FC<PropsType> = props => {
       }
     }
 
-    innerAsync().catch(console.log);
+    innerAsync().catch(err => {
+      showToastError('Failed fetching photos from server.');
+      console.log(err);
+    });
   }, [
     RefreshServerPhotosRequest,
     isFetchingRef,
@@ -71,6 +78,7 @@ export const ServerInvalidationEffects: React.FC<PropsType> = props => {
     setResultStatus,
     UpdatePhotoInfoRequest,
     UpdatePhotoInfoByMediaIdRequest,
+    showToastError,
   ]);
 
   return props.children;

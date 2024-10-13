@@ -8,33 +8,30 @@ import {
   updatePhotosServer,
 } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { useAppDispatch } from '~/Context/ReduxStore/Store';
-import { GetPhotosById, GetPhotosByMediaId } from '~/Helpers/ServerQueries';
-import { useGetPhotosBatched } from '~/Hooks/useServerQueries';
+import { useGetPhotosBatched, useServerQueries } from '~/Hooks/useServerQueries';
 
 export function useServerRequestsInner() {
   const dispatch = useAppDispatch();
 
   const { getPhotosBatched } = useGetPhotosBatched();
+  const { GetPhotosByIdPost, GetPhotosByMediaIdPost } = useServerQueries();
 
   const RefreshServerPhotosRequest = useCallback(
     async (n: number) => {
-      const photosFromServer = await getPhotosBatched({
+      const ret = await getPhotosBatched({
         number: n,
         offset: 0,
         photoType: 'data',
       });
 
-      if (!photosFromServer.ok) {
-        console.log('RefreshServerPhotosRequest: failed to get photos from server');
+      if (!ret.ok) {
         throw new Error(
           'RefreshServerPhotosRequest: failed to get photos from server, ' +
-            photosFromServer.errorCode +
-            ', ' +
-            photosFromServer.message,
+            JSON.stringify(ret),
         );
       }
 
-      const photos: PhotoServerType[] = photosFromServer.data.photos.map(ParseApiPhoto);
+      const photos: PhotoServerType[] = ret.data.photos.map(ParseApiPhoto);
 
       dispatch(setPhotosServer(photos));
     },
@@ -43,15 +40,11 @@ export function useServerRequestsInner() {
 
   const UpdatePhotoInfoRequest = useCallback(
     async (payload: { serverIds: string[] }) => {
-      const ret = await GetPhotosById.Post({ ids: payload.serverIds, photoType: 'data' });
+      const ret = await GetPhotosByIdPost({ ids: payload.serverIds, photoType: 'data' });
 
       if (!ret.ok) {
-        console.log('UpdatePhotoInfoRequest: failed to get photos from server');
         throw new Error(
-          'UpdatePhotoInfoRequest: failed to get photos from server, ' +
-            ret.errorCode +
-            ', ' +
-            ret.message,
+          'UpdatePhotoInfoRequest: failed to get photos from server, ' + JSON.stringify(ret),
         );
       }
 
@@ -67,12 +60,12 @@ export function useServerRequestsInner() {
 
       dispatch(updatePhotosServer(photos));
     },
-    [dispatch],
+    [dispatch, GetPhotosByIdPost],
   );
 
   const UpdatePhotoInfoByMediaIdRequest = useCallback(
     async (payload: { mediaIds: string[] }) => {
-      const ret = await GetPhotosByMediaId.Post({
+      const ret = await GetPhotosByMediaIdPost({
         deviceUniqueId: uniqueDeviceId,
         photoType: 'data',
         photosData: payload.mediaIds.map(mediaId => {
@@ -81,12 +74,9 @@ export function useServerRequestsInner() {
       });
 
       if (!ret.ok) {
-        console.log('UpdatePhotoInfoByMediaIdRequest: failed to get photos from server');
         throw new Error(
           'UpdatePhotoInfoByMediaIdRequest: failed to get photos from server, ' +
-            ret.errorCode +
-            ', ' +
-            ret.message,
+            JSON.stringify(ret),
         );
       }
 
@@ -102,7 +92,7 @@ export function useServerRequestsInner() {
 
       dispatch(updatePhotosServer(photos));
     },
-    [dispatch],
+    [dispatch, GetPhotosByMediaIdPost],
   );
 
   return {
