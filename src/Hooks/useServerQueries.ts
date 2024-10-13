@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 import { useServerContextFunctions } from '~/Context/Contexts/ServerContext';
-import { GetPhotosById } from '~/Helpers/ServerQueries';
+import { GetPhotosById, GetServerInfo } from '~/Helpers/ServerQueries';
 import { ErrorServerUnreachable } from '~/Helpers/ServerQueries/ExceptionsManager';
 import { ErrorCodes } from '~/Helpers/ServerQueries/Types/ErrorTypes';
 
@@ -42,6 +42,7 @@ export function useServerQueries() {
   return useMemo(() => {
     return {
       GetPhotosByIdPost: transformFunction(GetPhotosById.Post),
+      GetServerInfoPost: transformFunction(GetServerInfo.Post),
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setServerNotReachable]);

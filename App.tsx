@@ -18,9 +18,9 @@ function App(): React.JSX.Element {
   ConfigModules();
   return (
     <Provider store={store}>
-      <GlobalContexts>
-        <GlobalEffects>
-          <SafeAreaProvider>
+      <SafeAreaProvider>
+        <GlobalContexts>
+          <GlobalEffects>
             <GestureHandlerRootView style={{ flex: 1 }}>
               <ThemeContextProvider>
                 <PopupMessageModalContextProvider>
@@ -30,9 +30,9 @@ function App(): React.JSX.Element {
                 </PopupMessageModalContextProvider>
               </ThemeContextProvider>
             </GestureHandlerRootView>
-          </SafeAreaProvider>
-        </GlobalEffects>
-      </GlobalContexts>
+          </GlobalEffects>
+        </GlobalContexts>
+      </SafeAreaProvider>
     </Provider>
   );
 }

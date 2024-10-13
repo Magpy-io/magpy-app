@@ -1,5 +1,7 @@
 import React, { ReactNode, useEffect } from 'react';
 
+import { useToast } from '~/Hooks/useToast';
+
 import { useMainContext } from '../MainContext';
 import { useServerContext } from '../ServerContext';
 import { useLocalAccountContextFunctions } from './useLocalAccountContext';
@@ -13,13 +15,17 @@ export const LocalAccountEffects: React.FC<PropsType> = props => {
 
   const { isUsingLocalAccount } = useMainContext();
 
+  const { showToastError } = useToast();
   const { updateLocalAccountDetails } = useLocalAccountContextFunctions();
 
   useEffect(() => {
     if (isUsingLocalAccount && isServerReachable) {
-      updateLocalAccountDetails().catch(console.log);
+      updateLocalAccountDetails().catch(err => {
+        showToastError('Error getting server info.');
+        console.log(err);
+      });
     }
-  }, [isServerReachable, isUsingLocalAccount, updateLocalAccountDetails]);
+  }, [isServerReachable, isUsingLocalAccount, updateLocalAccountDetails, showToastError]);
 
   return props.children;
 };
