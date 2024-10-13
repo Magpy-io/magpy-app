@@ -7,7 +7,8 @@ import {
   photoCompressedExistsInCache,
   photoThumbnailExistsInCache,
 } from '~/Helpers/GalleryFunctions/Functions';
-import { GetPhotosById } from '~/Helpers/ServerQueries';
+import { useServerQueries } from '~/Hooks/useServerQueries';
+import { useToast } from '~/Hooks/useToast';
 
 export function useServerPhotoUri(
   serverPhoto: PhotoServerType | undefined,
@@ -18,6 +19,10 @@ export function useServerPhotoUri(
   const [cacheChecked, setCacheChecked] = useState(false);
 
   const { photoExistsInCache, addPhotoToCache } = getFunctionsForVariation(photoVariation);
+
+  const { GetPhotosByIdPost } = useServerQueries();
+
+  const { showToastError } = useToast();
 
   useEffect(() => {
     async function innerAsync() {
@@ -35,19 +40,28 @@ export function useServerPhotoUri(
 
   useEffect(() => {
     async function innerAsync() {
-      if (serverPhoto && photoUriNeeded && !serverPhotoUri && cacheChecked) {
-        const res = await GetPhotosById.Post({
-          ids: [serverPhoto.id],
-          photoType: photoVariation,
-        });
+      try {
+        if (serverPhoto && photoUriNeeded && !serverPhotoUri && cacheChecked) {
+          const res = await GetPhotosByIdPost({
+            ids: [serverPhoto.id],
+            photoType: photoVariation,
+          });
 
-        if (!res.ok || !res.data.photos[0].exists) {
-          throw new Error('Could not get photo by id');
+          if (!res.ok) {
+            throw new Error('Could not get photo by id, ' + JSON.stringify(res));
+          }
+
+          if (!res.data.photos[0].exists) {
+            throw new Error('Could not find photo by id in server, ' + serverPhoto.id);
+          }
+
+          const uri = await addPhotoToCache(serverPhoto.id, res.data.photos[0].photo.image64);
+
+          setServerPhotoUri(uri);
         }
-
-        const uri = await addPhotoToCache(serverPhoto.id, res.data.photos[0].photo.image64);
-
-        setServerPhotoUri(uri);
+      } catch (err) {
+        showToastError('Error fetching photo from server.');
+        throw err;
       }
     }
 
@@ -59,6 +73,8 @@ export function useServerPhotoUri(
     serverPhoto,
     photoVariation,
     addPhotoToCache,
+    GetPhotosByIdPost,
+    showToastError,
   ]);
 
   return serverPhotoUri;
