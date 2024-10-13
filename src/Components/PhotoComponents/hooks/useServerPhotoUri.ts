@@ -40,32 +40,30 @@ export function useServerPhotoUri(
 
   useEffect(() => {
     async function innerAsync() {
-      try {
-        if (serverPhoto && photoUriNeeded && !serverPhotoUri && cacheChecked) {
-          const res = await GetPhotosByIdPost({
-            ids: [serverPhoto.id],
-            photoType: photoVariation,
-          });
+      if (serverPhoto && photoUriNeeded && !serverPhotoUri && cacheChecked) {
+        const res = await GetPhotosByIdPost({
+          ids: [serverPhoto.id],
+          photoType: photoVariation,
+        });
 
-          if (!res.ok) {
-            throw new Error('Could not get photo by id, ' + JSON.stringify(res));
-          }
-
-          if (!res.data.photos[0].exists) {
-            throw new Error('Could not find photo by id in server, ' + serverPhoto.id);
-          }
-
-          const uri = await addPhotoToCache(serverPhoto.id, res.data.photos[0].photo.image64);
-
-          setServerPhotoUri(uri);
+        if (!res.ok) {
+          throw new Error('Could not get photo by id, ' + JSON.stringify(res));
         }
-      } catch (err) {
-        showToastError('Error fetching photo from server.');
-        throw err;
+
+        if (!res.data.photos[0].exists) {
+          throw new Error('Could not find photo by id in server, ' + serverPhoto.id);
+        }
+
+        const uri = await addPhotoToCache(serverPhoto.id, res.data.photos[0].photo.image64);
+
+        setServerPhotoUri(uri);
       }
     }
 
-    innerAsync().catch(console.log);
+    innerAsync().catch(err => {
+      showToastError('Error fetching photo from server.');
+      console.log(err);
+    });
   }, [
     photoUriNeeded,
     cacheChecked,
