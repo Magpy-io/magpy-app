@@ -8,8 +8,8 @@ import {
 } from '~/Context/ReduxStore/Slices/Photos/Selectors';
 import { useAppDispatch, useAppSelector } from '~/Context/ReduxStore/Store';
 import { addPhotoToDevice } from '~/Helpers/GalleryFunctions/Functions';
-import { UpdatePhotoMediaId } from '~/Helpers/ServerQueries';
-import { useGetPhotoWithProgress } from '~/Hooks/useServerQueries';
+import { useGetPhotoWithProgress, useServerQueries } from '~/Hooks/useServerQueries';
+import { useToast } from '~/Hooks/useToast';
 
 import { useServerInvalidationContext } from '../ServerInvalidationContext';
 import * as PhotosDownloadingActions from './PhotosDownloadingActions';
@@ -34,7 +34,10 @@ export const PhotosDownloadingEffects: React.FC<PropsType> = props => {
 
   const { InvalidatePhotos } = useServerInvalidationContext();
 
+  const { showToastError } = useToast();
+
   const { getPhotoWithProgress } = useGetPhotoWithProgress();
+  const { UpdatePhotoMediaIdPost } = useServerQueries();
 
   const dispatch = useAppDispatch();
 
@@ -63,7 +66,7 @@ export const PhotosDownloadingEffects: React.FC<PropsType> = props => {
 
         console.log('Downloading  photo', photoDownloading.serverId);
 
-        const result = await getPhotoWithProgress(
+        const resultDownload = await getPhotoWithProgress(
           photoDownloading.serverId,
           (p: number, t: number) => {
             photosDownloadingDispatch(
@@ -75,14 +78,13 @@ export const PhotosDownloadingEffects: React.FC<PropsType> = props => {
           },
         );
 
-        if (!result.ok) {
-          console.log(result.errorCode);
+        if (!resultDownload.ok) {
           // TODO manage retries
-          return;
+          throw new Error('Error downloading photo, ' + JSON.stringify(resultDownload));
         }
 
         console.log('photo downloaded');
-        const photoServer = result.data.photo;
+        const photoServer = resultDownload.data.photo;
 
         const localPhoto = await addPhotoToDevice({
           fileName: photoServer.meta.name,
@@ -90,16 +92,16 @@ export const PhotosDownloadingEffects: React.FC<PropsType> = props => {
           image64: photoServer.image64,
         });
 
-        const result1 = await UpdatePhotoMediaId.Post({
+        const resultMediaIdUpdate = await UpdatePhotoMediaIdPost({
           id: photoServer.id,
           mediaId: localPhoto.id,
           deviceUniqueId: uniqueDeviceId,
         });
 
-        if (!result1.ok) {
-          console.log('Error updating uri on server');
-          console.log(result1.errorCode);
-          return;
+        if (!resultMediaIdUpdate.ok) {
+          throw new Error(
+            'Error updating uri on server, ' + JSON.stringify(resultMediaIdUpdate),
+          );
         }
 
         dispatch(
@@ -112,7 +114,10 @@ export const PhotosDownloadingEffects: React.FC<PropsType> = props => {
       }
     }
 
-    innerAsync().catch(console.log);
+    innerAsync().catch(err => {
+      showToastError('Error while downloading photo.');
+      console.log(err);
+    });
   }, [
     photosDownloadingDispatch,
     InvalidatePhotos,
@@ -121,6 +126,8 @@ export const PhotosDownloadingEffects: React.FC<PropsType> = props => {
     photosLocal,
     dispatch,
     getPhotoWithProgress,
+    UpdatePhotoMediaIdPost,
+    showToastError,
   ]);
 
   return props.children;

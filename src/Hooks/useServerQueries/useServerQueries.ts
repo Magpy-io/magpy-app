@@ -6,6 +6,7 @@ import {
   GetPhotos,
   GetPhotosById,
   GetServerInfo,
+  UpdatePhotoMediaId,
 } from '~/Helpers/ServerQueries';
 import { ErrorServerUnreachable } from '~/Helpers/ServerQueries/ExceptionsManager';
 import { ErrorCodes } from '~/Helpers/ServerQueries/Types/ErrorTypes';
@@ -50,6 +51,7 @@ export function useServerQueries() {
       GetServerInfoPost: transformFunction(GetServerInfo.Post),
       GetPhotosPost: transformFunction(GetPhotos.Post),
       GetPhotoPartByIdPost: transformFunction(GetPhotoPartById.Post),
+      UpdatePhotoMediaIdPost: transformFunction(UpdatePhotoMediaId.Post),
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setServerNotReachable]);
