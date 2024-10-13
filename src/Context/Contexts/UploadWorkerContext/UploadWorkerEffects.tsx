@@ -6,6 +6,7 @@ import { addPhotosFromLocalToServer } from '~/Context/ReduxStore/Slices/Photos/P
 import { useAppDispatch } from '~/Context/ReduxStore/Store';
 import { APIPhoto } from '~/Helpers/ServerQueries/Types';
 import { useHasValueChanged } from '~/Hooks/useHasValueChanged';
+import { useToast } from '~/Hooks/useToast';
 import {
   UploadMediaEvents,
   UploadMediaModule,
@@ -31,6 +32,8 @@ export const UploadWorkerEffects: React.FC<PropsType> = props => {
 
   const [workerStatus, setWorkerStatus] = useState<WorkerStatus>('WORKER_SUCCESS');
   const workerStatusChanged = useHasValueChanged(workerStatus, 'WORKER_SUCCESS');
+
+  const { showToastError } = useToast();
 
   const {
     queuedPhotosToUpload,
@@ -152,12 +155,17 @@ export const UploadWorkerEffects: React.FC<PropsType> = props => {
     }
 
     setCurrentPhotosUploading(new Set());
+
+    if (workerStatus == 'WORKER_FAILED') {
+      showToastError('Photos upload failed.');
+    }
   }, [
     InvalidatePhotosByMediaId,
     setCurrentPhotosUploading,
     currentPhotosUploading,
     workerStatus,
     workerStatusChanged,
+    showToastError,
   ]);
 
   return props.children;
