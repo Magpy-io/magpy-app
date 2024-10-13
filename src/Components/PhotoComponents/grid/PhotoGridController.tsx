@@ -114,7 +114,7 @@ const PhotoGridController = forwardRef<PhotoGridComponentRefType, PropsType>(
     }, [resetSelection]);
 
     const onRefresh = useCallback(() => {
-      RefreshAllPhotos(5000, 5000).catch(console.log);
+      RefreshAllPhotos(5000).catch(console.log);
     }, [RefreshAllPhotos]);
 
     const menuButton = useCallback(

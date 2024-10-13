@@ -1,24 +1,47 @@
-import React, { ReactNode, createContext, useContext } from 'react';
+import React, { ReactNode, createContext, useContext, useState } from 'react';
 
 import { UploadWorkerEffects } from './UploadWorkerEffects';
 
-export type UploadWorkerDataType = null;
+type SetStateType<T> = React.Dispatch<React.SetStateAction<T>>;
 
-const UploadWorkerContext = createContext<UploadWorkerDataType>(null);
+export type UploadWorkerDataType = {
+  currentPhotosUploading: Set<string>;
+  queuedPhotosToUpload: Set<string>;
+  setCurrentPhotosUploading: SetStateType<Set<string>>;
+  setQueuedPhotosToUpload: SetStateType<Set<string>>;
+};
+
+const initialState: UploadWorkerDataType = {
+  currentPhotosUploading: new Set(),
+  queuedPhotosToUpload: new Set(),
+  setCurrentPhotosUploading: () => {},
+  setQueuedPhotosToUpload: () => {},
+};
+
+const UploadWorkerContext = createContext<UploadWorkerDataType>(initialState);
 
 type PropsType = {
   children: ReactNode;
 };
 
 export const UploadWorkerContextProvider: React.FC<PropsType> = props => {
+  const [currentPhotosUploading, setCurrentPhotosUploading] = useState(new Set<string>());
+  const [queuedPhotosToUpload, setQueuedPhotosToUpload] = useState(new Set<string>());
+
   return (
-    <UploadWorkerContext.Provider value={null}>
+    <UploadWorkerContext.Provider
+      value={{
+        currentPhotosUploading,
+        queuedPhotosToUpload,
+        setCurrentPhotosUploading,
+        setQueuedPhotosToUpload,
+      }}>
       <UploadWorkerEffects>{props.children}</UploadWorkerEffects>
     </UploadWorkerContext.Provider>
   );
 };
 
-export function useUploadWorkerContext(): UploadWorkerDataType {
+export function useUploadWorkerContextInner(): UploadWorkerDataType {
   const context = useContext(UploadWorkerContext);
 
   if (!context) {

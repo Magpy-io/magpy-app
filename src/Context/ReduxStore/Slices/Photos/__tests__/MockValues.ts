@@ -98,8 +98,6 @@ export function makeServerPhoto(options?: {
     date: options?.date ?? defaultDate,
     syncDate: defaultDate,
     mediaId: options?.mediaId ?? 'mediaIdForServerPhoto',
-    uriThumbnail: '',
-    uriCompressed: '',
   };
 }
 

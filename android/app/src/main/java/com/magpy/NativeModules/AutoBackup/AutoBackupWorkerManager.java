@@ -1,6 +1,7 @@
 package com.magpy.NativeModules.AutoBackup;
 
 import static com.magpy.Workers.AutoBackupWorker.UPLOADED_PHOTO_MEDIA_ID;
+import static com.magpy.Workers.UploadWorker.UPLOADED_PHOTO_STRING;
 
 import android.content.Context;
 import android.util.Log;
@@ -31,7 +32,7 @@ public class AutoBackupWorkerManager {
         this.context = context;
     }
 
-    public void StartWorker(String url, String serverToken, String deviceId, Observer<String> observer) throws ExecutionException, InterruptedException {
+    public void StartWorker(String url, String serverToken, String deviceId, Observer<ObserverData> observer) throws ExecutionException, InterruptedException {
 
         Constraints constraints = new Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.UNMETERED)
@@ -57,17 +58,23 @@ public class AutoBackupWorkerManager {
         SetupWorkerObserver(observer);
     }
 
-    private void SetupWorkerObserver(Observer<String> observer) throws ExecutionException, InterruptedException {
+    private void SetupWorkerObserver(Observer<ObserverData> observer) throws ExecutionException, InterruptedException {
         WorkInfo result = GetWorker();
         ExecutorsManager.ExecuteOnMainThread(() -> {
             try{
                 WorkManager.getInstance(context).getWorkInfoByIdLiveData(result.getId()).observe(ProcessLifecycleOwner.get(), (workInfo -> {
                     if (workInfo != null) {
+
+                        ObserverData data = new ObserverData();
+
                         Data progress = workInfo.getProgress();
                         String uploadedMediaId = progress.getString(UPLOADED_PHOTO_MEDIA_ID);
+                        String uploadedPhoto = progress.getString(UPLOADED_PHOTO_STRING);
 
                         if(uploadedMediaId != null){
-                            observer.onChanged(uploadedMediaId);
+                            data.mediaId = uploadedMediaId;
+                            data.photo = uploadedPhoto;
+                            observer.onChanged(data);
                         }
                     }
                 }));
@@ -102,5 +109,10 @@ public class AutoBackupWorkerManager {
 
     public void StopWorker() throws ExecutionException, InterruptedException {
         WorkManager.getInstance(context).cancelUniqueWork(AutoBackupWorker.WORKER_NAME).getResult().get();
+    }
+
+    public class ObserverData{
+        public String mediaId;
+        public String photo;
     }
 }

@@ -1,24 +1,29 @@
 import { useCallback } from 'react';
 
-import { uniqueDeviceId } from '~/Config/config';
-import { UploadMediaModule } from '~/NativeModules/UploadMediaModule';
+import { useUploadWorkerContextInner } from './UploadWorkerContext';
 
-import { useServerContext } from '../ServerContext';
-
-export function useUploadWorkerFunctions() {
-  const { serverPath, token } = useServerContext();
+export function useUploadWorkerContext() {
+  const { setQueuedPhotosToUpload, currentPhotosUploading, queuedPhotosToUpload } =
+    useUploadWorkerContextInner();
 
   const UploadPhotosWorker = useCallback(
-    async (mediaIds: string[]) => {
-      await UploadMediaModule.StartUploadWorker({
-        url: serverPath ?? '',
-        deviceId: uniqueDeviceId,
-        serverToken: token ?? '',
-        photosIds: mediaIds,
+    (mediaIds: string[]) => {
+      setQueuedPhotosToUpload(oldQueued => {
+        return new Set([...oldQueued, ...mediaIds]);
       });
     },
-    [serverPath, token],
+    [setQueuedPhotosToUpload],
   );
 
-  return { UploadPhotosWorker };
+  const IsMediaIdUploadQueued = useCallback(
+    (mediaId: string) => {
+      return currentPhotosUploading.has(mediaId) || queuedPhotosToUpload.has(mediaId);
+    },
+    [currentPhotosUploading, queuedPhotosToUpload],
+  );
+
+  return {
+    UploadPhotosWorker,
+    IsMediaIdUploadQueued,
+  };
 }

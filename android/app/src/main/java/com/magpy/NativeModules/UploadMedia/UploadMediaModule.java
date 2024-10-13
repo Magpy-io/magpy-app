@@ -12,9 +12,24 @@ import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeMap;
 import com.magpy.Utils.BridgeFunctions;
 
+import java.util.Objects;
+
 public class UploadMediaModule extends ReactContextBaseJavaModule {
 
     public static final String EVENT_PHOTO_UPLOADED = "PHOTO_UPLOADED_EVENT_NAME";
+    public static final String EVENT_WORKER_STATUS_CHANGED = "WORKER_STATUS_CHANGED_NAME";
+
+    public static final String WORKER_ENQUEUED = "WORKER_ENQUEUED";
+    public static final String WORKER_RUNNING = "WORKER_RUNNING";
+    public static final String WORKER_FAILED = "WORKER_FAILED";
+    public static final String WORKER_SUCCESS = "WORKER_SUCCESS";
+    public static final String WORKER_CANCELED = "WORKER_CANCELED";
+
+    public static final String EVENT_FIELD_NAME_MEDIA_ID = "mediaId";
+    public static final String EVENT_FIELD_NAME_PHOTO = "photo";
+
+
+    public String workerStatus = WORKER_SUCCESS;
 
     public UploadMediaModule(ReactApplicationContext context) {
         super(context);
@@ -65,10 +80,32 @@ public class UploadMediaModule extends ReactContextBaseJavaModule {
             mPromise.reject("Error", "photosIds should be an array of strings.");
             return;
         }
-        uploadWorkerManager.StartWorker(url, serverToken, deviceId, photosIds, mediaId -> {
-            WritableMap params = new WritableNativeMap();
-            params.putString("mediaId", mediaId);
-            BridgeFunctions.sendEvent(getReactApplicationContext(), EVENT_PHOTO_UPLOADED, params);
+
+        uploadWorkerManager.StartWorker(url, serverToken, deviceId, photosIds, observerData -> {
+            if(observerData.mediaId != null){
+                WritableMap params = new WritableNativeMap();
+                params.putString(EVENT_FIELD_NAME_MEDIA_ID, observerData.mediaId);
+                params.putString(EVENT_FIELD_NAME_PHOTO, observerData.photo);
+                BridgeFunctions.sendEvent(getReactApplicationContext(), EVENT_PHOTO_UPLOADED, params);
+            }
+
+            String newWorkerStatus = "";
+            switch (observerData.workerState){
+                case SUCCEEDED -> newWorkerStatus = WORKER_SUCCESS;
+                case ENQUEUED -> newWorkerStatus = WORKER_ENQUEUED;
+                case RUNNING -> newWorkerStatus = WORKER_RUNNING;
+                case CANCELLED -> newWorkerStatus = WORKER_CANCELED;
+                default -> newWorkerStatus = WORKER_FAILED;
+            }
+
+
+            if(!newWorkerStatus.equals(workerStatus)){
+                workerStatus = newWorkerStatus;
+                WritableMap params = new WritableNativeMap();
+                params.putString("status", workerStatus);
+                BridgeFunctions.sendEvent(getReactApplicationContext(), EVENT_WORKER_STATUS_CHANGED, params);
+            }
+
         });
     }
 

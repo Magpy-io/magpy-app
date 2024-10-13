@@ -1,14 +1,15 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
-import { usePhotosFunctionsStore } from '~/Context/ReduxStore/Slices/Photos/PhotosFunctions';
 import {
   photoLocalSelector,
   photoServerSelector,
 } from '~/Context/ReduxStore/Slices/Photos/Selectors';
 import { useAppSelector } from '~/Context/ReduxStore/Store';
 import { borderRadius } from '~/Styles/spacing';
+
+import { useServerPhotoUri } from '../PhotoComponents/grid/useServerPhotoUri';
 
 export default function RecentPhotoComponent({
   photo,
@@ -21,20 +22,14 @@ export default function RecentPhotoComponent({
   const localPhoto = useAppSelector(photoLocalSelector(photo.mediaId));
   const serverPhoto = useAppSelector(photoServerSelector(photo.serverId));
 
-  const { AddPhotoThumbnailIfMissing } = usePhotosFunctionsStore();
-
-  useEffect(() => {
-    if (serverPhoto && !localPhoto && !serverPhoto.uriThumbnail) {
-      AddPhotoThumbnailIfMissing(serverPhoto).catch(console.log);
-    }
-  }, [AddPhotoThumbnailIfMissing, localPhoto, serverPhoto]);
+  const uriThumbnail = useServerPhotoUri(serverPhoto, !localPhoto, 'thumbnail');
 
   let uriSource = '';
 
   if (localPhoto) {
     uriSource = localPhoto.uri;
-  } else if (serverPhoto?.uriThumbnail) {
-    uriSource = serverPhoto.uriThumbnail;
+  } else if (uriThumbnail) {
+    uriSource = uriThumbnail;
   }
   return uriSource ? (
     <Image

@@ -41,19 +41,19 @@ export function LoginServerForm() {
         console.log(loginRet);
 
         if (loginRet.errorCode == 'INVALID_CREDENTIALS') {
-          showToastError('Invalid username or password', 'top');
+          showToastError('Invalid username or password');
         } else if (loginRet.errorCode == 'SERVER_NOT_CLAIMED') {
-          showToastError('Server is not claimed', 'top');
+          showToastError('Server is not claimed');
         } else {
-          showToastError('Unexpected error while connecting to server', 'top');
+          showToastError('Unexpected error while connecting to server');
         }
       }
     } catch (err) {
       console.log('Login Error', err);
       if (err instanceof ErrorServerUnreachable) {
-        showToastError('Server unreachable', 'top');
+        showToastError('Server unreachable');
       } else {
-        showToastError('Unexpected error while claiming server', 'top');
+        showToastError('Unexpected error while claiming server');
       }
     }
   };

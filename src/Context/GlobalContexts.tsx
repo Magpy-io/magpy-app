@@ -11,6 +11,7 @@ import { BackupWorkerContextProvider } from './Contexts/BackupWorkerContext';
 import { LocalAccountContextProvider } from './Contexts/LocalAccountContext';
 import { MainContextProvider } from './Contexts/MainContext';
 import { PermissionsContextProvider } from './Contexts/PermissionsContext';
+import { ServerInvalidationContextProvider } from './Contexts/ServerInvalidationContext';
 
 type PropsType = {
   children: ReactNode;
@@ -20,23 +21,25 @@ export const GlobalContexts: React.FC<PropsType> = props => {
   return (
     <PermissionsContextProvider>
       <MainContextProvider>
-        <AuthContextProvider>
-          <LocalServersContextProvider>
-            <UploadWorkerContextProvider>
+        <ServerInvalidationContextProvider>
+          <AuthContextProvider>
+            <LocalServersContextProvider>
               <ServerClaimContextProvider>
                 <ServerContextProvider>
-                  <LocalAccountContextProvider>
-                    <PhotosDownloadingContextProvider>
-                      <BackupWorkerContextProvider>
-                        {props.children}
-                      </BackupWorkerContextProvider>
-                    </PhotosDownloadingContextProvider>
-                  </LocalAccountContextProvider>
+                  <UploadWorkerContextProvider>
+                    <LocalAccountContextProvider>
+                      <PhotosDownloadingContextProvider>
+                        <BackupWorkerContextProvider>
+                          {props.children}
+                        </BackupWorkerContextProvider>
+                      </PhotosDownloadingContextProvider>
+                    </LocalAccountContextProvider>
+                  </UploadWorkerContextProvider>
                 </ServerContextProvider>
               </ServerClaimContextProvider>
-            </UploadWorkerContextProvider>
-          </LocalServersContextProvider>
-        </AuthContextProvider>
+            </LocalServersContextProvider>
+          </AuthContextProvider>
+        </ServerInvalidationContextProvider>
       </MainContextProvider>
     </PermissionsContextProvider>
   );

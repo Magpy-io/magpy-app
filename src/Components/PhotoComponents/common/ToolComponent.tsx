@@ -15,6 +15,7 @@ type ToolComponentProps = {
   onPress: () => void;
   showNumber?: boolean;
   number?: number;
+  disabled?: boolean;
 };
 
 //last one is partially visible
@@ -22,6 +23,7 @@ const NUM_TOOLS_VISIBLE = 5;
 
 const ToolComponent = React.memo(function ToolComponent({
   icon: Icon,
+  disabled,
   ...props
 }: ToolComponentProps) {
   const styles = useStyles(makeStyles);
@@ -31,6 +33,7 @@ const ToolComponent = React.memo(function ToolComponent({
     width / NUM_TOOLS_VISIBLE + width / (NUM_TOOLS_VISIBLE * 2 * (NUM_TOOLS_VISIBLE - 1));
   return (
     <TouchableHighlight
+      disabled={disabled}
       onPress={props.onPress}
       style={[
         styles.toolComponent,

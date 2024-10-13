@@ -37,6 +37,7 @@ public class UploadWorker extends Worker {
     final String CHANNEL_ID = "UPLOAD CHANNEL";
 
     public static final String UPLOADED_PHOTO_MEDIA_ID = "UPLOADED_PHOTO_MEDIA_ID";
+    public static final String UPLOADED_PHOTO_STRING = "UPLOADED_PHOTO_STRING";
 
     public static final String WORKER_NAME = "UPLOAD_WORKER_NAME";
     public static final String DATA_KEY_URL = "URL";
@@ -124,16 +125,15 @@ public class UploadWorker extends Worker {
                 }
 
                 try{
-                    photoUploader.uploadPhoto(photoData);
-                    setProgressAsync(new Data.Builder().putString(UPLOADED_PHOTO_MEDIA_ID, mediaId).build());
+                    String photoUploaded = photoUploader.uploadPhoto(photoData);
+                    Data progressData = new Data.Builder()
+                            .putString(UPLOADED_PHOTO_MEDIA_ID, mediaId)
+                            .putString(UPLOADED_PHOTO_STRING, photoUploaded)
+                            .build();
+                    setProgressAsync(progressData);
                 }
                 catch (ResponseNotOkException e){
-                    if(e.GetErrorCode().equals("PHOTO_EXISTS")){
-                        setProgressAsync(new Data.Builder().putString(UPLOADED_PHOTO_MEDIA_ID, mediaId).build());
-                        Log.i("UploadWorker", "Failed upload of photo with mediaId: " + mediaId + " because it already exists in server.", e);
-                    }else{
-                        Log.e("UploadWorker", "Failed upload of photo with mediaId: " + mediaId, e);
-                    }
+                    Log.e("UploadWorker", "Failed upload of photo with mediaId: " + mediaId, e);
                 }
             }
 

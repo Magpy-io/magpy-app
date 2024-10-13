@@ -11,8 +11,6 @@ export type PhotoServerType = {
   date: string;
   syncDate: string;
   mediaId: string | undefined;
-  uriThumbnail: string | undefined;
-  uriCompressed: string | undefined;
 };
 
 export type PhotoLocalType = {
@@ -83,47 +81,49 @@ const photosServerSlice = createSlice({
       state.photosGallery = mergePhotos(state);
     },
 
-    addPhotosServer: (state, action: { payload: PhotoServerType[] }) => {
-      state.photosServer = action.payload.reduce((accumulator: PhotosServerType, photo) => {
-        accumulator[photo.id] = photo;
-        return accumulator;
-      }, state.photosServer);
-
-      state.photosServerIdsOrdered = [
-        ...state.photosServerIdsOrdered,
-        ...action.payload.map(photo => photo.id),
-      ];
-      state.photosGallery = mergePhotos(state);
-    },
-
-    addCompressedPhotoById: (state, action: { payload: { id: string; uri: string } }) => {
-      state.photosServer[action.payload.id].uriCompressed = action.payload.uri;
-    },
-
-    addThumbnailPhotoById: (state, action: { payload: { id: string; uri: string } }) => {
-      state.photosServer[action.payload.id].uriThumbnail = action.payload.uri;
-    },
-
-    addMediaIdToServerPhoto: (state, action: { payload: { id: string; mediaId: string } }) => {
-      state.photosServer[action.payload.id].mediaId = action.payload.mediaId;
-    },
-
-    addPhotoFromLocalToServer: (
+    updatePhotosServer: (
       state,
-      action: { payload: { photoServer: PhotoServerType; mediaId: string } },
+      action: { payload: { id: string; photo: PhotoServerType | null }[] },
     ) => {
-      state.photosServer[action.payload.photoServer.id] = action.payload.photoServer;
+      let anyChanged = false;
 
-      insertPhotoKeyWithOrder(
-        state.photosServer,
-        state.photosServerIdsOrdered,
-        action.payload.photoServer,
-      );
+      action.payload.forEach(v => {
+        const photoServer = state.photosServer[v.id];
 
-      const galleryPhoto = state.photosGallery.find(p => p.mediaId == action.payload.mediaId);
+        // Photo was deleted
+        if (photoServer && !v.photo) {
+          delete state.photosServer[v.id];
 
-      if (galleryPhoto) {
-        galleryPhoto.serverId = action.payload.photoServer.id;
+          state.photosServerIdsOrdered = state.photosServerIdsOrdered.filter(serverId => {
+            return serverId != v.id;
+          });
+          anyChanged = true;
+          return;
+        }
+
+        // Photo was added
+        if (!photoServer && v.photo) {
+          state.photosServer[v.id] = v.photo;
+          insertPhotoKeyWithOrder(state.photosServer, state.photosServerIdsOrdered, v.photo);
+          anyChanged = true;
+          return;
+        }
+
+        // Update photo if changed, assumes that only value that can change is mediaId
+        // This is the case when downloading a photo to device
+        if (photoServer && v.photo) {
+          if (photoServer.mediaId == v.photo.mediaId) {
+            return; // no change
+          }
+
+          photoServer.mediaId = v.photo.mediaId;
+          anyChanged = true;
+          return;
+        }
+      });
+
+      if (anyChanged) {
+        state.photosGallery = mergePhotos(state);
       }
     },
 
@@ -159,6 +159,8 @@ const photosServerSlice = createSlice({
         action.payload.photoLocal,
       );
 
+      state.photosServer[action.payload.serverId].mediaId = action.payload.photoLocal.id;
+
       const galleryPhoto = state.photosGallery.find(
         p => p.serverId == action.payload.serverId,
       );
@@ -191,45 +193,17 @@ const photosServerSlice = createSlice({
 
       state.photosGallery = mergePhotos(state);
     },
-
-    deletePhotos: (state, action: { payload: { photos: PhotoGalleryType[] } }) => {
-      const mediaIds = action.payload.photos.map(p => p.mediaId);
-      const serverIds = action.payload.photos.map(p => p.serverId);
-
-      mediaIds.forEach(mediaId => {
-        delete state.photosLocal[mediaId ?? ''];
-      });
-
-      serverIds.forEach(serverId => {
-        delete state.photosServer[serverId ?? ''];
-      });
-
-      state.photosLocalIdsOrdered = state.photosLocalIdsOrdered.filter(mediaId => {
-        return !mediaIds.includes(mediaId);
-      });
-
-      state.photosServerIdsOrdered = state.photosServerIdsOrdered.filter(serverId => {
-        return !serverIds.includes(serverId);
-      });
-
-      state.photosGallery = mergePhotos(state);
-    },
   },
 });
 
 export const {
   setPhotosServer,
-  addPhotosServer,
   setPhotosLocal,
-  addCompressedPhotoById,
-  addThumbnailPhotoById,
-  addMediaIdToServerPhoto,
-  addPhotoFromLocalToServer,
+  updatePhotosServer,
   addPhotosFromLocalToServer,
   addPhotoFromServerToLocal,
   deletePhotosFromLocal,
   deletePhotosFromServer,
-  deletePhotos,
 } = photosServerSlice.actions;
 
 export default photosServerSlice.reducer;

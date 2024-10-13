@@ -1,10 +1,7 @@
 import React, { ReactNode, useEffect, useRef } from 'react';
 
 import { uniqueDeviceId } from '~/Config/config';
-import {
-  addMediaIdToServerPhoto,
-  addPhotoFromServerToLocal,
-} from '~/Context/ReduxStore/Slices/Photos/Photos';
+import { addPhotoFromServerToLocal } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import {
   photosLocalSelector,
   photosServerSelector,
@@ -14,6 +11,7 @@ import { addPhotoToDevice } from '~/Helpers/GalleryFunctions/Functions';
 import * as Queries from '~/Helpers/Queries';
 import { UpdatePhotoMediaId } from '~/Helpers/ServerQueries';
 
+import { useServerInvalidationContext } from '../ServerInvalidationContext';
 import * as PhotosDownloadingActions from './PhotosDownloadingActions';
 import {
   usePhotosDownloadingContext,
@@ -29,11 +27,14 @@ export const PhotosDownloadingEffects: React.FC<PropsType> = props => {
   const photosDownloadingContext = usePhotosDownloadingContext();
   const { photosDownloading } = photosDownloadingContext;
 
-  const AppDisptach = useAppDispatch();
   const photosServer = useAppSelector(photosServerSelector);
   const photosLocal = useAppSelector(photosLocalSelector);
 
   const isEffectRunning = useRef(false);
+
+  const { InvalidatePhotos } = useServerInvalidationContext();
+
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     async function innerAsync() {
@@ -41,14 +42,14 @@ export const PhotosDownloadingEffects: React.FC<PropsType> = props => {
         return;
       }
 
+      if (photosDownloading.length == 0) {
+        return;
+      }
+
       try {
         isEffectRunning.current = true;
 
-        if (photosDownloading.length == 0) {
-          return;
-        }
-
-        const photoDownloading = photosDownloading[0];
+        const [photoDownloading] = photosDownloading;
 
         const serverPhotoMediaId = photosServer[photoDownloading.serverId].mediaId;
 
@@ -63,7 +64,6 @@ export const PhotosDownloadingEffects: React.FC<PropsType> = props => {
         const result = await Queries.getPhotoWithProgress(
           photoDownloading.serverId,
           (p: number, t: number) => {
-            console.log('Downloaded part', p, 'out of', t);
             photosDownloadingDispatch(
               PhotosDownloadingActions.update({
                 serverId: photoDownloading.serverId,
@@ -76,7 +76,6 @@ export const PhotosDownloadingEffects: React.FC<PropsType> = props => {
         if (!result.ok) {
           console.log(result.errorCode);
           // TODO manage retries
-          photosDownloadingDispatch(PhotosDownloadingActions.shift());
           return;
         }
 
@@ -89,10 +88,6 @@ export const PhotosDownloadingEffects: React.FC<PropsType> = props => {
           image64: photoServer.image64,
         });
 
-        AppDisptach(
-          addPhotoFromServerToLocal({ photoLocal: localPhoto, serverId: photoServer.id }),
-        );
-
         const result1 = await UpdatePhotoMediaId.Post({
           id: photoServer.id,
           mediaId: localPhoto.id,
@@ -102,18 +97,28 @@ export const PhotosDownloadingEffects: React.FC<PropsType> = props => {
         if (!result1.ok) {
           console.log('Error updating uri on server');
           console.log(result1.errorCode);
+          return;
         }
 
-        AppDisptach(addMediaIdToServerPhoto({ id: photoServer.id, mediaId: localPhoto.id }));
-
-        photosDownloadingDispatch(PhotosDownloadingActions.shift());
+        dispatch(
+          addPhotoFromServerToLocal({ photoLocal: localPhoto, serverId: photoServer.id }),
+        );
+        InvalidatePhotos({ serverIds: [photoServer.id] });
       } finally {
+        photosDownloadingDispatch(PhotosDownloadingActions.shift());
         isEffectRunning.current = false;
       }
     }
 
     innerAsync().catch(console.log);
-  }, [photosDownloadingDispatch, AppDisptach, photosDownloading, photosServer, photosLocal]);
+  }, [
+    photosDownloadingDispatch,
+    InvalidatePhotos,
+    photosDownloading,
+    photosServer,
+    photosLocal,
+    dispatch,
+  ]);
 
   return props.children;
 };

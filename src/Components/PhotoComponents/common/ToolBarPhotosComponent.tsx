@@ -30,6 +30,8 @@ type ToolBarPhotosComponentProps = {
   nbPhotosToDeleteEverywhere: number;
   nbPhotosToDeleteFromServer: number;
   nbPhotosToDeleteFromDevice: number;
+  isPhotoBeingUploaded: boolean;
+  isPhotoBeingDownloaded: boolean;
 };
 
 function ToolBarPhotosComponent(props: ToolBarPhotosComponentProps) {
@@ -40,6 +42,8 @@ function ToolBarPhotosComponent(props: ToolBarPhotosComponentProps) {
     nbPhotosToDeleteEverywhere,
     nbPhotosToDeleteFromServer,
     nbPhotosToDeleteFromDevice,
+    isPhotoBeingUploaded,
+    isPhotoBeingDownloaded,
     onBackUp,
     onDelete,
     onDeleteFromDevice,
@@ -57,8 +61,9 @@ function ToolBarPhotosComponent(props: ToolBarPhotosComponentProps) {
       {nbPhotosToBackUp > 0 && (
         <ToolComponent
           icon={UploadIcon}
-          text="Back up"
+          text={isPhotoBeingUploaded ? 'Backing up...' : 'Back up'}
           onPress={onBackUp}
+          disabled={isPhotoBeingUploaded}
           showNumber={showNumber}
           number={nbPhotosToBackUp}
         />
@@ -67,8 +72,9 @@ function ToolBarPhotosComponent(props: ToolBarPhotosComponentProps) {
       {nbPhotosToDownload > 0 && (
         <ToolComponent
           icon={DownloadIcon}
-          text="Download"
+          text={isPhotoBeingDownloaded ? 'Downloading...' : 'Download'}
           onPress={onDownload}
+          disabled={isPhotoBeingDownloaded}
           showNumber={showNumber}
           number={nbPhotosToDownload}
         />

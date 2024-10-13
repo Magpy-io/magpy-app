@@ -5,7 +5,7 @@ import { MediaManagementModule } from '~/NativeModules/MediaManagementModule';
 
 import { parsePhotoIdentifierToPhotoLocalType } from './GetGalleryPhotos';
 
-export async function deletePhotoFromDevice(mediaIds: string[]) {
+export async function deletePhotosFromDevice(mediaIds: string[]) {
   await MediaManagementModule.deleteMedia(mediaIds);
 }
 
@@ -48,7 +48,7 @@ export async function addPhotoToDevice(photo: {
 }): Promise<PhotoLocalType> {
   const imageName = await getFirstPossibleFileName(photo.fileName);
 
-  const cachePhotoPath = RNFS.ExternalCachesDirectoryPath + `/${imageName}`;
+  const cachePhotoPath = PhotosCacheFolder() + `/${imageName}`;
   await RNFS.writeFile(cachePhotoPath, photo.image64, 'base64');
 
   const imageData = await MediaManagementModule.saveToCameraRoll(cachePhotoPath, {
@@ -61,35 +61,75 @@ export async function addPhotoToDevice(photo: {
 }
 
 export async function addPhotoThumbnailToCache(id: string, image: string) {
-  const cachePhotoPath = RNFS.ExternalCachesDirectoryPath + `/thumbnail_${id}`;
+  await CheckPhotosCacheFolderExists();
+  const cachePhotoPath = PhotosCacheFolder() + `/thumbnail_${id}`;
   await RNFS.writeFile(cachePhotoPath, image, 'base64');
   return 'file://' + cachePhotoPath;
 }
 
 export async function addPhotoCompressedToCache(id: string, image: string) {
-  const cachePhotoPath = RNFS.ExternalCachesDirectoryPath + `/compressed_${id}`;
+  await CheckPhotosCacheFolderExists();
+  const cachePhotoPath = PhotosCacheFolder() + `/compressed_${id}`;
   await RNFS.writeFile(cachePhotoPath, image, 'base64');
   return 'file://' + cachePhotoPath;
 }
 
-export async function photoThumbnailExistsInCache(id: string) {
-  const cachePhotoPath = RNFS.ExternalCachesDirectoryPath + `/thumbnail_${id}`;
+export async function photoThumbnailExistsInCache(id: string): Promise<string | null> {
+  const cachePhotoPath = PhotosCacheFolder() + `/thumbnail_${id}`;
   const exists = await RNFS.exists(cachePhotoPath);
 
-  return { exists: exists, uri: 'file://' + cachePhotoPath };
+  if (exists) {
+    return 'file://' + cachePhotoPath;
+  } else {
+    return null;
+  }
 }
 
-export async function photoCompressedExistsInCache(id: string) {
-  const cachePhotoPath = RNFS.ExternalCachesDirectoryPath + `/compressed_${id}`;
+export async function photoCompressedExistsInCache(id: string): Promise<string | null> {
+  const cachePhotoPath = PhotosCacheFolder() + `/compressed_${id}`;
   const exists = await RNFS.exists(cachePhotoPath);
 
-  return { exists: exists, uri: 'file://' + cachePhotoPath };
+  if (exists) {
+    return 'file://' + cachePhotoPath;
+  } else {
+    return null;
+  }
+}
+
+export async function deletePhotoThumbnailFromCache(id: string) {
+  const cachePhotoPath = PhotosCacheFolder() + `/thumbnail_${id}`;
+  const exists = await RNFS.exists(cachePhotoPath);
+
+  if (exists) {
+    await RNFS.unlink(cachePhotoPath);
+  }
+}
+
+export async function deletePhotoCompressedFromCache(id: string) {
+  const cachePhotoPath = PhotosCacheFolder() + `/compressed_${id}`;
+  const exists = await RNFS.exists(cachePhotoPath);
+
+  if (exists) {
+    await RNFS.unlink(cachePhotoPath);
+  }
 }
 
 export async function clearCache() {
-  const results = await RNFS.readDir(RNFS.ExternalCachesDirectoryPath);
+  const results = await RNFS.readDir(PhotosCacheFolder());
 
   for (let i = 0; i < results.length; i++) {
     await RNFS.unlink(results[i].path);
   }
+}
+
+async function CheckPhotosCacheFolderExists() {
+  const exists = await RNFS.exists(PhotosCacheFolder());
+
+  if (!exists) {
+    await RNFS.mkdir(PhotosCacheFolder());
+  }
+}
+
+function PhotosCacheFolder() {
+  return RNFS.ExternalCachesDirectoryPath + '/CachedPhotos';
 }

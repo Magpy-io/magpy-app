@@ -16,6 +16,7 @@ type PasswordInputProps = {
   error: string | undefined;
   showPasswordRequirements?: boolean;
   showValidation?: boolean;
+  submitClicked?: boolean;
 } & TextInputProps;
 
 export function PasswordInput(props: PasswordInputProps) {
@@ -26,7 +27,8 @@ export function PasswordInput(props: PasswordInputProps) {
     setPasswordVisible(!passwordVisible);
   };
   const inputRef = useRef<TextInput>(null);
-  const showError = !inputRef.current?.isFocused() && props.value !== '';
+  const showError =
+    (!inputRef.current?.isFocused() && props.value !== '') || props.submitClicked;
 
   return (
     <View>

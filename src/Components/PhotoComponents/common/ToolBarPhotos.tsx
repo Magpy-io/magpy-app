@@ -5,6 +5,7 @@ import { usePopupMessageModal } from '~/Components/CommonComponents/PopupMessage
 import { useMainContext, useMainContextFunctions } from '~/Context/Contexts/MainContext';
 import { usePermissionsContext } from '~/Context/Contexts/PermissionsContext';
 import { usePhotosDownloadingFunctions } from '~/Context/Contexts/PhotosDownloadingContext/usePhotosDownloadingContext';
+import { useUploadWorkerContext } from '~/Context/Contexts/UploadWorkerContext';
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { usePhotosFunctionsStore } from '~/Context/ReduxStore/Slices/Photos/PhotosFunctions';
 import { photosLocalSelector } from '~/Context/ReduxStore/Slices/Photos/Selectors';
@@ -24,8 +25,8 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
   const styles = useStyles(makeStyles);
   const [modalVisible, setModalVisible] = useState(false);
 
-  const { askedForNotificationPermissionBefore } = useMainContext();
-  const { setAskedForNotificationPermissionBefore } = useMainContextFunctions();
+  const { neverAskForNotificationPermissionAgain } = useMainContext();
+  const { setNeverAskForNotificationPermissionAgain } = useMainContextFunctions();
 
   const { notificationsPermissionStatus, askNotificationsPermission } =
     usePermissionsContext();
@@ -42,6 +43,9 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
   const { UploadPhotos, DeletePhotosLocal, DeletePhotosServer, DeletePhotosEverywhere } =
     usePhotosFunctionsStore();
   const { StartPhotosDownload } = usePhotosDownloadingFunctions();
+
+  const { IsMediaIdUploadQueued } = useUploadWorkerContext();
+  const { IsDownloadQueued } = usePhotosDownloadingFunctions();
 
   const selectedLocalOnlyPhotos = useMemo(() => {
     const selectedLocalOnlyPhotos = [];
@@ -102,35 +106,60 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
 
   const atleastOneServerAndOneLocal = atleastOneLocal && atleastOneServer;
 
+  const isPhotoBeingUploaded = useMemo(() => {
+    if (isOnePhoto && atleastOneLocal) {
+      const selectedPhoto = selectedGalleryPhotos[0];
+      return IsMediaIdUploadQueued(selectedPhoto.mediaId ?? '');
+    }
+    return false;
+  }, [atleastOneLocal, IsMediaIdUploadQueued, isOnePhoto, selectedGalleryPhotos]);
+
+  const isPhotoBeingDownloaded = useMemo(() => {
+    if (isOnePhoto && atleastOneServer) {
+      const selectedPhoto = selectedGalleryPhotos[0];
+      return IsDownloadQueued(selectedPhoto.serverId ?? '');
+    }
+    return false;
+  }, [atleastOneServer, IsDownloadQueued, isOnePhoto, selectedGalleryPhotos]);
+
   const onBackup = useCallback(() => {
-    if (notificationsPermissionStatus == 'PENDING' && !askedForNotificationPermissionBefore) {
-      setAskedForNotificationPermissionBefore(true);
-
-      const onDismissed = async () => {
-        await askNotificationsPermission();
-        await UploadPhotos(selectedLocalOnlyPhotos);
-      };
-
+    if (
+      notificationsPermissionStatus == 'PENDING' &&
+      !neverAskForNotificationPermissionAgain
+    ) {
       displayPopupMessage({
         title: 'Notification Permission Needed',
+        cancel: 'Never ask again',
         content:
           'Allow Magpy to display notifications. This will be used to display the progress of the backing up of your photos.',
-        onDismissed: () => {
-          onDismissed().catch(console.log);
+        onDismissed: userAction => {
+          if (userAction == 'Cancel') {
+            setNeverAskForNotificationPermissionAgain(true);
+          }
+
+          if (userAction == 'Ok') {
+            askNotificationsPermission()
+              .then(() => {
+                UploadPhotos(selectedLocalOnlyPhotos);
+              })
+              .catch(console.log);
+          } else {
+            UploadPhotos(selectedLocalOnlyPhotos);
+          }
         },
       });
       return;
     }
 
-    UploadPhotos(selectedLocalOnlyPhotos).catch(console.log);
+    UploadPhotos(selectedLocalOnlyPhotos);
   }, [
     UploadPhotos,
     askNotificationsPermission,
-    askedForNotificationPermissionBefore,
+    neverAskForNotificationPermissionAgain,
     displayPopupMessage,
     notificationsPermissionStatus,
     selectedLocalOnlyPhotos,
-    setAskedForNotificationPermissionBefore,
+    setNeverAskForNotificationPermissionAgain,
   ]);
 
   const onDownload = useCallback(
@@ -145,10 +174,25 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
   }, [DeletePhotosEverywhere, clearSelection, selectedGalleryPhotos]);
 
   const onDeleteFromServer = useCallback(() => {
-    DeletePhotosServer(selectedServerPhotosIds)
-      .then(() => clearSelection?.())
-      .catch(console.log);
-  }, [DeletePhotosServer, clearSelection, selectedServerPhotosIds]);
+    const photosToDeleteCount = selectedServerPhotosIds.length;
+
+    const photosMessage =
+      photosToDeleteCount == 1 ? 'this photo' : photosToDeleteCount.toString() + ' photos';
+
+    displayPopupMessage({
+      title: 'Deletion confirmation',
+      ok: 'Yes',
+      cancel: 'Cancel',
+      content: 'Are you sure you want to delete ' + photosMessage + ' from server ?',
+      onDismissed: userAction => {
+        if (userAction == 'Ok') {
+          DeletePhotosServer(selectedServerPhotosIds)
+            .then(() => clearSelection?.())
+            .catch(console.log);
+        }
+      },
+    });
+  }, [DeletePhotosServer, clearSelection, displayPopupMessage, selectedServerPhotosIds]);
 
   const onDeleteFromDevice = useCallback(() => {
     DeletePhotosLocal(selectedLocalPhotosIds)
@@ -177,6 +221,8 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
         onShare={onShare}
         showInfo={isOnePhoto}
         onInfo={showModal}
+        isPhotoBeingUploaded={isPhotoBeingUploaded}
+        isPhotoBeingDownloaded={isPhotoBeingDownloaded}
       />
       {isOnePhoto && (
         <PhotoDetailsModal
