@@ -30,7 +30,7 @@ export function ServerComponent({ name, ip, port, error }: ServerComponentProps)
 
   const errorMessage: string =
     error == 'SERVER_AUTH_FAILED'
-      ? 'Error when connecting to server'
+      ? 'Authentification failed'
       : error == 'SERVER_NOT_REACHABLE'
         ? 'Server unreachable'
         : '';
