@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 
 import { useServerContextFunctions } from '~/Context/Contexts/ServerContext';
 import {
+  DeletePhotosById,
   GetPhotoPartById,
   GetPhotos,
   GetPhotosById,
@@ -54,6 +55,7 @@ export function useServerQueries() {
       GetPhotosPost: transformFunction(GetPhotos.Post),
       GetPhotoPartByIdPost: transformFunction(GetPhotoPartById.Post),
       UpdatePhotoMediaIdPost: transformFunction(UpdatePhotoMediaId.Post),
+      DeletePhotosByIdPost: transformFunction(DeletePhotosById.Post),
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setServerNotReachable]);
