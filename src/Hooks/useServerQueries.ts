@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useMemo } from 'react';
 
 import { useServerContextFunctions } from '~/Context/Contexts/ServerContext';
 import { GetPhotosById } from '~/Helpers/ServerQueries';
@@ -16,10 +16,14 @@ function isAuthError(errorCode: ErrorCodes) {
 export function useServerQueries() {
   const { setServerNotReachable } = useServerContextFunctions();
 
-  const GetPhotosByIdPost = useCallback(
-    async (data: GetPhotosById.RequestData) => {
+  type ResponseTypeGeneric = { ok: true } | { ok: false; errorCode: ErrorCodes };
+
+  function transformFunction<RequestData, ResponseType extends ResponseTypeGeneric>(
+    f: (data: RequestData) => Promise<ResponseType>,
+  ) {
+    return async (data: RequestData) => {
       try {
-        const ret = await GetPhotosById.Post(data);
+        const ret = await f(data);
 
         if (!ret.ok && isAuthError(ret.errorCode)) {
           setServerNotReachable();
@@ -32,9 +36,13 @@ export function useServerQueries() {
         }
         throw err;
       }
-    },
-    [setServerNotReachable],
-  );
+    };
+  }
 
-  return { GetPhotosByIdPost };
+  return useMemo(() => {
+    return {
+      GetPhotosByIdPost: transformFunction(GetPhotosById.Post),
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [setServerNotReachable]);
 }
