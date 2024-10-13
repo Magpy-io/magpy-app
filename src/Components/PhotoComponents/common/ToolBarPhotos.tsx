@@ -184,7 +184,9 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
     DeletePhotosEverywhere(selectedGalleryPhotos)
       .then(() => clearSelection?.())
       .catch(err => {
-        showToastError('Failed to delete photos.');
+        if ((err as { code: string })?.code != 'ERROR_USER_REJECTED') {
+          showToastError('Failed to delete photos.');
+        }
         console.log(err);
       });
   }, [DeletePhotosEverywhere, clearSelection, selectedGalleryPhotos, showToastError]);
@@ -223,7 +225,9 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
     DeletePhotosLocal(selectedLocalPhotosIds)
       .then(() => clearSelection?.())
       .catch(err => {
-        showToastError('Failed to delete photos.');
+        if ((err as { code: string })?.code != 'ERROR_USER_REJECTED') {
+          showToastError('Failed to delete photos.');
+        }
         console.log(err);
       });
   }, [DeletePhotosLocal, clearSelection, selectedLocalPhotosIds, showToastError]);
