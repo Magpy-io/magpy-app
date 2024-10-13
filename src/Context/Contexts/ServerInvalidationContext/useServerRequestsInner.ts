@@ -8,11 +8,13 @@ import {
   updatePhotosServer,
 } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { useAppDispatch } from '~/Context/ReduxStore/Store';
-import { getPhotosBatched } from '~/Helpers/Queries';
 import { GetPhotosById, GetPhotosByMediaId } from '~/Helpers/ServerQueries';
+import { useGetPhotosBatched } from '~/Hooks/useServerQueries';
 
 export function useServerRequestsInner() {
   const dispatch = useAppDispatch();
+
+  const { getPhotosBatched } = useGetPhotosBatched();
 
   const RefreshServerPhotosRequest = useCallback(
     async (n: number) => {
@@ -36,7 +38,7 @@ export function useServerRequestsInner() {
 
       dispatch(setPhotosServer(photos));
     },
-    [dispatch],
+    [dispatch, getPhotosBatched],
   );
 
   const UpdatePhotoInfoRequest = useCallback(

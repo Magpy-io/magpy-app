@@ -1,9 +1,16 @@
 import { useMemo } from 'react';
 
 import { useServerContextFunctions } from '~/Context/Contexts/ServerContext';
-import { GetPhotosById, GetServerInfo } from '~/Helpers/ServerQueries';
+import {
+  GetPhotoPartById,
+  GetPhotos,
+  GetPhotosById,
+  GetServerInfo,
+} from '~/Helpers/ServerQueries';
 import { ErrorServerUnreachable } from '~/Helpers/ServerQueries/ExceptionsManager';
 import { ErrorCodes } from '~/Helpers/ServerQueries/Types/ErrorTypes';
+
+type ResponseTypeGeneric = { ok: true } | { ok: false; errorCode: ErrorCodes };
 
 function isAuthError(errorCode: ErrorCodes) {
   return (
@@ -15,8 +22,6 @@ function isAuthError(errorCode: ErrorCodes) {
 
 export function useServerQueries() {
   const { setServerNotReachable } = useServerContextFunctions();
-
-  type ResponseTypeGeneric = { ok: true } | { ok: false; errorCode: ErrorCodes };
 
   function transformFunction<RequestData, ResponseType extends ResponseTypeGeneric>(
     f: (data: RequestData) => Promise<ResponseType>,
@@ -43,6 +48,8 @@ export function useServerQueries() {
     return {
       GetPhotosByIdPost: transformFunction(GetPhotosById.Post),
       GetServerInfoPost: transformFunction(GetServerInfo.Post),
+      GetPhotosPost: transformFunction(GetPhotos.Post),
+      GetPhotoPartByIdPost: transformFunction(GetPhotoPartById.Post),
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setServerNotReachable]);

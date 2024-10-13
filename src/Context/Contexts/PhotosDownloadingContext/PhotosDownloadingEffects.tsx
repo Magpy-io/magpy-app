@@ -8,8 +8,8 @@ import {
 } from '~/Context/ReduxStore/Slices/Photos/Selectors';
 import { useAppDispatch, useAppSelector } from '~/Context/ReduxStore/Store';
 import { addPhotoToDevice } from '~/Helpers/GalleryFunctions/Functions';
-import * as Queries from '~/Helpers/Queries';
 import { UpdatePhotoMediaId } from '~/Helpers/ServerQueries';
+import { useGetPhotoWithProgress } from '~/Hooks/useServerQueries';
 
 import { useServerInvalidationContext } from '../ServerInvalidationContext';
 import * as PhotosDownloadingActions from './PhotosDownloadingActions';
@@ -33,6 +33,8 @@ export const PhotosDownloadingEffects: React.FC<PropsType> = props => {
   const isEffectRunning = useRef(false);
 
   const { InvalidatePhotos } = useServerInvalidationContext();
+
+  const { getPhotoWithProgress } = useGetPhotoWithProgress();
 
   const dispatch = useAppDispatch();
 
@@ -61,7 +63,7 @@ export const PhotosDownloadingEffects: React.FC<PropsType> = props => {
 
         console.log('Downloading  photo', photoDownloading.serverId);
 
-        const result = await Queries.getPhotoWithProgress(
+        const result = await getPhotoWithProgress(
           photoDownloading.serverId,
           (p: number, t: number) => {
             photosDownloadingDispatch(
@@ -118,6 +120,7 @@ export const PhotosDownloadingEffects: React.FC<PropsType> = props => {
     photosServer,
     photosLocal,
     dispatch,
+    getPhotoWithProgress,
   ]);
 
   return props.children;
