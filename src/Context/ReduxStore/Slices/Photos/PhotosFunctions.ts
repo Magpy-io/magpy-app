@@ -154,7 +154,7 @@ export function usePhotosStoreEffect() {
 
   const { showToastError } = useToast();
 
-  const { serverNetwork } = useServerContext();
+  const { serverNetwork, isServerReachable } = useServerContext();
 
   const { mediaPermissionStatus } = usePermissionsContext();
 
@@ -172,7 +172,7 @@ export function usePhotosStoreEffect() {
 
   useEffect(() => {
     try {
-      if (serverNetwork) {
+      if (serverNetwork && isServerReachable) {
         RefreshServerPhotos();
       } else {
         ClearServerPhotos();
@@ -181,5 +181,11 @@ export function usePhotosStoreEffect() {
       showToastError('Failed to fetch photos from server.');
       console.log(err);
     }
-  }, [ClearServerPhotos, RefreshServerPhotos, showToastError, serverNetwork]);
+  }, [
+    ClearServerPhotos,
+    RefreshServerPhotos,
+    showToastError,
+    serverNetwork,
+    isServerReachable,
+  ]);
 }
