@@ -11,6 +11,7 @@ import { usePhotosFunctionsStore } from '~/Context/ReduxStore/Slices/Photos/Phot
 import { photosLocalSelector } from '~/Context/ReduxStore/Slices/Photos/Selectors';
 import { useAppSelector } from '~/Context/ReduxStore/Store';
 import { useStyles } from '~/Hooks/useStyles';
+import { useToast } from '~/Hooks/useToast';
 import { colorsType } from '~/Styles/colors';
 
 import PhotoDetailsModal from '../slider/PhotoDetailsModal';
@@ -27,6 +28,8 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
 
   const { neverAskForNotificationPermissionAgain } = useMainContext();
   const { setNeverAskForNotificationPermissionAgain } = useMainContextFunctions();
+
+  const { showToastError } = useToast();
 
   const { notificationsPermissionStatus, askNotificationsPermission } =
     usePermissionsContext();
@@ -137,15 +140,20 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
             setNeverAskForNotificationPermissionAgain(true);
           }
 
-          if (userAction == 'Ok') {
-            askNotificationsPermission()
-              .then(() => {
-                UploadPhotos(selectedLocalOnlyPhotos);
-              })
-              .catch(console.log);
-          } else {
+          const AskNotificationPermissionPromise = new Promise((res, rej) => {
+            if (userAction == 'Ok') {
+              askNotificationsPermission().then(res).catch(rej);
+            } else {
+              res(null);
+            }
+          });
+
+          AskNotificationPermissionPromise.then(() => {
             UploadPhotos(selectedLocalOnlyPhotos);
-          }
+          }).catch(err => {
+            showToastError('Failed to start photo upload.');
+            console.log(err);
+          });
         },
       });
       return;
@@ -160,18 +168,28 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
     notificationsPermissionStatus,
     selectedLocalOnlyPhotos,
     setNeverAskForNotificationPermissionAgain,
+    showToastError,
   ]);
 
-  const onDownload = useCallback(
-    () => StartPhotosDownload(selectedServerOnlyPhotosIds),
-    [StartPhotosDownload, selectedServerOnlyPhotosIds],
-  );
+  const onDownload = useCallback(() => {
+    try {
+      StartPhotosDownload(selectedServerOnlyPhotosIds);
+    } catch (err) {
+      showToastError('Failed to start photo download.');
+      console.log(err);
+    }
+  }, [StartPhotosDownload, selectedServerOnlyPhotosIds, showToastError]);
 
   const onDelete = useCallback(() => {
     DeletePhotosEverywhere(selectedGalleryPhotos)
       .then(() => clearSelection?.())
-      .catch(console.log);
-  }, [DeletePhotosEverywhere, clearSelection, selectedGalleryPhotos]);
+      .catch(err => {
+        if ((err as { code: string })?.code != 'ERROR_USER_REJECTED') {
+          showToastError('Failed to delete photos.');
+        }
+        console.log(err);
+      });
+  }, [DeletePhotosEverywhere, clearSelection, selectedGalleryPhotos, showToastError]);
 
   const onDeleteFromServer = useCallback(() => {
     const photosToDeleteCount = selectedServerPhotosIds.length;
@@ -188,17 +206,31 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
         if (userAction == 'Ok') {
           DeletePhotosServer(selectedServerPhotosIds)
             .then(() => clearSelection?.())
-            .catch(console.log);
+            .catch(err => {
+              showToastError('Failed to delete photos.');
+              console.log(err);
+            });
         }
       },
     });
-  }, [DeletePhotosServer, clearSelection, displayPopupMessage, selectedServerPhotosIds]);
+  }, [
+    DeletePhotosServer,
+    clearSelection,
+    displayPopupMessage,
+    selectedServerPhotosIds,
+    showToastError,
+  ]);
 
   const onDeleteFromDevice = useCallback(() => {
     DeletePhotosLocal(selectedLocalPhotosIds)
       .then(() => clearSelection?.())
-      .catch(console.log);
-  }, [DeletePhotosLocal, clearSelection, selectedLocalPhotosIds]);
+      .catch(err => {
+        if ((err as { code: string })?.code != 'ERROR_USER_REJECTED') {
+          showToastError('Failed to delete photos.');
+        }
+        console.log(err);
+      });
+  }, [DeletePhotosLocal, clearSelection, selectedLocalPhotosIds, showToastError]);
 
   const onShare = useCallback(() => {}, []);
 

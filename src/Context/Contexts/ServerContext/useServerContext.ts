@@ -63,12 +63,17 @@ export function useServerContextFunctions() {
     clearAddressForServerApi();
   }, [setError, setIsServerReachable, setServerNetwork, setToken]);
 
+  const setServerNotReachable = useCallback(() => {
+    setIsServerReachable(false);
+  }, [setIsServerReachable]);
+
   return {
     setReachableServer,
     setServerSelecting,
     setCurrentSelectingServerReachable,
     forgetServer,
     setServerNetworkSelecting,
+    setServerNotReachable,
   };
 }
 

@@ -6,6 +6,7 @@ import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { usePhotosFunctionsStore } from '~/Context/ReduxStore/Slices/Photos/PhotosFunctions';
 import { photosGalleryFilteredSelector } from '~/Context/ReduxStore/Slices/Photos/Selectors';
 import { RootState, useAppSelector } from '~/Context/ReduxStore/Store';
+import { useToast } from '~/Hooks/useToast';
 import { TabBarPadding } from '~/Navigation/TabNavigation/TabBar';
 import { useTabNavigationContextFunctions } from '~/Navigation/TabNavigation/TabNavigationContext';
 import { spacing } from '~/Styles/spacing';
@@ -56,6 +57,8 @@ const PhotoGridController = forwardRef<PhotoGridComponentRefType, PropsType>(
     const selectedPhotos = useAppSelector((state: RootState) =>
       photosGalleryFilteredSelector(state, isSelected),
     );
+
+    const { showToastError } = useToast();
 
     const backPressAction = useCallback(() => {
       setIsSelecting(false);
@@ -114,8 +117,11 @@ const PhotoGridController = forwardRef<PhotoGridComponentRefType, PropsType>(
     }, [resetSelection]);
 
     const onRefresh = useCallback(() => {
-      RefreshAllPhotos(5000).catch(console.log);
-    }, [RefreshAllPhotos]);
+      RefreshAllPhotos(5000).catch(err => {
+        showToastError('Error refreshing photos.');
+        console.log(err);
+      });
+    }, [RefreshAllPhotos, showToastError]);
 
     const menuButton = useCallback(
       () => (
