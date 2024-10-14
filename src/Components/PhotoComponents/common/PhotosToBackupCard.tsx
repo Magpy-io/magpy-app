@@ -2,15 +2,34 @@ import React, { useMemo, useState } from 'react';
 
 import { GenericCard } from '~/Components/CommonComponents/GenericCard';
 import { UploadIcon } from '~/Components/CommonComponents/Icons';
-import { photosGallerySelector } from '~/Context/ReduxStore/Slices/Photos/Selectors';
+import {
+  photosGallerySelector,
+  photosLocalSelector,
+} from '~/Context/ReduxStore/Slices/Photos/Selectors';
 import { useAppSelector } from '~/Context/ReduxStore/Store';
+
+import { useActionUploadPhotos } from './Actions/useActionUploadPhotos';
 
 export function PhotosToBackupCard() {
   const photos = useAppSelector(photosGallerySelector);
 
-  const unbackedPhotosCount = useMemo(() => {
-    return photos.filter(photo => !photo.serverId).length;
-  }, [photos]);
+  const localPhotos = useAppSelector(photosLocalSelector);
+
+  const { UploadPhotosAction } = useActionUploadPhotos();
+
+  const unbackedPhotos = useMemo(() => {
+    const localOnlyPhotos = [];
+    for (const photo of photos) {
+      if (photo.serverId) {
+        continue;
+      }
+      const localPhoto = photo.mediaId ? localPhotos[photo.mediaId] : undefined;
+      if (localPhoto) {
+        localOnlyPhotos.push(localPhoto);
+      }
+    }
+    return localOnlyPhotos;
+  }, [photos, localPhotos]);
 
   const [showCard, setShowCard] = useState(true);
 
@@ -19,9 +38,12 @@ export function PhotosToBackupCard() {
       <GenericCard
         icon={<UploadIcon />}
         title={'Some Photos can be backed up'}
-        text={`You have ${unbackedPhotosCount} photos that can be backed up. Back them now so you don't lose them.`}
+        text={`You have ${unbackedPhotos.length} photos that can be backed up. Back them now so you don't lose them.`}
         buttonOk={'Back up'}
-        onButtonOk={() => {}}
+        onButtonOk={() => {
+          UploadPhotosAction(unbackedPhotos);
+          setShowCard(false);
+        }}
         hasCloseButton
         onCloseButton={() => {
           setShowCard(false);

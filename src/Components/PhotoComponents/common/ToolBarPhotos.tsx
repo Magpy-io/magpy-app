@@ -2,8 +2,6 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { usePopupMessageModal } from '~/Components/CommonComponents/PopupMessageModal';
-import { useMainContext, useMainContextFunctions } from '~/Context/Contexts/MainContext';
-import { usePermissionsContext } from '~/Context/Contexts/PermissionsContext';
 import { usePhotosDownloadingFunctions } from '~/Context/Contexts/PhotosDownloadingContext/usePhotosDownloadingContext';
 import { useUploadWorkerContext } from '~/Context/Contexts/UploadWorkerContext';
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
@@ -15,6 +13,7 @@ import { useToast } from '~/Hooks/useToast';
 import { colorsType } from '~/Styles/colors';
 
 import PhotoDetailsModal from '../slider/PhotoDetailsModal';
+import { useActionUploadPhotos } from './Actions/useActionUploadPhotos';
 import ToolBarPhotosComponent from './ToolBarPhotosComponent';
 
 type ToolBarProps = {
@@ -26,13 +25,7 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
   const styles = useStyles(makeStyles);
   const [modalVisible, setModalVisible] = useState(false);
 
-  const { neverAskForNotificationPermissionAgain } = useMainContext();
-  const { setNeverAskForNotificationPermissionAgain } = useMainContextFunctions();
-
   const { showToastError } = useToast();
-
-  const { notificationsPermissionStatus, askNotificationsPermission } =
-    usePermissionsContext();
 
   const { displayPopupMessage } = usePopupMessageModal();
 
@@ -43,12 +36,14 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
 
   const localPhotos = useAppSelector(photosLocalSelector);
 
-  const { UploadPhotos, DeletePhotosLocal, DeletePhotosServer, DeletePhotosEverywhere } =
+  const { DeletePhotosLocal, DeletePhotosServer, DeletePhotosEverywhere } =
     usePhotosFunctionsStore();
   const { StartPhotosDownload } = usePhotosDownloadingFunctions();
 
   const { IsMediaIdUploadQueued } = useUploadWorkerContext();
   const { IsDownloadQueued } = usePhotosDownloadingFunctions();
+
+  const { UploadPhotosAction } = useActionUploadPhotos();
 
   const selectedLocalOnlyPhotos = useMemo(() => {
     const selectedLocalOnlyPhotos = [];
@@ -126,50 +121,8 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
   }, [atleastOneServer, IsDownloadQueued, isOnePhoto, selectedGalleryPhotos]);
 
   const onBackup = useCallback(() => {
-    if (
-      notificationsPermissionStatus == 'PENDING' &&
-      !neverAskForNotificationPermissionAgain
-    ) {
-      displayPopupMessage({
-        title: 'Notification Permission Needed',
-        cancel: 'Never ask again',
-        content:
-          'Allow Magpy to display notifications. This will be used to display the progress of the backing up of your photos.',
-        onDismissed: userAction => {
-          if (userAction == 'Cancel') {
-            setNeverAskForNotificationPermissionAgain(true);
-          }
-
-          const AskNotificationPermissionPromise = new Promise((res, rej) => {
-            if (userAction == 'Ok') {
-              askNotificationsPermission().then(res).catch(rej);
-            } else {
-              res(null);
-            }
-          });
-
-          AskNotificationPermissionPromise.then(() => {
-            UploadPhotos(selectedLocalOnlyPhotos);
-          }).catch(err => {
-            showToastError('Failed to start photo upload.');
-            console.log(err);
-          });
-        },
-      });
-      return;
-    }
-
-    UploadPhotos(selectedLocalOnlyPhotos);
-  }, [
-    UploadPhotos,
-    askNotificationsPermission,
-    neverAskForNotificationPermissionAgain,
-    displayPopupMessage,
-    notificationsPermissionStatus,
-    selectedLocalOnlyPhotos,
-    setNeverAskForNotificationPermissionAgain,
-    showToastError,
-  ]);
+    UploadPhotosAction(selectedLocalOnlyPhotos);
+  }, [UploadPhotosAction, selectedLocalOnlyPhotos]);
 
   const onDownload = useCallback(() => {
     try {
