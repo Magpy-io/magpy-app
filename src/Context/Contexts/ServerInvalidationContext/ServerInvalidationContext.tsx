@@ -9,8 +9,10 @@ export type FetchingStatus = 'Idle' | 'Fetching';
 export type ResultStatus = 'Pending' | 'Success' | 'Failed';
 
 export type ServerInvalidationDataType = {
+  isRefreshing: boolean;
   fetchingStatus: FetchingStatus;
   resultStatus: ResultStatus;
+  setIsRefreshing: SetStateType<boolean>;
   setFetchingStatus: SetStateType<FetchingStatus>;
   setResultStatus: SetStateType<ResultStatus>;
   isFetchingRef: React.MutableRefObject<boolean>;
@@ -19,8 +21,10 @@ export type ServerInvalidationDataType = {
 };
 
 const initialState: ServerInvalidationDataType = {
+  isRefreshing: false,
   fetchingStatus: 'Idle',
   resultStatus: 'Pending',
+  setIsRefreshing: () => {},
   setFetchingStatus: () => {},
   setResultStatus: () => {},
   isFetchingRef: { current: false },
@@ -35,6 +39,7 @@ type PropsType = {
 };
 
 export const ServerInvalidationContextProvider: React.FC<PropsType> = props => {
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [resultStatus, setResultStatus] = useState<ResultStatus>('Pending');
   const [fetchingStatus, setFetchingStatus] = useState<FetchingStatus>('Idle');
   const isFetchingRef = useRef(false);
@@ -43,8 +48,10 @@ export const ServerInvalidationContextProvider: React.FC<PropsType> = props => {
   return (
     <ServerInvalidationContext.Provider
       value={{
+        isRefreshing,
         resultStatus,
         fetchingStatus,
+        setIsRefreshing,
         setResultStatus,
         setFetchingStatus,
         isFetchingRef,

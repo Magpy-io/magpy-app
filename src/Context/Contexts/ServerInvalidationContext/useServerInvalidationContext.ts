@@ -4,6 +4,7 @@ import { useServerInvalidationContextInner } from './ServerInvalidationContext';
 
 export function useServerInvalidationContext() {
   const { setPendingInvalidations } = useServerInvalidationContextInner();
+  const { isRefreshing } = useServerInvalidationContextInner();
 
   const RefreshServerPhotos = useCallback(() => {
     setPendingInvalidations(p => {
@@ -32,5 +33,5 @@ export function useServerInvalidationContext() {
     [setPendingInvalidations],
   );
 
-  return { RefreshServerPhotos, InvalidatePhotos, InvalidatePhotosByMediaId };
+  return { RefreshServerPhotos, InvalidatePhotos, InvalidatePhotosByMediaId, isRefreshing };
 }
