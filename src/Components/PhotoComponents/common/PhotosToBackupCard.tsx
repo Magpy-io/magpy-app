@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 
 import { GenericCard } from '~/Components/CommonComponents/GenericCard';
 import { UploadIcon } from '~/Components/CommonComponents/Icons';
+import { useBackupWorkerContext } from '~/Context/Contexts/BackupWorkerContext';
 import { useServerInvalidationContext } from '~/Context/Contexts/ServerInvalidationContext';
 import {
   photosGallerySelector,
@@ -14,14 +15,16 @@ import { useActionUploadPhotos } from './Actions/useActionUploadPhotos';
 
 export function PhotosToBackupCard() {
   const photos = useAppSelector(photosGallerySelector);
-
   const localPhotos = useAppSelector(photosLocalSelector);
+
+  const { autobackupEnabled } = useBackupWorkerContext();
 
   const { UploadPhotosAction } = useActionUploadPhotos();
 
   const { isRefreshing } = useServerInvalidationContext();
-
   const hasRefreshingStatusChanged = useHasValueChanged(isRefreshing, false);
+
+  const [showCard, setShowCard] = useState(false);
 
   const unbackedPhotos = useMemo(() => {
     const localOnlyPhotos = [];
@@ -37,16 +40,19 @@ export function PhotosToBackupCard() {
     return localOnlyPhotos;
   }, [photos, localPhotos]);
 
-  const [showCard, setShowCard] = useState(false);
-
   useEffect(() => {
+    if (autobackupEnabled) {
+      setShowCard(false);
+      return;
+    }
+
     if (!isRefreshing && hasRefreshingStatusChanged && unbackedPhotos.length != 0) {
       setShowCard(true);
     }
     if (isRefreshing || unbackedPhotos.length == 0) {
       setShowCard(false);
     }
-  }, [hasRefreshingStatusChanged, isRefreshing, unbackedPhotos]);
+  }, [hasRefreshingStatusChanged, isRefreshing, unbackedPhotos, autobackupEnabled]);
 
   return (
     showCard && (
