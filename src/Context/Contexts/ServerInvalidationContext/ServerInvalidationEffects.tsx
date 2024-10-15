@@ -19,6 +19,8 @@ export const ServerInvalidationEffects: React.FC<PropsType> = props => {
     isFetchingRef,
     setFetchingStatus,
     setResultStatus,
+    setIsRefreshing,
+    setHasRefreshedOnce,
     pendingInvalidations,
     setPendingInvalidations,
   } = useServerInvalidationContextInner();
@@ -43,7 +45,9 @@ export const ServerInvalidationEffects: React.FC<PropsType> = props => {
 
         try {
           if (currentInvalidation.name == 'PhotosInvalidateAll') {
+            setIsRefreshing(true);
             await RefreshServerPhotosRequest(5000);
+            setHasRefreshedOnce(true);
           } else if (currentInvalidation.name == 'PhotosInvalidated') {
             await UpdatePhotoInfoRequest(currentInvalidation.payload);
           } else if (currentInvalidation.name == 'PhotosInvalidatedByMediaId') {
@@ -62,6 +66,7 @@ export const ServerInvalidationEffects: React.FC<PropsType> = props => {
         });
         isFetchingRef.current = false;
         setFetchingStatus('Idle');
+        setIsRefreshing(false);
       }
     }
 
@@ -73,6 +78,8 @@ export const ServerInvalidationEffects: React.FC<PropsType> = props => {
     RefreshServerPhotosRequest,
     isFetchingRef,
     pendingInvalidations,
+    setIsRefreshing,
+    setHasRefreshedOnce,
     setFetchingStatus,
     setPendingInvalidations,
     setResultStatus,

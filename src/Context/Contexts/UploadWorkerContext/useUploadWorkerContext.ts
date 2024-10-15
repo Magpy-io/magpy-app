@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { useUploadWorkerContextInner } from './UploadWorkerContext';
 
@@ -22,8 +22,13 @@ export function useUploadWorkerContext() {
     [currentPhotosUploading, queuedPhotosToUpload],
   );
 
+  const IsUploadRunning = useMemo(() => {
+    return currentPhotosUploading.size != 0 || queuedPhotosToUpload.size != 0;
+  }, [currentPhotosUploading.size, queuedPhotosToUpload.size]);
+
   return {
     UploadPhotosWorker,
     IsMediaIdUploadQueued,
+    IsUploadRunning,
   };
 }

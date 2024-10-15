@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -19,6 +19,7 @@ type PhotoGalleryPropsType = {
   showBackButton?: boolean;
   onPressBack?: () => void;
   isInTabScreen?: boolean;
+  cardComponent?: ReactNode;
 };
 
 export default function PhotoGallery({ ...props }: PhotoGalleryPropsType) {
@@ -79,6 +80,7 @@ export default function PhotoGallery({ ...props }: PhotoGalleryPropsType) {
           photos={filteredPhotos}
           onSwitchMode={onSwitchMode}
           isInTabScreen={props.isInTabScreen}
+          cardComponent={props.cardComponent}
         />
       </View>
       <View

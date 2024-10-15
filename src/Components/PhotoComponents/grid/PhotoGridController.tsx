@@ -1,4 +1,4 @@
-import React, { forwardRef, useCallback, useRef, useState } from 'react';
+import React, { ReactNode, forwardRef, useCallback, useRef, useState } from 'react';
 import { Pressable, View } from 'react-native';
 
 import { TuneIcon } from '~/Components/CommonComponents/Icons';
@@ -27,17 +27,18 @@ type PropsType = {
   title?: string;
   showBackButton?: boolean;
   onPressBack?: () => void;
+  cardComponent?: ReactNode;
 };
 
 const PhotoGridController = forwardRef<PhotoGridComponentRefType, PropsType>(
   (
     {
       photos,
-
       onSwitchMode,
       isInTabScreen,
       title,
       showBackButton,
+      cardComponent,
       onPressBack,
     }: PropsType,
     ref,
@@ -147,6 +148,7 @@ const PhotoGridController = forwardRef<PhotoGridComponentRefType, PropsType>(
     return (
       <View style={{ flex: 1 }}>
         <Header />
+
         <PhotoGridComponent
           photos={photos}
           onPressPhoto={onRenderItemPress}
@@ -156,6 +158,7 @@ const PhotoGridController = forwardRef<PhotoGridComponentRefType, PropsType>(
           isSelected={isSelected}
           selectGroup={selectGroup}
           ref={ref}
+          header={cardComponent}
         />
 
         {isSelecting && (
