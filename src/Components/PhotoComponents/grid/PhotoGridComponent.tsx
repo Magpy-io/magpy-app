@@ -130,7 +130,6 @@ const PhotoGridComponent = forwardRef<PhotoGridComponentRefType, PhotoGridCompon
       <View
         style={styles.headerStyle}
         onLayout={event => {
-          console.log(event.nativeEvent.layout.height);
           setListHeaderHeight(event.nativeEvent.layout.height);
         }}>
         {header}
