@@ -5,6 +5,8 @@ import { APIPhoto } from '~/Helpers/ServerQueries/Types';
 
 import { useServerQueries } from './useServerQueries';
 
+const BATCH_SIZE = 500;
+
 export function useGetPhotosBatched() {
   const { GetPhotosPost } = useServerQueries();
 
@@ -14,8 +16,6 @@ export function useGetPhotosBatched() {
       offset,
       photoType,
     }: GetPhotos.RequestData): Promise<GetPhotos.ResponseType> => {
-      const BATCH_SIZE = 500;
-
       let photosLeft = number;
       let endReached = false;
       const photos: APIPhoto[] = [];
