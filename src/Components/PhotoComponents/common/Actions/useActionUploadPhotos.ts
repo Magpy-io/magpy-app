@@ -7,6 +7,8 @@ import { PhotoLocalType } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { usePhotosFunctionsStore } from '~/Context/ReduxStore/Slices/Photos/PhotosFunctions';
 import { useToast } from '~/Hooks/useToast';
 
+const MAX_NUMBER_PHOTOS_TO_UPLOAD = 500;
+
 export function useActionUploadPhotos() {
   const { notificationsPermissionStatus, askNotificationsPermission } =
     usePermissionsContext();
@@ -22,6 +24,8 @@ export function useActionUploadPhotos() {
 
   const UploadPhotosAction = useCallback(
     (photosToUpload: PhotoLocalType[]) => {
+      const photosToUploadMaxed = photosToUpload.slice(0, MAX_NUMBER_PHOTOS_TO_UPLOAD);
+
       if (
         notificationsPermissionStatus == 'PENDING' &&
         !neverAskForNotificationPermissionAgain
@@ -45,7 +49,7 @@ export function useActionUploadPhotos() {
             });
 
             AskNotificationPermissionPromise.then(() => {
-              UploadPhotos(photosToUpload);
+              UploadPhotos(photosToUploadMaxed);
             }).catch(err => {
               showToastError('Failed to start photo upload.');
               console.log(err);
@@ -55,7 +59,7 @@ export function useActionUploadPhotos() {
         return;
       }
 
-      UploadPhotos(photosToUpload);
+      UploadPhotos(photosToUploadMaxed);
     },
     [
       UploadPhotos,
