@@ -53,6 +53,7 @@ export function PhotosToBackupCard() {
     if (!isRefreshing && hasRefreshedOnce && unbackedPhotos.length != 0) {
       setShowCard(true);
     }
+
     if (isRefreshing || unbackedPhotos.length == 0) {
       setShowCard(false);
     }
