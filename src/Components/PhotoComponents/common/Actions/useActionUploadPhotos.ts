@@ -7,12 +7,6 @@ import { PhotoLocalType } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { usePhotosFunctionsStore } from '~/Context/ReduxStore/Slices/Photos/PhotosFunctions';
 import { useToast } from '~/Hooks/useToast';
 
-// This is needed because there is a limit of data transmit throught the bridge at once
-// So when starting the worker and passing the ids of photos to upload
-// 500 is about the maximum that the bridge can take
-
-const MAX_NUMBER_PHOTOS_TO_UPLOAD = 500;
-
 export function useActionUploadPhotos() {
   const { notificationsPermissionStatus, askNotificationsPermission } =
     usePermissionsContext();
@@ -28,8 +22,6 @@ export function useActionUploadPhotos() {
 
   const UploadPhotosAction = useCallback(
     (photosToUpload: PhotoLocalType[]) => {
-      const photosToUploadMaxed = photosToUpload.slice(0, MAX_NUMBER_PHOTOS_TO_UPLOAD);
-
       if (
         notificationsPermissionStatus == 'PENDING' &&
         !neverAskForNotificationPermissionAgain
@@ -53,7 +45,7 @@ export function useActionUploadPhotos() {
             });
 
             AskNotificationPermissionPromise.then(() => {
-              UploadPhotos(photosToUploadMaxed);
+              UploadPhotos(photosToUpload);
             }).catch(err => {
               showToastError('Failed to start photo upload.');
               console.log(err);
@@ -63,7 +55,7 @@ export function useActionUploadPhotos() {
         return;
       }
 
-      UploadPhotos(photosToUploadMaxed);
+      UploadPhotos(photosToUpload);
     },
     [
       UploadPhotos,
