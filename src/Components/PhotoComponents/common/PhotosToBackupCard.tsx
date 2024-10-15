@@ -28,7 +28,7 @@ export function PhotosToBackupCard() {
   const { isRefreshing, hasRefreshedOnce } = useServerInvalidationContext();
 
   const [showCard, setShowCard] = useState(false);
-  const [closedShowCard, setClosedShowCard] = useState(false);
+  const [closedCard, setClosedCard] = useState(false);
 
   const unbackedPhotos = useMemo(() => {
     const localOnlyPhotos = [];
@@ -45,7 +45,7 @@ export function PhotosToBackupCard() {
   }, [photos, localPhotos]);
 
   useEffect(() => {
-    if (closedShowCard || autobackupEnabled || !isServerReachable || IsUploadRunning) {
+    if (closedCard || autobackupEnabled || !isServerReachable || IsUploadRunning) {
       setShowCard(false);
       return;
     }
@@ -63,7 +63,7 @@ export function PhotosToBackupCard() {
     autobackupEnabled,
     isServerReachable,
     IsUploadRunning,
-    closedShowCard,
+    closedCard,
   ]);
 
   return (
@@ -78,7 +78,7 @@ export function PhotosToBackupCard() {
         }}
         hasCloseButton
         onCloseButton={() => {
-          setClosedShowCard(true);
+          setClosedCard(true);
         }}
       />
     )
