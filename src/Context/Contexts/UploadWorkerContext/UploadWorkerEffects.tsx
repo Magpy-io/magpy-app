@@ -153,7 +153,7 @@ export const UploadWorkerEffects: React.FC<PropsType> = props => {
       return;
     }
 
-    if (!isWorkerStatusFinished(workerStatus)) {
+    if (workerStatus && !isWorkerStatusFinished(workerStatus)) {
       return;
     }
 

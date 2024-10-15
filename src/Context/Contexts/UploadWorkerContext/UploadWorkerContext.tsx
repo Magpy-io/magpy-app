@@ -9,16 +9,16 @@ type SetStateType<T> = React.Dispatch<React.SetStateAction<T>>;
 export type UploadWorkerDataType = {
   currentPhotosUploading: Set<string>;
   queuedPhotosToUpload: Set<string>;
-  workerStatus: WorkerStatus;
+  workerStatus?: WorkerStatus;
   setCurrentPhotosUploading: SetStateType<Set<string>>;
   setQueuedPhotosToUpload: SetStateType<Set<string>>;
-  setWorkerStatus: SetStateType<WorkerStatus>;
+  setWorkerStatus: SetStateType<WorkerStatus | undefined>;
 };
 
 const initialState: UploadWorkerDataType = {
   currentPhotosUploading: new Set(),
   queuedPhotosToUpload: new Set(),
-  workerStatus: 'WORKER_SUCCESS',
+  workerStatus: undefined,
   setCurrentPhotosUploading: () => {},
   setQueuedPhotosToUpload: () => {},
   setWorkerStatus: () => {},
@@ -33,7 +33,7 @@ type PropsType = {
 export const UploadWorkerContextProvider: React.FC<PropsType> = props => {
   const [currentPhotosUploading, setCurrentPhotosUploading] = useState(new Set<string>());
   const [queuedPhotosToUpload, setQueuedPhotosToUpload] = useState(new Set<string>());
-  const [workerStatus, setWorkerStatus] = useState<WorkerStatus>('WORKER_SUCCESS');
+  const [workerStatus, setWorkerStatus] = useState<WorkerStatus | undefined>(undefined);
 
   return (
     <UploadWorkerContext.Provider
