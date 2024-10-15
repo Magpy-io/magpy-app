@@ -10,7 +10,7 @@ import {
   deletePhotosFromDevice,
 } from '~/Helpers/GalleryFunctions/Functions';
 import { GalleryGetPhotos } from '~/Helpers/GalleryFunctions/GetGalleryPhotos';
-import { useServerQueries } from '~/Hooks/useServerQueries';
+import { useDeletePhotosByIdBatched } from '~/Hooks/useServerQueries';
 import { useToast } from '~/Hooks/useToast';
 
 import { useAppDispatch } from '../../Store';
@@ -30,7 +30,7 @@ export function usePhotosFunctionsStore() {
   const isServerReachableRef = useRef(false);
   isServerReachableRef.current = isServerReachable;
 
-  const { DeletePhotosByIdPost } = useServerQueries();
+  const { DeletePhotosByIdBatched } = useDeletePhotosByIdBatched();
 
   const { UploadPhotosWorker } = useUploadWorkerContext();
   const { RefreshServerPhotos, InvalidatePhotos } = useServerInvalidationContext();
@@ -69,7 +69,7 @@ export function usePhotosFunctionsStore() {
 
   const DeletePhotosServer = useCallback(
     async (serverIds: string[]) => {
-      const ret = await DeletePhotosByIdPost({
+      const ret = await DeletePhotosByIdBatched({
         ids: serverIds,
       });
 
@@ -84,10 +84,13 @@ export function usePhotosFunctionsStore() {
         await deletePhotoCompressedFromCache(serverId).catch(console.log);
       }
 
+      // Update store for photos we know have been deleted
       dispatch(deletePhotosFromServer({ serverIds: deletedIds }));
+
+      // Invalidate all photos in request to make sure they are correctly updated
       InvalidatePhotos({ serverIds });
     },
-    [dispatch, InvalidatePhotos, DeletePhotosByIdPost],
+    [dispatch, InvalidatePhotos, DeletePhotosByIdBatched],
   );
 
   const DeletePhotosEverywhere = useCallback(
@@ -108,7 +111,7 @@ export function usePhotosFunctionsStore() {
       await deletePhotosFromDevice(mediaIds);
       dispatch(deletePhotosFromLocal({ mediaIds }));
 
-      const ret = await DeletePhotosByIdPost({
+      const ret = await DeletePhotosByIdBatched({
         ids: serverIds,
       });
 
@@ -116,15 +119,17 @@ export function usePhotosFunctionsStore() {
         throw new Error(ret.errorCode);
       }
 
-      for (const serverId of serverIds) {
+      const deletedIds = ret.data.deletedIds;
+
+      for (const serverId of deletedIds) {
         await deletePhotoThumbnailFromCache(serverId).catch(console.log);
         await deletePhotoCompressedFromCache(serverId).catch(console.log);
       }
 
-      dispatch(deletePhotosFromServer({ serverIds }));
+      dispatch(deletePhotosFromServer({ serverIds: deletedIds }));
       InvalidatePhotos({ serverIds });
     },
-    [dispatch, InvalidatePhotos, DeletePhotosByIdPost],
+    [dispatch, InvalidatePhotos, DeletePhotosByIdBatched],
   );
 
   const RefreshAllPhotos = useCallback(
