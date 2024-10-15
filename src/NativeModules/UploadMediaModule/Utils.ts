@@ -1,6 +1,8 @@
 import RNFS from 'react-native-fs';
 import { v4 as uuidv4 } from 'uuid';
 
+import { CheckFolderExists, ClearFolderContent } from '~/Helpers/FileSystemFunctions';
+
 const WORKER_DATA_INPUT_FOLDER_NAME = 'WorkerDataTmp';
 
 export function getWorkerDataInputFolderPath() {
@@ -20,17 +22,9 @@ export async function writeWorkerDataInput(photosIds: string[]) {
 }
 
 export async function WorkerDataInputFolderExists() {
-  const exists = await RNFS.exists(getWorkerDataInputFolderPath());
-
-  if (!exists) {
-    await RNFS.mkdir(getWorkerDataInputFolderPath());
-  }
+  await CheckFolderExists(getWorkerDataInputFolderPath());
 }
 
 export async function ClearWorkerDataInputFiles() {
-  const results = await RNFS.readDir(getWorkerDataInputFolderPath());
-
-  for (let i = 0; i < results.length; i++) {
-    await RNFS.unlink(results[i].path);
-  }
+  await ClearFolderContent(getWorkerDataInputFolderPath());
 }
