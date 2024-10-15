@@ -75,7 +75,6 @@ export function PhotosToBackupCard() {
         buttonOk={'Back up'}
         onButtonOk={() => {
           UploadPhotosAction(unbackedPhotos);
-          setShowCard(false);
         }}
         hasCloseButton
         onCloseButton={() => {
