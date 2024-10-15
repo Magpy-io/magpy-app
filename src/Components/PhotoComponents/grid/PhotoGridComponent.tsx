@@ -1,4 +1,11 @@
-import React, { ReactNode, forwardRef, useCallback, useImperativeHandle, useRef } from 'react';
+import React, {
+  ReactNode,
+  forwardRef,
+  useCallback,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react';
 import { StyleSheet, TouchableHighlight, View } from 'react-native';
 
 import { Text } from 'react-native-elements';
@@ -117,8 +124,15 @@ const PhotoGridComponent = forwardRef<PhotoGridComponentRefType, PhotoGridCompon
       [colors, styles, isSelecting, selectGroup],
     );
 
+    const [listHeaderHeight, setListHeaderHeight] = useState(0);
+
     const ListHeaderComponent = (
-      <View style={styles.headerStyle}>
+      <View
+        style={styles.headerStyle}
+        onLayout={event => {
+          console.log(event.nativeEvent.layout.height);
+          setListHeaderHeight(event.nativeEvent.layout.height);
+        }}>
         {header}
         <SelectedFilters />
       </View>
@@ -137,6 +151,7 @@ const PhotoGridComponent = forwardRef<PhotoGridComponentRefType, PhotoGridCompon
           sectionHeaderHeight={SECTION_HEADER_HEIGHT}
           onRefresh={onRefresh}
           refreshing={false}
+          listHeaderHeight={listHeaderHeight}
         />
       </View>
     );

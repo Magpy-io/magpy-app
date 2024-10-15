@@ -48,7 +48,16 @@ export default function PhotoGallery({ ...props }: PhotoGalleryPropsType) {
     if (isSlidingPhotos) {
       sliderRef.current?.scrollToIndex({ index, animated: false });
     } else {
-      gridRef.current?.scrollToIndex({ index, animated: true });
+      // Added timeout to avoid scrolling before the grid is rerendered
+      // Otherwise we scroll while display is set to none and
+      // listHeaderHeight in the PhotoGridComponent is 0
+      // This causes the scrollToIndex to not take into consideration the height of
+      // the listHeader passed to SectionListWithColumns and thus gives a wrong
+      // scroll position
+
+      setTimeout(() => {
+        gridRef.current?.scrollToIndex({ index, animated: true });
+      }, 100);
     }
 
     setIsSlidingPhotos(isSlidingPhotos);
