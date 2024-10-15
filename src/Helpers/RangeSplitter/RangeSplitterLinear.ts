@@ -17,6 +17,10 @@ export class RangeSplitterLinear implements RangeSplitter {
       throw new Error('Invalid segmentLength, must be positive integer > 0');
     }
 
+    if (a == b) {
+      return [{ start: a, end: a }];
+    }
+
     const perfectSplit = (b - a) % this.segmentLength == 0;
 
     const numberOfFullRanges = Math.floor((b - a) / this.segmentLength);

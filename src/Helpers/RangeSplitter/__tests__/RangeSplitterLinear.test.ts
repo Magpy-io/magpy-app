@@ -60,4 +60,16 @@ describe('Tests for RangeSplitterLinear class', () => {
     expect(range3.start).toBe(7);
     expect(range3.end).toBe(10);
   });
+
+  test(`RangeSplitterLinear.split(0) should return 1 range of length 0`, () => {
+    const rangeSplitter = new RangeSplitterLinear(5);
+
+    const ret = rangeSplitter.splitRange(0);
+    expect(ret.length).toBe(1);
+
+    const range = ret[0];
+
+    expect(range.start).toBe(0);
+    expect(range.end).toBe(0);
+  });
 });

@@ -75,6 +75,18 @@ describe('Tests for RangeSplitterExponential class', () => {
   });
 });
 
+test(`RangeSplitterExponential.split(0) should return 1 range of length 0`, () => {
+  const rangeSplitter = new RangeSplitterExponential(5, 5, 3);
+
+  const ret = rangeSplitter.splitRange(0);
+  expect(ret.length).toBe(1);
+
+  const range = ret[0];
+
+  expect(range.start).toBe(0);
+  expect(range.end).toBe(0);
+});
+
 function testRangesStartAndEndAreCorrect({
   a,
   b,
