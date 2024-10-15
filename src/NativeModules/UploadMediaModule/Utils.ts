@@ -26,3 +26,11 @@ export async function WorkerDataInputFolderExists() {
     await RNFS.mkdir(getWorkerDataInputFolderPath());
   }
 }
+
+export async function ClearWorkerDataInputFiles() {
+  const results = await RNFS.readDir(getWorkerDataInputFolderPath());
+
+  for (let i = 0; i < results.length; i++) {
+    await RNFS.unlink(results[i].path);
+  }
+}
