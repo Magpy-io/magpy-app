@@ -8,6 +8,7 @@ import { APIPhoto } from '~/Helpers/ServerQueries/Types';
 import { useHasValueChanged } from '~/Hooks/useHasValueChanged';
 import { useToast } from '~/Hooks/useToast';
 import {
+  ClearWorkerDataInputFiles,
   UploadMediaEvents,
   UploadMediaModule,
   isWorkerStatusFinished,
@@ -179,6 +180,12 @@ export const UploadWorkerEffects: React.FC<PropsType> = props => {
     workerStatusChanged,
     showToastError,
   ]);
+
+  useEffect(() => {
+    if (workerStatus && isWorkerStatusFinished(workerStatus)) {
+      ClearWorkerDataInputFiles().catch(console.log);
+    }
+  }, [workerStatus]);
 
   return props.children;
 };
