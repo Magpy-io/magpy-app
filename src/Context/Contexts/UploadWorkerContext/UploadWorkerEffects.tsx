@@ -132,13 +132,18 @@ export const UploadWorkerEffects: React.FC<PropsType> = props => {
       });
     }
 
-    asyncInner().catch(console.log);
+    asyncInner().catch(err => {
+      setCurrentPhotosUploading(new Set());
+      showToastError('Photos upload failed.');
+      console.log(err);
+    });
   }, [
     queuedPhotosToUpload,
     currentPhotosUploading,
     setCurrentPhotosUploading,
     setQueuedPhotosToUpload,
     InvalidatePhotosByMediaId,
+    showToastError,
     serverPath,
     token,
   ]);
