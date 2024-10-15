@@ -10,7 +10,6 @@ import { useToast } from '~/Hooks/useToast';
 import {
   UploadMediaEvents,
   UploadMediaModule,
-  WorkerStatus,
   isWorkerStatusFinished,
 } from '~/NativeModules/UploadMediaModule';
 
@@ -30,7 +29,8 @@ export const UploadWorkerEffects: React.FC<PropsType> = props => {
   const { serverPath, token } = useServerContext();
   const [rerunEffect, setRerunEffect] = useState(false);
 
-  const [workerStatus, setWorkerStatus] = useState<WorkerStatus>('WORKER_SUCCESS');
+  const { workerStatus, setWorkerStatus } = useUploadWorkerContextInner();
+
   const workerStatusChanged = useHasValueChanged(workerStatus, 'WORKER_SUCCESS');
 
   const { showToastError } = useToast();
@@ -60,12 +60,19 @@ export const UploadWorkerEffects: React.FC<PropsType> = props => {
       },
     );
 
+    // Initial worker status
+    UploadMediaModule.IsWorkerAlive()
+      .then(workerRunning => {
+        setWorkerStatus(workerRunning ? 'WORKER_RUNNING' : 'WORKER_SUCCESS');
+      })
+      .catch(console.log);
+
     return () => {
       subscription.remove();
       subscriptionWorkerStatus.remove();
       clearInterval(interval);
     };
-  }, []);
+  }, [setWorkerStatus]);
 
   const isEffectRunning = useRef(false);
 

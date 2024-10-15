@@ -1,10 +1,16 @@
 import { useCallback, useMemo } from 'react';
 
+import { isWorkerStatusFinished } from '~/NativeModules/UploadMediaModule';
+
 import { useUploadWorkerContextInner } from './UploadWorkerContext';
 
 export function useUploadWorkerContext() {
-  const { setQueuedPhotosToUpload, currentPhotosUploading, queuedPhotosToUpload } =
-    useUploadWorkerContextInner();
+  const {
+    setQueuedPhotosToUpload,
+    currentPhotosUploading,
+    queuedPhotosToUpload,
+    workerStatus,
+  } = useUploadWorkerContextInner();
 
   const UploadPhotosWorker = useCallback(
     (mediaIds: string[]) => {
@@ -23,8 +29,12 @@ export function useUploadWorkerContext() {
   );
 
   const IsUploadRunning = useMemo(() => {
-    return currentPhotosUploading.size != 0 || queuedPhotosToUpload.size != 0;
-  }, [currentPhotosUploading.size, queuedPhotosToUpload.size]);
+    return (
+      currentPhotosUploading.size != 0 ||
+      queuedPhotosToUpload.size != 0 ||
+      !isWorkerStatusFinished(workerStatus)
+    );
+  }, [currentPhotosUploading.size, queuedPhotosToUpload.size, workerStatus]);
 
   return {
     UploadPhotosWorker,
