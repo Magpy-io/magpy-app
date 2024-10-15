@@ -5,6 +5,7 @@ import { UploadIcon } from '~/Components/CommonComponents/Icons';
 import { useBackupWorkerContext } from '~/Context/Contexts/BackupWorkerContext';
 import { useServerContext } from '~/Context/Contexts/ServerContext';
 import { useServerInvalidationContext } from '~/Context/Contexts/ServerInvalidationContext';
+import { useUploadWorkerContext } from '~/Context/Contexts/UploadWorkerContext';
 import {
   photosGallerySelector,
   photosLocalSelector,
@@ -22,9 +23,12 @@ export function PhotosToBackupCard() {
 
   const { UploadPhotosAction } = useActionUploadPhotos();
 
+  const { IsUploadRunning } = useUploadWorkerContext();
+
   const { isRefreshing, hasRefreshedOnce } = useServerInvalidationContext();
 
   const [showCard, setShowCard] = useState(false);
+  const [closedShowCard, setClosedShowCard] = useState(false);
 
   const unbackedPhotos = useMemo(() => {
     const localOnlyPhotos = [];
@@ -41,7 +45,7 @@ export function PhotosToBackupCard() {
   }, [photos, localPhotos]);
 
   useEffect(() => {
-    if (autobackupEnabled || !isServerReachable) {
+    if (closedShowCard || autobackupEnabled || !isServerReachable || IsUploadRunning) {
       setShowCard(false);
       return;
     }
@@ -52,7 +56,15 @@ export function PhotosToBackupCard() {
     if (isRefreshing || unbackedPhotos.length == 0) {
       setShowCard(false);
     }
-  }, [hasRefreshedOnce, isRefreshing, unbackedPhotos, autobackupEnabled, isServerReachable]);
+  }, [
+    hasRefreshedOnce,
+    isRefreshing,
+    unbackedPhotos,
+    autobackupEnabled,
+    isServerReachable,
+    IsUploadRunning,
+    closedShowCard,
+  ]);
 
   return (
     showCard && (
@@ -67,7 +79,7 @@ export function PhotosToBackupCard() {
         }}
         hasCloseButton
         onCloseButton={() => {
-          setShowCard(false);
+          setClosedShowCard(true);
         }}
       />
     )
