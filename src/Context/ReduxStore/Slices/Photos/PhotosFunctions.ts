@@ -77,12 +77,14 @@ export function usePhotosFunctionsStore() {
         throw new Error(ret.errorCode);
       }
 
-      for (const serverId of serverIds) {
+      const deletedIds = ret.data.deletedIds;
+
+      for (const serverId of deletedIds) {
         await deletePhotoThumbnailFromCache(serverId).catch(console.log);
         await deletePhotoCompressedFromCache(serverId).catch(console.log);
       }
 
-      dispatch(deletePhotosFromServer({ serverIds }));
+      dispatch(deletePhotosFromServer({ serverIds: deletedIds }));
       InvalidatePhotos({ serverIds });
     },
     [dispatch, InvalidatePhotos, DeletePhotosByIdPost],
