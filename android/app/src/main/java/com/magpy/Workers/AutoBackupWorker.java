@@ -49,7 +49,7 @@ public class AutoBackupWorker extends Worker {
     public static final String UPLOADED_PHOTO_MEDIA_ID = "UPLOADED_PHOTO_MEDIA_ID";
     public static final String UPLOADED_PHOTO_STRING = "UPLOADED_PHOTO_STRING";
 
-    protected final int MAX_MISSING_PHOTOS_TO_UPLOAD = 500;
+    protected final int MAX_MISSING_PHOTOS_TO_UPLOAD = 5000;
     protected final int MAX_GALLERY_PHOTOS_TO_UPLOAD = 5000;
 
     protected String url;
