@@ -108,28 +108,10 @@ export function usePhotosFunctionsStore() {
         }
       });
 
-      await deletePhotosFromDevice(mediaIds);
-      dispatch(deletePhotosFromLocal({ mediaIds }));
-
-      const ret = await DeletePhotosByIdBatched({
-        ids: serverIds,
-      });
-
-      if (!ret.ok) {
-        throw new Error(ret.errorCode);
-      }
-
-      const deletedIds = ret.data.deletedIds;
-
-      for (const serverId of deletedIds) {
-        await deletePhotoThumbnailFromCache(serverId).catch(console.log);
-        await deletePhotoCompressedFromCache(serverId).catch(console.log);
-      }
-
-      dispatch(deletePhotosFromServer({ serverIds: deletedIds }));
-      InvalidatePhotos({ serverIds });
+      await DeletePhotosServer(serverIds);
+      await DeletePhotosLocal(mediaIds);
     },
-    [dispatch, InvalidatePhotos, DeletePhotosByIdBatched],
+    [DeletePhotosServer, DeletePhotosLocal],
   );
 
   const RefreshAllPhotos = useCallback(

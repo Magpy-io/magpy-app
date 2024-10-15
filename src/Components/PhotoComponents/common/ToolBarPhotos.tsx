@@ -134,15 +134,36 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
   }, [StartPhotosDownload, selectedServerOnlyPhotosIds, showToastError]);
 
   const onDelete = useCallback(() => {
-    DeletePhotosEverywhere(selectedGalleryPhotos)
-      .then(() => clearSelection?.())
-      .catch(err => {
-        if ((err as { code: string })?.code != 'ERROR_USER_REJECTED') {
-          showToastError('Failed to delete photos.');
+    const photosToDeleteCount = selectedGalleryPhotos.length;
+
+    const photosMessage =
+      photosToDeleteCount == 1 ? 'this photo' : photosToDeleteCount.toString() + ' photos';
+
+    displayPopupMessage({
+      title: 'Deletion confirmation',
+      ok: 'Yes',
+      cancel: 'Cancel',
+      content: 'Are you sure you want to delete ' + photosMessage + ' permanently ?',
+      onDismissed: userAction => {
+        if (userAction == 'Ok') {
+          DeletePhotosEverywhere(selectedGalleryPhotos)
+            .then(() => clearSelection?.())
+            .catch(err => {
+              if ((err as { code: string })?.code != 'ERROR_USER_REJECTED') {
+                showToastError('Failed to delete photos.');
+              }
+              console.log(err);
+            });
         }
-        console.log(err);
-      });
-  }, [DeletePhotosEverywhere, clearSelection, selectedGalleryPhotos, showToastError]);
+      },
+    });
+  }, [
+    DeletePhotosEverywhere,
+    clearSelection,
+    displayPopupMessage,
+    selectedGalleryPhotos,
+    showToastError,
+  ]);
 
   const onDeleteFromServer = useCallback(() => {
     const photosToDeleteCount = selectedServerPhotosIds.length;
