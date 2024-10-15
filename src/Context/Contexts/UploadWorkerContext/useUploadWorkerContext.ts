@@ -32,7 +32,7 @@ export function useUploadWorkerContext() {
     return (
       currentPhotosUploading.size != 0 ||
       queuedPhotosToUpload.size != 0 ||
-      !isWorkerStatusFinished(workerStatus)
+      (workerStatus && !isWorkerStatusFinished(workerStatus))
     );
   }, [currentPhotosUploading.size, queuedPhotosToUpload.size, workerStatus]);
 

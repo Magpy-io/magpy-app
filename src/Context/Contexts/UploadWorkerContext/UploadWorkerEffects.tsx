@@ -8,6 +8,7 @@ import { APIPhoto } from '~/Helpers/ServerQueries/Types';
 import { useHasValueChanged } from '~/Hooks/useHasValueChanged';
 import { useToast } from '~/Hooks/useToast';
 import {
+  ClearWorkerDataInputFiles,
   UploadMediaEvents,
   UploadMediaModule,
   isWorkerStatusFinished,
@@ -132,13 +133,18 @@ export const UploadWorkerEffects: React.FC<PropsType> = props => {
       });
     }
 
-    asyncInner().catch(console.log);
+    asyncInner().catch(err => {
+      setCurrentPhotosUploading(new Set());
+      showToastError('Photos upload failed.');
+      console.log(err);
+    });
   }, [
     queuedPhotosToUpload,
     currentPhotosUploading,
     setCurrentPhotosUploading,
     setQueuedPhotosToUpload,
     InvalidatePhotosByMediaId,
+    showToastError,
     serverPath,
     token,
   ]);
@@ -148,7 +154,7 @@ export const UploadWorkerEffects: React.FC<PropsType> = props => {
       return;
     }
 
-    if (!isWorkerStatusFinished(workerStatus)) {
+    if (workerStatus && !isWorkerStatusFinished(workerStatus)) {
       return;
     }
 
@@ -174,6 +180,12 @@ export const UploadWorkerEffects: React.FC<PropsType> = props => {
     workerStatusChanged,
     showToastError,
   ]);
+
+  useEffect(() => {
+    if (workerStatus && isWorkerStatusFinished(workerStatus)) {
+      ClearWorkerDataInputFiles().catch(console.log);
+    }
+  }, [workerStatus]);
 
   return props.children;
 };

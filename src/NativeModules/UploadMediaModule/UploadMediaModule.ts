@@ -2,7 +2,9 @@ import { NativeEventEmitter, NativeModules } from 'react-native';
 
 import { APIPhoto } from '~/Helpers/ServerQueries/Types';
 
-const { UploadMediaModule } = NativeModules;
+import { writeWorkerDataInput } from './Utils';
+
+const { UploadMediaModule: UploadMediaModuleTypeNative } = NativeModules;
 
 const PHOTO_UPLOADED_EVENT_NAME = 'PHOTO_UPLOADED_EVENT_NAME';
 const WORKER_STATUS_CHANGED_NAME = 'WORKER_STATUS_CHANGED_NAME';
@@ -27,7 +29,7 @@ export interface UploadMediaModuleType {
     url: string;
     serverToken: string;
     deviceId: string;
-    photosIds: string[];
+    photosIdsFilePath: string;
   }) => Promise<void>;
   IsWorkerAlive: () => Promise<boolean>;
   StopWorker: () => Promise<void>;
@@ -49,6 +51,24 @@ export const UploadMediaEvents = {
   },
 };
 
-const Module = UploadMediaModule as UploadMediaModuleType;
+const { StartUploadWorker, IsWorkerAlive, StopWorker } =
+  UploadMediaModuleTypeNative as UploadMediaModuleType;
 
-export { Module as UploadMediaModule };
+export const UploadMediaModule = {
+  IsWorkerAlive,
+  StopWorker,
+  StartUploadWorker: async ({
+    url,
+    serverToken,
+    deviceId,
+    photosIds,
+  }: {
+    url: string;
+    serverToken: string;
+    deviceId: string;
+    photosIds: string[];
+  }) => {
+    const photosIdsFilePath = await writeWorkerDataInput(photosIds);
+    await StartUploadWorker({ url, serverToken, deviceId, photosIdsFilePath });
+  },
+};
