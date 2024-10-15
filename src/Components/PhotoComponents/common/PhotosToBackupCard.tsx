@@ -67,12 +67,14 @@ export function PhotosToBackupCard() {
     closedCard,
   ]);
 
+  const photoString = unbackedPhotos.length == 1 ? 'photo' : 'photos';
+
   return (
     showCard && (
       <GenericCard
         icon={<UploadIcon />}
         title={'Some Photos can be backed up'}
-        text={`You have ${unbackedPhotos.length} photos that can be backed up. Back them now so you don't lose them.`}
+        text={`You have ${unbackedPhotos.length} ${photoString} that can be backed up. Back them now so you don't lose them.`}
         buttonOk={'Back up'}
         onButtonOk={() => {
           UploadPhotosAction(unbackedPhotos);
