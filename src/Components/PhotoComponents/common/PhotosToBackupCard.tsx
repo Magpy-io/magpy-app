@@ -12,7 +12,7 @@ import {
 } from '~/Context/ReduxStore/Slices/Photos/Selectors';
 import { useAppSelector } from '~/Context/ReduxStore/Store';
 
-import { useActionUploadPhotos } from './Actions/useActionUploadPhotos';
+import { useUserActions } from './Actions/useUserActions';
 
 export function PhotosToBackupCard() {
   const photos = useAppSelector(photosGallerySelector);
@@ -21,7 +21,7 @@ export function PhotosToBackupCard() {
   const { autobackupEnabled } = useBackupWorkerContext();
   const { isServerReachable } = useServerContext();
 
-  const { UploadPhotosAction } = useActionUploadPhotos();
+  const { UploadPhotosAction } = useUserActions();
 
   const { IsUploadRunning } = useUploadWorkerContext();
 

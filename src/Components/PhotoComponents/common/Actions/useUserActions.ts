@@ -7,7 +7,7 @@ import { PhotoLocalType } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { usePhotosFunctionsStore } from '~/Context/ReduxStore/Slices/Photos/PhotosFunctions';
 import { useToast } from '~/Hooks/useToast';
 
-export function useActionUploadPhotos() {
+export function useUserActions() {
   const { notificationsPermissionStatus, askNotificationsPermission } =
     usePermissionsContext();
 

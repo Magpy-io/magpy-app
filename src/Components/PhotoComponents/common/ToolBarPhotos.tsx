@@ -13,7 +13,7 @@ import { useToast } from '~/Hooks/useToast';
 import { colorsType } from '~/Styles/colors';
 
 import PhotoDetailsModal from '../slider/PhotoDetailsModal';
-import { useActionUploadPhotos } from './Actions/useActionUploadPhotos';
+import { useUserActions } from './Actions/useUserActions';
 import ToolBarPhotosComponent from './ToolBarPhotosComponent';
 
 type ToolBarProps = {
@@ -43,7 +43,7 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
   const { IsMediaIdUploadQueued } = useUploadWorkerContext();
   const { IsDownloadQueued } = usePhotosDownloadingFunctions();
 
-  const { UploadPhotosAction } = useActionUploadPhotos();
+  const { UploadPhotosAction } = useUserActions();
 
   const selectedLocalOnlyPhotos = useMemo(() => {
     const selectedLocalOnlyPhotos = [];
