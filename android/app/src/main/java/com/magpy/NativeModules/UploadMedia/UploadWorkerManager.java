@@ -32,13 +32,7 @@ public class UploadWorkerManager {
         this.mPromise = promise;
     }
 
-    public void StartWorker(String url, String serverToken, String deviceId, String[] photosIds, Observer<ObserverData> observer){
-
-        if(photosIds.length == 0){
-            mPromise.resolve(null);
-            return;
-        }
-
+    public void StartWorker(String url, String serverToken, String deviceId, String photosIdsFilePath, Observer<ObserverData> observer){
         OneTimeWorkRequest uploadRequest =
                 new OneTimeWorkRequest.Builder(UploadWorker.class)
                         .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
@@ -47,7 +41,7 @@ public class UploadWorkerManager {
                                         .putString(UploadWorker.DATA_KEY_URL, url)
                                         .putString(UploadWorker.DATA_KEY_SERVER_TOKEN, serverToken)
                                         .putString(UploadWorker.DATA_KEY_DEVICE_UNIQUE_ID, deviceId)
-                                        .putStringArray(UploadWorker.DATA_KEY_PHOTOS_IDS, photosIds)
+                                        .putString(UploadWorker.DATA_KEY_PHOTOS_IDS_FILE_PATH, photosIdsFilePath)
                                         .build()
                         )
                         .build();
