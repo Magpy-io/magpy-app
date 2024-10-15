@@ -3,13 +3,13 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { GenericCard } from '~/Components/CommonComponents/GenericCard';
 import { UploadIcon } from '~/Components/CommonComponents/Icons';
 import { useBackupWorkerContext } from '~/Context/Contexts/BackupWorkerContext';
+import { useServerContext } from '~/Context/Contexts/ServerContext';
 import { useServerInvalidationContext } from '~/Context/Contexts/ServerInvalidationContext';
 import {
   photosGallerySelector,
   photosLocalSelector,
 } from '~/Context/ReduxStore/Slices/Photos/Selectors';
 import { useAppSelector } from '~/Context/ReduxStore/Store';
-import { useHasValueChanged } from '~/Hooks/useHasValueChanged';
 
 import { useActionUploadPhotos } from './Actions/useActionUploadPhotos';
 
@@ -18,11 +18,11 @@ export function PhotosToBackupCard() {
   const localPhotos = useAppSelector(photosLocalSelector);
 
   const { autobackupEnabled } = useBackupWorkerContext();
+  const { isServerReachable } = useServerContext();
 
   const { UploadPhotosAction } = useActionUploadPhotos();
 
-  const { isRefreshing } = useServerInvalidationContext();
-  const hasRefreshingStatusChanged = useHasValueChanged(isRefreshing, false);
+  const { isRefreshing, hasRefreshedOnce } = useServerInvalidationContext();
 
   const [showCard, setShowCard] = useState(false);
 
@@ -41,18 +41,18 @@ export function PhotosToBackupCard() {
   }, [photos, localPhotos]);
 
   useEffect(() => {
-    if (autobackupEnabled) {
+    if (autobackupEnabled || !isServerReachable) {
       setShowCard(false);
       return;
     }
 
-    if (!isRefreshing && hasRefreshingStatusChanged && unbackedPhotos.length != 0) {
+    if (!isRefreshing && hasRefreshedOnce && unbackedPhotos.length != 0) {
       setShowCard(true);
     }
     if (isRefreshing || unbackedPhotos.length == 0) {
       setShowCard(false);
     }
-  }, [hasRefreshingStatusChanged, isRefreshing, unbackedPhotos, autobackupEnabled]);
+  }, [hasRefreshedOnce, isRefreshing, unbackedPhotos, autobackupEnabled, isServerReachable]);
 
   return (
     showCard && (
