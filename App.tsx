@@ -6,6 +6,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { Provider } from 'react-redux';
 
+import { LoadingScreenContextProvider } from '~/Components/CommonComponents/LoadingScreen/LoadingScreenContext';
 import { PopupMessageModalContextProvider } from '~/Components/CommonComponents/PopupMessageModal/PopupMessageModalContext';
 import { ConfigModules } from '~/Config/configModules';
 import { ThemeContextProvider } from '~/Context/Contexts/ThemeContext';
@@ -24,9 +25,11 @@ function App(): React.JSX.Element {
             <GestureHandlerRootView style={{ flex: 1 }}>
               <ThemeContextProvider>
                 <PopupMessageModalContextProvider>
-                  <StatusBar backgroundColor={'transparent'} translucent />
-                  <Navigation />
-                  <Toast />
+                  <LoadingScreenContextProvider>
+                    <StatusBar backgroundColor={'transparent'} translucent />
+                    <Navigation />
+                    <Toast />
+                  </LoadingScreenContextProvider>
                 </PopupMessageModalContextProvider>
               </ThemeContextProvider>
             </GestureHandlerRootView>
