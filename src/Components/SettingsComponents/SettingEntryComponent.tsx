@@ -28,12 +28,14 @@ export default function SettingEntryComponent({
   const styles = useStyles(makeStyles);
 
   return (
-    <TouchableOpacity style={styles.container} onPress={onPress} disabled={notTouchable}>
-      <View style={styles.iconTitle}>
-        {icon}
-        <Text style={[styles.titleStyle, style]}>{title}</Text>
+    <TouchableOpacity onPress={onPress} disabled={notTouchable}>
+      <View style={styles.container}>
+        <View style={styles.iconTitle}>
+          {icon}
+          <Text style={[styles.titleStyle, style]}>{title}</Text>
+        </View>
+        {componentEnd}
       </View>
-      {componentEnd}
     </TouchableOpacity>
   );
 }
@@ -42,11 +44,13 @@ const makeStyles = (colors: colorsType) =>
   StyleSheet.create({
     titleStyle: {
       ...typography(colors).largeText,
+      flex: 1,
     },
     iconTitle: {
       flexDirection: 'row',
       gap: spacing.spacing_s,
       alignItems: 'center',
+      flex: 1,
     },
     container: {
       flexDirection: 'row',
