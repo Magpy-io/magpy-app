@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
+import { useLoadingScreen } from '~/Components/CommonComponents/LoadingScreen/LoadingScreenContext';
 import { usePopupMessageModal } from '~/Components/CommonComponents/PopupMessageModal';
 import { usePhotosDownloadingFunctions } from '~/Context/Contexts/PhotosDownloadingContext/usePhotosDownloadingContext';
 import { useUploadWorkerContext } from '~/Context/Contexts/UploadWorkerContext';
@@ -28,6 +29,7 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
   const { showToastError } = useToast();
 
   const { displayPopupMessage } = usePopupMessageModal();
+  const { showLoadingScreen, hideLoadingScreen } = useLoadingScreen();
 
   const onRequestClose = useCallback(() => setModalVisible(false), []);
   const showModal = useCallback(() => setModalVisible(true), []);
@@ -178,11 +180,15 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
       content: 'Are you sure you want to delete ' + photosMessage + ' from server ?',
       onDismissed: userAction => {
         if (userAction == 'Ok') {
+          showLoadingScreen();
           DeletePhotosServer(selectedServerPhotosIds)
             .then(() => clearSelection?.())
             .catch(err => {
               showToastError('Failed to delete photos.');
               console.log(err);
+            })
+            .finally(() => {
+              hideLoadingScreen();
             });
         }
       },
@@ -193,6 +199,8 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
     displayPopupMessage,
     selectedServerPhotosIds,
     showToastError,
+    showLoadingScreen,
+    hideLoadingScreen,
   ]);
 
   const onDeleteFromDevice = useCallback(() => {
