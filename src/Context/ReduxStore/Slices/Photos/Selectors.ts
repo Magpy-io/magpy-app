@@ -32,10 +32,17 @@ export const serverGalleryPhotosSelector = createSelector(
   },
 );
 
-export const localGalleryPhotosSelector = createSelector(
+export const notOnServerGalleryPhotosSelector = createSelector(
   [photosGallerySelector],
   photosGallery => {
     return photosGallery.filter(p => !p.serverId);
+  },
+);
+
+export const localGalleryPhotosSelector = createSelector(
+  [photosGallerySelector],
+  photosGallery => {
+    return photosGallery.filter(p => p.mediaId);
   },
 );
 

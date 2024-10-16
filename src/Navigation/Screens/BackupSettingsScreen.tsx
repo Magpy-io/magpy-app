@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 
-import { UploadIcon } from '~/Components/CommonComponents/Icons';
+import { InfoIcon, UploadIcon } from '~/Components/CommonComponents/Icons';
 import { usePopupMessageModal } from '~/Components/CommonComponents/PopupMessageModal';
 import SettingsPageComponent, {
   SettingsListType,
@@ -11,6 +11,8 @@ import {
 } from '~/Context/Contexts/BackupWorkerContext';
 import { usePermissionsContext } from '~/Context/Contexts/PermissionsContext';
 import { useServerContext } from '~/Context/Contexts/ServerContext';
+import { notOnServerGalleryPhotosSelector } from '~/Context/ReduxStore/Slices/Photos/Selectors';
+import { useAppSelector } from '~/Context/ReduxStore/Store';
 
 export default function BackupSettingsScreen() {
   const { StartAutoBackup, StopAutoBackup } = useBackupWorkerContextFunctions();
@@ -21,6 +23,9 @@ export default function BackupSettingsScreen() {
     usePermissionsContext();
 
   const { displayPopupMessage } = usePopupMessageModal();
+
+  const notBackedupPhotos = useAppSelector(notOnServerGalleryPhotosSelector);
+  const notBackedupPhotosCount = notBackedupPhotos.length;
 
   const onBackupPressAsync = useCallback(
     async (autoBackupEnabled: boolean) => {
@@ -55,6 +60,13 @@ export default function BackupSettingsScreen() {
     ],
   );
 
+  const photosMessage = notBackedupPhotosCount == 1 ? 'photo' : 'photos';
+
+  const notBackedUpPhotosMessage =
+    notBackedupPhotosCount == 0
+      ? 'All photos are backed up'
+      : `You have ${notBackedupPhotosCount} ${photosMessage} not backed up`;
+
   const data: SettingsListType = [
     {
       title: 'Backup Settings',
@@ -68,6 +80,11 @@ export default function BackupSettingsScreen() {
           icon: <UploadIcon />,
           initialState: autobackupEnabled,
           disabled: !isServerReachable,
+        },
+        {
+          type: 'Label',
+          title: notBackedUpPhotosMessage,
+          icon: <InfoIcon />,
         },
       ],
     },
