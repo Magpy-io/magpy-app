@@ -48,12 +48,12 @@ export function usePhotosFunctionsStore() {
   }, [dispatch]);
 
   const UploadPhotos = useCallback(
-    (photos: PhotoLocalType[]) => {
-      if (photos.length == 0) {
+    (mediaIds: string[]) => {
+      if (mediaIds.length == 0) {
         return;
       }
 
-      UploadPhotosWorker(photos.map(photo => photo.id));
+      UploadPhotosWorker(mediaIds);
     },
     [UploadPhotosWorker],
   );

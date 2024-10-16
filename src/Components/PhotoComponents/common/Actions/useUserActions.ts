@@ -3,7 +3,6 @@ import { useCallback } from 'react';
 import { usePopupMessageModal } from '~/Components/CommonComponents/PopupMessageModal';
 import { useMainContext, useMainContextFunctions } from '~/Context/Contexts/MainContext';
 import { usePermissionsContext } from '~/Context/Contexts/PermissionsContext';
-import { PhotoLocalType } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { usePhotosFunctionsStore } from '~/Context/ReduxStore/Slices/Photos/PhotosFunctions';
 import { useToast } from '~/Hooks/useToast';
 
@@ -21,7 +20,7 @@ export function useUserActions() {
   const { UploadPhotos } = usePhotosFunctionsStore();
 
   const UploadPhotosAction = useCallback(
-    (photosToUpload: PhotoLocalType[]) => {
+    (mediaIds: string[]) => {
       if (
         notificationsPermissionStatus == 'PENDING' &&
         !neverAskForNotificationPermissionAgain
@@ -45,7 +44,7 @@ export function useUserActions() {
             });
 
             AskNotificationPermissionPromise.then(() => {
-              UploadPhotos(photosToUpload);
+              UploadPhotos(mediaIds);
             }).catch(err => {
               showToastError('Failed to start photo upload.');
               console.log(err);
@@ -55,7 +54,7 @@ export function useUserActions() {
         return;
       }
 
-      UploadPhotos(photosToUpload);
+      UploadPhotos(mediaIds);
     },
     [
       UploadPhotos,

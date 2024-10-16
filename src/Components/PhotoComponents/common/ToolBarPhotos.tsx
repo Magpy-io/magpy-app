@@ -7,8 +7,6 @@ import { usePhotosDownloadingFunctions } from '~/Context/Contexts/PhotosDownload
 import { useUploadWorkerContext } from '~/Context/Contexts/UploadWorkerContext';
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { usePhotosFunctionsStore } from '~/Context/ReduxStore/Slices/Photos/PhotosFunctions';
-import { photosLocalSelector } from '~/Context/ReduxStore/Slices/Photos/Selectors';
-import { useAppSelector } from '~/Context/ReduxStore/Store';
 import { useStyles } from '~/Hooks/useStyles';
 import { useToast } from '~/Hooks/useToast';
 import { colorsType } from '~/Styles/colors';
@@ -36,8 +34,6 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
 
   const isOnePhoto = selectedGalleryPhotos.length == 1;
 
-  const localPhotos = useAppSelector(photosLocalSelector);
-
   const { DeletePhotosLocal, DeletePhotosServer } = usePhotosFunctionsStore();
   const { StartPhotosDownload } = usePhotosDownloadingFunctions();
 
@@ -47,61 +43,27 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
   const { UploadPhotosAction } = useUserActions();
 
   const selectedLocalOnlyPhotos = useMemo(() => {
-    const selectedLocalOnlyPhotos = [];
-    for (const photo of selectedGalleryPhotos) {
-      if (photo.serverId) {
-        continue;
-      }
-      const localPhoto = photo.mediaId ? localPhotos[photo.mediaId] : undefined;
-      if (localPhoto) {
-        selectedLocalOnlyPhotos.push(localPhoto);
-      }
-    }
-    return selectedLocalOnlyPhotos;
-  }, [localPhotos, selectedGalleryPhotos]);
+    return selectedGalleryPhotos
+      .filter(photo => photo.mediaId && !photo.serverId)
+      .map(photo => photo.mediaId);
+  }, [selectedGalleryPhotos]) as string[];
 
   const selectedServerOnlyPhotosIds = useMemo(() => {
-    const selectedServerOnlyPhotosIds = [];
-    for (const photo of selectedGalleryPhotos) {
-      if (photo.mediaId) {
-        continue;
-      }
-
-      if (!photo.serverId) {
-        continue;
-      }
-      selectedServerOnlyPhotosIds.push(photo.serverId);
-    }
-    return selectedServerOnlyPhotosIds;
-  }, [selectedGalleryPhotos]);
+    return selectedGalleryPhotos
+      .filter(photo => photo.serverId && !photo.mediaId)
+      .map(photo => photo.serverId);
+  }, [selectedGalleryPhotos]) as string[];
 
   const selectedLocalPhotosIds = useMemo(() => {
-    const selectedLocalPhotosIds = [];
-
-    for (const photo of selectedGalleryPhotos) {
-      if (!photo.mediaId) {
-        continue;
-      }
-      selectedLocalPhotosIds.push(photo.mediaId);
-    }
-
-    return selectedLocalPhotosIds;
-  }, [selectedGalleryPhotos]);
+    return selectedGalleryPhotos.filter(photo => photo.mediaId).map(photo => photo.mediaId);
+  }, [selectedGalleryPhotos]) as string[];
 
   const selectedServerPhotosIds = useMemo(() => {
-    const selectedServerPhotosIds = [];
+    return selectedGalleryPhotos.filter(photo => photo.serverId).map(photo => photo.serverId);
+  }, [selectedGalleryPhotos]) as string[];
 
-    for (const photo of selectedGalleryPhotos) {
-      if (!photo.serverId) {
-        continue;
-      }
-      selectedServerPhotosIds.push(photo.serverId);
-    }
-    return selectedServerPhotosIds;
-  }, [selectedGalleryPhotos]);
-
-  const atleastOneLocal = selectedGalleryPhotos.find(p => p.mediaId);
-  const atleastOneServer = selectedGalleryPhotos.find(p => p.serverId);
+  const atleastOneLocal = selectedLocalPhotosIds.length > 0;
+  const atleastOneServer = selectedServerPhotosIds.length > 0;
 
   const atleastOneServerAndOneLocal = atleastOneLocal && atleastOneServer;
 
