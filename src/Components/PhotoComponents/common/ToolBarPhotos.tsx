@@ -38,8 +38,7 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
 
   const localPhotos = useAppSelector(photosLocalSelector);
 
-  const { DeletePhotosLocal, DeletePhotosServer, DeletePhotosEverywhere } =
-    usePhotosFunctionsStore();
+  const { DeletePhotosLocal, DeletePhotosServer } = usePhotosFunctionsStore();
   const { StartPhotosDownload } = usePhotosDownloadingFunctions();
 
   const { IsMediaIdUploadQueued } = useUploadWorkerContext();
@@ -135,7 +134,7 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
     }
   }, [StartPhotosDownload, selectedServerOnlyPhotosIds, showToastError]);
 
-  const onDelete = useCallback(() => {
+  const onDeleteEverywhere = useCallback(() => {
     const photosToDeleteCount = selectedGalleryPhotos.length;
 
     const photosMessage =
@@ -145,25 +144,37 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
       title: 'Deletion confirmation',
       ok: 'Yes',
       cancel: 'Cancel',
-      content: 'Are you sure you want to delete ' + photosMessage + ' permanently ?',
+      content: 'Are you sure you want to delete ' + photosMessage + ' from server ?',
       onDismissed: userAction => {
         if (userAction == 'Ok') {
-          DeletePhotosEverywhere(selectedGalleryPhotos)
+          showLoadingScreen();
+          DeletePhotosServer(selectedServerPhotosIds)
+            .then(() => {
+              return DeletePhotosLocal(selectedLocalPhotosIds);
+            })
             .then(() => clearSelection?.())
             .catch(err => {
               if ((err as { code: string })?.code != 'ERROR_USER_REJECTED') {
                 showToastError('Failed to delete photos.');
               }
               console.log(err);
+            })
+            .finally(() => {
+              hideLoadingScreen();
             });
         }
       },
     });
   }, [
-    DeletePhotosEverywhere,
+    DeletePhotosServer,
+    DeletePhotosLocal,
     clearSelection,
     displayPopupMessage,
-    selectedGalleryPhotos,
+    hideLoadingScreen,
+    selectedGalleryPhotos.length,
+    selectedServerPhotosIds,
+    selectedLocalPhotosIds,
+    showLoadingScreen,
     showToastError,
   ]);
 
@@ -229,7 +240,7 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
         nbPhotosToDeleteFromDevice={selectedLocalPhotosIds.length}
         onBackUp={onBackup}
         onDownload={onDownload}
-        onDelete={onDelete}
+        onDelete={onDeleteEverywhere}
         onDeleteFromServer={onDeleteFromServer}
         onDeleteFromDevice={onDeleteFromDevice}
         onShare={onShare}

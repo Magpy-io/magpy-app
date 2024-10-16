@@ -15,7 +15,6 @@ import { useToast } from '~/Hooks/useToast';
 
 import { useAppDispatch } from '../../Store';
 import {
-  PhotoGalleryType,
   PhotoLocalType,
   deletePhotosFromLocal,
   deletePhotosFromServer,
@@ -93,27 +92,6 @@ export function usePhotosFunctionsStore() {
     [dispatch, InvalidatePhotos, DeletePhotosByIdBatched],
   );
 
-  const DeletePhotosEverywhere = useCallback(
-    async (photos: PhotoGalleryType[]) => {
-      const mediaIds: string[] = [];
-      const serverIds: string[] = [];
-
-      photos.forEach(p => {
-        if (p.mediaId) {
-          mediaIds.push(p.mediaId);
-        }
-
-        if (p.serverId) {
-          serverIds.push(p.serverId);
-        }
-      });
-
-      await DeletePhotosServer(serverIds);
-      await DeletePhotosLocal(mediaIds);
-    },
-    [DeletePhotosServer, DeletePhotosLocal],
-  );
-
   const RefreshAllPhotos = useCallback(
     async (nLocal: number) => {
       await RefreshLocalPhotos(nLocal);
@@ -132,7 +110,6 @@ export function usePhotosFunctionsStore() {
     UploadPhotos,
     DeletePhotosLocal,
     DeletePhotosServer,
-    DeletePhotosEverywhere,
     ClearServerPhotos,
   };
 }
