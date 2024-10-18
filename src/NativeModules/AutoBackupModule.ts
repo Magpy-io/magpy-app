@@ -15,9 +15,9 @@ export interface AutoBackupModuleType {
     nextScheduleMillis: number;
     repeatIntervalMillis: number;
     stopReason: number;
-  }>;
+  } | null>;
   GetWorkerStats: () => Promise<{
-    lastExecutionTime: number;
+    lastExecutionTime: number | null;
     lastExecutionTimes: number[];
   }>;
 }
