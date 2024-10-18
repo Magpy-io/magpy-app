@@ -58,7 +58,7 @@ export function parseMillisecondsIntoReadableTime(
   const hours = milliseconds / (1000 * 60 * 60);
   const absoluteHours = Math.floor(hours);
   const hoursString =
-    absoluteHours == 0 ? '' : absoluteHours == 1 ? '1 hour ' : absoluteHours + ' hours';
+    absoluteHours == 0 ? '' : absoluteHours == 1 ? '1 hour' : absoluteHours + ' hours';
 
   //Get remainder from hours and convert to minutes
   const minutes = milliseconds / (1000 * 60);
@@ -68,7 +68,7 @@ export function parseMillisecondsIntoReadableTime(
     absoluteMinutes == 0
       ? ''
       : absoluteMinutes == 1
-        ? '1 minute '
+        ? '1 minute'
         : absoluteMinutes + ' minutes';
 
   //Get remainder from minutes and convert to seconds
