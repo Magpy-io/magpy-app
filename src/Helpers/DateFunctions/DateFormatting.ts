@@ -54,15 +54,22 @@ export function parseMillisecondsIntoReadableTime(
   milliseconds: number,
   precise: boolean = false,
 ) {
-  //Get hours from milliseconds
+  //Get days from milliseconds
+  const days = milliseconds / (1000 * 60 * 60 * 24);
+  const absoluteDays = Math.floor(days);
+  const daysString =
+    absoluteDays == 0 ? '' : absoluteDays == 1 ? '1 day' : absoluteDays + ' days';
+
+  //Get remainder from days and convert to hours
   const hours = milliseconds / (1000 * 60 * 60);
-  const absoluteHours = Math.floor(hours);
+  const remainderHours = hours - absoluteDays * 24;
+  const absoluteHours = Math.floor(remainderHours);
   const hoursString =
     absoluteHours == 0 ? '' : absoluteHours == 1 ? '1 hour' : absoluteHours + ' hours';
 
   //Get remainder from hours and convert to minutes
   const minutes = milliseconds / (1000 * 60);
-  const remainderMinutes = minutes - absoluteHours * 60;
+  const remainderMinutes = minutes - absoluteHours * 60 - absoluteDays * 60 * 24;
   const absoluteMinutes = Math.floor(remainderMinutes);
   const minutesString =
     absoluteMinutes == 0
@@ -73,7 +80,8 @@ export function parseMillisecondsIntoReadableTime(
 
   //Get remainder from minutes and convert to seconds
   const seconds = milliseconds / 1000;
-  const remainderSeconds = seconds - absoluteMinutes * 60 - absoluteHours * 60 * 60;
+  const remainderSeconds =
+    seconds - absoluteMinutes * 60 - absoluteHours * 60 * 60 - absoluteDays * 60 * 60 * 24;
   const absoluteSeconds = Math.floor(remainderSeconds);
   const secondsString =
     absoluteSeconds == 0
@@ -86,13 +94,17 @@ export function parseMillisecondsIntoReadableTime(
 
   if (precise) {
     ret =
+      daysString +
+      (daysString && ' ') +
       hoursString +
       (hoursString && ' ') +
       minutesString +
       (minutesString && ' ') +
       secondsString;
   } else {
-    if (hoursString) {
+    if (daysString) {
+      ret = daysString;
+    } else if (hoursString) {
       ret = hoursString;
     } else if (minutesString) {
       ret = minutesString;
