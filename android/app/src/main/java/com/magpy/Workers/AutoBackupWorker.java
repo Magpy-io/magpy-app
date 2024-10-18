@@ -7,6 +7,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.util.Log;
 
@@ -24,6 +25,7 @@ import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
+import com.magpy.GlobalManagers.MySharedPreferences.WorkerStatsPreferences;
 import com.magpy.GlobalManagers.ServerQueriesManager.Common.PhotoData;
 import com.magpy.GlobalManagers.ServerQueriesManager.Common.ResponseNotOkException;
 import com.magpy.GlobalManagers.ServerQueriesManager.GetPhotos;
@@ -34,6 +36,8 @@ import com.magpy.R;
 import com.magpy.Utils.MediaParser;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -77,6 +81,7 @@ public class AutoBackupWorker extends Worker {
     @Override
     public Result doWork() {
         Log.d("AutoBackupWorker", "Work started.");
+        recordExecutionTime();
 
         try {
             if(!parseInputData()) {
@@ -256,4 +261,14 @@ public class AutoBackupWorker extends Worker {
         getApplicationContext().getSystemService(NotificationManager.class).notify(NOTIFICATION_ID, notificationBuilder.build());
     }
 
+    private void recordExecutionTime(){
+        try{
+            Date currentTime = Calendar.getInstance().getTime();
+
+            WorkerStatsPreferences workerStatsPreferences = new WorkerStatsPreferences(getApplicationContext());
+            workerStatsPreferences.SetLastExecutionTime(currentTime.getTime());
+        }catch (Exception e){
+            Log.e("AutoBackupWorker", e.toString());
+        }
+    }
 }
