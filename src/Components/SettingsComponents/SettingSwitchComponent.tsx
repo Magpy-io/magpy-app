@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { TextStyle } from 'react-native';
 
 import SwitchComponent from '../CommonComponents/SwitchComponent';
@@ -21,18 +21,21 @@ export default function SettingSwitchComponent({
   initialState,
   disabled,
 }: SettingSwitchComponentProps) {
+  const [state, setState] = useState(initialState);
+
+  const onSwitchClicked = () => {
+    setState(!state);
+    onPress(!state);
+  };
+
   return (
     <SettingEntryComponent
       title={title}
       icon={icon}
       style={style}
-      notTouchable
+      onPress={onSwitchClicked}
       componentEnd={
-        <SwitchComponent
-          onSwitchChanged={onPress}
-          initialState={initialState}
-          disabled={disabled}
-        />
+        <SwitchComponent onSwitchChanged={onSwitchClicked} state={state} disabled={disabled} />
       }
     />
   );

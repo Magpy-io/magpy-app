@@ -14,7 +14,6 @@ type SettingEntryComponentProps = {
   icon?: JSX.Element;
   componentEnd?: JSX.Element;
   style?: TextStyle;
-  notTouchable?: boolean;
 };
 
 export default function SettingEntryComponent({
@@ -23,12 +22,11 @@ export default function SettingEntryComponent({
   title,
   onPress,
   style,
-  notTouchable,
 }: SettingEntryComponentProps) {
   const styles = useStyles(makeStyles);
 
   return (
-    <TouchableOpacity onPress={onPress} disabled={notTouchable}>
+    <TouchableOpacity onPress={onPress} disabled={!onPress}>
       <View style={styles.container}>
         <View style={styles.iconTitle}>
           {icon}

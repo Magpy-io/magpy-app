@@ -28,7 +28,7 @@ export default function SettingRadioButtonComponent({
       title={title}
       icon={icon}
       style={style}
-      notTouchable
+      onPress={onPress}
       componentEnd={
         <RadioButtonComponent
           onPress={onPress}
