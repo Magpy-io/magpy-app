@@ -16,7 +16,7 @@ export function useLastAutobackupExecutionTime() {
           }
         })
         .catch(console.log);
-    }, 2000);
+    }, 5000);
 
     return () => {
       clearTimeout(handle);
