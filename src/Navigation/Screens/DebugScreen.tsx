@@ -42,11 +42,13 @@ export default function DebugScreen() {
         'Next run in : ' +
         parseMillisecondsIntoReadableTime(
           workerInfo.nextScheduleMillis - new Date().getTime(),
+          true,
         );
     }
 
     const intervalTimeString = workerInfo
-      ? 'Run interval: ' + parseMillisecondsIntoReadableTime(workerInfo.repeatIntervalMillis)
+      ? 'Run interval: ' +
+        parseMillisecondsIntoReadableTime(workerInfo.repeatIntervalMillis, true)
       : null;
 
     const stopReason = workerInfo
@@ -63,7 +65,10 @@ export default function DebugScreen() {
 
     const timeSinceLastExecution = workerStats.lastExecutionTime
       ? 'Time since last execution: ' +
-        parseMillisecondsIntoReadableTime(new Date().getTime() - workerStats.lastExecutionTime)
+        parseMillisecondsIntoReadableTime(
+          new Date().getTime() - workerStats.lastExecutionTime,
+          true,
+        )
       : null;
 
     const lastExecutionTimes =
