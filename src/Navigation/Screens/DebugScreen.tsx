@@ -61,6 +61,11 @@ export default function DebugScreen() {
       ? 'Last execution time: ' + new Date(workerStats.lastExecutionTime).toString()
       : 'Last execution time: none';
 
+    const timeSinceLastExecution = workerStats.lastExecutionTime
+      ? 'Time since last execution: ' +
+        parseMillisecondsIntoReadableTime(new Date().getTime() - workerStats.lastExecutionTime)
+      : null;
+
     const lastExecutionTimes =
       'Last execution times: \n' +
       (workerStats.lastExecutionTimes.length == 0
@@ -78,6 +83,7 @@ export default function DebugScreen() {
         intervalTimeString,
         stopReason,
         lastExecutionTime,
+        timeSinceLastExecution,
         lastExecutionTimes,
       ].filter(e => e != null),
     );
