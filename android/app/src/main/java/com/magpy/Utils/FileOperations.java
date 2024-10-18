@@ -41,17 +41,17 @@ public class FileOperations {
     }
 
     public static ArrayList<String> readLinesFromFile(String filePath) throws IOException {
-        FileInputStream fis = new FileInputStream (filePath);
-        InputStreamReader isr = new InputStreamReader(fis);
-        BufferedReader bufferedReader = new BufferedReader(isr);
+        try(FileInputStream fis = new FileInputStream (filePath)){
 
-        ArrayList<String> lines = new ArrayList<>();
-        String line;
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(fis));
 
-        while ((line = bufferedReader.readLine()) != null) {
-            lines.add(line);
+            ArrayList<String> lines = new ArrayList<>();
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                lines.add(line);
+            }
+
+            return lines;
         }
-
-        return lines;
     }
 }
