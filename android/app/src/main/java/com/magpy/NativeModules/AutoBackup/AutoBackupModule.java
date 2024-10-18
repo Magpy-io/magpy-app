@@ -11,11 +11,16 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.bridge.WritableNativeMap;
 import com.magpy.GlobalManagers.ExecutorsManager;
+import com.magpy.GlobalManagers.MySharedPreferences.WorkerStatsPreferences;
 import com.magpy.NativeModules.UploadMedia.UploadMediaModule;
 import com.magpy.Utils.BridgeFunctions;
+
+import java.util.Collection;
 
 public class AutoBackupModule extends ReactContextBaseJavaModule {
     public AutoBackupModule(ReactApplicationContext context) {
@@ -117,5 +122,30 @@ public class AutoBackupModule extends ReactContextBaseJavaModule {
                 mPromise.reject("Error", e);
             }
         });
+    }
+
+    @ReactMethod
+    public void GetWorkerStats(Promise mPromise) {
+        try{
+            WorkerStatsPreferences workerStatsPreferences = new WorkerStatsPreferences(getReactApplicationContext());
+
+            long lastExecutionTime = workerStatsPreferences.GetLastExecutionTime();
+            Collection<Long> lastExecutionTimes = workerStatsPreferences.GetAllExecutionTimes();
+
+
+            WritableArray lastExecutionTimesArray = new WritableNativeArray();
+
+            for (Long executionTime:lastExecutionTimes) {
+                lastExecutionTimesArray.pushLong(executionTime);
+            }
+
+            WritableMap workStatsObject = new WritableNativeMap();
+            workStatsObject.putLong("lastExecutionTime", lastExecutionTime);
+            workStatsObject.putArray("lastExecutionTimes", lastExecutionTimesArray);
+
+            mPromise.resolve(workStatsObject);
+        }catch(Exception e){
+            mPromise.reject("GetWorkerStatsError", e);
+        }
     }
 }

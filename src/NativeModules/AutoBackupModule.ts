@@ -16,6 +16,10 @@ export interface AutoBackupModuleType {
     repeatIntervalMillis: number;
     stopReason: number;
   }>;
+  GetWorkerStats: () => Promise<{
+    lastExecutionTime: number;
+    lastExecutionTimes: number[];
+  }>;
 }
 
 const Module = AutoBackupModule as AutoBackupModuleType;
