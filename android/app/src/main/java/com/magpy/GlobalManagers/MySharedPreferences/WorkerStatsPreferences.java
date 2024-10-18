@@ -11,7 +11,7 @@ import java.util.List;
 
 public class WorkerStatsPreferences extends MyPreferencesBase{
 
-    private static final int NUMBER_EXECUTION_TIME_SAVED = 5;
+    private static final int NUMBER_EXECUTION_TIME_SAVED = 10;
     private static final String LAST_EXECUTION_TIME_KEY_NAME_BASE = "lastExecutionTime";
     private static final String LAST_EXECUTION_TIME_SPOT_KEY_NAME = "lastExecutionTimeSpot";
 
