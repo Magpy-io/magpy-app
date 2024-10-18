@@ -50,12 +50,15 @@ export function formatYear(date: string) {
 }
 
 // Converts a time difference in millis to readable
-export function parseMillisecondsIntoReadableTime(milliseconds: number) {
+export function parseMillisecondsIntoReadableTime(
+  milliseconds: number,
+  precise: boolean = false,
+) {
   //Get hours from milliseconds
   const hours = milliseconds / (1000 * 60 * 60);
   const absoluteHours = Math.floor(hours);
   const hoursString =
-    absoluteHours == 0 ? '' : absoluteHours == 1 ? '1 hour ' : absoluteHours + ' hours ';
+    absoluteHours == 0 ? '' : absoluteHours == 1 ? '1 hour ' : absoluteHours + ' hours';
 
   //Get remainder from hours and convert to minutes
   const minutes = milliseconds / (1000 * 60);
@@ -66,7 +69,7 @@ export function parseMillisecondsIntoReadableTime(milliseconds: number) {
       ? ''
       : absoluteMinutes == 1
         ? '1 minute '
-        : absoluteMinutes + ' minutes ';
+        : absoluteMinutes + ' minutes';
 
   //Get remainder from minutes and convert to seconds
   const seconds = milliseconds / 1000;
@@ -79,7 +82,24 @@ export function parseMillisecondsIntoReadableTime(milliseconds: number) {
         ? '1 second'
         : absoluteSeconds + ' seconds';
 
-  const ret = hoursString + minutesString + secondsString;
+  let ret;
+
+  if (precise) {
+    ret =
+      hoursString +
+      (hoursString && ' ') +
+      minutesString +
+      (minutesString && ' ') +
+      secondsString;
+  } else {
+    if (hoursString) {
+      ret = hoursString;
+    } else if (minutesString) {
+      ret = minutesString;
+    } else {
+      ret = secondsString;
+    }
+  }
 
   return ret ?? 'None';
 }
