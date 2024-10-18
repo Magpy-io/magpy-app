@@ -136,11 +136,15 @@ public class AutoBackupModule extends ReactContextBaseJavaModule {
             WritableArray lastExecutionTimesArray = new WritableNativeArray();
 
             for (Long executionTime:lastExecutionTimes) {
-                lastExecutionTimesArray.pushLong(executionTime);
+                lastExecutionTimesArray.pushDouble(executionTime);
             }
 
             WritableMap workStatsObject = new WritableNativeMap();
-            workStatsObject.putLong("lastExecutionTime", lastExecutionTime);
+            if(lastExecutionTime < 0){
+                workStatsObject.putNull("lastExecutionTime");
+            }else{
+                workStatsObject.putDouble("lastExecutionTime", lastExecutionTime);
+            }
             workStatsObject.putArray("lastExecutionTimes", lastExecutionTimesArray);
 
             mPromise.resolve(workStatsObject);
