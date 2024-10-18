@@ -22,11 +22,16 @@ export default function DebugScreen() {
   const refreshData = async () => {
     const workerInfo = await AutoBackupModule.GetWorkerInfo();
 
-    const workerStateString = 'State: ' + workerInfo.state;
+    const workerStateString = workerInfo
+      ? 'State: ' + workerInfo.state
+      : 'Worker not scheduled';
 
     let workerNextScheduledRunString;
     let workerNextRunTimerString;
-    if (workerInfo.nextScheduleMillis == -1) {
+    if (!workerInfo) {
+      workerNextScheduledRunString = null;
+      workerNextRunTimerString = null;
+    } else if (workerInfo.nextScheduleMillis == -1) {
       workerNextScheduledRunString = null;
       workerNextRunTimerString = null;
     } else {
@@ -40,11 +45,29 @@ export default function DebugScreen() {
         );
     }
 
-    const intervalTimeString =
-      'Run interval: ' + parseMillisecondsIntoReadableTime(workerInfo.repeatIntervalMillis);
+    const intervalTimeString = workerInfo
+      ? 'Run interval: ' + parseMillisecondsIntoReadableTime(workerInfo.repeatIntervalMillis)
+      : null;
 
-    const stopReason =
-      workerInfo.stopReason == -256 ? null : 'Stop reason: ' + workerInfo.stopReason;
+    const stopReason = workerInfo
+      ? workerInfo.stopReason == -256
+        ? null
+        : 'Stop reason: ' + workerInfo.stopReason
+      : null;
+
+    const workerStats = await AutoBackupModule.GetWorkerStats();
+
+    const lastExecutionTime = workerStats.lastExecutionTime
+      ? 'Last execution time: ' + new Date(workerStats.lastExecutionTime).toString()
+      : 'Last execution time: none';
+
+    const lastExecutionTimes =
+      'Last execution times: \n' +
+      (workerStats.lastExecutionTimes.length == 0
+        ? 'none'
+        : workerStats.lastExecutionTimes.reduce((prev, current) => {
+            return prev + new Date(current).toString() + '\n';
+          }, ''));
 
     setData(
       [
@@ -54,6 +77,8 @@ export default function DebugScreen() {
         workerNextRunTimerString,
         intervalTimeString,
         stopReason,
+        lastExecutionTime,
+        lastExecutionTimes,
       ].filter(e => e != null),
     );
   };
