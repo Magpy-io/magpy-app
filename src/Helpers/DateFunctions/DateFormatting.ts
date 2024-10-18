@@ -54,6 +54,10 @@ export function parseMillisecondsIntoReadableTime(
   milliseconds: number,
   precise: boolean = false,
 ) {
+  if (milliseconds < 1000) {
+    return 'None';
+  }
+
   //Get days from milliseconds
   const days = milliseconds / (1000 * 60 * 60 * 24);
   const absoluteDays = Math.floor(days);
@@ -93,14 +97,10 @@ export function parseMillisecondsIntoReadableTime(
   let ret;
 
   if (precise) {
-    ret =
-      daysString +
-      (daysString && ' ') +
-      hoursString +
-      (hoursString && ' ') +
-      minutesString +
-      (minutesString && ' ') +
-      secondsString;
+    ret = daysString;
+    ret = ret + (ret && hoursString && ' ') + hoursString;
+    ret = ret + (ret && minutesString && ' ') + minutesString;
+    ret = ret + (ret && secondsString && ' ') + secondsString;
   } else {
     if (daysString) {
       ret = daysString;
@@ -113,5 +113,5 @@ export function parseMillisecondsIntoReadableTime(
     }
   }
 
-  return ret ?? 'None';
+  return ret;
 }
