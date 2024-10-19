@@ -19,6 +19,8 @@ import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.bridge.WritableNativeMap;
 import com.magpy.GlobalManagers.ExecutorsManager;
 import com.magpy.GlobalManagers.MySharedPreferences.WorkerStatsPreferences;
+import com.magpy.NativeModules.Events.EventAutobackupWorkerStatusChanged;
+import com.magpy.NativeModules.Events.EventPhotoUploaded;
 import com.magpy.NativeModules.UploadMedia.UploadMediaModule;
 import com.magpy.Utils.BridgeFunctions;
 import com.magpy.Utils.CallbackEmptyWithThrowable;
@@ -27,8 +29,6 @@ import com.magpy.Utils.CallbackWithParameterAndThrowable;
 import java.util.Collection;
 
 public class AutoBackupModule extends ReactContextBaseJavaModule {
-
-    public static final String EVENT_WORKER_STATUS_CHANGED = "AUTO_BACKUP_WORKER_STATUS_CHANGED";
 
     public static final String WORKER_ENQUEUED = "WORKER_ENQUEUED";
     public static final String WORKER_RUNNING = "WORKER_RUNNING";
@@ -74,12 +74,12 @@ public class AutoBackupModule extends ReactContextBaseJavaModule {
             autoBackupWorkerManager.StartWorker(url, serverToken, deviceId, observerData -> {
 
                 if (observerData.mediaId != null) {
-                    UploadMediaModule.SendEventPhotoUploaded(getReactApplicationContext(), observerData.mediaId, observerData.photo);
+                    EventPhotoUploaded.Send(getReactApplicationContext(), observerData.mediaId, observerData.photo);
                 }
 
                 boolean hasStatusChanged = CheckStatusChanged(observerData.workerState);
                 if (hasStatusChanged) {
-                    SendEventStatusChanged(getReactApplicationContext(), workerStatus);
+                    EventAutobackupWorkerStatusChanged.Send(getReactApplicationContext(), workerStatus);
                 }
             }, new CallbackEmptyWithThrowable() {
                 @Override
@@ -115,12 +115,6 @@ public class AutoBackupModule extends ReactContextBaseJavaModule {
         }
 
         return hasStatusChanged;
-    }
-
-    static private void SendEventStatusChanged(ReactContext context, String workerStatus){
-        WritableMap params = new WritableNativeMap();
-        params.putString("status", workerStatus);
-        BridgeFunctions.sendEvent(context, EVENT_WORKER_STATUS_CHANGED, params);
     }
 
     @ReactMethod
