@@ -10,6 +10,8 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeMap;
 import com.magpy.Utils.BridgeFunctions;
+import com.magpy.Utils.CallbackEmptyWithThrowable;
+import com.magpy.Utils.CallbackWithParameterAndThrowable;
 
 public class UploadMediaModule extends ReactContextBaseJavaModule {
 
@@ -40,7 +42,7 @@ public class UploadMediaModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void StartUploadWorker(ReadableMap data, Promise mPromise) {
-        UploadWorkerManager uploadWorkerManager = new UploadWorkerManager(getReactApplicationContext(), mPromise);
+        UploadWorkerManager uploadWorkerManager = new UploadWorkerManager(getReactApplicationContext());
 
         String url = data.getString("url");
         if(url == null){
@@ -68,7 +70,7 @@ public class UploadMediaModule extends ReactContextBaseJavaModule {
 
         try{
             uploadWorkerManager.StartWorker(url, serverToken, deviceId, photosIdsFilePath, observerData -> {
-                if(observerData.mediaId != null){
+                if (observerData.mediaId != null) {
                     WritableMap params = new WritableNativeMap();
                     params.putString(EVENT_FIELD_NAME_MEDIA_ID, observerData.mediaId);
                     params.putString(EVENT_FIELD_NAME_PHOTO, observerData.photo);
@@ -76,7 +78,7 @@ public class UploadMediaModule extends ReactContextBaseJavaModule {
                 }
 
                 String newWorkerStatus = "";
-                switch (observerData.workerState){
+                switch (observerData.workerState) {
                     case SUCCEEDED -> newWorkerStatus = WORKER_SUCCESS;
                     case ENQUEUED -> newWorkerStatus = WORKER_ENQUEUED;
                     case RUNNING -> newWorkerStatus = WORKER_RUNNING;
@@ -85,13 +87,23 @@ public class UploadMediaModule extends ReactContextBaseJavaModule {
                 }
 
 
-                if(!newWorkerStatus.equals(workerStatus)){
+                if (!newWorkerStatus.equals(workerStatus)) {
                     workerStatus = newWorkerStatus;
                     WritableMap params = new WritableNativeMap();
                     params.putString("status", workerStatus);
                     BridgeFunctions.sendEvent(getReactApplicationContext(), EVENT_WORKER_STATUS_CHANGED, params);
                 }
 
+            }, new CallbackEmptyWithThrowable() {
+                @Override
+                public void onSuccess() {
+                    mPromise.resolve(null);
+                }
+
+                @Override
+                public void onFailed(Throwable e) {
+                    mPromise.reject("Error", e);
+                }
             });
         }
         catch(Exception e){
@@ -102,13 +114,35 @@ public class UploadMediaModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void IsWorkerAlive(Promise mPromise) {
-        UploadWorkerManager uploadWorkerManager = new UploadWorkerManager(getReactApplicationContext(), mPromise);
-        uploadWorkerManager.IsWorkerAlive();
+        UploadWorkerManager uploadWorkerManager = new UploadWorkerManager(getReactApplicationContext());
+        uploadWorkerManager.IsWorkerAlive(new CallbackWithParameterAndThrowable<Boolean>() {
+            @Override
+            public void onSuccess(Boolean result) {
+                mPromise.resolve(result);
+            }
+
+            @Override
+            public void onFailed(Throwable e) {
+                mPromise.reject("Error", e);
+            }
+        });
     }
 
     @ReactMethod
     public void StopWorker(Promise mPromise) {
-        UploadWorkerManager uploadWorkerManager = new UploadWorkerManager(getReactApplicationContext(), mPromise);
-        uploadWorkerManager.StopWorker();
+        UploadWorkerManager uploadWorkerManager = new UploadWorkerManager(getReactApplicationContext());
+        uploadWorkerManager.StopWorker(
+                new CallbackEmptyWithThrowable() {
+                    @Override
+                    public void onSuccess() {
+                        mPromise.resolve(null);
+                    }
+
+                    @Override
+                    public void onFailed(Throwable e) {
+                        mPromise.reject("Error", e);
+                    }
+                }
+        );
     }
 }

@@ -15,8 +15,9 @@ import androidx.work.OutOfQuotaPolicy;
 import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 
-import com.facebook.react.bridge.Promise;
 import com.magpy.GlobalManagers.ExecutorsManager;
+import com.magpy.Utils.CallbackEmptyWithThrowable;
+import com.magpy.Utils.CallbackWithParameterAndThrowable;
 import com.magpy.Workers.UploadWorker;
 
 import java.util.List;
@@ -25,14 +26,12 @@ import java.util.concurrent.ExecutionException;
 public class UploadWorkerManager {
 
     Context context;
-    Promise mPromise;
 
-    public UploadWorkerManager(Context context, Promise promise){
+    public UploadWorkerManager(Context context){
         this.context = context;
-        this.mPromise = promise;
     }
 
-    public void StartWorker(String url, String serverToken, String deviceId, String photosIdsFilePath, Observer<ObserverData> observer){
+    public void StartWorker(String url, String serverToken, String deviceId, String photosIdsFilePath, Observer<ObserverData> observer, CallbackEmptyWithThrowable callback){
         OneTimeWorkRequest uploadRequest =
                 new OneTimeWorkRequest.Builder(UploadWorker.class)
                         .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
@@ -53,17 +52,22 @@ public class UploadWorkerManager {
                 }
 
                 WorkManager.getInstance(context).enqueueUniqueWork(UploadWorker.WORKER_NAME, ExistingWorkPolicy.REPLACE, uploadRequest).getResult().get();
-                SetupWorkerObserver(observer);
-            } catch (ExecutionException | InterruptedException e) {
-                mPromise.reject("Error", e);
+                SetupWorkerObserver(observer, callback);
+            } catch (Exception e) {
+                callback.onFailed(e);
             }
         });
     }
 
-    private void SetupWorkerObserver(Observer<ObserverData> observer){
+    private void SetupWorkerObserver(Observer<ObserverData> observer, CallbackEmptyWithThrowable callback){
         ExecutorsManager.ExecuteOnMainThread(() -> {
             try {
                 WorkInfo result = GetWorker();
+
+                if(result == null){
+                    throw new Exception("Failed to setup WorkerObserver, Worker not found.");
+                }
+
                 WorkManager.getInstance(context).getWorkInfoByIdLiveData(result.getId()).observe(ProcessLifecycleOwner.get(), (workInfo -> {
                     if (workInfo != null) {
 
@@ -82,10 +86,10 @@ public class UploadWorkerManager {
                         observer.onChanged(data);
                     }
                 }));
-            } catch (ExecutionException | InterruptedException e) {
-                mPromise.reject("Error", e);
+            } catch (Exception e) {
+                callback.onFailed(e);
             }
-            mPromise.resolve(null);
+            callback.onSuccess();
         });
     }
 
@@ -102,43 +106,38 @@ public class UploadWorkerManager {
         return result.get(0);
     }
 
-    public void IsWorkerAlive(){
+    public void IsWorkerAlive(CallbackWithParameterAndThrowable<Boolean> callback){
         ExecutorsManager.ExecuteOnBackgroundThread(() -> {
             try {
                 WorkInfo workInfo = GetWorker();
 
                 if(workInfo == null){
-                    mPromise.resolve(false);
+                    callback.onSuccess(false);
                     return;
                 }
 
-                if(!workInfo.getState().isFinished()){
-                    mPromise.resolve(true);
-                    return;
-                }
-                mPromise.resolve(false);
-            } catch (ExecutionException | InterruptedException e) {
-                mPromise.reject("Error", e);
+                callback.onSuccess(!workInfo.getState().isFinished());
+            } catch (Exception e) {
+                callback.onFailed(e);
             }
         });
     }
 
-    public void StopWorker(){
+    public void StopWorker(CallbackEmptyWithThrowable callback){
         ExecutorsManager.ExecuteOnBackgroundThread(() -> {
             try {
                 WorkManager.getInstance(context).cancelUniqueWork(UploadWorker.WORKER_NAME).getResult().get();
-                mPromise.resolve(null);
-            } catch (ExecutionException | InterruptedException e) {
-                mPromise.reject("Error", e);
+                callback.onSuccess();
+            } catch (Exception e) {
+                callback.onFailed(e);
             }
         });
     }
 
 
-    public class ObserverData{
+    public static class ObserverData{
         public String mediaId;
         public String photo;
         public WorkInfo.State workerState;
     }
-
 }
