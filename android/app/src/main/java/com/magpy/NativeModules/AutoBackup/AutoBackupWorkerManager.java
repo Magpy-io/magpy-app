@@ -27,10 +27,12 @@ import java.util.concurrent.TimeUnit;
 
 public class AutoBackupWorkerManager {
 
-    Context context;
+    Context m_context;
+    WorkInfo.State workerState;
 
     public AutoBackupWorkerManager(Context context){
-        this.context = context;
+        m_context = context;
+        workerState = WorkInfo.State.SUCCEEDED;
     }
 
     public void StartWorker(String url, String serverToken, String deviceId, Observer<ObserverData> observer, CallbackEmptyWithThrowable callback){
@@ -54,10 +56,10 @@ public class AutoBackupWorkerManager {
         ExecutorsManager.ExecuteOnBackgroundThread(() -> {
             try {
                 if(!WorkManager.isInitialized()){
-                    WorkManager.initialize(context, new Configuration.Builder().setExecutor(ExecutorsManager.executorService).build());
+                    WorkManager.initialize(m_context, new Configuration.Builder().setExecutor(ExecutorsManager.executorService).build());
                 }
 
-                WorkManager.getInstance(context).enqueueUniquePeriodicWork(AutoBackupWorker.WORKER_NAME, ExistingPeriodicWorkPolicy.UPDATE, uploadRequest).getResult().get();
+                WorkManager.getInstance(m_context).enqueueUniquePeriodicWork(AutoBackupWorker.WORKER_NAME, ExistingPeriodicWorkPolicy.UPDATE, uploadRequest).getResult().get();
                 SetupWorkerObserver(observer, callback);
             } catch (Exception e) {
                 callback.onFailed(e);
@@ -74,11 +76,15 @@ public class AutoBackupWorkerManager {
                     throw new Exception("Failed to setup WorkerObserver, Worker not found.");
                 }
 
-                WorkManager.getInstance(context).getWorkInfoByIdLiveData(result.getId()).observe(ProcessLifecycleOwner.get(), (workInfo -> {
+                WorkManager.getInstance(m_context).getWorkInfoByIdLiveData(result.getId()).observe(ProcessLifecycleOwner.get(), (workInfo -> {
                     if (workInfo != null) {
 
                         ObserverData data = new ObserverData();
-                        data.workerState = workInfo.getState();
+
+                        boolean hasStateChanged = CheckStateChanged(workInfo.getState());
+                        if (hasStateChanged){
+                            data.workerState = workInfo.getState();
+                        }
 
                         Data progress = workInfo.getProgress();
                         String uploadedMediaId = progress.getString(UPLOADED_PHOTO_MEDIA_ID);
@@ -99,6 +105,16 @@ public class AutoBackupWorkerManager {
         });
     }
 
+    private boolean CheckStateChanged(WorkInfo.State newState){
+        boolean hasStateChanged = workerState != newState;
+
+        if(hasStateChanged){
+            workerState = newState;
+        }
+
+        return hasStateChanged;
+    }
+
     public void GetWorker(CallbackWithParameterAndThrowable<WorkInfo> callback){
         ExecutorsManager.ExecuteOnBackgroundThread(() -> {
             try {
@@ -112,7 +128,7 @@ public class AutoBackupWorkerManager {
 
     private WorkInfo getWorker() throws ExecutionException, InterruptedException {
         List<WorkInfo> result = WorkManager
-                .getInstance(context)
+                .getInstance(m_context)
                 .getWorkInfosForUniqueWork(AutoBackupWorker.WORKER_NAME)
                 .get();
 
@@ -143,7 +159,7 @@ public class AutoBackupWorkerManager {
     public void StopWorker(CallbackEmptyWithThrowable callback) {
         ExecutorsManager.ExecuteOnBackgroundThread(() -> {
             try {
-                WorkManager.getInstance(context).cancelUniqueWork(AutoBackupWorker.WORKER_NAME).getResult().get();
+                WorkManager.getInstance(m_context).cancelUniqueWork(AutoBackupWorker.WORKER_NAME).getResult().get();
                 callback.onSuccess();
             } catch (Exception e) {
                 callback.onFailed(e);
@@ -152,8 +168,8 @@ public class AutoBackupWorkerManager {
     }
 
     public static class ObserverData{
-        public String mediaId;
-        public String photo;
-        public WorkInfo.State workerState;
+        public String mediaId = null;
+        public String photo = null;
+        public WorkInfo.State workerState = null;
     }
 }

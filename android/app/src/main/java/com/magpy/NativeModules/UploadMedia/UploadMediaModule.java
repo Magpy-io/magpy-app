@@ -11,6 +11,7 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeMap;
+import com.magpy.NativeModules.Events.EventAutobackupWorkerStatusChanged;
 import com.magpy.NativeModules.Events.EventPhotoUploaded;
 import com.magpy.NativeModules.Events.EventUploadWorkerStatusChanged;
 import com.magpy.Utils.BridgeFunctions;
@@ -71,9 +72,8 @@ public class UploadMediaModule extends ReactContextBaseJavaModule {
                     EventPhotoUploaded.Send(getReactApplicationContext(), observerData.mediaId, observerData.photo);
                 }
 
-                boolean hasStatusChanged = CheckStatusChanged(observerData.workerState);
-                if (hasStatusChanged) {
-                    EventUploadWorkerStatusChanged.Send(getReactApplicationContext(), workerStatus);
+                if(observerData.workerState != null){
+                    EventUploadWorkerStatusChanged.Send(getReactApplicationContext(), ParseState(observerData.workerState));
                 }
             }, new CallbackEmptyWithThrowable() {
                 @Override
@@ -92,23 +92,17 @@ public class UploadMediaModule extends ReactContextBaseJavaModule {
         }
     }
 
-    private boolean CheckStatusChanged(WorkInfo.State newState){
-        String newWorkerStatus = "";
-        switch (newState) {
-            case SUCCEEDED -> newWorkerStatus = WORKER_SUCCESS;
-            case ENQUEUED -> newWorkerStatus = WORKER_ENQUEUED;
-            case RUNNING -> newWorkerStatus = WORKER_RUNNING;
-            case CANCELLED -> newWorkerStatus = WORKER_CANCELED;
-            default -> newWorkerStatus = WORKER_FAILED;
+    private String ParseState(WorkInfo.State state){
+        String stateParsed = "";
+        switch (state) {
+            case SUCCEEDED -> stateParsed = WORKER_SUCCESS;
+            case ENQUEUED -> stateParsed = WORKER_ENQUEUED;
+            case RUNNING -> stateParsed = WORKER_RUNNING;
+            case CANCELLED -> stateParsed = WORKER_CANCELED;
+            default -> stateParsed = WORKER_FAILED;
         }
 
-        boolean hasStatusChanged = !newWorkerStatus.equals(workerStatus);
-
-        if(hasStatusChanged){
-            workerStatus = newWorkerStatus;
-        }
-
-        return hasStatusChanged;
+        return stateParsed;
     }
 
 

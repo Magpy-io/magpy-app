@@ -36,8 +36,6 @@ public class AutoBackupModule extends ReactContextBaseJavaModule {
     public static final String WORKER_SUCCESS = "WORKER_SUCCESS";
     public static final String WORKER_CANCELED = "WORKER_CANCELED";
 
-    public String workerStatus = WORKER_SUCCESS;
-
     public AutoBackupModule(ReactApplicationContext context) {
         super(context);
     }
@@ -77,9 +75,8 @@ public class AutoBackupModule extends ReactContextBaseJavaModule {
                     EventPhotoUploaded.Send(getReactApplicationContext(), observerData.mediaId, observerData.photo);
                 }
 
-                boolean hasStatusChanged = CheckStatusChanged(observerData.workerState);
-                if (hasStatusChanged) {
-                    EventAutobackupWorkerStatusChanged.Send(getReactApplicationContext(), workerStatus);
+                if(observerData.workerState != null){
+                    EventAutobackupWorkerStatusChanged.Send(getReactApplicationContext(), ParseState(observerData.workerState));
                 }
             }, new CallbackEmptyWithThrowable() {
                 @Override
@@ -98,23 +95,17 @@ public class AutoBackupModule extends ReactContextBaseJavaModule {
         }
     }
 
-    private boolean CheckStatusChanged(WorkInfo.State newState){
-        String newWorkerStatus = "";
-        switch (newState) {
-            case SUCCEEDED -> newWorkerStatus = WORKER_SUCCESS;
-            case ENQUEUED -> newWorkerStatus = WORKER_ENQUEUED;
-            case RUNNING -> newWorkerStatus = WORKER_RUNNING;
-            case CANCELLED -> newWorkerStatus = WORKER_CANCELED;
-            default -> newWorkerStatus = WORKER_FAILED;
+    private String ParseState(WorkInfo.State state){
+        String stateParsed = "";
+        switch (state) {
+            case SUCCEEDED -> stateParsed = WORKER_SUCCESS;
+            case ENQUEUED -> stateParsed = WORKER_ENQUEUED;
+            case RUNNING -> stateParsed = WORKER_RUNNING;
+            case CANCELLED -> stateParsed = WORKER_CANCELED;
+            default -> stateParsed = WORKER_FAILED;
         }
 
-        boolean hasStatusChanged = !newWorkerStatus.equals(workerStatus);
-
-        if(hasStatusChanged){
-            workerStatus = newWorkerStatus;
-        }
-
-        return hasStatusChanged;
+        return stateParsed;
     }
 
     @ReactMethod
