@@ -1,5 +1,7 @@
 package com.magpy.NativeModules.AutoBackup;
 
+import static com.magpy.NativeModules.Parsers.WorkerStateParser.ParseWorkerState;
+
 import android.content.Context;
 import android.os.Build;
 
@@ -29,12 +31,6 @@ import com.magpy.Utils.CallbackWithParameterAndThrowable;
 import java.util.Collection;
 
 public class AutoBackupModule extends ReactContextBaseJavaModule {
-
-    public static final String WORKER_ENQUEUED = "WORKER_ENQUEUED";
-    public static final String WORKER_RUNNING = "WORKER_RUNNING";
-    public static final String WORKER_FAILED = "WORKER_FAILED";
-    public static final String WORKER_SUCCESS = "WORKER_SUCCESS";
-    public static final String WORKER_CANCELED = "WORKER_CANCELED";
 
     public AutoBackupModule(ReactApplicationContext context) {
         super(context);
@@ -76,7 +72,7 @@ public class AutoBackupModule extends ReactContextBaseJavaModule {
                 }
 
                 if(observerData.workerState != null){
-                    EventAutobackupWorkerStatusChanged.Send(getReactApplicationContext(), ParseState(observerData.workerState));
+                    EventAutobackupWorkerStatusChanged.Send(getReactApplicationContext(), ParseWorkerState(observerData.workerState));
                 }
             }, new CallbackEmptyWithThrowable() {
                 @Override
@@ -93,19 +89,6 @@ public class AutoBackupModule extends ReactContextBaseJavaModule {
         }catch(Exception e){
             mPromise.reject("Error", e);
         }
-    }
-
-    private String ParseState(WorkInfo.State state){
-        String stateParsed = "";
-        switch (state) {
-            case SUCCEEDED -> stateParsed = WORKER_SUCCESS;
-            case ENQUEUED -> stateParsed = WORKER_ENQUEUED;
-            case RUNNING -> stateParsed = WORKER_RUNNING;
-            case CANCELLED -> stateParsed = WORKER_CANCELED;
-            default -> stateParsed = WORKER_FAILED;
-        }
-
-        return stateParsed;
     }
 
     @ReactMethod

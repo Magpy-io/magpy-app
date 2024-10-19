@@ -1,5 +1,7 @@
 package com.magpy.NativeModules.UploadMedia;
 
+import static com.magpy.NativeModules.Parsers.WorkerStateParser.ParseWorkerState;
+
 import androidx.annotation.NonNull;
 import androidx.work.WorkInfo;
 
@@ -20,13 +22,6 @@ import com.magpy.Utils.CallbackWithParameterAndThrowable;
 
 public class UploadMediaModule extends ReactContextBaseJavaModule {
 
-    public static final String WORKER_ENQUEUED = "WORKER_ENQUEUED";
-    public static final String WORKER_RUNNING = "WORKER_RUNNING";
-    public static final String WORKER_FAILED = "WORKER_FAILED";
-    public static final String WORKER_SUCCESS = "WORKER_SUCCESS";
-    public static final String WORKER_CANCELED = "WORKER_CANCELED";
-
-    public String workerStatus = WORKER_SUCCESS;
 
     public UploadMediaModule(ReactApplicationContext context) {
         super(context);
@@ -73,7 +68,7 @@ public class UploadMediaModule extends ReactContextBaseJavaModule {
                 }
 
                 if(observerData.workerState != null){
-                    EventUploadWorkerStatusChanged.Send(getReactApplicationContext(), ParseState(observerData.workerState));
+                    EventUploadWorkerStatusChanged.Send(getReactApplicationContext(), ParseWorkerState(observerData.workerState));
                 }
             }, new CallbackEmptyWithThrowable() {
                 @Override
@@ -91,20 +86,6 @@ public class UploadMediaModule extends ReactContextBaseJavaModule {
             mPromise.reject("Error", e);
         }
     }
-
-    private String ParseState(WorkInfo.State state){
-        String stateParsed = "";
-        switch (state) {
-            case SUCCEEDED -> stateParsed = WORKER_SUCCESS;
-            case ENQUEUED -> stateParsed = WORKER_ENQUEUED;
-            case RUNNING -> stateParsed = WORKER_RUNNING;
-            case CANCELLED -> stateParsed = WORKER_CANCELED;
-            default -> stateParsed = WORKER_FAILED;
-        }
-
-        return stateParsed;
-    }
-
 
     @ReactMethod
     public void IsWorkerAlive(Promise mPromise) {
