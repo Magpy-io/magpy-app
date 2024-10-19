@@ -7,7 +7,7 @@ import { writeWorkerDataInput } from './Utils';
 const { UploadMediaModule: UploadMediaModuleTypeNative } = NativeModules;
 
 const PHOTO_UPLOADED_EVENT_NAME = 'PHOTO_UPLOADED_EVENT_NAME';
-const WORKER_STATUS_CHANGED_NAME = 'WORKER_STATUS_CHANGED_NAME';
+const WORKER_STATUS_CHANGED_NAME = 'UPLOAD_WORKER_STATUS_CHANGED';
 
 export type WorkerStatus =
   | 'WORKER_ENQUEUED'

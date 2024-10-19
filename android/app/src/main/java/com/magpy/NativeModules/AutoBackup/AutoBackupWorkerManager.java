@@ -78,6 +78,7 @@ public class AutoBackupWorkerManager {
                     if (workInfo != null) {
 
                         ObserverData data = new ObserverData();
+                        data.workerState = workInfo.getState();
 
                         Data progress = workInfo.getProgress();
                         String uploadedMediaId = progress.getString(UPLOADED_PHOTO_MEDIA_ID);
@@ -86,8 +87,9 @@ public class AutoBackupWorkerManager {
                         if(uploadedMediaId != null){
                             data.mediaId = uploadedMediaId;
                             data.photo = uploadedPhoto;
-                            observer.onChanged(data);
                         }
+
+                        observer.onChanged(data);
                     }
                 }));
             } catch (Exception e) {
@@ -152,5 +154,6 @@ public class AutoBackupWorkerManager {
     public static class ObserverData{
         public String mediaId;
         public String photo;
+        public WorkInfo.State workerState;
     }
 }

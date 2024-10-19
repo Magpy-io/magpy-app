@@ -1,14 +1,15 @@
 package com.magpy.NativeModules.AutoBackup;
 
+import android.content.Context;
 import android.os.Build;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.work.WorkInfo;
-import androidx.work.WorkManager;
 
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
@@ -22,11 +23,21 @@ import com.magpy.NativeModules.UploadMedia.UploadMediaModule;
 import com.magpy.Utils.BridgeFunctions;
 import com.magpy.Utils.CallbackEmptyWithThrowable;
 import com.magpy.Utils.CallbackWithParameterAndThrowable;
-import com.magpy.Workers.AutoBackupWorker;
 
 import java.util.Collection;
 
 public class AutoBackupModule extends ReactContextBaseJavaModule {
+
+    public static final String EVENT_WORKER_STATUS_CHANGED = "AUTO_BACKUP_WORKER_STATUS_CHANGED";
+
+    public static final String WORKER_ENQUEUED = "WORKER_ENQUEUED";
+    public static final String WORKER_RUNNING = "WORKER_RUNNING";
+    public static final String WORKER_FAILED = "WORKER_FAILED";
+    public static final String WORKER_SUCCESS = "WORKER_SUCCESS";
+    public static final String WORKER_CANCELED = "WORKER_CANCELED";
+
+    public String workerStatus = WORKER_SUCCESS;
+
     public AutoBackupModule(ReactApplicationContext context) {
         super(context);
     }
@@ -61,10 +72,15 @@ public class AutoBackupModule extends ReactContextBaseJavaModule {
             }
 
             autoBackupWorkerManager.StartWorker(url, serverToken, deviceId, observerData -> {
-                WritableMap params = new WritableNativeMap();
-                params.putString(UploadMediaModule.EVENT_FIELD_NAME_MEDIA_ID, observerData.mediaId);
-                params.putString(UploadMediaModule.EVENT_FIELD_NAME_PHOTO, observerData.photo);
-                BridgeFunctions.sendEvent(getReactApplicationContext(), UploadMediaModule.EVENT_PHOTO_UPLOADED, params);
+
+                if (observerData.mediaId != null) {
+                    UploadMediaModule.SendEventPhotoUploaded(getReactApplicationContext(), observerData.mediaId, observerData.photo);
+                }
+
+                boolean hasStatusChanged = CheckStatusChanged(observerData.workerState);
+                if (hasStatusChanged) {
+                    SendEventStatusChanged(getReactApplicationContext(), workerStatus);
+                }
             }, new CallbackEmptyWithThrowable() {
                 @Override
                 public void onSuccess() {
@@ -80,6 +96,31 @@ public class AutoBackupModule extends ReactContextBaseJavaModule {
         }catch(Exception e){
             mPromise.reject("Error", e);
         }
+    }
+
+    private boolean CheckStatusChanged(WorkInfo.State newState){
+        String newWorkerStatus = "";
+        switch (newState) {
+            case SUCCEEDED -> newWorkerStatus = WORKER_SUCCESS;
+            case ENQUEUED -> newWorkerStatus = WORKER_ENQUEUED;
+            case RUNNING -> newWorkerStatus = WORKER_RUNNING;
+            case CANCELLED -> newWorkerStatus = WORKER_CANCELED;
+            default -> newWorkerStatus = WORKER_FAILED;
+        }
+
+        boolean hasStatusChanged = !newWorkerStatus.equals(workerStatus);
+
+        if(hasStatusChanged){
+            workerStatus = newWorkerStatus;
+        }
+
+        return hasStatusChanged;
+    }
+
+    static private void SendEventStatusChanged(ReactContext context, String workerStatus){
+        WritableMap params = new WritableNativeMap();
+        params.putString("status", workerStatus);
+        BridgeFunctions.sendEvent(context, EVENT_WORKER_STATUS_CHANGED, params);
     }
 
     @ReactMethod

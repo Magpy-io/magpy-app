@@ -1,9 +1,11 @@
 package com.magpy.NativeModules.UploadMedia;
 
 import androidx.annotation.NonNull;
+import androidx.work.WorkInfo;
 
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
@@ -16,7 +18,7 @@ import com.magpy.Utils.CallbackWithParameterAndThrowable;
 public class UploadMediaModule extends ReactContextBaseJavaModule {
 
     public static final String EVENT_PHOTO_UPLOADED = "PHOTO_UPLOADED_EVENT_NAME";
-    public static final String EVENT_WORKER_STATUS_CHANGED = "WORKER_STATUS_CHANGED_NAME";
+    public static final String EVENT_WORKER_STATUS_CHANGED = "UPLOAD_WORKER_STATUS_CHANGED";
 
     public static final String WORKER_ENQUEUED = "WORKER_ENQUEUED";
     public static final String WORKER_RUNNING = "WORKER_RUNNING";
@@ -71,29 +73,13 @@ public class UploadMediaModule extends ReactContextBaseJavaModule {
 
             uploadWorkerManager.StartWorker(url, serverToken, deviceId, photosIdsFilePath, observerData -> {
                 if (observerData.mediaId != null) {
-                    WritableMap params = new WritableNativeMap();
-                    params.putString(EVENT_FIELD_NAME_MEDIA_ID, observerData.mediaId);
-                    params.putString(EVENT_FIELD_NAME_PHOTO, observerData.photo);
-                    BridgeFunctions.sendEvent(getReactApplicationContext(), EVENT_PHOTO_UPLOADED, params);
+                    SendEventPhotoUploaded(getReactApplicationContext(), observerData.mediaId, observerData.photo);
                 }
 
-                String newWorkerStatus = "";
-                switch (observerData.workerState) {
-                    case SUCCEEDED -> newWorkerStatus = WORKER_SUCCESS;
-                    case ENQUEUED -> newWorkerStatus = WORKER_ENQUEUED;
-                    case RUNNING -> newWorkerStatus = WORKER_RUNNING;
-                    case CANCELLED -> newWorkerStatus = WORKER_CANCELED;
-                    default -> newWorkerStatus = WORKER_FAILED;
+                boolean hasStatusChanged = CheckStatusChanged(observerData.workerState);
+                if (hasStatusChanged) {
+                    SendEventStatusChanged(getReactApplicationContext(), workerStatus);
                 }
-
-
-                if (!newWorkerStatus.equals(workerStatus)) {
-                    workerStatus = newWorkerStatus;
-                    WritableMap params = new WritableNativeMap();
-                    params.putString("status", workerStatus);
-                    BridgeFunctions.sendEvent(getReactApplicationContext(), EVENT_WORKER_STATUS_CHANGED, params);
-                }
-
             }, new CallbackEmptyWithThrowable() {
                 @Override
                 public void onSuccess() {
@@ -109,6 +95,38 @@ public class UploadMediaModule extends ReactContextBaseJavaModule {
         catch(Exception e){
             mPromise.reject("Error", e);
         }
+    }
+
+    private boolean CheckStatusChanged(WorkInfo.State newState){
+        String newWorkerStatus = "";
+        switch (newState) {
+            case SUCCEEDED -> newWorkerStatus = WORKER_SUCCESS;
+            case ENQUEUED -> newWorkerStatus = WORKER_ENQUEUED;
+            case RUNNING -> newWorkerStatus = WORKER_RUNNING;
+            case CANCELLED -> newWorkerStatus = WORKER_CANCELED;
+            default -> newWorkerStatus = WORKER_FAILED;
+        }
+
+        boolean hasStatusChanged = !newWorkerStatus.equals(workerStatus);
+
+        if(hasStatusChanged){
+            workerStatus = newWorkerStatus;
+        }
+
+        return hasStatusChanged;
+    }
+
+    static public void SendEventPhotoUploaded(ReactContext context, String mediaId, String photo){
+        WritableMap params = new WritableNativeMap();
+        params.putString(EVENT_FIELD_NAME_MEDIA_ID, mediaId);
+        params.putString(EVENT_FIELD_NAME_PHOTO, photo);
+        BridgeFunctions.sendEvent(context, EVENT_PHOTO_UPLOADED, params);
+    }
+
+    static private void SendEventStatusChanged(ReactContext context, String workerStatus){
+        WritableMap params = new WritableNativeMap();
+        params.putString("status", workerStatus);
+        BridgeFunctions.sendEvent(context, EVENT_WORKER_STATUS_CHANGED, params);
     }
 
     @ReactMethod
