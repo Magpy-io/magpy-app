@@ -4,7 +4,6 @@ import static com.magpy.Workers.AutoBackupWorker.UPLOADED_PHOTO_MEDIA_ID;
 import static com.magpy.Workers.UploadWorker.UPLOADED_PHOTO_STRING;
 
 import android.content.Context;
-import android.util.Log;
 
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ProcessLifecycleOwner;
@@ -18,6 +17,8 @@ import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 
 import com.magpy.GlobalManagers.ExecutorsManager;
+import com.magpy.Utils.CallbackEmptyWithThrowable;
+import com.magpy.Utils.CallbackWithParameterAndThrowable;
 import com.magpy.Workers.AutoBackupWorker;
 
 import java.util.List;
@@ -32,7 +33,7 @@ public class AutoBackupWorkerManager {
         this.context = context;
     }
 
-    public void StartWorker(String url, String serverToken, String deviceId, Observer<ObserverData> observer) throws ExecutionException, InterruptedException {
+    public void StartWorker(String url, String serverToken, String deviceId, Observer<ObserverData> observer, CallbackEmptyWithThrowable callback){
 
         Constraints constraints = new Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.UNMETERED)
@@ -50,18 +51,29 @@ public class AutoBackupWorkerManager {
                         .setConstraints(constraints)
                         .build();
 
-        if(!WorkManager.isInitialized()){
-            WorkManager.initialize(context, new Configuration.Builder().setExecutor(ExecutorsManager.executorService).build());
-        }
+        ExecutorsManager.ExecuteOnBackgroundThread(() -> {
+            try {
+                if(!WorkManager.isInitialized()){
+                    WorkManager.initialize(context, new Configuration.Builder().setExecutor(ExecutorsManager.executorService).build());
+                }
 
-        WorkManager.getInstance(context).enqueueUniquePeriodicWork(AutoBackupWorker.WORKER_NAME, ExistingPeriodicWorkPolicy.UPDATE, uploadRequest).getResult().get();
-        SetupWorkerObserver(observer);
+                WorkManager.getInstance(context).enqueueUniquePeriodicWork(AutoBackupWorker.WORKER_NAME, ExistingPeriodicWorkPolicy.UPDATE, uploadRequest).getResult().get();
+                SetupWorkerObserver(observer, callback);
+            } catch (Exception e) {
+                callback.onFailed(e);
+            }
+        });
     }
 
-    private void SetupWorkerObserver(Observer<ObserverData> observer) throws ExecutionException, InterruptedException {
-        WorkInfo result = GetWorker();
+    private void SetupWorkerObserver(Observer<ObserverData> observer, CallbackEmptyWithThrowable callback) {
         ExecutorsManager.ExecuteOnMainThread(() -> {
-            try{
+            try {
+                WorkInfo result = getWorker();
+
+                if(result == null){
+                    throw new Exception("Failed to setup WorkerObserver, Worker not found.");
+                }
+
                 WorkManager.getInstance(context).getWorkInfoByIdLiveData(result.getId()).observe(ProcessLifecycleOwner.get(), (workInfo -> {
                     if (workInfo != null) {
 
@@ -78,13 +90,25 @@ public class AutoBackupWorkerManager {
                         }
                     }
                 }));
-            }catch (Exception e){
-                Log.d("AutoBackupWorker", e.toString());
+            } catch (Exception e) {
+                callback.onFailed(e);
+            }
+            callback.onSuccess();
+        });
+    }
+
+    public void GetWorker(CallbackWithParameterAndThrowable<WorkInfo> callback){
+        ExecutorsManager.ExecuteOnBackgroundThread(() -> {
+            try {
+                WorkInfo workInfo = getWorker();
+                callback.onSuccess(workInfo);
+            } catch (Exception e) {
+                callback.onFailed(e);
             }
         });
     }
 
-    public WorkInfo GetWorker() throws ExecutionException, InterruptedException {
+    private WorkInfo getWorker() throws ExecutionException, InterruptedException {
         List<WorkInfo> result = WorkManager
                 .getInstance(context)
                 .getWorkInfosForUniqueWork(AutoBackupWorker.WORKER_NAME)
@@ -97,21 +121,35 @@ public class AutoBackupWorkerManager {
         return result.get(0);
     }
 
-    public boolean IsWorkerAlive() throws ExecutionException, InterruptedException {
-        WorkInfo workInfo = GetWorker();
+    public void IsWorkerAlive(CallbackWithParameterAndThrowable<Boolean> callback) {
+        ExecutorsManager.ExecuteOnBackgroundThread(() -> {
+            try {
+                WorkInfo workInfo = getWorker();
 
-        if(workInfo == null){
-            return false;
-        }
+                if(workInfo == null){
+                    callback.onSuccess(false);
+                    return;
+                }
 
-        return !workInfo.getState().isFinished();
+                callback.onSuccess(!workInfo.getState().isFinished());
+            } catch (Exception e) {
+                callback.onFailed(e);
+            }
+        });
     }
 
-    public void StopWorker() throws ExecutionException, InterruptedException {
-        WorkManager.getInstance(context).cancelUniqueWork(AutoBackupWorker.WORKER_NAME).getResult().get();
+    public void StopWorker(CallbackEmptyWithThrowable callback) {
+        ExecutorsManager.ExecuteOnBackgroundThread(() -> {
+            try {
+                WorkManager.getInstance(context).cancelUniqueWork(AutoBackupWorker.WORKER_NAME).getResult().get();
+                callback.onSuccess();
+            } catch (Exception e) {
+                callback.onFailed(e);
+            }
+        });
     }
 
-    public class ObserverData{
+    public static class ObserverData{
         public String mediaId;
         public String photo;
     }

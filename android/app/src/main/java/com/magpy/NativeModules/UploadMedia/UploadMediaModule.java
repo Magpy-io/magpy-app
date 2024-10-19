@@ -42,33 +42,33 @@ public class UploadMediaModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void StartUploadWorker(ReadableMap data, Promise mPromise) {
-        UploadWorkerManager uploadWorkerManager = new UploadWorkerManager(getReactApplicationContext());
-
-        String url = data.getString("url");
-        if(url == null){
-            mPromise.reject("Error", "url not defined in data input object.");
-            return;
-        }
-
-        String serverToken = data.getString("serverToken");
-        if(serverToken == null){
-            mPromise.reject("Error", "serverToken not defined in data input object.");
-            return;
-        }
-
-        String deviceId = data.getString("deviceId");
-        if(deviceId == null){
-            mPromise.reject("Error", "deviceId not defined in data input object.");
-            return;
-        }
-
-        String photosIdsFilePath = data.getString("photosIdsFilePath");
-        if(photosIdsFilePath == null){
-            mPromise.reject("Error", "photosIdsFilePath not defined in data input object.");
-            return;
-        }
-
         try{
+            UploadWorkerManager uploadWorkerManager = new UploadWorkerManager(getReactApplicationContext());
+
+            String url = data.getString("url");
+            if(url == null){
+                mPromise.reject("Error", "url not defined in data input object.");
+                return;
+            }
+
+            String serverToken = data.getString("serverToken");
+            if(serverToken == null){
+                mPromise.reject("Error", "serverToken not defined in data input object.");
+                return;
+            }
+
+            String deviceId = data.getString("deviceId");
+            if(deviceId == null){
+                mPromise.reject("Error", "deviceId not defined in data input object.");
+                return;
+            }
+
+            String photosIdsFilePath = data.getString("photosIdsFilePath");
+            if(photosIdsFilePath == null){
+                mPromise.reject("Error", "photosIdsFilePath not defined in data input object.");
+                return;
+            }
+
             uploadWorkerManager.StartWorker(url, serverToken, deviceId, photosIdsFilePath, observerData -> {
                 if (observerData.mediaId != null) {
                     WritableMap params = new WritableNativeMap();
@@ -107,8 +107,7 @@ public class UploadMediaModule extends ReactContextBaseJavaModule {
             });
         }
         catch(Exception e){
-            mPromise.reject("Error", "Unable to start upload worker");
-            return;
+            mPromise.reject("Error", e);
         }
     }
 

@@ -62,7 +62,7 @@ public class UploadWorkerManager {
     private void SetupWorkerObserver(Observer<ObserverData> observer, CallbackEmptyWithThrowable callback){
         ExecutorsManager.ExecuteOnMainThread(() -> {
             try {
-                WorkInfo result = GetWorker();
+                WorkInfo result = getWorker();
 
                 if(result == null){
                     throw new Exception("Failed to setup WorkerObserver, Worker not found.");
@@ -93,7 +93,18 @@ public class UploadWorkerManager {
         });
     }
 
-    private WorkInfo GetWorker() throws ExecutionException, InterruptedException {
+    public void GetWorker(CallbackWithParameterAndThrowable<WorkInfo> callback){
+        ExecutorsManager.ExecuteOnBackgroundThread(() -> {
+            try {
+                WorkInfo workInfo = getWorker();
+                callback.onSuccess(workInfo);
+            } catch (Exception e) {
+                callback.onFailed(e);
+            }
+        });
+    }
+
+    private WorkInfo getWorker() throws ExecutionException, InterruptedException {
         List<WorkInfo> result = WorkManager
                 .getInstance(context)
                 .getWorkInfosForUniqueWork(UploadWorker.WORKER_NAME)
@@ -109,7 +120,7 @@ public class UploadWorkerManager {
     public void IsWorkerAlive(CallbackWithParameterAndThrowable<Boolean> callback){
         ExecutorsManager.ExecuteOnBackgroundThread(() -> {
             try {
-                WorkInfo workInfo = GetWorker();
+                WorkInfo workInfo = getWorker();
 
                 if(workInfo == null){
                     callback.onSuccess(false);
