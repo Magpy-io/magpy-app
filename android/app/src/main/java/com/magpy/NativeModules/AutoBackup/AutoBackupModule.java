@@ -2,7 +2,6 @@ package com.magpy.NativeModules.AutoBackup;
 
 import static com.magpy.NativeModules.Parsers.WorkerStateParser.ParseWorkerState;
 
-import android.content.Context;
 import android.os.Build;
 
 import androidx.annotation.NonNull;
@@ -11,7 +10,6 @@ import androidx.work.WorkInfo;
 
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
-import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
@@ -23,8 +21,6 @@ import com.magpy.GlobalManagers.ExecutorsManager;
 import com.magpy.GlobalManagers.MySharedPreferences.WorkerStatsPreferences;
 import com.magpy.NativeModules.Events.EventAutobackupWorkerStatusChanged;
 import com.magpy.NativeModules.Events.EventPhotoUploaded;
-import com.magpy.NativeModules.UploadMedia.UploadMediaModule;
-import com.magpy.Utils.BridgeFunctions;
 import com.magpy.Utils.CallbackEmptyWithThrowable;
 import com.magpy.Utils.CallbackWithParameterAndThrowable;
 

@@ -3,20 +3,14 @@ package com.magpy.NativeModules.UploadMedia;
 import static com.magpy.NativeModules.Parsers.WorkerStateParser.ParseWorkerState;
 
 import androidx.annotation.NonNull;
-import androidx.work.WorkInfo;
 
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
-import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
-import com.facebook.react.bridge.WritableMap;
-import com.facebook.react.bridge.WritableNativeMap;
-import com.magpy.NativeModules.Events.EventAutobackupWorkerStatusChanged;
 import com.magpy.NativeModules.Events.EventPhotoUploaded;
 import com.magpy.NativeModules.Events.EventUploadWorkerStatusChanged;
-import com.magpy.Utils.BridgeFunctions;
 import com.magpy.Utils.CallbackEmptyWithThrowable;
 import com.magpy.Utils.CallbackWithParameterAndThrowable;
 
