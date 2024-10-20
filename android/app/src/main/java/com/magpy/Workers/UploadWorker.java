@@ -35,6 +35,7 @@ import com.magpy.Utils.MediaParser;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 public class UploadWorker extends Worker {
     final int NOTIFICATION_ID = 1003;
@@ -127,11 +128,7 @@ public class UploadWorker extends Worker {
 
                 try{
                     String photoUploaded = photoUploader.uploadPhoto(photoData);
-                    Data progressData = new Data.Builder()
-                            .putString(UPLOADED_PHOTO_MEDIA_ID, mediaId)
-                            .putString(UPLOADED_PHOTO_STRING, photoUploaded)
-                            .build();
-                    setProgressAsync(progressData);
+                    sendProgressPhotoUploaded(mediaId, photoUploaded);
                 }
                 catch (ResponseNotOkException e){
                     Log.e("UploadWorker", "Failed upload of photo with mediaId: " + mediaId, e);
@@ -140,6 +137,7 @@ public class UploadWorker extends Worker {
 
             // Wait time to avoid the worker finishing before the progress is received by the UploadWorkerManager
             sleep(500);
+
             Log.d("UploadWorker", "Work finished.");
             return Result.success();
         }catch(Exception e){
@@ -239,6 +237,18 @@ public class UploadWorker extends Worker {
         }
         catch(Exception e){
             return false;
+        }
+    }
+
+    private void sendProgressPhotoUploaded(String mediaId, String photoUploaded){
+        Data progressData = new Data.Builder()
+                .putString(UPLOADED_PHOTO_MEDIA_ID, mediaId)
+                .putString(UPLOADED_PHOTO_STRING, photoUploaded)
+                .build();
+        try{
+            setProgressAsync(progressData).get();
+        }catch(Exception e){
+            Log.e("UploadWorker", e.toString());
         }
     }
 }
