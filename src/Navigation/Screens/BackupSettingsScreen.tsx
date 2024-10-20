@@ -14,6 +14,7 @@ import { useServerContext } from '~/Context/Contexts/ServerContext';
 import { notOnServerGalleryPhotosSelector } from '~/Context/ReduxStore/Slices/Photos/Selectors';
 import { useAppSelector } from '~/Context/ReduxStore/Store';
 import { parseMillisecondsIntoReadableTime } from '~/Helpers/DateFunctions/DateFormatting';
+import { useDebouncedDelayed } from '~/Hooks/useDebouncedDelayed';
 import { useLastAutobackupExecutionTime } from '~/NativeModules/AutoBackupModule/';
 
 export default function BackupSettingsScreen() {
@@ -127,10 +128,18 @@ export default function BackupSettingsScreen() {
     }
   }
 
+  // Worker state changes rapidly and causes the button to appear and then disappear rapidly
+  // This debouncing avoids that
+
+  const {
+    autobackupEnabled: autobackupEnabledDebounced,
+    autoBackupWorkerRunning: autoBackupWorkerRunningDebounced,
+  } = useDebouncedDelayed({ autobackupEnabled, autoBackupWorkerRunning }, 300);
+
   if (
     isServerReachable &&
-    autobackupEnabled &&
-    !autoBackupWorkerRunning &&
+    autobackupEnabledDebounced &&
+    !autoBackupWorkerRunningDebounced &&
     notBackedupPhotosCount != 0
   ) {
     data[0].data.push({
