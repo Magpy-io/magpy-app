@@ -35,8 +35,8 @@ export interface AutoBackupModuleType {
     stopReason: number;
   } | null>;
   GetWorkerStats: () => Promise<{
-    lastExecutionTime: number | null;
-    lastExecutionTimes: number[];
+    lastSuccessRunTime: number | null;
+    lastSuccessRunTimes: number[];
   }>;
 }
 

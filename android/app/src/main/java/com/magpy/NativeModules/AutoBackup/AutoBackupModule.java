@@ -171,22 +171,22 @@ public class AutoBackupModule extends ReactContextBaseJavaModule {
     }
 
     private static @NonNull WritableMap parseWorkerStatsPreferences(WorkerStatsPreferences workerStatsPreferences) {
-        long lastExecutionTime = workerStatsPreferences.GetLastSuccessRunTime();
-        Collection<Long> lastExecutionTimes = workerStatsPreferences.GetAllSuccessRunTimes();
+        long lastSuccessRunTime = workerStatsPreferences.GetLastSuccessRunTime();
+        Collection<Long> lastSuccessRunTimes = workerStatsPreferences.GetAllSuccessRunTimes();
 
         WritableArray lastExecutionTimesArray = new WritableNativeArray();
 
-        for (Long executionTime: lastExecutionTimes) {
+        for (Long executionTime: lastSuccessRunTimes) {
             lastExecutionTimesArray.pushDouble(executionTime);
         }
 
         WritableMap workStatsObject = new WritableNativeMap();
-        if(lastExecutionTime < 0){
-            workStatsObject.putNull("lastExecutionTime");
+        if(lastSuccessRunTime < 0){
+            workStatsObject.putNull("lastSuccessRunTime");
         }else{
-            workStatsObject.putDouble("lastExecutionTime", lastExecutionTime);
+            workStatsObject.putDouble("lastSuccessRunTimes", lastSuccessRunTime);
         }
-        workStatsObject.putArray("lastExecutionTimes", lastExecutionTimesArray);
+        workStatsObject.putArray("lastSuccessRunTimes", lastExecutionTimesArray);
         return workStatsObject;
     }
 }

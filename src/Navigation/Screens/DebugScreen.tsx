@@ -59,23 +59,23 @@ export default function DebugScreen() {
 
     const workerStats = await AutoBackupModule.GetWorkerStats();
 
-    const lastExecutionTime = workerStats.lastExecutionTime
-      ? 'Last execution time: ' + new Date(workerStats.lastExecutionTime).toString()
+    const lastExecutionTime = workerStats.lastSuccessRunTime
+      ? 'Last execution time: ' + new Date(workerStats.lastSuccessRunTime).toString()
       : 'Last execution time: none';
 
-    const timeSinceLastExecution = workerStats.lastExecutionTime
+    const timeSinceLastExecution = workerStats.lastSuccessRunTime
       ? 'Time since last execution: ' +
         parseMillisecondsIntoReadableTime(
-          new Date().getTime() - workerStats.lastExecutionTime,
+          new Date().getTime() - workerStats.lastSuccessRunTime,
           true,
         )
       : null;
 
     const lastExecutionTimes =
       'Last execution times: \n' +
-      (workerStats.lastExecutionTimes.length == 0
+      (workerStats.lastSuccessRunTimes.length == 0
         ? 'none'
-        : workerStats.lastExecutionTimes.reduce((prev, current) => {
+        : workerStats.lastSuccessRunTimes.reduce((prev, current) => {
             return prev + new Date(current).toString() + '\n';
           }, ''));
 
