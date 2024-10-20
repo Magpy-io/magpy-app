@@ -1,5 +1,6 @@
 import React, { ReactNode, useEffect, useMemo, useRef } from 'react';
 
+import { useToast } from '~/Hooks/useToast';
 import { AutoBackupModule, AutoBackupModuleEvents } from '~/NativeModules/AutoBackupModule';
 
 import { useServerContext } from '../ServerContext';
@@ -17,6 +18,8 @@ export const BackupWorkerEffect: React.FC<PropsType> = props => {
   const { autobackupEnabled } = useBackupWorkerContext();
   const { setWorkerStatus } = useBackupWorkerContextInner();
   const { StartAutoBackup } = useBackupWorkerContextFunctions();
+
+  const { showToastError } = useToast();
 
   const { isServerReachable, serverPath, token } = useServerContext();
 
@@ -64,6 +67,20 @@ export const BackupWorkerEffect: React.FC<PropsType> = props => {
       subscriptionWorkerStatus.remove();
     };
   }, [setWorkerStatus]);
+
+  useEffect(() => {
+    const sub = AutoBackupModuleEvents.subscribeOnWorkerError(({ error }) => {
+      if (error == 'ERROR_AUTOBACKUP_WORKER_SERVER_UNREACHABLE') {
+        showToastError('Autobackup failed, server not reachable.');
+      } else {
+        showToastError('Autobackup failed, unexpected error');
+      }
+    });
+
+    return () => {
+      sub.remove();
+    };
+  }, [showToastError]);
 
   return props.children;
 };
