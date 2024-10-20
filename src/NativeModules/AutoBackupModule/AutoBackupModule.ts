@@ -28,7 +28,7 @@ export interface AutoBackupModuleType {
   IsWorkerAlive: () => Promise<boolean>;
   StopWorker: () => Promise<void>;
   GetWorkerInfo: () => Promise<{
-    state: string;
+    state: WorkerStatus;
     nextScheduleMillis: number;
     repeatIntervalMillis: number;
     stopReason: number;

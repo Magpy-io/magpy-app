@@ -21,6 +21,7 @@ import com.magpy.GlobalManagers.ExecutorsManager;
 import com.magpy.GlobalManagers.MySharedPreferences.WorkerStatsPreferences;
 import com.magpy.NativeModules.Events.EventAutobackupWorkerStatusChanged;
 import com.magpy.NativeModules.Events.EventPhotoUploaded;
+import com.magpy.NativeModules.Parsers.WorkerStateParser;
 import com.magpy.Utils.CallbackEmptyWithThrowable;
 import com.magpy.Utils.CallbackWithParameterAndThrowable;
 
@@ -132,7 +133,7 @@ public class AutoBackupModule extends ReactContextBaseJavaModule {
                 }
 
                 WritableMap workInfoObject = new WritableNativeMap();
-                workInfoObject.putString("state", workInfo.getState().name());
+                workInfoObject.putString("state", WorkerStateParser.ParseWorkerState(workInfo.getState()));
                 workInfoObject.putDouble("nextScheduleMillis", workInfo.getState() == WorkInfo.State.ENQUEUED ? workInfo.getNextScheduleTimeMillis() : -1);
                 workInfoObject.putDouble("repeatIntervalMillis", workInfo.getPeriodicityInfo() != null ? workInfo.getPeriodicityInfo().getRepeatIntervalMillis() : -1);
                 workInfoObject.putDouble("stopReason", workInfo.getStopReason());
