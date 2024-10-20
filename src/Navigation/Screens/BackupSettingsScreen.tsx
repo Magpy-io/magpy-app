@@ -11,6 +11,7 @@ import {
 } from '~/Context/Contexts/BackupWorkerContext';
 import { usePermissionsContext } from '~/Context/Contexts/PermissionsContext';
 import { useServerContext } from '~/Context/Contexts/ServerContext';
+import { useServerInvalidationContext } from '~/Context/Contexts/ServerInvalidationContext';
 import { notOnServerGalleryPhotosSelector } from '~/Context/ReduxStore/Slices/Photos/Selectors';
 import { useAppSelector } from '~/Context/ReduxStore/Store';
 import { parseMillisecondsIntoReadableTime } from '~/Helpers/DateFunctions/DateFormatting';
@@ -28,6 +29,8 @@ export default function BackupSettingsScreen() {
     usePermissionsContext();
 
   const { displayPopupMessage } = usePopupMessageModal();
+
+  const { isRefreshing } = useServerInvalidationContext();
 
   const notBackedupPhotos = useAppSelector(notOnServerGalleryPhotosSelector);
   const notBackedupPhotosCount = notBackedupPhotos.length;
@@ -93,7 +96,7 @@ export default function BackupSettingsScreen() {
     },
   ];
 
-  if (isServerReachable) {
+  if (isServerReachable && !isRefreshing) {
     data[0].data.push({
       type: 'Label',
       title: notBackedUpPhotosMessage,
@@ -138,6 +141,7 @@ export default function BackupSettingsScreen() {
 
   if (
     isServerReachable &&
+    !isRefreshing &&
     autobackupEnabledDebounced &&
     !autoBackupWorkerRunningDebounced &&
     notBackedupPhotosCount != 0
