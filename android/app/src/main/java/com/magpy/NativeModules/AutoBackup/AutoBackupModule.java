@@ -19,6 +19,7 @@ import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.bridge.WritableNativeMap;
 import com.magpy.GlobalManagers.ExecutorsManager;
 import com.magpy.GlobalManagers.MySharedPreferences.WorkerStatsPreferences;
+import com.magpy.NativeModules.Events.EventAutobackupWorkerError;
 import com.magpy.NativeModules.Events.EventAutobackupWorkerStatusChanged;
 import com.magpy.NativeModules.Events.EventPhotoUploaded;
 import com.magpy.NativeModules.Parsers.WorkerStateParser;
@@ -69,7 +70,6 @@ public class AutoBackupModule extends ReactContextBaseJavaModule {
                 restartWorker = false;
             }
 
-
             autoBackupWorkerManager.StartWorker(url, serverToken, deviceId, restartWorker, observerData -> {
 
                 if (observerData.mediaId != null) {
@@ -79,6 +79,11 @@ public class AutoBackupModule extends ReactContextBaseJavaModule {
                 if(observerData.workerState != null){
                     EventAutobackupWorkerStatusChanged.Send(getReactApplicationContext(), ParseWorkerState(observerData.workerState));
                 }
+
+                if(observerData.error != null){
+                    EventAutobackupWorkerError.Send(getReactApplicationContext(), observerData.error);
+                }
+
             }, new CallbackEmptyWithThrowable() {
                 @Override
                 public void onSuccess() {

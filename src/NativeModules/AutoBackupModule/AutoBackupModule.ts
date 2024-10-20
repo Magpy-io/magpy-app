@@ -3,6 +3,7 @@ import { NativeEventEmitter, NativeModules } from 'react-native';
 const { AutoBackupModule } = NativeModules;
 
 const WORKER_STATUS_CHANGED_NAME = 'AUTO_BACKUP_WORKER_STATUS_CHANGED';
+const AUTO_BACKUP_WORKER_ERROR_NAME = 'AUTO_BACKUP_WORKER_ERROR';
 
 export type WorkerStatus =
   | 'WORKER_ENQUEUED'
@@ -18,6 +19,10 @@ export function isWorkerStatusFinished(workerStatus: WorkerStatus) {
     workerStatus == 'WORKER_SUCCESS'
   );
 }
+
+export type WorkerErrorType =
+  | 'ERROR_AUTOBACKUP_WORKER_SERVER_UNREACHABLE'
+  | 'ERROR_AUTOBACKUP_WORKER_UNEXPECTED';
 
 export interface AutoBackupModuleType {
   StartBackupWorker: (data: {
@@ -45,6 +50,9 @@ const emitter = new NativeEventEmitter();
 export const AutoBackupModuleEvents = {
   subscribeOnWorkerStatusChanged: (f: (event: { status: WorkerStatus }) => void) => {
     return emitter.addListener(WORKER_STATUS_CHANGED_NAME, f);
+  },
+  subscribeOnWorkerError: (f: (event: { error: WorkerErrorType }) => void) => {
+    return emitter.addListener(AUTO_BACKUP_WORKER_ERROR_NAME, f);
   },
 };
 

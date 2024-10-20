@@ -1,6 +1,7 @@
 package com.magpy.NativeModules.AutoBackup;
 
 import static com.magpy.Workers.AutoBackupWorker.UPLOADED_PHOTO_MEDIA_ID;
+import static com.magpy.Workers.AutoBackupWorker.WORKER_ERROR;
 import static com.magpy.Workers.UploadWorker.UPLOADED_PHOTO_STRING;
 
 import android.content.Context;
@@ -102,6 +103,11 @@ public class AutoBackupWorkerManager {
                             data.photo = uploadedPhoto;
                         }
 
+                        String error = progress.getString(WORKER_ERROR);
+                        if(error != null){
+                            data.error = AutobackupWorkerError.valueOf(error);
+                        }
+
                         observer.onChanged(data);
                     }
                 }));
@@ -178,5 +184,11 @@ public class AutoBackupWorkerManager {
         public String mediaId = null;
         public String photo = null;
         public WorkInfo.State workerState = null;
+        public AutobackupWorkerError error = null;
+    }
+
+    public enum AutobackupWorkerError{
+        SERVER_NOT_REACHABLE,
+        UNEXPECTED_ERROR
     }
 }

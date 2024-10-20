@@ -3,6 +3,8 @@ package com.magpy.GlobalManagers.MySharedPreferences;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.magpy.NativeModules.AutoBackup.AutoBackupWorkerManager;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -53,7 +55,7 @@ public class WorkerStatsPreferences extends MyPreferencesBase{
         editor.apply();
     }
 
-    public void SetLastError(long lastFailedRunTime, AutobackupWorkerError error){
+    public void SetLastError(long lastFailedRunTime, AutoBackupWorkerManager.AutobackupWorkerError error){
         SharedPreferences sharedPref = GetSharedPreferencesHandler();
 
         SharedPreferences.Editor editor = sharedPref.edit();
@@ -63,11 +65,11 @@ public class WorkerStatsPreferences extends MyPreferencesBase{
         editor.apply();
     }
 
-    public AutobackupWorkerError GetLastError(){
+    public AutoBackupWorkerManager.AutobackupWorkerError GetLastError(){
         SharedPreferences sharedPref = GetSharedPreferencesHandler();
-        String storedError = sharedPref.getString(LAST_FAILED_RUN_ERROR, AutobackupWorkerError.UNEXPECTED_ERROR.name());
+        String storedError = sharedPref.getString(LAST_FAILED_RUN_ERROR, AutoBackupWorkerManager.AutobackupWorkerError.UNEXPECTED_ERROR.name());
 
-        return AutobackupWorkerError.valueOf(storedError);
+        return AutoBackupWorkerManager.AutobackupWorkerError.valueOf(storedError);
     }
 
     public long GetLastErrorTime(){
@@ -109,10 +111,5 @@ public class WorkerStatsPreferences extends MyPreferencesBase{
 
     private static String GetLastExecutionTimeKeyNameN(int n){
         return LAST_SUCCESS_RUN_TIME_KEY_NAME_BASE + String.valueOf(n);
-    }
-
-    public enum AutobackupWorkerError{
-        SERVER_NOT_REACHABLE,
-        UNEXPECTED_ERROR
     }
 }
