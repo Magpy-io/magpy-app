@@ -67,11 +67,11 @@ export default function DebugScreen() {
       : null;
 
     const lastExecutionTime = workerStats.lastSuccessRunTime
-      ? 'Last execution time: ' + new Date(workerStats.lastSuccessRunTime).toString()
-      : 'Last execution time: none';
+      ? 'Last successfull run time: ' + new Date(workerStats.lastSuccessRunTime).toString()
+      : 'Last successfull run time: none';
 
     const timeSinceLastExecution = workerStats.lastSuccessRunTime
-      ? 'Time since last execution: ' +
+      ? 'Time since last successfull run: ' +
         parseMillisecondsIntoReadableTime(
           new Date().getTime() - workerStats.lastSuccessRunTime,
           true,
@@ -79,7 +79,7 @@ export default function DebugScreen() {
       : null;
 
     const lastExecutionTimes =
-      'Last execution times: \n' +
+      'Last successfull run times: \n' +
       (workerStats.lastSuccessRunTimes.length == 0
         ? 'none'
         : workerStats.lastSuccessRunTimes.reduce((prev, current) => {
