@@ -23,13 +23,12 @@ export function useBackupWorkerContextFunctions() {
 
       if (isStarted) {
         console.log('worker started');
-        setWorkerStatus('WORKER_ENQUEUED');
         return;
       }
 
       throw new Error('Error while starting autobackup worker');
     }
-  }, [isServerReachable, serverPath, setWorkerStatus, token]);
+  }, [isServerReachable, serverPath, token]);
 
   const StopAutoBackup = useCallback(async () => {
     await AutoBackupModule.StopWorker();
