@@ -171,8 +171,8 @@ public class AutoBackupModule extends ReactContextBaseJavaModule {
     }
 
     private static @NonNull WritableMap parseWorkerStatsPreferences(WorkerStatsPreferences workerStatsPreferences) {
-        long lastExecutionTime = workerStatsPreferences.GetLastExecutionTime();
-        Collection<Long> lastExecutionTimes = workerStatsPreferences.GetAllExecutionTimes();
+        long lastExecutionTime = workerStatsPreferences.GetLastSuccessRunTime();
+        Collection<Long> lastExecutionTimes = workerStatsPreferences.GetAllSuccessRunTimes();
 
         WritableArray lastExecutionTimesArray = new WritableNativeArray();
 

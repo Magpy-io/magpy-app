@@ -7,7 +7,6 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Build;
 import android.util.Log;
 
@@ -266,7 +265,7 @@ public class AutoBackupWorker extends Worker {
             Date currentTime = Calendar.getInstance().getTime();
 
             WorkerStatsPreferences workerStatsPreferences = new WorkerStatsPreferences(getApplicationContext());
-            workerStatsPreferences.SetLastExecutionTime(currentTime.getTime());
+            workerStatsPreferences.SetLastSuccessRunTime(currentTime.getTime());
         }catch (Exception e){
             Log.e("AutoBackupWorker", e.toString());
         }
