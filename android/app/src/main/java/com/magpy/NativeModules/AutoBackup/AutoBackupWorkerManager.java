@@ -35,7 +35,7 @@ public class AutoBackupWorkerManager {
         workerState = WorkInfo.State.SUCCEEDED;
     }
 
-    public void StartWorker(String url, String serverToken, String deviceId, Observer<ObserverData> observer, CallbackEmptyWithThrowable callback){
+    public void StartWorker(String url, String serverToken, String deviceId, boolean restartWorker, Observer<ObserverData> observer, CallbackEmptyWithThrowable callback){
 
         Constraints constraints = new Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.UNMETERED)
@@ -59,7 +59,14 @@ public class AutoBackupWorkerManager {
                     WorkManager.initialize(m_context, new Configuration.Builder().setExecutor(ExecutorsManager.executorService).build());
                 }
 
-                WorkManager.getInstance(m_context).enqueueUniquePeriodicWork(AutoBackupWorker.WORKER_NAME, ExistingPeriodicWorkPolicy.UPDATE, uploadRequest).getResult().get();
+                ExistingPeriodicWorkPolicy policy;
+                if (restartWorker){
+                    policy = ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE;
+                }else {
+                    policy = ExistingPeriodicWorkPolicy.UPDATE;
+                }
+
+                WorkManager.getInstance(m_context).enqueueUniquePeriodicWork(AutoBackupWorker.WORKER_NAME, policy, uploadRequest).getResult().get();
                 SetupWorkerObserver(observer, callback);
             } catch (Exception e) {
                 callback.onFailed(e);

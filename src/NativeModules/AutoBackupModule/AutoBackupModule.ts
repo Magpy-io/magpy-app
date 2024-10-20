@@ -24,6 +24,7 @@ export interface AutoBackupModuleType {
     url: string;
     serverToken: string;
     deviceId: string;
+    restartWorker?: boolean;
   }) => Promise<void>;
   IsWorkerAlive: () => Promise<boolean>;
   StopWorker: () => Promise<void>;

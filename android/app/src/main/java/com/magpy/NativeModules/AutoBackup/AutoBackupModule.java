@@ -62,7 +62,15 @@ public class AutoBackupModule extends ReactContextBaseJavaModule {
                 return;
             }
 
-            autoBackupWorkerManager.StartWorker(url, serverToken, deviceId, observerData -> {
+            boolean restartWorker;
+            try{
+                restartWorker = data.getBoolean("restartWorker");
+            }catch (Exception e){
+                restartWorker = false;
+            }
+
+
+            autoBackupWorkerManager.StartWorker(url, serverToken, deviceId, restartWorker, observerData -> {
 
                 if (observerData.mediaId != null) {
                     EventPhotoUploaded.Send(getReactApplicationContext(), observerData.mediaId, observerData.photo);
