@@ -4,10 +4,16 @@ import android.content.Context;
 import android.net.Uri;
 import android.util.Base64;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FileOperations {
     public static byte[] getBase64FromUri(Context context, String uri) throws IOException {
@@ -31,6 +37,21 @@ public class FileOperations {
             throw new RuntimeException("getBase64FromUri: Media file not found.", e);
         } catch (Exception e){
             throw new RuntimeException("getBase64FromUri: Error reading media file.", e);
+        }
+    }
+
+    public static ArrayList<String> readLinesFromFile(String filePath) throws IOException {
+        try(FileInputStream fis = new FileInputStream (filePath)){
+
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(fis));
+
+            ArrayList<String> lines = new ArrayList<>();
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                lines.add(line);
+            }
+
+            return lines;
         }
     }
 }

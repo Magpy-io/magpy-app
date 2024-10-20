@@ -17,7 +17,7 @@ import {
 } from '~/Context/ReduxStore/Slices/Photos/Selectors';
 import { useAppSelector } from '~/Context/ReduxStore/Store';
 
-import { useServerPhotoUri } from '../grid/useServerPhotoUri';
+import { useServerPhotoUri } from '../hooks/useServerPhotoUri';
 
 const H = Dimensions.get('screen').height;
 const W = Dimensions.get('screen').width;

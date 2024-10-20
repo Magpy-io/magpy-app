@@ -81,7 +81,7 @@ export default function SettingsScreenTab() {
 
   if (!isUsingLocalAccount) {
     data[0].data.push({
-      type: 'Button',
+      type: 'Label',
       title: 'Logout',
       onPress: onPressLogout,
       icon: <LogoutIcon />,
@@ -90,7 +90,7 @@ export default function SettingsScreenTab() {
 
   if (__DEV__) {
     data[0].data.push({
-      type: 'Button',
+      type: 'Label',
       title: 'Debug menu',
       onPress: () => {
         navigate('Debug');

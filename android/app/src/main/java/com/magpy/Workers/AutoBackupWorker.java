@@ -7,6 +7,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.util.Log;
 
@@ -24,6 +25,7 @@ import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
+import com.magpy.GlobalManagers.MySharedPreferences.WorkerStatsPreferences;
 import com.magpy.GlobalManagers.ServerQueriesManager.Common.PhotoData;
 import com.magpy.GlobalManagers.ServerQueriesManager.Common.ResponseNotOkException;
 import com.magpy.GlobalManagers.ServerQueriesManager.GetPhotos;
@@ -34,6 +36,8 @@ import com.magpy.R;
 import com.magpy.Utils.MediaParser;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -49,7 +53,7 @@ public class AutoBackupWorker extends Worker {
     public static final String UPLOADED_PHOTO_MEDIA_ID = "UPLOADED_PHOTO_MEDIA_ID";
     public static final String UPLOADED_PHOTO_STRING = "UPLOADED_PHOTO_STRING";
 
-    protected final int MAX_MISSING_PHOTOS_TO_UPLOAD = 500;
+    protected final int MAX_MISSING_PHOTOS_TO_UPLOAD = 5000;
     protected final int MAX_GALLERY_PHOTOS_TO_UPLOAD = 5000;
 
     protected String url;
@@ -115,6 +119,7 @@ public class AutoBackupWorker extends Worker {
             Log.e("AutoBackupWorker", "Exception thrown: ", e);
             return Result.failure();
         }finally {
+            recordExecutionTime();
             getApplicationContext().getSystemService(NotificationManager.class).cancel(NOTIFICATION_ID);
         }
     }
@@ -256,4 +261,14 @@ public class AutoBackupWorker extends Worker {
         getApplicationContext().getSystemService(NotificationManager.class).notify(NOTIFICATION_ID, notificationBuilder.build());
     }
 
+    private void recordExecutionTime(){
+        try{
+            Date currentTime = Calendar.getInstance().getTime();
+
+            WorkerStatsPreferences workerStatsPreferences = new WorkerStatsPreferences(getApplicationContext());
+            workerStatsPreferences.SetLastExecutionTime(currentTime.getTime());
+        }catch (Exception e){
+            Log.e("AutoBackupWorker", e.toString());
+        }
+    }
 }

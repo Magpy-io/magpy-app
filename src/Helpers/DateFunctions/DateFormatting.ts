@@ -50,27 +50,42 @@ export function formatYear(date: string) {
 }
 
 // Converts a time difference in millis to readable
-export function parseMillisecondsIntoReadableTime(milliseconds: number) {
-  //Get hours from milliseconds
+export function parseMillisecondsIntoReadableTime(
+  milliseconds: number,
+  precise: boolean = false,
+) {
+  if (milliseconds < 1000) {
+    return 'None';
+  }
+
+  //Get days from milliseconds
+  const days = milliseconds / (1000 * 60 * 60 * 24);
+  const absoluteDays = Math.floor(days);
+  const daysString =
+    absoluteDays == 0 ? '' : absoluteDays == 1 ? '1 day' : absoluteDays + ' days';
+
+  //Get remainder from days and convert to hours
   const hours = milliseconds / (1000 * 60 * 60);
-  const absoluteHours = Math.floor(hours);
+  const remainderHours = hours - absoluteDays * 24;
+  const absoluteHours = Math.floor(remainderHours);
   const hoursString =
-    absoluteHours == 0 ? '' : absoluteHours == 1 ? '1 hour ' : absoluteHours + ' hours ';
+    absoluteHours == 0 ? '' : absoluteHours == 1 ? '1 hour' : absoluteHours + ' hours';
 
   //Get remainder from hours and convert to minutes
   const minutes = milliseconds / (1000 * 60);
-  const remainderMinutes = minutes - absoluteHours * 60;
+  const remainderMinutes = minutes - absoluteHours * 60 - absoluteDays * 60 * 24;
   const absoluteMinutes = Math.floor(remainderMinutes);
   const minutesString =
     absoluteMinutes == 0
       ? ''
       : absoluteMinutes == 1
-        ? '1 minute '
-        : absoluteMinutes + ' minutes ';
+        ? '1 minute'
+        : absoluteMinutes + ' minutes';
 
   //Get remainder from minutes and convert to seconds
   const seconds = milliseconds / 1000;
-  const remainderSeconds = seconds - absoluteMinutes * 60 - absoluteHours * 60 * 60;
+  const remainderSeconds =
+    seconds - absoluteMinutes * 60 - absoluteHours * 60 * 60 - absoluteDays * 60 * 60 * 24;
   const absoluteSeconds = Math.floor(remainderSeconds);
   const secondsString =
     absoluteSeconds == 0
@@ -79,7 +94,24 @@ export function parseMillisecondsIntoReadableTime(milliseconds: number) {
         ? '1 second'
         : absoluteSeconds + ' seconds';
 
-  const ret = hoursString + minutesString + secondsString;
+  let ret;
 
-  return ret ?? 'None';
+  if (precise) {
+    ret = daysString;
+    ret = ret + (ret && hoursString && ' ') + hoursString;
+    ret = ret + (ret && minutesString && ' ') + minutesString;
+    ret = ret + (ret && secondsString && ' ') + secondsString;
+  } else {
+    if (daysString) {
+      ret = daysString;
+    } else if (hoursString) {
+      ret = hoursString;
+    } else if (minutesString) {
+      ret = minutesString;
+    } else {
+      ret = secondsString;
+    }
+  }
+
+  return ret;
 }

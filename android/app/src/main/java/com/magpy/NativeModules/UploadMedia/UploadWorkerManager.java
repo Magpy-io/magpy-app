@@ -15,8 +15,9 @@ import androidx.work.OutOfQuotaPolicy;
 import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 
-import com.facebook.react.bridge.Promise;
 import com.magpy.GlobalManagers.ExecutorsManager;
+import com.magpy.Utils.CallbackEmptyWithThrowable;
+import com.magpy.Utils.CallbackWithParameterAndThrowable;
 import com.magpy.Workers.UploadWorker;
 
 import java.util.List;
@@ -24,21 +25,15 @@ import java.util.concurrent.ExecutionException;
 
 public class UploadWorkerManager {
 
-    Context context;
-    Promise mPromise;
+    Context m_context;
+    WorkInfo.State workerState;
 
-    public UploadWorkerManager(Context context, Promise promise){
-        this.context = context;
-        this.mPromise = promise;
+    public UploadWorkerManager(Context context){
+        m_context = context;
+        workerState = WorkInfo.State.SUCCEEDED;
     }
 
-    public void StartWorker(String url, String serverToken, String deviceId, String[] photosIds, Observer<ObserverData> observer){
-
-        if(photosIds.length == 0){
-            mPromise.resolve(null);
-            return;
-        }
-
+    public void StartWorker(String url, String serverToken, String deviceId, String photosIdsFilePath, Observer<ObserverData> observer, CallbackEmptyWithThrowable callback){
         OneTimeWorkRequest uploadRequest =
                 new OneTimeWorkRequest.Builder(UploadWorker.class)
                         .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
@@ -47,7 +42,7 @@ public class UploadWorkerManager {
                                         .putString(UploadWorker.DATA_KEY_URL, url)
                                         .putString(UploadWorker.DATA_KEY_SERVER_TOKEN, serverToken)
                                         .putString(UploadWorker.DATA_KEY_DEVICE_UNIQUE_ID, deviceId)
-                                        .putStringArray(UploadWorker.DATA_KEY_PHOTOS_IDS, photosIds)
+                                        .putString(UploadWorker.DATA_KEY_PHOTOS_IDS_FILE_PATH, photosIdsFilePath)
                                         .build()
                         )
                         .build();
@@ -55,26 +50,35 @@ public class UploadWorkerManager {
         ExecutorsManager.ExecuteOnBackgroundThread(() -> {
             try {
                 if(!WorkManager.isInitialized()){
-                    WorkManager.initialize(context, new Configuration.Builder().setExecutor(ExecutorsManager.executorService).build());
+                    WorkManager.initialize(m_context, new Configuration.Builder().setExecutor(ExecutorsManager.executorService).build());
                 }
 
-                WorkManager.getInstance(context).enqueueUniqueWork(UploadWorker.WORKER_NAME, ExistingWorkPolicy.REPLACE, uploadRequest).getResult().get();
-                SetupWorkerObserver(observer);
-            } catch (ExecutionException | InterruptedException e) {
-                mPromise.reject("Error", e);
+                WorkManager.getInstance(m_context).enqueueUniqueWork(UploadWorker.WORKER_NAME, ExistingWorkPolicy.REPLACE, uploadRequest).getResult().get();
+                SetupWorkerObserver(observer, callback);
+            } catch (Exception e) {
+                callback.onFailed(e);
             }
         });
     }
 
-    private void SetupWorkerObserver(Observer<ObserverData> observer){
+    private void SetupWorkerObserver(Observer<ObserverData> observer, CallbackEmptyWithThrowable callback){
         ExecutorsManager.ExecuteOnMainThread(() -> {
             try {
-                WorkInfo result = GetWorker();
-                WorkManager.getInstance(context).getWorkInfoByIdLiveData(result.getId()).observe(ProcessLifecycleOwner.get(), (workInfo -> {
+                WorkInfo result = getWorker();
+
+                if(result == null){
+                    throw new Exception("Failed to setup WorkerObserver, Worker not found.");
+                }
+
+                WorkManager.getInstance(m_context).getWorkInfoByIdLiveData(result.getId()).observe(ProcessLifecycleOwner.get(), (workInfo -> {
                     if (workInfo != null) {
 
                         ObserverData data = new ObserverData();
-                        data.workerState = workInfo.getState();
+
+                        boolean hasStateChanged = CheckStateChanged(workInfo.getState());
+                        if (hasStateChanged){
+                            data.workerState = workInfo.getState();
+                        }
 
                         Data progress = workInfo.getProgress();
                         String uploadedMediaId = progress.getString(UPLOADED_PHOTO_MEDIA_ID);
@@ -88,16 +92,37 @@ public class UploadWorkerManager {
                         observer.onChanged(data);
                     }
                 }));
-            } catch (ExecutionException | InterruptedException e) {
-                mPromise.reject("Error", e);
+            } catch (Exception e) {
+                callback.onFailed(e);
             }
-            mPromise.resolve(null);
+            callback.onSuccess();
         });
     }
 
-    private WorkInfo GetWorker() throws ExecutionException, InterruptedException {
+    private boolean CheckStateChanged(WorkInfo.State newState){
+        boolean hasStateChanged = workerState != newState;
+
+        if(hasStateChanged){
+            workerState = newState;
+        }
+
+        return hasStateChanged;
+    }
+
+    public void GetWorker(CallbackWithParameterAndThrowable<WorkInfo> callback){
+        ExecutorsManager.ExecuteOnBackgroundThread(() -> {
+            try {
+                WorkInfo workInfo = getWorker();
+                callback.onSuccess(workInfo);
+            } catch (Exception e) {
+                callback.onFailed(e);
+            }
+        });
+    }
+
+    private WorkInfo getWorker() throws ExecutionException, InterruptedException {
         List<WorkInfo> result = WorkManager
-                .getInstance(context)
+                .getInstance(m_context)
                 .getWorkInfosForUniqueWork(UploadWorker.WORKER_NAME)
                 .get();
 
@@ -108,43 +133,38 @@ public class UploadWorkerManager {
         return result.get(0);
     }
 
-    public void IsWorkerAlive(){
+    public void IsWorkerAlive(CallbackWithParameterAndThrowable<Boolean> callback){
         ExecutorsManager.ExecuteOnBackgroundThread(() -> {
             try {
-                WorkInfo workInfo = GetWorker();
+                WorkInfo workInfo = getWorker();
 
                 if(workInfo == null){
-                    mPromise.resolve(false);
+                    callback.onSuccess(false);
                     return;
                 }
 
-                if(!workInfo.getState().isFinished()){
-                    mPromise.resolve(true);
-                    return;
-                }
-                mPromise.resolve(false);
-            } catch (ExecutionException | InterruptedException e) {
-                mPromise.reject("Error", e);
+                callback.onSuccess(!workInfo.getState().isFinished());
+            } catch (Exception e) {
+                callback.onFailed(e);
             }
         });
     }
 
-    public void StopWorker(){
+    public void StopWorker(CallbackEmptyWithThrowable callback){
         ExecutorsManager.ExecuteOnBackgroundThread(() -> {
             try {
-                WorkManager.getInstance(context).cancelUniqueWork(UploadWorker.WORKER_NAME).getResult().get();
-                mPromise.resolve(null);
-            } catch (ExecutionException | InterruptedException e) {
-                mPromise.reject("Error", e);
+                WorkManager.getInstance(m_context).cancelUniqueWork(UploadWorker.WORKER_NAME).getResult().get();
+                callback.onSuccess();
+            } catch (Exception e) {
+                callback.onFailed(e);
             }
         });
     }
 
 
-    public class ObserverData{
-        public String mediaId;
-        public String photo;
-        public WorkInfo.State workerState;
+    public static class ObserverData{
+        public String mediaId = null;
+        public String photo = null;
+        public WorkInfo.State workerState = null;
     }
-
 }

@@ -1,4 +1,4 @@
-import React, { useCallback, useImperativeHandle, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useImperativeHandle, useMemo, useRef } from 'react';
 import { SectionList, View } from 'react-native';
 
 import sectionListGetItemLayout from 'react-native-section-list-get-item-layout';
@@ -37,7 +37,8 @@ type SectionListWithColumnsProps<ItemType extends { key: string }, SectionData> 
   itemSpacing?: number;
   sectionHeaderHeight: number;
   mref: React.MutableRefObject<SectionListWithColumnsRefType | null>;
-  ListHeaderComponent?: () => JSX.Element;
+  ListHeaderComponent?: (() => JSX.Element) | JSX.Element;
+  listHeaderHeight?: number;
 };
 
 function SectionListWithColumns<ItemType extends { key: string }, SectionData>({
@@ -51,33 +52,29 @@ function SectionListWithColumns<ItemType extends { key: string }, SectionData>({
   sectionHeaderHeight,
   mref,
   ListHeaderComponent,
+  listHeaderHeight,
 }: SectionListWithColumnsProps<ItemType, SectionData>) {
   const { width } = useOrientation();
 
   const sectionListRef = useRef<SectionListWithColumnsType<ItemType, SectionData>>(null);
-  const [headerHeight, setHeaderHeight] = useState(0);
   const totalSpacingHorizontal = itemSpacing * (numberColumns - 1);
   const itemSize = (width - totalSpacingHorizontal) / numberColumns;
 
-  useImperativeHandle(
-    mref,
-    () => {
-      return {
-        scrollToLocation(location) {
-          if (location.itemIndex == null) {
-            sectionListRef.current?.scrollToLocation({ ...location, itemIndex: 0 });
-          } else {
-            // +1 to make an itemIndex of 0 scroll to the first element in the section instead of the section header
-            sectionListRef.current?.scrollToLocation({
-              ...location,
-              itemIndex: Math.floor(location.itemIndex / numberColumns) + 1,
-            });
-          }
-        },
-      };
-    },
-    [numberColumns],
-  );
+  useImperativeHandle(mref, () => {
+    return {
+      scrollToLocation(location) {
+        if (location.itemIndex == null) {
+          sectionListRef.current?.scrollToLocation({ ...location, itemIndex: 0 });
+        } else {
+          // +1 to make an itemIndex of 0 scroll to the first element in the section instead of the section header
+          sectionListRef.current?.scrollToLocation({
+            ...location,
+            itemIndex: Math.floor(location.itemIndex / numberColumns) + 1,
+          });
+        }
+      },
+    };
+  }, [numberColumns]);
 
   const sectionsWithRows = useMemo(() => {
     return sections.map(section => {
@@ -120,11 +117,11 @@ function SectionListWithColumns<ItemType extends { key: string }, SectionData>({
       getItemHeight: () => itemSize,
       getSectionHeaderHeight: () => sectionHeaderHeight,
       getSeparatorHeight: () => itemSpacing,
-      listHeaderHeight: headerHeight,
+      listHeaderHeight: () => listHeaderHeight ?? 0,
     });
 
     return getItemLayoutFunction;
-  }, [itemSize, sectionHeaderHeight, itemSpacing, headerHeight]);
+  }, [itemSize, sectionHeaderHeight, itemSpacing, listHeaderHeight]);
 
   const renderSectionHeaderInner = useCallback(
     (info: { section: SectionWithRowsType<ItemType, SectionData> }) => {
@@ -143,19 +140,11 @@ function SectionListWithColumns<ItemType extends { key: string }, SectionData>({
     [itemSpacing],
   );
 
-  const NewListHeaderComponent = useCallback(() => {
-    return (
-      <View onLayout={event => setHeaderHeight(event.nativeEvent.layout.height)}>
-        {ListHeaderComponent && <ListHeaderComponent />}
-      </View>
-    );
-  }, [ListHeaderComponent]);
-
   return (
     <SectionList
       sections={sectionsWithRows}
       renderItem={renderRow}
-      ListHeaderComponent={NewListHeaderComponent}
+      ListHeaderComponent={ListHeaderComponent}
       renderSectionHeader={renderSectionHeaderInner}
       keyExtractor={rowKeyExtractor}
       getItemLayout={getItemLayout}

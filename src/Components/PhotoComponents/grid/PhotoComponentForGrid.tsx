@@ -9,9 +9,9 @@ import {
 } from '~/Context/ReduxStore/Slices/Photos/Selectors';
 import { useAppSelector } from '~/Context/ReduxStore/Store';
 
+import { useServerPhotoUri } from '../hooks/useServerPhotoUri';
 import ImageForGrid from './ImageForGrid';
 import SelectionIconForGrid from './SelectionIconForGrid';
-import { useServerPhotoUri } from './useServerPhotoUri';
 
 type PropsType = {
   photo: PhotoGalleryType;

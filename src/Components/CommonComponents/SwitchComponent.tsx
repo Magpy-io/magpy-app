@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { StyleSheet } from 'react-native';
 
 import { Switch } from 'react-native-paper';
@@ -7,18 +7,16 @@ import { useStyles } from '~/Hooks/useStyles';
 import { colorsType } from '~/Styles/colors';
 
 type SwitchComponentProps = {
-  initialState: boolean;
+  state: boolean;
   disabled?: boolean;
   onSwitchChanged?: (switchState: boolean) => void;
 };
 
 export default function SwitchComponent({
-  initialState,
+  state,
   disabled,
   onSwitchChanged,
 }: SwitchComponentProps) {
-  const [state, setState] = useState(initialState);
-
   const styles = useStyles(makeStyles);
 
   return (
@@ -29,10 +27,7 @@ export default function SwitchComponent({
         padding: 0,
       }}
       value={state}
-      onValueChange={s => {
-        setState(s);
-        onSwitchChanged?.(s);
-      }}
+      onValueChange={onSwitchChanged}
       color={styles.switch.color}
       disabled={disabled}
     />

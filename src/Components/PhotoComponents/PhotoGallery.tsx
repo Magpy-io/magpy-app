@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -19,6 +19,7 @@ type PhotoGalleryPropsType = {
   showBackButton?: boolean;
   onPressBack?: () => void;
   isInTabScreen?: boolean;
+  cardComponent?: ReactNode;
 };
 
 export default function PhotoGallery({ ...props }: PhotoGalleryPropsType) {
@@ -47,7 +48,16 @@ export default function PhotoGallery({ ...props }: PhotoGalleryPropsType) {
     if (isSlidingPhotos) {
       sliderRef.current?.scrollToIndex({ index, animated: false });
     } else {
-      gridRef.current?.scrollToIndex({ index, animated: true });
+      // Added timeout to avoid scrolling before the grid is rerendered
+      // Otherwise we scroll while display is set to none and
+      // listHeaderHeight in the PhotoGridComponent is 0
+      // This causes the scrollToIndex to not take into consideration the height of
+      // the listHeader passed to SectionListWithColumns and thus gives a wrong
+      // scroll position
+
+      setTimeout(() => {
+        gridRef.current?.scrollToIndex({ index, animated: true });
+      }, 100);
     }
 
     setIsSlidingPhotos(isSlidingPhotos);
@@ -79,6 +89,7 @@ export default function PhotoGallery({ ...props }: PhotoGalleryPropsType) {
           photos={filteredPhotos}
           onSwitchMode={onSwitchMode}
           isInTabScreen={props.isInTabScreen}
+          cardComponent={props.cardComponent}
         />
       </View>
       <View

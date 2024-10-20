@@ -6,10 +6,11 @@ import { addPhotosFromLocalToServer } from '~/Context/ReduxStore/Slices/Photos/P
 import { useAppDispatch } from '~/Context/ReduxStore/Store';
 import { APIPhoto } from '~/Helpers/ServerQueries/Types';
 import { useHasValueChanged } from '~/Hooks/useHasValueChanged';
+import { useToast } from '~/Hooks/useToast';
 import {
+  ClearWorkerDataInputFiles,
   UploadMediaEvents,
   UploadMediaModule,
-  WorkerStatus,
   isWorkerStatusFinished,
 } from '~/NativeModules/UploadMediaModule';
 
@@ -29,8 +30,11 @@ export const UploadWorkerEffects: React.FC<PropsType> = props => {
   const { serverPath, token } = useServerContext();
   const [rerunEffect, setRerunEffect] = useState(false);
 
-  const [workerStatus, setWorkerStatus] = useState<WorkerStatus>('WORKER_SUCCESS');
+  const { workerStatus, setWorkerStatus } = useUploadWorkerContextInner();
+
   const workerStatusChanged = useHasValueChanged(workerStatus, 'WORKER_SUCCESS');
+
+  const { showToastError } = useToast();
 
   const {
     queuedPhotosToUpload,
@@ -57,12 +61,19 @@ export const UploadWorkerEffects: React.FC<PropsType> = props => {
       },
     );
 
+    // Initial worker status
+    UploadMediaModule.IsWorkerAlive()
+      .then(workerRunning => {
+        setWorkerStatus(workerRunning ? 'WORKER_RUNNING' : 'WORKER_SUCCESS');
+      })
+      .catch(console.log);
+
     return () => {
       subscription.remove();
       subscriptionWorkerStatus.remove();
       clearInterval(interval);
     };
-  }, []);
+  }, [setWorkerStatus]);
 
   const isEffectRunning = useRef(false);
 
@@ -122,13 +133,18 @@ export const UploadWorkerEffects: React.FC<PropsType> = props => {
       });
     }
 
-    asyncInner().catch(console.log);
+    asyncInner().catch(err => {
+      setCurrentPhotosUploading(new Set());
+      showToastError('Photos upload failed.');
+      console.log(err);
+    });
   }, [
     queuedPhotosToUpload,
     currentPhotosUploading,
     setCurrentPhotosUploading,
     setQueuedPhotosToUpload,
     InvalidatePhotosByMediaId,
+    showToastError,
     serverPath,
     token,
   ]);
@@ -138,7 +154,7 @@ export const UploadWorkerEffects: React.FC<PropsType> = props => {
       return;
     }
 
-    if (!isWorkerStatusFinished(workerStatus)) {
+    if (workerStatus && !isWorkerStatusFinished(workerStatus)) {
       return;
     }
 
@@ -152,13 +168,24 @@ export const UploadWorkerEffects: React.FC<PropsType> = props => {
     }
 
     setCurrentPhotosUploading(new Set());
+
+    if (workerStatus == 'WORKER_FAILED') {
+      showToastError('Photos upload failed.');
+    }
   }, [
     InvalidatePhotosByMediaId,
     setCurrentPhotosUploading,
     currentPhotosUploading,
     workerStatus,
     workerStatusChanged,
+    showToastError,
   ]);
+
+  useEffect(() => {
+    if (workerStatus && isWorkerStatusFinished(workerStatus)) {
+      ClearWorkerDataInputFiles().catch(console.log);
+    }
+  }, [workerStatus]);
 
   return props.children;
 };

@@ -1,4 +1,11 @@
-import React, { forwardRef, useCallback, useImperativeHandle, useRef } from 'react';
+import React, {
+  ReactNode,
+  forwardRef,
+  useCallback,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react';
 import { StyleSheet, TouchableHighlight, View } from 'react-native';
 
 import { Text } from 'react-native-elements';
@@ -33,6 +40,7 @@ type PhotoGridComponentProps = {
   isSelecting: boolean;
   isSelected: (photo: PhotoGalleryType) => boolean;
   selectGroup: (photos: PhotoGalleryType[]) => void;
+  header?: ReactNode;
 };
 
 const PhotoGridComponent = forwardRef<PhotoGridComponentRefType, PhotoGridComponentProps>(
@@ -45,6 +53,7 @@ const PhotoGridComponent = forwardRef<PhotoGridComponentRefType, PhotoGridCompon
       isSelecting,
       isSelected,
       selectGroup,
+      header,
     }: PhotoGridComponentProps,
     ref: React.ForwardedRef<PhotoGridComponentRefType>,
   ) => {
@@ -115,19 +124,33 @@ const PhotoGridComponent = forwardRef<PhotoGridComponentRefType, PhotoGridCompon
       [colors, styles, isSelecting, selectGroup],
     );
 
+    const [listHeaderHeight, setListHeaderHeight] = useState(0);
+
+    const ListHeaderComponent = (
+      <View
+        style={styles.headerStyle}
+        onLayout={event => {
+          setListHeaderHeight(event.nativeEvent.layout.height);
+        }}>
+        {header}
+        <SelectedFilters />
+      </View>
+    );
+
     return (
       <View style={[styles.mainViewStyle, { backgroundColor: colors.BACKGROUND }]}>
         <SectionListWithColumns
           mref={sectionlistRef}
           sections={sections}
           renderItem={renderItem}
-          ListHeaderComponent={SelectedFilters}
+          ListHeaderComponent={ListHeaderComponent}
           renderSectionHeader={renderSectionHeader}
           numberColumns={numberOfColumns}
           itemSpacing={SPACE_BETWEEN_PHOTOS}
           sectionHeaderHeight={SECTION_HEADER_HEIGHT}
           onRefresh={onRefresh}
           refreshing={false}
+          listHeaderHeight={listHeaderHeight}
         />
       </View>
     );
@@ -164,5 +187,8 @@ const makeStyles = (colors: colorsType) =>
     },
     mainViewStyle: {
       flex: 1,
+    },
+    headerStyle: {
+      marginHorizontal: spacing.spacing_m,
     },
   });

@@ -15,14 +15,14 @@ export default function AboutSettingsScreen() {
       title: 'About Magpy',
       data: [
         {
-          type: 'Button',
+          type: 'Label',
           title: 'Magpy website',
           onPress: () => {
             Linking.openURL(websiteUrl).catch(console.log);
           },
         },
         {
-          type: 'Button',
+          type: 'Label',
           title: 'Privacy Policy',
           onPress: () => {
             Linking.openURL(privacyPolicyUrl).catch(console.log);

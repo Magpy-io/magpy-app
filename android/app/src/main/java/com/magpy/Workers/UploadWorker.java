@@ -30,7 +30,11 @@ import com.magpy.GlobalManagers.ServerQueriesManager.PhotoUploader;
 import com.magpy.NativeModules.MediaManagement.Utils.Definitions;
 import com.magpy.NativeModules.MediaManagement.Utils.GetMediaTask;
 import com.magpy.R;
+import com.magpy.Utils.FileOperations;
 import com.magpy.Utils.MediaParser;
+
+import java.io.IOException;
+import java.util.ArrayList;
 
 public class UploadWorker extends Worker {
     final int NOTIFICATION_ID = 1003;
@@ -43,12 +47,14 @@ public class UploadWorker extends Worker {
     public static final String DATA_KEY_URL = "URL";
     public static final String DATA_KEY_SERVER_TOKEN = "SERVER_TOKEN";
     public static final String DATA_KEY_DEVICE_UNIQUE_ID = "DEVICE_UNIQUE_ID";
-    public static final String DATA_KEY_PHOTOS_IDS = "PHOTOS_IDS";
+    public static final String DATA_KEY_PHOTOS_IDS_FILE_PATH = "PHOTOS_IDS_FILE_PATH";
 
 
     protected String url;
     protected String serverToken;
     protected String deviceId;
+    protected String photosIdsFilePath;
+
     protected String[] photosIds;
 
     NotificationCompat.Builder notificationBuilder;
@@ -59,15 +65,6 @@ public class UploadWorker extends Worker {
         super(context, params);
     }
 
-    protected boolean parseInputData(){
-        url = getInputData().getString(DATA_KEY_URL);
-        serverToken = getInputData().getString(DATA_KEY_SERVER_TOKEN);
-        deviceId = getInputData().getString(DATA_KEY_DEVICE_UNIQUE_ID);
-        photosIds = getInputData().getStringArray(DATA_KEY_PHOTOS_IDS);
-
-        return url != null && serverToken != null && deviceId != null && photosIds != null;
-    }
-
     @RequiresApi(api = Build.VERSION_CODES.Q)
     @NonNull
     @Override
@@ -76,6 +73,10 @@ public class UploadWorker extends Worker {
 
         try{
             if(!parseInputData()) {
+                return Result.failure();
+            }
+
+            if(!parsePhotosIdsFilePath()){
                 return Result.failure();
             }
 
@@ -219,4 +220,25 @@ public class UploadWorker extends Worker {
         getApplicationContext().getSystemService(NotificationManager.class).notify(NOTIFICATION_ID, notificationBuilder.build());
     }
 
+    private boolean parseInputData(){
+        url = getInputData().getString(DATA_KEY_URL);
+        serverToken = getInputData().getString(DATA_KEY_SERVER_TOKEN);
+        deviceId = getInputData().getString(DATA_KEY_DEVICE_UNIQUE_ID);
+        photosIdsFilePath = getInputData().getString(DATA_KEY_PHOTOS_IDS_FILE_PATH);
+
+        return url != null && serverToken != null && deviceId != null && photosIdsFilePath != null;
+    }
+
+    private boolean parsePhotosIdsFilePath() {
+        try{
+            ArrayList<String> photosIdsFileLines = FileOperations.readLinesFromFile(photosIdsFilePath);
+
+            photosIds = new String[photosIdsFileLines.size()];
+            photosIdsFileLines.toArray(photosIds);
+            return true;
+        }
+        catch(Exception e){
+            return false;
+        }
+    }
 }

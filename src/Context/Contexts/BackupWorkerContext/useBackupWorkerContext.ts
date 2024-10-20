@@ -1,38 +1,38 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { uniqueDeviceId } from '~/Config/config';
-import { AutoBackupModule } from '~/NativeModules/AutoBackupModule';
+import { AutoBackupModule, isWorkerStatusFinished } from '~/NativeModules/AutoBackupModule';
 
 import { useServerContext } from '../ServerContext';
-import {
-  useBackupWorkerContextInner,
-  useBackupWorkerContextSettersInner,
-} from './BackupWorkerContext';
+import { useBackupWorkerContextInner } from './BackupWorkerContext';
 
 export function useBackupWorkerContextFunctions() {
-  const { setAutobackupEnabled } = useBackupWorkerContextSettersInner();
+  const { setWorkerStatus } = useBackupWorkerContextInner();
 
   const { isServerReachable, serverPath, token } = useServerContext();
 
-  const StartAutoBackup = useCallback(async () => {
-    if (isServerReachable) {
-      await AutoBackupModule.StartBackupWorker({
-        url: serverPath ?? '',
-        deviceId: uniqueDeviceId,
-        serverToken: token ?? '',
-      });
+  const StartAutoBackup = useCallback(
+    async (restartWorker?: boolean) => {
+      if (isServerReachable) {
+        await AutoBackupModule.StartBackupWorker({
+          url: serverPath ?? '',
+          deviceId: uniqueDeviceId,
+          serverToken: token ?? '',
+          restartWorker,
+        });
 
-      const isStarted = await AutoBackupModule.IsWorkerAlive();
+        const isStarted = await AutoBackupModule.IsWorkerAlive();
 
-      if (isStarted) {
-        console.log('worker started');
-        setAutobackupEnabled(true);
-        return;
+        if (isStarted) {
+          console.log('worker started');
+          return;
+        }
+
+        throw new Error('Error while starting autobackup worker');
       }
-
-      throw new Error('Error while starting autobackup worker');
-    }
-  }, [isServerReachable, serverPath, setAutobackupEnabled, token]);
+    },
+    [isServerReachable, serverPath, token],
+  );
 
   const StopAutoBackup = useCallback(async () => {
     await AutoBackupModule.StopWorker();
@@ -41,18 +41,29 @@ export function useBackupWorkerContextFunctions() {
 
     if (!isStarted) {
       console.log('worker stopped');
-      setAutobackupEnabled(false);
+      setWorkerStatus('WORKER_CANCELED');
       return;
     }
 
     throw new Error('Error while stopping autobackup worker');
-  }, [setAutobackupEnabled]);
+  }, [setWorkerStatus]);
 
   return { StartAutoBackup, StopAutoBackup };
 }
 
 export function useBackupWorkerContext() {
-  const { autobackupEnabled } = useBackupWorkerContextInner();
+  const { workerStatus } = useBackupWorkerContextInner();
 
-  return { autobackupEnabled };
+  const autobackupEnabled: boolean = useMemo(() => {
+    if (!workerStatus) {
+      return false;
+    }
+    return !isWorkerStatusFinished(workerStatus);
+  }, [workerStatus]);
+
+  const autoBackupWorkerRunning = useMemo(() => {
+    return workerStatus == 'WORKER_RUNNING';
+  }, [workerStatus]);
+
+  return { autobackupEnabled, autoBackupWorkerRunning };
 }

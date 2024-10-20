@@ -1,21 +1,32 @@
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useCallback } from 'react';
+
 import Toast from 'react-native-toast-message';
 
-export function useToast() {
-  const insets = useSafeAreaInsets();
+let lastToastTime = 0;
 
-  const showToastError = (text: string, position?: 'bottom' | 'top') => {
+const TOAST_VISIBILITY_TIME = 3000;
+
+export function useToast() {
+  const showToastError = useCallback((text: string) => {
+    const timeNow = Date.now();
+
+    if (timeNow - lastToastTime < TOAST_VISIBILITY_TIME) {
+      return;
+    }
+
+    lastToastTime = timeNow;
+
     Toast.show({
       type: 'error',
       text1: text,
-      position: position ?? 'top',
-      bottomOffset: insets.bottom + 5,
+      position: 'top',
+      visibilityTime: TOAST_VISIBILITY_TIME,
     });
-  };
+  }, []);
 
-  const hideToast = () => {
+  const hideToast = useCallback(() => {
     Toast.hide();
-  };
+  }, []);
 
   return { showToastError, hideToast };
 }

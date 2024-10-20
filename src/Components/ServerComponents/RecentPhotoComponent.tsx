@@ -9,7 +9,7 @@ import {
 import { useAppSelector } from '~/Context/ReduxStore/Store';
 import { borderRadius } from '~/Styles/spacing';
 
-import { useServerPhotoUri } from '../PhotoComponents/grid/useServerPhotoUri';
+import { useServerPhotoUri } from '../PhotoComponents/hooks/useServerPhotoUri';
 
 export default function RecentPhotoComponent({
   photo,

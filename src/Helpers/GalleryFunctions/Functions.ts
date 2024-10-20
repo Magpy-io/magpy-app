@@ -3,6 +3,7 @@ import RNFS from 'react-native-fs';
 import { PhotoLocalType } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { MediaManagementModule } from '~/NativeModules/MediaManagementModule';
 
+import { CheckFolderExists, ClearFolderContent, DeleteFile } from '../FileSystemFunctions';
 import { parsePhotoIdentifierToPhotoLocalType } from './GetGalleryPhotos';
 
 export async function deletePhotosFromDevice(mediaIds: string[]) {
@@ -98,36 +99,21 @@ export async function photoCompressedExistsInCache(id: string): Promise<string |
 
 export async function deletePhotoThumbnailFromCache(id: string) {
   const cachePhotoPath = PhotosCacheFolder() + `/thumbnail_${id}`;
-  const exists = await RNFS.exists(cachePhotoPath);
-
-  if (exists) {
-    await RNFS.unlink(cachePhotoPath);
-  }
+  await DeleteFile(cachePhotoPath);
 }
 
 export async function deletePhotoCompressedFromCache(id: string) {
   const cachePhotoPath = PhotosCacheFolder() + `/compressed_${id}`;
-  const exists = await RNFS.exists(cachePhotoPath);
 
-  if (exists) {
-    await RNFS.unlink(cachePhotoPath);
-  }
+  await DeleteFile(cachePhotoPath);
 }
 
 export async function clearCache() {
-  const results = await RNFS.readDir(PhotosCacheFolder());
-
-  for (let i = 0; i < results.length; i++) {
-    await RNFS.unlink(results[i].path);
-  }
+  await ClearFolderContent(PhotosCacheFolder());
 }
 
 async function CheckPhotosCacheFolderExists() {
-  const exists = await RNFS.exists(PhotosCacheFolder());
-
-  if (!exists) {
-    await RNFS.mkdir(PhotosCacheFolder());
-  }
+  await CheckFolderExists(PhotosCacheFolder());
 }
 
 function PhotosCacheFolder() {

@@ -10,11 +10,11 @@ import {
   deletePhotosFromDevice,
 } from '~/Helpers/GalleryFunctions/Functions';
 import { GalleryGetPhotos } from '~/Helpers/GalleryFunctions/GetGalleryPhotos';
-import { DeletePhotosById } from '~/Helpers/ServerQueries';
+import { useDeletePhotosByIdBatched } from '~/Hooks/useServerQueries';
+import { useToast } from '~/Hooks/useToast';
 
 import { useAppDispatch } from '../../Store';
 import {
-  PhotoGalleryType,
   PhotoLocalType,
   deletePhotosFromLocal,
   deletePhotosFromServer,
@@ -28,6 +28,8 @@ export function usePhotosFunctionsStore() {
   const { isServerReachable } = useServerContext();
   const isServerReachableRef = useRef(false);
   isServerReachableRef.current = isServerReachable;
+
+  const { DeletePhotosByIdBatched } = useDeletePhotosByIdBatched();
 
   const { UploadPhotosWorker } = useUploadWorkerContext();
   const { RefreshServerPhotos, InvalidatePhotos } = useServerInvalidationContext();
@@ -46,12 +48,12 @@ export function usePhotosFunctionsStore() {
   }, [dispatch]);
 
   const UploadPhotos = useCallback(
-    (photos: PhotoLocalType[]) => {
-      if (photos.length == 0) {
+    (mediaIds: string[]) => {
+      if (mediaIds.length == 0) {
         return;
       }
 
-      UploadPhotosWorker(photos.map(photo => photo.id));
+      UploadPhotosWorker(mediaIds);
     },
     [UploadPhotosWorker],
   );
@@ -66,7 +68,7 @@ export function usePhotosFunctionsStore() {
 
   const DeletePhotosServer = useCallback(
     async (serverIds: string[]) => {
-      const ret = await DeletePhotosById.Post({
+      const ret = await DeletePhotosByIdBatched({
         ids: serverIds,
       });
 
@@ -74,52 +76,20 @@ export function usePhotosFunctionsStore() {
         throw new Error(ret.errorCode);
       }
 
-      for (const serverId of serverIds) {
+      const deletedIds = ret.data.deletedIds;
+
+      for (const serverId of deletedIds) {
         await deletePhotoThumbnailFromCache(serverId).catch(console.log);
         await deletePhotoCompressedFromCache(serverId).catch(console.log);
       }
 
-      dispatch(deletePhotosFromServer({ serverIds }));
+      // Update store for photos we know have been deleted
+      dispatch(deletePhotosFromServer({ serverIds: deletedIds }));
+
+      // Invalidate all photos in request to make sure they are correctly updated
       InvalidatePhotos({ serverIds });
     },
-    [dispatch, InvalidatePhotos],
-  );
-
-  const DeletePhotosEverywhere = useCallback(
-    async (photos: PhotoGalleryType[]) => {
-      const mediaIds: string[] = [];
-      const serverIds: string[] = [];
-
-      photos.forEach(p => {
-        if (p.mediaId) {
-          mediaIds.push(p.mediaId);
-        }
-
-        if (p.serverId) {
-          serverIds.push(p.serverId);
-        }
-      });
-
-      await deletePhotosFromDevice(mediaIds);
-      dispatch(deletePhotosFromLocal({ mediaIds }));
-
-      const ret = await DeletePhotosById.Post({
-        ids: serverIds,
-      });
-
-      if (!ret.ok) {
-        throw new Error(ret.errorCode);
-      }
-
-      for (const serverId of serverIds) {
-        await deletePhotoThumbnailFromCache(serverId).catch(console.log);
-        await deletePhotoCompressedFromCache(serverId).catch(console.log);
-      }
-
-      dispatch(deletePhotosFromServer({ serverIds }));
-      InvalidatePhotos({ serverIds });
-    },
-    [dispatch, InvalidatePhotos],
+    [dispatch, InvalidatePhotos, DeletePhotosByIdBatched],
   );
 
   const RefreshAllPhotos = useCallback(
@@ -140,7 +110,6 @@ export function usePhotosFunctionsStore() {
     UploadPhotos,
     DeletePhotosLocal,
     DeletePhotosServer,
-    DeletePhotosEverywhere,
     ClearServerPhotos,
   };
 }
@@ -149,7 +118,9 @@ export function usePhotosStoreEffect() {
   const { RefreshLocalPhotos, ClearServerPhotos } = usePhotosFunctionsStore();
   const { RefreshServerPhotos } = useServerInvalidationContext();
 
-  const { serverNetwork } = useServerContext();
+  const { showToastError } = useToast();
+
+  const { serverNetwork, isServerReachable } = useServerContext();
 
   const { mediaPermissionStatus } = usePermissionsContext();
 
@@ -159,14 +130,28 @@ export function usePhotosStoreEffect() {
         await RefreshLocalPhotos(5000);
       }
     }
-    innerEffect().catch(console.log);
-  }, [RefreshLocalPhotos, mediaPermissionStatus]);
+    innerEffect().catch(err => {
+      showToastError('Failed to get photos from device.');
+      console.log(err);
+    });
+  }, [RefreshLocalPhotos, mediaPermissionStatus, showToastError]);
 
   useEffect(() => {
-    if (serverNetwork) {
-      RefreshServerPhotos();
-    } else {
-      ClearServerPhotos();
+    try {
+      if (serverNetwork && isServerReachable) {
+        RefreshServerPhotos();
+      } else {
+        ClearServerPhotos();
+      }
+    } catch (err) {
+      showToastError('Failed to fetch photos from server.');
+      console.log(err);
     }
-  }, [ClearServerPhotos, RefreshServerPhotos, serverNetwork]);
+  }, [
+    ClearServerPhotos,
+    RefreshServerPhotos,
+    showToastError,
+    serverNetwork,
+    isServerReachable,
+  ]);
 }

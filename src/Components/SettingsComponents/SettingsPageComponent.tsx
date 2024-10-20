@@ -16,16 +16,9 @@ import SettingLabelComponent from './SettingLabelComponent';
 import SettingRadioButtonComponent from './SettingRadioButtonComponent';
 import SettingSwitchComponent from './SettingSwitchComponent';
 
-export type ButtonType = {
-  type: 'Button';
-  onPress: () => void;
-  title: string;
-  icon?: JSX.Element;
-  style?: TextStyle;
-};
-
 export type LabelType = {
   type: 'Label';
+  onPress?: () => void;
   title: string;
   icon?: JSX.Element;
   style?: TextStyle;
@@ -60,7 +53,14 @@ export type ComboBoxType = {
   style?: TextStyle;
 };
 
-export type EntryTypes = ButtonType | LabelType | NavigationType | SwitchType | ComboBoxType;
+export type ButtonType = {
+  type: 'Button';
+  onPress: () => void;
+  title: string;
+  align?: 'left' | 'center' | 'right';
+};
+
+export type EntryTypes = LabelType | NavigationType | SwitchType | ComboBoxType | ButtonType;
 
 export type SettingsListType = Array<{ title: string; data: Array<EntryTypes> }>;
 
@@ -84,18 +84,14 @@ export default function SettingsPageComponent({
 
   const renderItem = ({ item }: { item: EntryTypes }) => {
     switch (item.type) {
-      case 'Button':
-        return (
-          <SettingButtonComponent
-            icon={item.icon}
-            title={item.title}
-            onPress={item.onPress}
-            style={item.style}
-          />
-        );
       case 'Label':
         return (
-          <SettingLabelComponent icon={item.icon} title={item.title} style={item.style} />
+          <SettingLabelComponent
+            icon={item.icon}
+            title={item.title}
+            style={item.style}
+            onPress={item.onPress}
+          />
         );
       case 'Navigation':
         return (
@@ -128,6 +124,14 @@ export default function SettingsPageComponent({
             name={item.name}
             checked={item.checked}
             disabled={item.disabled}
+          />
+        );
+      case 'Button':
+        return (
+          <SettingButtonComponent
+            title={item.title}
+            onPress={item.onPress}
+            align={item.align}
           />
         );
     }

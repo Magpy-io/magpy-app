@@ -1,19 +1,18 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
+import { useLoadingScreen } from '~/Components/CommonComponents/LoadingScreen/LoadingScreenContext';
 import { usePopupMessageModal } from '~/Components/CommonComponents/PopupMessageModal';
-import { useMainContext, useMainContextFunctions } from '~/Context/Contexts/MainContext';
-import { usePermissionsContext } from '~/Context/Contexts/PermissionsContext';
 import { usePhotosDownloadingFunctions } from '~/Context/Contexts/PhotosDownloadingContext/usePhotosDownloadingContext';
 import { useUploadWorkerContext } from '~/Context/Contexts/UploadWorkerContext';
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { usePhotosFunctionsStore } from '~/Context/ReduxStore/Slices/Photos/PhotosFunctions';
-import { photosLocalSelector } from '~/Context/ReduxStore/Slices/Photos/Selectors';
-import { useAppSelector } from '~/Context/ReduxStore/Store';
 import { useStyles } from '~/Hooks/useStyles';
+import { useToast } from '~/Hooks/useToast';
 import { colorsType } from '~/Styles/colors';
 
 import PhotoDetailsModal from '../slider/PhotoDetailsModal';
+import { useUserActions } from './Actions/useUserActions';
 import ToolBarPhotosComponent from './ToolBarPhotosComponent';
 
 type ToolBarProps = {
@@ -25,84 +24,46 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
   const styles = useStyles(makeStyles);
   const [modalVisible, setModalVisible] = useState(false);
 
-  const { neverAskForNotificationPermissionAgain } = useMainContext();
-  const { setNeverAskForNotificationPermissionAgain } = useMainContextFunctions();
-
-  const { notificationsPermissionStatus, askNotificationsPermission } =
-    usePermissionsContext();
+  const { showToastError } = useToast();
 
   const { displayPopupMessage } = usePopupMessageModal();
+  const { showLoadingScreen, hideLoadingScreen } = useLoadingScreen();
 
   const onRequestClose = useCallback(() => setModalVisible(false), []);
   const showModal = useCallback(() => setModalVisible(true), []);
 
   const isOnePhoto = selectedGalleryPhotos.length == 1;
 
-  const localPhotos = useAppSelector(photosLocalSelector);
-
-  const { UploadPhotos, DeletePhotosLocal, DeletePhotosServer, DeletePhotosEverywhere } =
-    usePhotosFunctionsStore();
+  const { DeletePhotosLocal, DeletePhotosServer } = usePhotosFunctionsStore();
   const { StartPhotosDownload } = usePhotosDownloadingFunctions();
 
   const { IsMediaIdUploadQueued } = useUploadWorkerContext();
   const { IsDownloadQueued } = usePhotosDownloadingFunctions();
 
+  const { UploadPhotosAction } = useUserActions();
+
   const selectedLocalOnlyPhotos = useMemo(() => {
-    const selectedLocalOnlyPhotos = [];
-    for (const photo of selectedGalleryPhotos) {
-      if (photo.serverId) {
-        continue;
-      }
-      const localPhoto = photo.mediaId ? localPhotos[photo.mediaId] : undefined;
-      if (localPhoto) {
-        selectedLocalOnlyPhotos.push(localPhoto);
-      }
-    }
-    return selectedLocalOnlyPhotos;
-  }, [localPhotos, selectedGalleryPhotos]);
+    return selectedGalleryPhotos
+      .filter(photo => photo.mediaId && !photo.serverId)
+      .map(photo => photo.mediaId);
+  }, [selectedGalleryPhotos]) as string[];
 
   const selectedServerOnlyPhotosIds = useMemo(() => {
-    const selectedServerOnlyPhotosIds = [];
-    for (const photo of selectedGalleryPhotos) {
-      if (photo.mediaId) {
-        continue;
-      }
-
-      if (!photo.serverId) {
-        continue;
-      }
-      selectedServerOnlyPhotosIds.push(photo.serverId);
-    }
-    return selectedServerOnlyPhotosIds;
-  }, [selectedGalleryPhotos]);
+    return selectedGalleryPhotos
+      .filter(photo => photo.serverId && !photo.mediaId)
+      .map(photo => photo.serverId);
+  }, [selectedGalleryPhotos]) as string[];
 
   const selectedLocalPhotosIds = useMemo(() => {
-    const selectedLocalPhotosIds = [];
-
-    for (const photo of selectedGalleryPhotos) {
-      if (!photo.mediaId) {
-        continue;
-      }
-      selectedLocalPhotosIds.push(photo.mediaId);
-    }
-
-    return selectedLocalPhotosIds;
-  }, [selectedGalleryPhotos]);
+    return selectedGalleryPhotos.filter(photo => photo.mediaId).map(photo => photo.mediaId);
+  }, [selectedGalleryPhotos]) as string[];
 
   const selectedServerPhotosIds = useMemo(() => {
-    const selectedServerPhotosIds = [];
+    return selectedGalleryPhotos.filter(photo => photo.serverId).map(photo => photo.serverId);
+  }, [selectedGalleryPhotos]) as string[];
 
-    for (const photo of selectedGalleryPhotos) {
-      if (!photo.serverId) {
-        continue;
-      }
-      selectedServerPhotosIds.push(photo.serverId);
-    }
-    return selectedServerPhotosIds;
-  }, [selectedGalleryPhotos]);
-
-  const atleastOneLocal = selectedGalleryPhotos.find(p => p.mediaId);
-  const atleastOneServer = selectedGalleryPhotos.find(p => p.serverId);
+  const atleastOneLocal = selectedLocalPhotosIds.length > 0;
+  const atleastOneServer = selectedServerPhotosIds.length > 0;
 
   const atleastOneServerAndOneLocal = atleastOneLocal && atleastOneServer;
 
@@ -123,55 +84,61 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
   }, [atleastOneServer, IsDownloadQueued, isOnePhoto, selectedGalleryPhotos]);
 
   const onBackup = useCallback(() => {
-    if (
-      notificationsPermissionStatus == 'PENDING' &&
-      !neverAskForNotificationPermissionAgain
-    ) {
-      displayPopupMessage({
-        title: 'Notification Permission Needed',
-        cancel: 'Never ask again',
-        content:
-          'Allow Magpy to display notifications. This will be used to display the progress of the backing up of your photos.',
-        onDismissed: userAction => {
-          if (userAction == 'Cancel') {
-            setNeverAskForNotificationPermissionAgain(true);
-          }
+    UploadPhotosAction(selectedLocalOnlyPhotos);
+  }, [UploadPhotosAction, selectedLocalOnlyPhotos]);
 
-          if (userAction == 'Ok') {
-            askNotificationsPermission()
-              .then(() => {
-                UploadPhotos(selectedLocalOnlyPhotos);
-              })
-              .catch(console.log);
-          } else {
-            UploadPhotos(selectedLocalOnlyPhotos);
-          }
-        },
-      });
-      return;
+  const onDownload = useCallback(() => {
+    try {
+      StartPhotosDownload(selectedServerOnlyPhotosIds);
+    } catch (err) {
+      showToastError('Failed to start photo download.');
+      console.log(err);
     }
+  }, [StartPhotosDownload, selectedServerOnlyPhotosIds, showToastError]);
 
-    UploadPhotos(selectedLocalOnlyPhotos);
+  const onDeleteEverywhere = useCallback(() => {
+    const photosToDeleteCount = selectedGalleryPhotos.length;
+
+    const photosMessage =
+      photosToDeleteCount == 1 ? 'this photo' : photosToDeleteCount.toString() + ' photos';
+
+    displayPopupMessage({
+      title: 'Deletion confirmation',
+      ok: 'Yes',
+      cancel: 'Cancel',
+      content: 'Are you sure you want to delete ' + photosMessage + ' from server ?',
+      onDismissed: userAction => {
+        if (userAction == 'Ok') {
+          showLoadingScreen();
+          DeletePhotosServer(selectedServerPhotosIds)
+            .then(() => {
+              return DeletePhotosLocal(selectedLocalPhotosIds);
+            })
+            .then(() => clearSelection?.())
+            .catch(err => {
+              if ((err as { code: string })?.code != 'ERROR_USER_REJECTED') {
+                showToastError('Failed to delete photos.');
+              }
+              console.log(err);
+            })
+            .finally(() => {
+              hideLoadingScreen();
+            });
+        }
+      },
+    });
   }, [
-    UploadPhotos,
-    askNotificationsPermission,
-    neverAskForNotificationPermissionAgain,
+    DeletePhotosServer,
+    DeletePhotosLocal,
+    clearSelection,
     displayPopupMessage,
-    notificationsPermissionStatus,
-    selectedLocalOnlyPhotos,
-    setNeverAskForNotificationPermissionAgain,
+    hideLoadingScreen,
+    selectedGalleryPhotos.length,
+    selectedServerPhotosIds,
+    selectedLocalPhotosIds,
+    showLoadingScreen,
+    showToastError,
   ]);
-
-  const onDownload = useCallback(
-    () => StartPhotosDownload(selectedServerOnlyPhotosIds),
-    [StartPhotosDownload, selectedServerOnlyPhotosIds],
-  );
-
-  const onDelete = useCallback(() => {
-    DeletePhotosEverywhere(selectedGalleryPhotos)
-      .then(() => clearSelection?.())
-      .catch(console.log);
-  }, [DeletePhotosEverywhere, clearSelection, selectedGalleryPhotos]);
 
   const onDeleteFromServer = useCallback(() => {
     const photosToDeleteCount = selectedServerPhotosIds.length;
@@ -186,19 +153,39 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
       content: 'Are you sure you want to delete ' + photosMessage + ' from server ?',
       onDismissed: userAction => {
         if (userAction == 'Ok') {
+          showLoadingScreen();
           DeletePhotosServer(selectedServerPhotosIds)
             .then(() => clearSelection?.())
-            .catch(console.log);
+            .catch(err => {
+              showToastError('Failed to delete photos.');
+              console.log(err);
+            })
+            .finally(() => {
+              hideLoadingScreen();
+            });
         }
       },
     });
-  }, [DeletePhotosServer, clearSelection, displayPopupMessage, selectedServerPhotosIds]);
+  }, [
+    DeletePhotosServer,
+    clearSelection,
+    displayPopupMessage,
+    selectedServerPhotosIds,
+    showToastError,
+    showLoadingScreen,
+    hideLoadingScreen,
+  ]);
 
   const onDeleteFromDevice = useCallback(() => {
     DeletePhotosLocal(selectedLocalPhotosIds)
       .then(() => clearSelection?.())
-      .catch(console.log);
-  }, [DeletePhotosLocal, clearSelection, selectedLocalPhotosIds]);
+      .catch(err => {
+        if ((err as { code: string })?.code != 'ERROR_USER_REJECTED') {
+          showToastError('Failed to delete photos.');
+        }
+        console.log(err);
+      });
+  }, [DeletePhotosLocal, clearSelection, selectedLocalPhotosIds, showToastError]);
 
   const onShare = useCallback(() => {}, []);
 
@@ -215,7 +202,7 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
         nbPhotosToDeleteFromDevice={selectedLocalPhotosIds.length}
         onBackUp={onBackup}
         onDownload={onDownload}
-        onDelete={onDelete}
+        onDelete={onDeleteEverywhere}
         onDeleteFromServer={onDeleteFromServer}
         onDeleteFromDevice={onDeleteFromDevice}
         onShare={onShare}

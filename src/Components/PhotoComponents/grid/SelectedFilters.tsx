@@ -103,7 +103,6 @@ const makeStyles = (colors: colorsType) =>
     viewStyle: {
       flexDirection: 'row',
       gap: spacing.spacing_xs,
-      marginHorizontal: spacing.spacing_m,
       marginTop: spacing.spacing_s,
       flexWrap: 'wrap',
     },
