@@ -189,7 +189,7 @@ public class AutoBackupModule extends ReactContextBaseJavaModule {
         if(lastSuccessRunTime < 0){
             workStatsObject.putNull("lastSuccessRunTime");
         }else{
-            workStatsObject.putDouble("lastSuccessRunTimes", lastSuccessRunTime);
+            workStatsObject.putDouble("lastSuccessRunTime", lastSuccessRunTime);
         }
         workStatsObject.putArray("lastSuccessRunTimes", lastExecutionTimesArray);
         return workStatsObject;
