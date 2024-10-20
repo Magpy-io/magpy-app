@@ -11,24 +11,28 @@ export function useBackupWorkerContextFunctions() {
 
   const { isServerReachable, serverPath, token } = useServerContext();
 
-  const StartAutoBackup = useCallback(async () => {
-    if (isServerReachable) {
-      await AutoBackupModule.StartBackupWorker({
-        url: serverPath ?? '',
-        deviceId: uniqueDeviceId,
-        serverToken: token ?? '',
-      });
+  const StartAutoBackup = useCallback(
+    async (restartWorker?: boolean) => {
+      if (isServerReachable) {
+        await AutoBackupModule.StartBackupWorker({
+          url: serverPath ?? '',
+          deviceId: uniqueDeviceId,
+          serverToken: token ?? '',
+          restartWorker,
+        });
 
-      const isStarted = await AutoBackupModule.IsWorkerAlive();
+        const isStarted = await AutoBackupModule.IsWorkerAlive();
 
-      if (isStarted) {
-        console.log('worker started');
-        return;
+        if (isStarted) {
+          console.log('worker started');
+          return;
+        }
+
+        throw new Error('Error while starting autobackup worker');
       }
-
-      throw new Error('Error while starting autobackup worker');
-    }
-  }, [isServerReachable, serverPath, token]);
+    },
+    [isServerReachable, serverPath, token],
+  );
 
   const StopAutoBackup = useCallback(async () => {
     await AutoBackupModule.StopWorker();

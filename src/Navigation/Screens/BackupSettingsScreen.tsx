@@ -31,37 +31,40 @@ export default function BackupSettingsScreen() {
   const notBackedupPhotos = useAppSelector(notOnServerGalleryPhotosSelector);
   const notBackedupPhotosCount = notBackedupPhotos.length;
 
+  const StartAutoBackupAsync = useCallback(async () => {
+    if (notificationsPermissionStatus == 'PENDING') {
+      const onDismissed = async () => {
+        await askNotificationsPermission();
+        await StartAutoBackup(true);
+      };
+
+      displayPopupMessage({
+        title: 'Notification Permission Needed',
+        content:
+          'Allow Magpy to display notifications. This will be used to display the progress of the backing up of your photos.',
+        onDismissed: () => {
+          onDismissed().catch(console.log);
+        },
+      });
+    } else {
+      await StartAutoBackup(true);
+    }
+  }, [
+    StartAutoBackup,
+    askNotificationsPermission,
+    displayPopupMessage,
+    notificationsPermissionStatus,
+  ]);
+
   const onBackupPressAsync = useCallback(
     async (autoBackupEnabled: boolean) => {
       if (autoBackupEnabled) {
-        if (notificationsPermissionStatus == 'PENDING') {
-          const onDismissed = async () => {
-            await askNotificationsPermission();
-            await StartAutoBackup();
-          };
-
-          displayPopupMessage({
-            title: 'Notification Permission Needed',
-            content:
-              'Allow Magpy to display notifications. This will be used to display the progress of the backing up of your photos.',
-            onDismissed: () => {
-              onDismissed().catch(console.log);
-            },
-          });
-        } else {
-          await StartAutoBackup();
-        }
+        await StartAutoBackupAsync();
       } else {
         await StopAutoBackup();
       }
     },
-    [
-      StartAutoBackup,
-      StopAutoBackup,
-      askNotificationsPermission,
-      displayPopupMessage,
-      notificationsPermissionStatus,
-    ],
+    [StartAutoBackupAsync, StopAutoBackup],
   );
 
   const photosMessage = notBackedupPhotosCount == 1 ? 'photo' : 'photos';
@@ -119,6 +122,17 @@ export default function BackupSettingsScreen() {
         icon: <InfoIcon />,
       });
     }
+  }
+
+  if (autobackupEnabled && !autoBackupWorkerRunning && notBackedupPhotosCount != 0) {
+    data[0].data.push({
+      type: 'Button',
+      align: 'right',
+      title: 'Backup now',
+      onPress: () => {
+        StartAutoBackupAsync().catch(console.log);
+      },
+    });
   }
 
   return <SettingsPageComponent data={data} />;
