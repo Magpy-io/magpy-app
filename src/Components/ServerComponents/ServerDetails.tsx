@@ -17,6 +17,7 @@ import {
   useServerContext,
   useServerContextFunctions,
 } from '~/Context/Contexts/ServerContext';
+import { usePhotosFunctionsStore } from '~/Context/ReduxStore/Slices/Photos/PhotosFunctions';
 import { useStyles } from '~/Hooks/useStyles';
 import { useMainStackNavigation } from '~/Navigation/Navigators/MainStackNavigator';
 import { colorsType } from '~/Styles/colors';
@@ -38,6 +39,8 @@ export default function ServerDetails() {
   const { FindServerLocal, FindServerRemote } = useFindServerFunctions();
   const styles = useStyles(makeStyles);
   const { navigate } = useMainStackNavigation();
+
+  const { ClearServerPhotos } = usePhotosFunctionsStore();
 
   const hasServer = useUserHasServer();
 
@@ -83,7 +86,14 @@ export default function ServerDetails() {
       forgetServerLocal();
     }
     forgetServer();
-  }, [forgetServer, forgetServerLocal, forgetServerRemote, isUsingLocalAccount]);
+    ClearServerPhotos();
+  }, [
+    ClearServerPhotos,
+    forgetServer,
+    forgetServerLocal,
+    forgetServerRemote,
+    isUsingLocalAccount,
+  ]);
 
   return (
     <View style={styles.viewStyle}>

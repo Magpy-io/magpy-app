@@ -115,7 +115,7 @@ export function usePhotosFunctionsStore() {
 }
 
 export function usePhotosStoreEffect() {
-  const { RefreshLocalPhotos, ClearServerPhotos } = usePhotosFunctionsStore();
+  const { RefreshLocalPhotos } = usePhotosFunctionsStore();
   const { RefreshServerPhotos } = useServerInvalidationContext();
 
   const { showToastError } = useToast();
@@ -140,18 +140,10 @@ export function usePhotosStoreEffect() {
     try {
       if (serverNetwork && isServerReachable) {
         RefreshServerPhotos();
-      } else {
-        ClearServerPhotos();
       }
     } catch (err) {
       showToastError('Failed to fetch photos from server.');
       console.log(err);
     }
-  }, [
-    ClearServerPhotos,
-    RefreshServerPhotos,
-    showToastError,
-    serverNetwork,
-    isServerReachable,
-  ]);
+  }, [RefreshServerPhotos, showToastError, serverNetwork, isServerReachable]);
 }
