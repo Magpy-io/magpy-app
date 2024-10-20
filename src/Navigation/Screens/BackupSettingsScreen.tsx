@@ -18,7 +18,7 @@ import { useLastAutobackupExecutionTime } from '~/NativeModules/AutoBackupModule
 
 export default function BackupSettingsScreen() {
   const { StartAutoBackup, StopAutoBackup } = useBackupWorkerContextFunctions();
-  const { autobackupEnabled } = useBackupWorkerContext();
+  const { autobackupEnabled, autoBackupWorkerRunning } = useBackupWorkerContext();
   const { isServerReachable } = useServerContext();
 
   const backupWorkerLastExecutionTime = useLastAutobackupExecutionTime();
@@ -95,22 +95,30 @@ export default function BackupSettingsScreen() {
   ];
 
   if (autobackupEnabled && backupWorkerLastExecutionTime) {
-    const timeDiffMillis = new Date().getTime() - backupWorkerLastExecutionTime.getTime();
+    if (!autoBackupWorkerRunning) {
+      const timeDiffMillis = new Date().getTime() - backupWorkerLastExecutionTime.getTime();
 
-    let timeSinceLastWorkerExecution;
+      let timeSinceLastWorkerExecution;
 
-    if (timeDiffMillis > 60000) {
-      timeSinceLastWorkerExecution =
-        parseMillisecondsIntoReadableTime(timeDiffMillis) + ' ago';
+      if (timeDiffMillis > 60000) {
+        timeSinceLastWorkerExecution =
+          parseMillisecondsIntoReadableTime(timeDiffMillis) + ' ago';
+      } else {
+        timeSinceLastWorkerExecution = 'just now';
+      }
+
+      data[0].data.push({
+        type: 'Label',
+        title: 'Backed up: ' + timeSinceLastWorkerExecution,
+        icon: <InfoIcon />,
+      });
     } else {
-      timeSinceLastWorkerExecution = 'just now';
+      data[0].data.push({
+        type: 'Label',
+        title: 'Backup Running',
+        icon: <InfoIcon />,
+      });
     }
-
-    data[0].data.push({
-      type: 'Label',
-      title: 'Backed up: ' + timeSinceLastWorkerExecution,
-      icon: <InfoIcon />,
-    });
   }
 
   return <SettingsPageComponent data={data} />;

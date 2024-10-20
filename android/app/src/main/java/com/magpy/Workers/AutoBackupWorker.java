@@ -81,7 +81,6 @@ public class AutoBackupWorker extends Worker {
     @Override
     public Result doWork() {
         Log.d("AutoBackupWorker", "Work started.");
-        recordExecutionTime();
 
         try {
             if(!parseInputData()) {
@@ -120,6 +119,7 @@ public class AutoBackupWorker extends Worker {
             Log.e("AutoBackupWorker", "Exception thrown: ", e);
             return Result.failure();
         }finally {
+            recordExecutionTime();
             getApplicationContext().getSystemService(NotificationManager.class).cancel(NOTIFICATION_ID);
         }
     }
