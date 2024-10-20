@@ -20,21 +20,21 @@ function App(): React.JSX.Element {
   return (
     <Provider store={store}>
       <SafeAreaProvider>
-        <GlobalContexts>
-          <GlobalEffects>
-            <GestureHandlerRootView style={{ flex: 1 }}>
-              <ThemeContextProvider>
-                <PopupMessageModalContextProvider>
-                  <LoadingScreenContextProvider>
+        <ThemeContextProvider>
+          <LoadingScreenContextProvider>
+            <GlobalContexts>
+              <GlobalEffects>
+                <GestureHandlerRootView style={{ flex: 1 }}>
+                  <PopupMessageModalContextProvider>
                     <StatusBar backgroundColor={'transparent'} translucent />
                     <Navigation />
                     <Toast />
-                  </LoadingScreenContextProvider>
-                </PopupMessageModalContextProvider>
-              </ThemeContextProvider>
-            </GestureHandlerRootView>
-          </GlobalEffects>
-        </GlobalContexts>
+                  </PopupMessageModalContextProvider>
+                </GestureHandlerRootView>
+              </GlobalEffects>
+            </GlobalContexts>
+          </LoadingScreenContextProvider>
+        </ThemeContextProvider>
       </SafeAreaProvider>
     </Provider>
   );
