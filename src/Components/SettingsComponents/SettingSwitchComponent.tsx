@@ -24,8 +24,10 @@ export default function SettingSwitchComponent({
   const [state, setState] = useState(initialState);
 
   const onSwitchClicked = () => {
-    setState(!state);
-    onPress(!state);
+    if (!disabled) {
+      setState(!state);
+      onPress(!state);
+    }
   };
 
   return (

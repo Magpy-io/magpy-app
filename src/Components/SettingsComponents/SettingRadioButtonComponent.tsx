@@ -23,12 +23,18 @@ export default function SettingRadioButtonComponent({
   checked,
   disabled,
 }: SettingRadioButtonComponentProps) {
+  const onButtonPress = () => {
+    if (!disabled) {
+      onPress();
+    }
+  };
+
   return (
     <SettingEntryComponent
       title={title}
       icon={icon}
       style={style}
-      onPress={onPress}
+      onPress={onButtonPress}
       componentEnd={
         <RadioButtonComponent
           onPress={onPress}
