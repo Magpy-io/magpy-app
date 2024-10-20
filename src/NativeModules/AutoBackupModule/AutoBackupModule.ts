@@ -42,6 +42,8 @@ export interface AutoBackupModuleType {
   GetWorkerStats: () => Promise<{
     lastSuccessRunTime: number | null;
     lastSuccessRunTimes: number[];
+    lastFailedRunTime: number | null;
+    lastFailedRunError: WorkerErrorType;
   }>;
 }
 

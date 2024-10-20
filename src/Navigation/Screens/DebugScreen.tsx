@@ -59,6 +59,13 @@ export default function DebugScreen() {
 
     const workerStats = await AutoBackupModule.GetWorkerStats();
 
+    const lastError = workerStats.lastFailedRunTime
+      ? 'Last Error: ' +
+        workerStats.lastFailedRunError +
+        ' at ' +
+        new Date(workerStats.lastFailedRunTime).toString()
+      : null;
+
     const lastExecutionTime = workerStats.lastSuccessRunTime
       ? 'Last execution time: ' + new Date(workerStats.lastSuccessRunTime).toString()
       : 'Last execution time: none';
@@ -87,6 +94,7 @@ export default function DebugScreen() {
         workerNextRunTimerString,
         intervalTimeString,
         stopReason,
+        lastError,
         lastExecutionTime,
         timeSinceLastExecution,
         lastExecutionTimes,

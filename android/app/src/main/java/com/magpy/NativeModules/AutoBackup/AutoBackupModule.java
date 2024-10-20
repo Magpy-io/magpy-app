@@ -179,6 +179,9 @@ public class AutoBackupModule extends ReactContextBaseJavaModule {
         long lastSuccessRunTime = workerStatsPreferences.GetLastSuccessRunTime();
         Collection<Long> lastSuccessRunTimes = workerStatsPreferences.GetAllSuccessRunTimes();
 
+        long lastFailedRunTime = workerStatsPreferences.GetLastErrorTime();
+        AutoBackupWorkerManager.AutobackupWorkerError lastFailedRunError =  workerStatsPreferences.GetLastError();
+
         WritableArray lastExecutionTimesArray = new WritableNativeArray();
 
         for (Long executionTime: lastSuccessRunTimes) {
@@ -192,6 +195,15 @@ public class AutoBackupModule extends ReactContextBaseJavaModule {
             workStatsObject.putDouble("lastSuccessRunTime", lastSuccessRunTime);
         }
         workStatsObject.putArray("lastSuccessRunTimes", lastExecutionTimesArray);
+
+        workStatsObject.putString("lastFailedRunError", EventAutobackupWorkerError.ParseWorkerError(lastFailedRunError).name());
+
+        if(lastFailedRunTime < 0){
+            workStatsObject.putNull("lastFailedRunTime");
+        }else{
+            workStatsObject.putDouble("lastFailedRunTime", lastFailedRunTime);
+        }
+
         return workStatsObject;
     }
 }
