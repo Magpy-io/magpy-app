@@ -114,12 +114,12 @@ public class AutoBackupWorker extends Worker {
             // Wait time to avoid the worker finishing before the progress is received by the AutoBackupWorkerManager
             sleep(500);
             Log.d("AutoBackupWorker", "Work finished.");
+            recordExecutionTime();
             return Result.success();
         }catch(Exception e){
             Log.e("AutoBackupWorker", "Exception thrown: ", e);
             return Result.failure();
         }finally {
-            recordExecutionTime();
             getApplicationContext().getSystemService(NotificationManager.class).cancel(NOTIFICATION_ID);
         }
     }

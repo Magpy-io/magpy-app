@@ -88,16 +88,19 @@ export default function BackupSettingsScreen() {
           initialState: autobackupEnabled,
           disabled: !isServerReachable,
         },
-        {
-          type: 'Label',
-          title: notBackedUpPhotosMessage,
-          icon: <InfoIcon />,
-        },
       ],
     },
   ];
 
-  if (autobackupEnabled && backupWorkerLastExecutionTime) {
+  if (isServerReachable) {
+    data[0].data.push({
+      type: 'Label',
+      title: notBackedUpPhotosMessage,
+      icon: <InfoIcon />,
+    });
+  }
+
+  if (isServerReachable && autobackupEnabled && backupWorkerLastExecutionTime) {
     if (!autoBackupWorkerRunning) {
       const timeDiffMillis = new Date().getTime() - backupWorkerLastExecutionTime.getTime();
 
@@ -124,7 +127,12 @@ export default function BackupSettingsScreen() {
     }
   }
 
-  if (autobackupEnabled && !autoBackupWorkerRunning && notBackedupPhotosCount != 0) {
+  if (
+    isServerReachable &&
+    autobackupEnabled &&
+    !autoBackupWorkerRunning &&
+    notBackedupPhotosCount != 0
+  ) {
     data[0].data.push({
       type: 'Button',
       align: 'right',
