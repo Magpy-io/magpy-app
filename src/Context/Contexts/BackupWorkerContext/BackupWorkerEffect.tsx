@@ -1,9 +1,9 @@
 import React, { ReactNode, useEffect, useMemo, useRef } from 'react';
 
-import { AutoBackupModule } from '~/NativeModules/AutoBackupModule';
+import { AutoBackupModule, AutoBackupModuleEvents } from '~/NativeModules/AutoBackupModule';
 
 import { useServerContext } from '../ServerContext';
-import { useBackupWorkerContextSettersInner } from './BackupWorkerContext';
+import { useBackupWorkerContextInner } from './BackupWorkerContext';
 import {
   useBackupWorkerContext,
   useBackupWorkerContextFunctions,
@@ -15,7 +15,7 @@ type PropsType = {
 
 export const BackupWorkerEffect: React.FC<PropsType> = props => {
   const { autobackupEnabled } = useBackupWorkerContext();
-  const { setAutobackupEnabled } = useBackupWorkerContextSettersInner();
+  const { setWorkerStatus } = useBackupWorkerContextInner();
   const { StartAutoBackup } = useBackupWorkerContextFunctions();
 
   const { isServerReachable, serverPath, token } = useServerContext();
@@ -43,10 +43,27 @@ export const BackupWorkerEffect: React.FC<PropsType> = props => {
   }, [StartAutoBackup, autobackupEnabled, isServerReachable, serverInfo]);
 
   useEffect(() => {
-    AutoBackupModule.IsWorkerAlive()
-      .then(alive => setAutobackupEnabled(alive))
+    const subscriptionWorkerStatus = AutoBackupModuleEvents.subscribeOnWorkerStatusChanged(
+      ({ status }) => {
+        setWorkerStatus(status);
+      },
+    );
+
+    // Initial worker status
+    AutoBackupModule.GetWorkerInfo()
+      .then(workerInfo => {
+        if (!workerInfo) {
+          setWorkerStatus('WORKER_SUCCESS');
+        } else {
+          setWorkerStatus(workerInfo.state);
+        }
+      })
       .catch(console.log);
-  }, [setAutobackupEnabled]);
+
+    return () => {
+      subscriptionWorkerStatus.remove();
+    };
+  }, [setWorkerStatus]);
 
   return props.children;
 };

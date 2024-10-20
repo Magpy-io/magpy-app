@@ -1,16 +1,13 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { uniqueDeviceId } from '~/Config/config';
-import { AutoBackupModule } from '~/NativeModules/AutoBackupModule';
+import { AutoBackupModule, isWorkerStatusFinished } from '~/NativeModules/AutoBackupModule';
 
 import { useServerContext } from '../ServerContext';
-import {
-  useBackupWorkerContextInner,
-  useBackupWorkerContextSettersInner,
-} from './BackupWorkerContext';
+import { useBackupWorkerContextInner } from './BackupWorkerContext';
 
 export function useBackupWorkerContextFunctions() {
-  const { setAutobackupEnabled } = useBackupWorkerContextSettersInner();
+  const { setWorkerStatus } = useBackupWorkerContextInner();
 
   const { isServerReachable, serverPath, token } = useServerContext();
 
@@ -26,13 +23,13 @@ export function useBackupWorkerContextFunctions() {
 
       if (isStarted) {
         console.log('worker started');
-        setAutobackupEnabled(true);
+        setWorkerStatus('WORKER_ENQUEUED');
         return;
       }
 
       throw new Error('Error while starting autobackup worker');
     }
-  }, [isServerReachable, serverPath, setAutobackupEnabled, token]);
+  }, [isServerReachable, serverPath, setWorkerStatus, token]);
 
   const StopAutoBackup = useCallback(async () => {
     await AutoBackupModule.StopWorker();
@@ -41,18 +38,29 @@ export function useBackupWorkerContextFunctions() {
 
     if (!isStarted) {
       console.log('worker stopped');
-      setAutobackupEnabled(false);
+      setWorkerStatus('WORKER_CANCELED');
       return;
     }
 
     throw new Error('Error while stopping autobackup worker');
-  }, [setAutobackupEnabled]);
+  }, [setWorkerStatus]);
 
   return { StartAutoBackup, StopAutoBackup };
 }
 
 export function useBackupWorkerContext() {
-  const { autobackupEnabled } = useBackupWorkerContextInner();
+  const { workerStatus } = useBackupWorkerContextInner();
 
-  return { autobackupEnabled };
+  const autobackupEnabled: boolean = useMemo(() => {
+    if (!workerStatus) {
+      return false;
+    }
+    return !isWorkerStatusFinished(workerStatus);
+  }, [workerStatus]);
+
+  const autoBackupWorkerRunning = useMemo(() => {
+    return workerStatus == 'WORKER_RUNNING';
+  }, [workerStatus]);
+
+  return { autobackupEnabled, autoBackupWorkerRunning };
 }
