@@ -24,6 +24,7 @@ import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
+import com.magpy.GlobalManagers.HttpManager;
 import com.magpy.GlobalManagers.MySharedPreferences.WorkerStatsPreferences;
 import com.magpy.GlobalManagers.ServerQueriesManager.Common.PhotoData;
 import com.magpy.GlobalManagers.ServerQueriesManager.Common.ResponseNotOkException;
@@ -82,7 +83,7 @@ public class AutoBackupWorker extends Worker {
         Log.d("AutoBackupWorker", "Work started.");
 
         try {
-            if(!parseInputData()) {
+            if (!parseInputData()) {
                 return Result.failure();
             }
 
@@ -113,10 +114,15 @@ public class AutoBackupWorker extends Worker {
             // Wait time to avoid the worker finishing before the progress is received by the AutoBackupWorkerManager
             sleep(500);
             Log.d("AutoBackupWorker", "Work finished.");
-            recordExecutionTime();
+            recordSuccessRunTime();
             return Result.success();
+        }catch(HttpManager.ServerUnreachable e){
+            Log.e("AutoBackupWorker", "Server unreachable, Exception thrown: ", e);
+            recordError(WorkerStatsPreferences.AutobackupWorkerError.SERVER_NOT_REACHABLE);
+            return Result.failure();
         }catch(Exception e){
             Log.e("AutoBackupWorker", "Exception thrown: ", e);
+            recordError(WorkerStatsPreferences.AutobackupWorkerError.UNEXPECTED_ERROR);
             return Result.failure();
         }finally {
             getApplicationContext().getSystemService(NotificationManager.class).cancel(NOTIFICATION_ID);
@@ -260,12 +266,23 @@ public class AutoBackupWorker extends Worker {
         getApplicationContext().getSystemService(NotificationManager.class).notify(NOTIFICATION_ID, notificationBuilder.build());
     }
 
-    private void recordExecutionTime(){
+    private void recordSuccessRunTime(){
         try{
             Date currentTime = Calendar.getInstance().getTime();
 
             WorkerStatsPreferences workerStatsPreferences = new WorkerStatsPreferences(getApplicationContext());
             workerStatsPreferences.SetLastSuccessRunTime(currentTime.getTime());
+        }catch (Exception e){
+            Log.e("AutoBackupWorker", e.toString());
+        }
+    }
+
+    private void recordError(WorkerStatsPreferences.AutobackupWorkerError error){
+        try{
+            Date currentTime = Calendar.getInstance().getTime();
+
+            WorkerStatsPreferences workerStatsPreferences = new WorkerStatsPreferences(getApplicationContext());
+            workerStatsPreferences.SetLastError(currentTime.getTime(), error);
         }catch (Exception e){
             Log.e("AutoBackupWorker", e.toString());
         }

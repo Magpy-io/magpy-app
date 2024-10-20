@@ -31,7 +31,7 @@ public class HttpManager {
         client = new OkHttpClient();
     }
 
-    public static JSONObject SendRequest(String url, JSONObject bodyJson, String token) throws IOException {
+    public static JSONObject SendRequest(String url, JSONObject bodyJson, String token) throws ServerUnreachable {
 
         RequestBody body = RequestBody.create(bodyJson.toString(), JSON);
 
@@ -47,10 +47,12 @@ public class HttpManager {
             return new JSONObject(responseString);
         } catch (JSONException e) {
             throw new RuntimeException("HttpManager.SendRequest: error while parsing response to Json object.", e);
+        }catch(IOException e){
+            throw new ServerUnreachable(e);
         }
     }
 
-    public static JSONObject SendRequest(String url, byte[] bodyArray, String token) throws IOException {
+    public static JSONObject SendRequest(String url, byte[] bodyArray, String token) throws ServerUnreachable {
 
         RequestBody body = RequestBody.create(bodyArray, JSON);
 
@@ -66,6 +68,14 @@ public class HttpManager {
             return new JSONObject(responseString);
         } catch (JSONException e) {
             throw new RuntimeException("HttpManager.SendRequest: error while parsing response to Json object.", e);
+        } catch(IOException e){
+            throw new ServerUnreachable(e);
+        }
+    }
+
+    public static class ServerUnreachable extends Exception{
+        public ServerUnreachable(Throwable e){
+            super(e);
         }
     }
 }

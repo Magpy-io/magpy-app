@@ -31,7 +31,7 @@ public class PhotoUploader {
         this.serverToken = serverToken;
     }
 
-    public String uploadPhoto(PhotoData photo) throws ResponseNotOkException, IOException {
+    public String uploadPhoto(PhotoData photo) throws ResponseNotOkException, IOException, HttpManager.ServerUnreachable {
         byte[] image64 = FileOperations.getBase64FromUri(context, photo.uri);
 
         JSONObject jsonRequest = formatJsonRequestAddPhotoInit(photo, image64);

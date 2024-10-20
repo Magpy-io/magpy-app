@@ -13,10 +13,11 @@ public class WorkerStatsPreferences extends MyPreferencesBase{
     private static final int NUMBER_EXECUTION_TIME_SAVED = 10;
     private static final String LAST_SUCCESS_RUN_TIME_KEY_NAME_BASE = "lastSuccessRunTime";
     private static final String LAST_SUCCESS_RUN_TIME_SPOT_KEY_NAME = "lastSuccessRunTimeSpot";
+    private static final String LAST_FAILED_RUN_ERROR = "lastFailedRunError";
+    private static final String LAST_FAILED_RUN_TIME = "lastFailedRunTime";
 
     public WorkerStatsPreferences(Context context) {
         super(context, PreferencesNames.WorkerStats);
-        Date currentTime = Calendar.getInstance().getTime();
     }
 
     public long GetLastSuccessRunTime(){
@@ -50,6 +51,28 @@ public class WorkerStatsPreferences extends MyPreferencesBase{
         editor.putLong(GetLastExecutionTimeKeyNameN(nextExecutionSpot), lastExecutionTime);
         editor.putInt(LAST_SUCCESS_RUN_TIME_SPOT_KEY_NAME, nextExecutionSpot);
         editor.apply();
+    }
+
+    public void SetLastError(long lastFailedRunTime, AutobackupWorkerError error){
+        SharedPreferences sharedPref = GetSharedPreferencesHandler();
+
+        SharedPreferences.Editor editor = sharedPref.edit();
+
+        editor.putLong(LAST_FAILED_RUN_TIME, lastFailedRunTime);
+        editor.putString(LAST_FAILED_RUN_ERROR, error.name());
+        editor.apply();
+    }
+
+    public AutobackupWorkerError GetLastError(){
+        SharedPreferences sharedPref = GetSharedPreferencesHandler();
+        String storedError = sharedPref.getString(LAST_FAILED_RUN_ERROR, AutobackupWorkerError.UNEXPECTED_ERROR.name());
+
+        return AutobackupWorkerError.valueOf(storedError);
+    }
+
+    public long GetLastErrorTime(){
+        SharedPreferences sharedPref = GetSharedPreferencesHandler();
+        return sharedPref.getLong(LAST_FAILED_RUN_TIME, -1);
     }
 
     public Collection<Long> GetAllSuccessRunTimes(){
@@ -86,5 +109,10 @@ public class WorkerStatsPreferences extends MyPreferencesBase{
 
     private static String GetLastExecutionTimeKeyNameN(int n){
         return LAST_SUCCESS_RUN_TIME_KEY_NAME_BASE + String.valueOf(n);
+    }
+
+    public enum AutobackupWorkerError{
+        SERVER_NOT_REACHABLE,
+        UNEXPECTED_ERROR
     }
 }
