@@ -11,9 +11,11 @@ import {
 } from '~/Context/Contexts/BackupWorkerContext';
 import { usePermissionsContext } from '~/Context/Contexts/PermissionsContext';
 import { useServerContext } from '~/Context/Contexts/ServerContext';
+import { useServerInvalidationContext } from '~/Context/Contexts/ServerInvalidationContext';
 import { notOnServerGalleryPhotosSelector } from '~/Context/ReduxStore/Slices/Photos/Selectors';
 import { useAppSelector } from '~/Context/ReduxStore/Store';
 import { parseMillisecondsIntoReadableTime } from '~/Helpers/DateFunctions/DateFormatting';
+import { useDebouncedDelayed } from '~/Hooks/useDebouncedDelayed';
 import { useLastAutobackupExecutionTime } from '~/NativeModules/AutoBackupModule/';
 
 export default function BackupSettingsScreen() {
@@ -27,6 +29,8 @@ export default function BackupSettingsScreen() {
     usePermissionsContext();
 
   const { displayPopupMessage } = usePopupMessageModal();
+
+  const { isRefreshing } = useServerInvalidationContext();
 
   const notBackedupPhotos = useAppSelector(notOnServerGalleryPhotosSelector);
   const notBackedupPhotosCount = notBackedupPhotos.length;
@@ -88,16 +92,19 @@ export default function BackupSettingsScreen() {
           initialState: autobackupEnabled,
           disabled: !isServerReachable,
         },
-        {
-          type: 'Label',
-          title: notBackedUpPhotosMessage,
-          icon: <InfoIcon />,
-        },
       ],
     },
   ];
 
-  if (autobackupEnabled && backupWorkerLastExecutionTime) {
+  if (isServerReachable && !isRefreshing) {
+    data[0].data.push({
+      type: 'Label',
+      title: notBackedUpPhotosMessage,
+      icon: <InfoIcon />,
+    });
+  }
+
+  if (isServerReachable && autobackupEnabled && backupWorkerLastExecutionTime) {
     if (!autoBackupWorkerRunning) {
       const timeDiffMillis = new Date().getTime() - backupWorkerLastExecutionTime.getTime();
 
@@ -124,7 +131,21 @@ export default function BackupSettingsScreen() {
     }
   }
 
-  if (autobackupEnabled && !autoBackupWorkerRunning && notBackedupPhotosCount != 0) {
+  // Worker state changes rapidly and causes the button to appear and then disappear rapidly
+  // This debouncing avoids that
+
+  const {
+    autobackupEnabled: autobackupEnabledDebounced,
+    autoBackupWorkerRunning: autoBackupWorkerRunningDebounced,
+  } = useDebouncedDelayed({ autobackupEnabled, autoBackupWorkerRunning }, 300);
+
+  if (
+    isServerReachable &&
+    !isRefreshing &&
+    autobackupEnabledDebounced &&
+    !autoBackupWorkerRunningDebounced &&
+    notBackedupPhotosCount != 0
+  ) {
     data[0].data.push({
       type: 'Button',
       align: 'right',

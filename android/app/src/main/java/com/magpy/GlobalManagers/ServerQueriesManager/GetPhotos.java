@@ -45,7 +45,7 @@ public class GetPhotos {
         this.serverToken = serverToken;
     }
 
-    public boolean[] getPhotosExistById(String[] photosIds) throws ResponseNotOkException, IOException {
+    public boolean[] getPhotosExistById(String[] photosIds) throws ResponseNotOkException, HttpManager.ServerUnreachable {
 
         JSONObject jsonRequest = formatJsonRequest(photosIds);
 
@@ -75,7 +75,7 @@ public class GetPhotos {
         }
     }
 
-    public boolean[] getPhotosExistByIdBatched(String[] photosIds) throws ResponseNotOkException, IOException {
+    public boolean[] getPhotosExistByIdBatched(String[] photosIds) throws ResponseNotOkException, HttpManager.ServerUnreachable {
         int BATCH_SIZE = 500;
 
         ArrayList<Boolean> ret = new ArrayList<>(photosIds.length);

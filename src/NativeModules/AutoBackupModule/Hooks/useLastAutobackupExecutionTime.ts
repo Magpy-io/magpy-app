@@ -8,10 +8,10 @@ export function useLastAutobackupExecutionTime() {
   function UpdateTime() {
     AutoBackupModule.GetWorkerStats()
       .then(workerStats => {
-        if (!workerStats.lastExecutionTime) {
+        if (!workerStats.lastSuccessRunTime) {
           setTime(null);
         } else {
-          setTime(new Date(workerStats.lastExecutionTime));
+          setTime(new Date(workerStats.lastSuccessRunTime));
         }
       })
       .catch(console.log);

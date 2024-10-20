@@ -4,6 +4,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { Badge } from 'react-native-elements';
 
 import { ConnectingToServerError, useServerContext } from '~/Context/Contexts/ServerContext';
+import { useServerInvalidationContext } from '~/Context/Contexts/ServerInvalidationContext';
 import { useStyles } from '~/Hooks/useStyles';
 import Logo from '~/Images/logoWhite.svg';
 import { colorsType } from '~/Styles/colors';
@@ -28,6 +29,8 @@ export function ServerComponent({ name, ip, port, error }: ServerComponentProps)
   const hasServer = useUserHasServer();
   const serverStateColor = useServerStatusColor();
 
+  const { isRefreshing } = useServerInvalidationContext();
+
   const errorMessage: string =
     error == 'SERVER_AUTH_FAILED'
       ? 'Authentification failed'
@@ -45,8 +48,9 @@ export function ServerComponent({ name, ip, port, error }: ServerComponentProps)
         {name && <Text style={styles.name}>{name}</Text>}
         {<Text style={styles.ipAddress}>{IpAddress}</Text>}
         {findingServer && (
-          <Text style={styles.findingServer}>{'Trying to locate your server...'}</Text>
+          <Text style={styles.textInfo}>{'Trying to locate your server...'}</Text>
         )}
+        {isRefreshing && <Text style={styles.textInfo}>{'Fetching server photos...'}</Text>}
         {!findingServer && error && <Text style={styles.unreachable}>{errorMessage}</Text>}
       </View>
     );
@@ -81,7 +85,7 @@ const makeStyles = (colors: colorsType) =>
       ...typography(colors).mediumTextBold,
       color: colors.WARNING,
     },
-    findingServer: {
+    textInfo: {
       ...typography(colors).mediumTextBold,
       color: colors.PENDING,
     },

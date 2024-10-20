@@ -4,6 +4,7 @@ import { StyleSheet, View } from 'react-native';
 import { useLoadingScreen } from '~/Components/CommonComponents/LoadingScreen/LoadingScreenContext';
 import { usePopupMessageModal } from '~/Components/CommonComponents/PopupMessageModal';
 import { usePhotosDownloadingFunctions } from '~/Context/Contexts/PhotosDownloadingContext/usePhotosDownloadingContext';
+import { useServerContext } from '~/Context/Contexts/ServerContext';
 import { useUploadWorkerContext } from '~/Context/Contexts/UploadWorkerContext';
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { usePhotosFunctionsStore } from '~/Context/ReduxStore/Slices/Photos/PhotosFunctions';
@@ -41,6 +42,8 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
   const { IsDownloadQueued } = usePhotosDownloadingFunctions();
 
   const { UploadPhotosAction } = useUserActions();
+
+  const { isServerReachable } = useServerContext();
 
   const selectedLocalOnlyPhotos = useMemo(() => {
     return selectedGalleryPhotos
@@ -83,20 +86,43 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
     return false;
   }, [atleastOneServer, IsDownloadQueued, isOnePhoto, selectedGalleryPhotos]);
 
+  const CheckServerReachable = useCallback(() => {
+    if (!isServerReachable) {
+      showToastError('Server not connected.');
+      return false;
+    }
+    return true;
+  }, [isServerReachable, showToastError]);
+
   const onBackup = useCallback(() => {
-    UploadPhotosAction(selectedLocalOnlyPhotos);
-  }, [UploadPhotosAction, selectedLocalOnlyPhotos]);
+    try {
+      if (!CheckServerReachable()) {
+        return;
+      }
+      UploadPhotosAction(selectedLocalOnlyPhotos);
+    } catch (err) {
+      showToastError('Failed to start photo upload.');
+      console.log(err);
+    }
+  }, [CheckServerReachable, UploadPhotosAction, selectedLocalOnlyPhotos, showToastError]);
 
   const onDownload = useCallback(() => {
     try {
+      if (!CheckServerReachable()) {
+        return;
+      }
       StartPhotosDownload(selectedServerOnlyPhotosIds);
     } catch (err) {
       showToastError('Failed to start photo download.');
       console.log(err);
     }
-  }, [StartPhotosDownload, selectedServerOnlyPhotosIds, showToastError]);
+  }, [CheckServerReachable, StartPhotosDownload, selectedServerOnlyPhotosIds, showToastError]);
 
   const onDeleteEverywhere = useCallback(() => {
+    if (!CheckServerReachable()) {
+      return;
+    }
+
     const photosToDeleteCount = selectedGalleryPhotos.length;
 
     const photosMessage =
@@ -128,6 +154,7 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
       },
     });
   }, [
+    CheckServerReachable,
     DeletePhotosServer,
     DeletePhotosLocal,
     clearSelection,
@@ -141,6 +168,9 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
   ]);
 
   const onDeleteFromServer = useCallback(() => {
+    if (!CheckServerReachable()) {
+      return;
+    }
     const photosToDeleteCount = selectedServerPhotosIds.length;
 
     const photosMessage =
@@ -167,6 +197,7 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
       },
     });
   }, [
+    CheckServerReachable,
     DeletePhotosServer,
     clearSelection,
     displayPopupMessage,

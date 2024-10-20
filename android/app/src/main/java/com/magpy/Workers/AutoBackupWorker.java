@@ -7,7 +7,6 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Build;
 import android.util.Log;
 
@@ -25,11 +24,13 @@ import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
+import com.magpy.GlobalManagers.HttpManager;
 import com.magpy.GlobalManagers.MySharedPreferences.WorkerStatsPreferences;
 import com.magpy.GlobalManagers.ServerQueriesManager.Common.PhotoData;
 import com.magpy.GlobalManagers.ServerQueriesManager.Common.ResponseNotOkException;
 import com.magpy.GlobalManagers.ServerQueriesManager.GetPhotos;
 import com.magpy.GlobalManagers.ServerQueriesManager.PhotoUploader;
+import com.magpy.NativeModules.AutoBackup.AutoBackupWorkerManager;
 import com.magpy.NativeModules.MediaManagement.Utils.Definitions;
 import com.magpy.NativeModules.MediaManagement.Utils.GetMediaTask;
 import com.magpy.R;
@@ -40,6 +41,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 public class AutoBackupWorker extends Worker {
     final int NOTIFICATION_ID = 1002;
@@ -52,6 +54,7 @@ public class AutoBackupWorker extends Worker {
 
     public static final String UPLOADED_PHOTO_MEDIA_ID = "UPLOADED_PHOTO_MEDIA_ID";
     public static final String UPLOADED_PHOTO_STRING = "UPLOADED_PHOTO_STRING";
+    public static final String WORKER_ERROR = "WORKER_ERROR";
 
     protected final int MAX_MISSING_PHOTOS_TO_UPLOAD = 5000;
     protected final int MAX_GALLERY_PHOTOS_TO_UPLOAD = 5000;
@@ -83,8 +86,8 @@ public class AutoBackupWorker extends Worker {
         Log.d("AutoBackupWorker", "Work started.");
 
         try {
-            if(!parseInputData()) {
-                return Result.failure();
+            if (!parseInputData()) {
+                throw new Exception("Error parsing worker input data.");
             }
 
             Context context = getApplicationContext();
@@ -114,12 +117,19 @@ public class AutoBackupWorker extends Worker {
             // Wait time to avoid the worker finishing before the progress is received by the AutoBackupWorkerManager
             sleep(500);
             Log.d("AutoBackupWorker", "Work finished.");
+            recordSuccessRunTime();
             return Result.success();
+        }catch(HttpManager.ServerUnreachable e){
+            Log.e("AutoBackupWorker", "Server unreachable, Exception thrown: ", e);
+            recordError(AutoBackupWorkerManager.AutobackupWorkerError.SERVER_NOT_REACHABLE);
+            sendProgressError(AutoBackupWorkerManager.AutobackupWorkerError.SERVER_NOT_REACHABLE);
+            return Result.failure();
         }catch(Exception e){
             Log.e("AutoBackupWorker", "Exception thrown: ", e);
+            recordError(AutoBackupWorkerManager.AutobackupWorkerError.UNEXPECTED_ERROR);
+            sendProgressError(AutoBackupWorkerManager.AutobackupWorkerError.UNEXPECTED_ERROR);
             return Result.failure();
         }finally {
-            recordExecutionTime();
             getApplicationContext().getSystemService(NotificationManager.class).cancel(NOTIFICATION_ID);
         }
     }
@@ -159,11 +169,7 @@ public class AutoBackupWorker extends Worker {
 
             try{
                 String photoUploaded = photoUploader.uploadPhoto(photoData);
-                Data progressData = new Data.Builder()
-                        .putString(UPLOADED_PHOTO_MEDIA_ID, photoData.mediaId)
-                        .putString(UPLOADED_PHOTO_STRING, photoUploaded)
-                        .build();
-                setProgressAsync(progressData);
+                sendProgressPhotoUploaded(photoData.mediaId, photoUploaded);
             }
             catch (ResponseNotOkException e){
                 Log.e("AutoBackupWorker", "Failed upload of photo with mediaId: " + photoData.mediaId, e);
@@ -261,13 +267,49 @@ public class AutoBackupWorker extends Worker {
         getApplicationContext().getSystemService(NotificationManager.class).notify(NOTIFICATION_ID, notificationBuilder.build());
     }
 
-    private void recordExecutionTime(){
+    private void recordSuccessRunTime(){
         try{
             Date currentTime = Calendar.getInstance().getTime();
 
             WorkerStatsPreferences workerStatsPreferences = new WorkerStatsPreferences(getApplicationContext());
-            workerStatsPreferences.SetLastExecutionTime(currentTime.getTime());
+            workerStatsPreferences.SetLastSuccessRunTime(currentTime.getTime());
         }catch (Exception e){
+            Log.e("AutoBackupWorker", e.toString());
+        }
+    }
+
+    private void recordError(AutoBackupWorkerManager.AutobackupWorkerError error){
+        try{
+            Date currentTime = Calendar.getInstance().getTime();
+
+            WorkerStatsPreferences workerStatsPreferences = new WorkerStatsPreferences(getApplicationContext());
+            workerStatsPreferences.SetLastError(currentTime.getTime(), error);
+        }catch (Exception e){
+            Log.e("AutoBackupWorker", e.toString());
+        }
+    }
+
+    private void sendProgressError(AutoBackupWorkerManager.AutobackupWorkerError error){
+        Data progressData = new Data.Builder()
+                .putString(WORKER_ERROR, error.name())
+                .build();
+        try{
+            setProgressAsync(progressData).get();
+            // Wait time to avoid the worker finishing before the progress is received by the WorkerManager
+            sleep(500);
+        }catch(Exception e){
+            Log.e("AutoBackupWorker", e.toString());
+        }
+    }
+
+    private void sendProgressPhotoUploaded(String mediaId, String photoUploaded){
+        Data progressData = new Data.Builder()
+                .putString(UPLOADED_PHOTO_MEDIA_ID, mediaId)
+                .putString(UPLOADED_PHOTO_STRING, photoUploaded)
+                .build();
+        try{
+            setProgressAsync(progressData).get();
+        }catch(Exception e){
             Log.e("AutoBackupWorker", e.toString());
         }
     }

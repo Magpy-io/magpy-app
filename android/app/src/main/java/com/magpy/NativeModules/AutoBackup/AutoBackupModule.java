@@ -19,6 +19,7 @@ import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.bridge.WritableNativeMap;
 import com.magpy.GlobalManagers.ExecutorsManager;
 import com.magpy.GlobalManagers.MySharedPreferences.WorkerStatsPreferences;
+import com.magpy.NativeModules.Events.EventAutobackupWorkerError;
 import com.magpy.NativeModules.Events.EventAutobackupWorkerStatusChanged;
 import com.magpy.NativeModules.Events.EventPhotoUploaded;
 import com.magpy.NativeModules.Parsers.WorkerStateParser;
@@ -69,7 +70,6 @@ public class AutoBackupModule extends ReactContextBaseJavaModule {
                 restartWorker = false;
             }
 
-
             autoBackupWorkerManager.StartWorker(url, serverToken, deviceId, restartWorker, observerData -> {
 
                 if (observerData.mediaId != null) {
@@ -79,6 +79,11 @@ public class AutoBackupModule extends ReactContextBaseJavaModule {
                 if(observerData.workerState != null){
                     EventAutobackupWorkerStatusChanged.Send(getReactApplicationContext(), ParseWorkerState(observerData.workerState));
                 }
+
+                if(observerData.error != null){
+                    EventAutobackupWorkerError.Send(getReactApplicationContext(), observerData.error);
+                }
+
             }, new CallbackEmptyWithThrowable() {
                 @Override
                 public void onSuccess() {
@@ -171,22 +176,34 @@ public class AutoBackupModule extends ReactContextBaseJavaModule {
     }
 
     private static @NonNull WritableMap parseWorkerStatsPreferences(WorkerStatsPreferences workerStatsPreferences) {
-        long lastExecutionTime = workerStatsPreferences.GetLastExecutionTime();
-        Collection<Long> lastExecutionTimes = workerStatsPreferences.GetAllExecutionTimes();
+        long lastSuccessRunTime = workerStatsPreferences.GetLastSuccessRunTime();
+        Collection<Long> lastSuccessRunTimes = workerStatsPreferences.GetAllSuccessRunTimes();
+
+        long lastFailedRunTime = workerStatsPreferences.GetLastErrorTime();
+        AutoBackupWorkerManager.AutobackupWorkerError lastFailedRunError =  workerStatsPreferences.GetLastError();
 
         WritableArray lastExecutionTimesArray = new WritableNativeArray();
 
-        for (Long executionTime: lastExecutionTimes) {
+        for (Long executionTime: lastSuccessRunTimes) {
             lastExecutionTimesArray.pushDouble(executionTime);
         }
 
         WritableMap workStatsObject = new WritableNativeMap();
-        if(lastExecutionTime < 0){
-            workStatsObject.putNull("lastExecutionTime");
+        if(lastSuccessRunTime < 0){
+            workStatsObject.putNull("lastSuccessRunTime");
         }else{
-            workStatsObject.putDouble("lastExecutionTime", lastExecutionTime);
+            workStatsObject.putDouble("lastSuccessRunTime", lastSuccessRunTime);
         }
-        workStatsObject.putArray("lastExecutionTimes", lastExecutionTimesArray);
+        workStatsObject.putArray("lastSuccessRunTimes", lastExecutionTimesArray);
+
+        workStatsObject.putString("lastFailedRunError", EventAutobackupWorkerError.ParseWorkerError(lastFailedRunError).name());
+
+        if(lastFailedRunTime < 0){
+            workStatsObject.putNull("lastFailedRunTime");
+        }else{
+            workStatsObject.putDouble("lastFailedRunTime", lastFailedRunTime);
+        }
+
         return workStatsObject;
     }
 }

@@ -7,6 +7,7 @@ import { isIP, isPort } from 'validator';
 import { PrimaryButton } from '~/Components/CommonComponents/Buttons';
 import KeyboardDismissingView from '~/Components/CommonComponents/KeyboardDismissingView';
 import TextInputComponent from '~/Components/CommonComponents/TextInputComponent';
+import { defaultServerPort } from '~/Config/config';
 import { useTheme } from '~/Context/Contexts/ThemeContext';
 import { useServerSelectionFunction } from '~/Hooks/useServerSelectionFunction';
 import { useStatePersistent } from '~/Hooks/useStatePersistent';
@@ -26,7 +27,7 @@ export default function ServerManualAddressScreen() {
     'CACHED_IP_INPUT',
   );
   const [cachedPortInput, cachedPortLoaded, setCachedPortInput] = useStatePersistent(
-    '',
+    defaultServerPort,
     'CACHED_PORT_INPUT',
   );
 
