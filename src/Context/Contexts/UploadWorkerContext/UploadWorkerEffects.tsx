@@ -25,6 +25,8 @@ type PropsType = {
 export const UploadWorkerEffects: React.FC<PropsType> = props => {
   const photosUploadedRef = useRef<{ mediaId: string; photo: APIPhoto }[]>([]);
 
+  const [errorOccurred, setErrorOccurred] = useState(false);
+
   const dispatch = useAppDispatch();
 
   const { serverPath, token } = useServerContext();
@@ -203,6 +205,30 @@ export const UploadWorkerEffects: React.FC<PropsType> = props => {
       ClearWorkerDataInputFiles().catch(console.log);
     }
   }, [workerStatus]);
+
+  // Effect to setup photo upload failed event subscription
+  useEffect(() => {
+    const subscriptionPhotoUploadFailed = UploadMediaEvents.subscribeOnPhotoUploadFailed(
+      ({ mediaId }) => {
+        console.log('photo upload failed for mediaId', mediaId);
+        setErrorOccurred(true);
+      },
+    );
+
+    return () => {
+      subscriptionPhotoUploadFailed.remove();
+    };
+  }, []);
+
+  // Effect to watch for Upload photo failed events.
+  useEffect(() => {
+    if (!errorOccurred) {
+      return;
+    }
+    setErrorOccurred(false);
+
+    showToastError('Photo upload failed for a photo.');
+  }, [errorOccurred, showToastError]);
 
   return props.children;
 };

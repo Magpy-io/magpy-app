@@ -1,6 +1,7 @@
 package com.magpy.Workers;
 
 import static android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC;
+import static com.magpy.Workers.UploadWorker.UPLOAD_FAIL_PHOTO_MEDIA_ID;
 import static java.lang.Thread.sleep;
 
 import android.app.NotificationChannel;
@@ -178,6 +179,7 @@ public class AutoBackupWorker extends Worker {
             }
             catch (ResponseNotOkException e){
                 Log.e("AutoBackupWorker", "Failed upload of photo with mediaId: " + photoData.mediaId, e);
+                sendProgressPhotoUploadFailed(photoData.mediaId);
             }
 
             progress++;
@@ -311,6 +313,17 @@ public class AutoBackupWorker extends Worker {
         Data progressData = new Data.Builder()
                 .putString(UPLOADED_PHOTO_MEDIA_ID, mediaId)
                 .putString(UPLOADED_PHOTO_STRING, photoUploaded)
+                .build();
+        try{
+            setProgressAsync(progressData).get();
+        }catch(Exception e){
+            Log.e("AutoBackupWorker", e.toString());
+        }
+    }
+
+    private void sendProgressPhotoUploadFailed(String mediaId){
+        Data progressData = new Data.Builder()
+                .putString(UPLOAD_FAIL_PHOTO_MEDIA_ID, mediaId)
                 .build();
         try{
             setProgressAsync(progressData).get();

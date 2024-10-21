@@ -21,6 +21,7 @@ import com.magpy.GlobalManagers.ExecutorsManager;
 import com.magpy.GlobalManagers.MySharedPreferences.WorkerStatsPreferences;
 import com.magpy.NativeModules.Events.EventAutobackupWorkerError;
 import com.magpy.NativeModules.Events.EventAutobackupWorkerStatusChanged;
+import com.magpy.NativeModules.Events.EventPhotoUploadFailed;
 import com.magpy.NativeModules.Events.EventPhotoUploaded;
 import com.magpy.NativeModules.Parsers.WorkerStateParser;
 import com.magpy.Utils.CallbackEmptyWithThrowable;
@@ -82,6 +83,10 @@ public class AutoBackupModule extends ReactContextBaseJavaModule {
 
                 if(observerData.error != null){
                     EventAutobackupWorkerError.Send(getReactApplicationContext(), observerData.error);
+                }
+
+                if(observerData.failedMediaId != null){
+                    EventPhotoUploadFailed.Send(getReactApplicationContext(), observerData.failedMediaId);
                 }
 
             }, new CallbackEmptyWithThrowable() {

@@ -2,6 +2,7 @@ package com.magpy.NativeModules.UploadMedia;
 
 import static com.magpy.Workers.UploadWorker.UPLOADED_PHOTO_MEDIA_ID;
 import static com.magpy.Workers.UploadWorker.UPLOADED_PHOTO_STRING;
+import static com.magpy.Workers.UploadWorker.UPLOAD_FAIL_PHOTO_MEDIA_ID;
 
 import android.content.Context;
 
@@ -81,12 +82,17 @@ public class UploadWorkerManager {
                         }
 
                         Data progress = workInfo.getProgress();
+
                         String uploadedMediaId = progress.getString(UPLOADED_PHOTO_MEDIA_ID);
                         String uploadedPhoto = progress.getString(UPLOADED_PHOTO_STRING);
-
                         if(uploadedMediaId != null){
                             data.mediaId = uploadedMediaId;
                             data.photo = uploadedPhoto;
+                        }
+
+                        String failedUploadMediaId = progress.getString(UPLOAD_FAIL_PHOTO_MEDIA_ID);
+                        if(failedUploadMediaId != null){
+                            data.failedMediaId = failedUploadMediaId;
                         }
 
                         observer.onChanged(data);
@@ -166,5 +172,6 @@ public class UploadWorkerManager {
         public String mediaId = null;
         public String photo = null;
         public WorkInfo.State workerState = null;
+        public String failedMediaId = null;
     }
 }

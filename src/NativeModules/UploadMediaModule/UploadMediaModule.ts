@@ -7,6 +7,7 @@ import { writeWorkerDataInput } from './Utils';
 const { UploadMediaModule: UploadMediaModuleTypeNative } = NativeModules;
 
 const PHOTO_UPLOADED_EVENT_NAME = 'PHOTO_UPLOADED_EVENT_NAME';
+const PHOTO_UPLOAD_FAILED_EVENT_NAME = 'PHOTO_UPLOAD_FAILED_EVENT_NAME';
 const WORKER_STATUS_CHANGED_NAME = 'UPLOAD_WORKER_STATUS_CHANGED';
 
 export type WorkerStatus =
@@ -48,6 +49,9 @@ export const UploadMediaEvents = {
   },
   subscribeOnWorkerStatusChanged: (f: (event: { status: WorkerStatus }) => void) => {
     return emitter.addListener(WORKER_STATUS_CHANGED_NAME, f);
+  },
+  subscribeOnPhotoUploadFailed: (f: (event: { mediaId: string }) => void) => {
+    return emitter.addListener(PHOTO_UPLOAD_FAILED_EVENT_NAME, f);
   },
 };
 
