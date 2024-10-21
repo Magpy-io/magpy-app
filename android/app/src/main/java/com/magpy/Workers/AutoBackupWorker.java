@@ -1,6 +1,7 @@
 package com.magpy.Workers;
 
 import static android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC;
+import static com.magpy.Workers.UploadWorker.UPLOAD_FAIL_PHOTO_MEDIA_ID;
 import static java.lang.Thread.sleep;
 
 import android.app.NotificationChannel;
@@ -24,6 +25,7 @@ import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.bridge.WritableNativeArray;
 import com.magpy.GlobalManagers.HttpManager;
 import com.magpy.GlobalManagers.MySharedPreferences.WorkerStatsPreferences;
 import com.magpy.GlobalManagers.ServerQueriesManager.Common.PhotoData;
@@ -94,10 +96,14 @@ public class AutoBackupWorker extends Worker {
 
             createNotification();
 
-            WritableArray include = Arguments.createArray();
+            WritableArray include = new WritableNativeArray();
             include.pushString("fileSize");
             include.pushString("filename");
             include.pushString("imageSize");
+
+            WritableArray mimeTypes = new WritableNativeArray();
+            mimeTypes.pushString("image/jpeg");
+            mimeTypes.pushString("image/png");
 
             WritableMap result = new GetMediaTask(
                     context,
@@ -105,7 +111,7 @@ public class AutoBackupWorker extends Worker {
                     MAX_GALLERY_PHOTOS_TO_UPLOAD,
                     null,
                     null,
-                    null,
+                    mimeTypes,
                     Definitions.ASSET_TYPE_PHOTOS,
                     0,
                     0,
@@ -173,6 +179,7 @@ public class AutoBackupWorker extends Worker {
             }
             catch (ResponseNotOkException e){
                 Log.e("AutoBackupWorker", "Failed upload of photo with mediaId: " + photoData.mediaId, e);
+                sendProgressPhotoUploadFailed(photoData.mediaId);
             }
 
             progress++;
@@ -306,6 +313,17 @@ public class AutoBackupWorker extends Worker {
         Data progressData = new Data.Builder()
                 .putString(UPLOADED_PHOTO_MEDIA_ID, mediaId)
                 .putString(UPLOADED_PHOTO_STRING, photoUploaded)
+                .build();
+        try{
+            setProgressAsync(progressData).get();
+        }catch(Exception e){
+            Log.e("AutoBackupWorker", e.toString());
+        }
+    }
+
+    private void sendProgressPhotoUploadFailed(String mediaId){
+        Data progressData = new Data.Builder()
+                .putString(UPLOAD_FAIL_PHOTO_MEDIA_ID, mediaId)
                 .build();
         try{
             setProgressAsync(progressData).get();

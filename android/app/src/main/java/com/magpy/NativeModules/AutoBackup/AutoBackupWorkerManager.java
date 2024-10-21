@@ -3,6 +3,7 @@ package com.magpy.NativeModules.AutoBackup;
 import static com.magpy.Workers.AutoBackupWorker.UPLOADED_PHOTO_MEDIA_ID;
 import static com.magpy.Workers.AutoBackupWorker.WORKER_ERROR;
 import static com.magpy.Workers.UploadWorker.UPLOADED_PHOTO_STRING;
+import static com.magpy.Workers.UploadWorker.UPLOAD_FAIL_PHOTO_MEDIA_ID;
 
 import android.content.Context;
 
@@ -95,9 +96,9 @@ public class AutoBackupWorkerManager {
                         }
 
                         Data progress = workInfo.getProgress();
+
                         String uploadedMediaId = progress.getString(UPLOADED_PHOTO_MEDIA_ID);
                         String uploadedPhoto = progress.getString(UPLOADED_PHOTO_STRING);
-
                         if(uploadedMediaId != null){
                             data.mediaId = uploadedMediaId;
                             data.photo = uploadedPhoto;
@@ -106,6 +107,11 @@ public class AutoBackupWorkerManager {
                         String error = progress.getString(WORKER_ERROR);
                         if(error != null){
                             data.error = AutobackupWorkerError.valueOf(error);
+                        }
+
+                        String failedUploadMediaId = progress.getString(UPLOAD_FAIL_PHOTO_MEDIA_ID);
+                        if(failedUploadMediaId != null){
+                            data.failedMediaId = failedUploadMediaId;
                         }
 
                         observer.onChanged(data);
@@ -185,6 +191,7 @@ public class AutoBackupWorkerManager {
         public String photo = null;
         public WorkInfo.State workerState = null;
         public AutobackupWorkerError error = null;
+        public String failedMediaId = null;
     }
 
     public enum AutobackupWorkerError{

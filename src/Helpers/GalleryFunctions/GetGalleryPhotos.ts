@@ -10,6 +10,7 @@ export async function GalleryGetPhotos(
     after: String(offset),
     assetType: 'Photos',
     include: ['fileSize', 'filename', 'imageSize', 'albums'],
+    mimeTypes: ['image/jpeg', 'image/png'],
   });
 
   // Need to be sorted because CameraRoll sorts them by DATE_ADDED, but the timestamp value comes

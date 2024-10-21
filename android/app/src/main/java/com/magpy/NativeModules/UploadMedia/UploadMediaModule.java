@@ -9,6 +9,7 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
+import com.magpy.NativeModules.Events.EventPhotoUploadFailed;
 import com.magpy.NativeModules.Events.EventPhotoUploaded;
 import com.magpy.NativeModules.Events.EventUploadWorkerStatusChanged;
 import com.magpy.Utils.CallbackEmptyWithThrowable;
@@ -64,6 +65,11 @@ public class UploadMediaModule extends ReactContextBaseJavaModule {
                 if(observerData.workerState != null){
                     EventUploadWorkerStatusChanged.Send(getReactApplicationContext(), ParseWorkerState(observerData.workerState));
                 }
+
+                if(observerData.failedMediaId != null){
+                    EventPhotoUploadFailed.Send(getReactApplicationContext(), observerData.failedMediaId);
+                }
+
             }, new CallbackEmptyWithThrowable() {
                 @Override
                 public void onSuccess() {

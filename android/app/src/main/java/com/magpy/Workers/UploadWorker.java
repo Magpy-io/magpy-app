@@ -43,6 +43,7 @@ public class UploadWorker extends Worker {
 
     public static final String UPLOADED_PHOTO_MEDIA_ID = "UPLOADED_PHOTO_MEDIA_ID";
     public static final String UPLOADED_PHOTO_STRING = "UPLOADED_PHOTO_STRING";
+    public static final String UPLOAD_FAIL_PHOTO_MEDIA_ID = "UPLOAD_FAIL_PHOTO_MEDIA_ID";
 
     public static final String WORKER_NAME = "UPLOAD_WORKER_NAME";
     public static final String DATA_KEY_URL = "URL";
@@ -132,6 +133,7 @@ public class UploadWorker extends Worker {
                 }
                 catch (ResponseNotOkException e){
                     Log.e("UploadWorker", "Failed upload of photo with mediaId: " + mediaId, e);
+                    sendProgressPhotoUploadFailed(mediaId);
                 }
             }
 
@@ -244,6 +246,17 @@ public class UploadWorker extends Worker {
         Data progressData = new Data.Builder()
                 .putString(UPLOADED_PHOTO_MEDIA_ID, mediaId)
                 .putString(UPLOADED_PHOTO_STRING, photoUploaded)
+                .build();
+        try{
+            setProgressAsync(progressData).get();
+        }catch(Exception e){
+            Log.e("UploadWorker", e.toString());
+        }
+    }
+
+    private void sendProgressPhotoUploadFailed(String mediaId){
+        Data progressData = new Data.Builder()
+                .putString(UPLOAD_FAIL_PHOTO_MEDIA_ID, mediaId)
                 .build();
         try{
             setProgressAsync(progressData).get();
