@@ -30,6 +30,10 @@ export const UploadWorkerEffects: React.FC<PropsType> = props => {
   const { serverPath, token } = useServerContext();
   const [rerunEffect, setRerunEffect] = useState(false);
 
+  const isEffectRunning = useRef(false);
+
+  const { InvalidatePhotos, InvalidatePhotosByMediaId } = useServerInvalidationContext();
+
   const { workerStatus, setWorkerStatus } = useUploadWorkerContextInner();
 
   const workerStatusChanged = useHasValueChanged(workerStatus, 'WORKER_SUCCESS');
@@ -43,18 +47,19 @@ export const UploadWorkerEffects: React.FC<PropsType> = props => {
     setQueuedPhotosToUpload,
   } = useUploadWorkerContextInner();
 
+  // Effect to capture photo uploaded events.
   useEffect(() => {
-    // The interval is used to batch store updates when photos are uploaded,
-    // instead of running a store update after each photo upload.
-    // This improves performance significantly specially when backing up large amount of photos
-    const interval = setInterval(() => {
-      setRerunEffect(s => !s);
-    }, 500);
-
-    const subscription = UploadMediaEvents.subscribeOnPhotoUploaded(eventData => {
+    const subscriptionPhotoUploaded = UploadMediaEvents.subscribeOnPhotoUploaded(eventData => {
       photosUploadedRef.current.push(eventData);
     });
 
+    return () => {
+      subscriptionPhotoUploaded.remove();
+    };
+  }, []);
+
+  // Effect to update Upload worker status
+  useEffect(() => {
     const subscriptionWorkerStatus = UploadMediaEvents.subscribeOnWorkerStatusChanged(
       ({ status }) => {
         setWorkerStatus(status);
@@ -69,16 +74,25 @@ export const UploadWorkerEffects: React.FC<PropsType> = props => {
       .catch(console.log);
 
     return () => {
-      subscription.remove();
       subscriptionWorkerStatus.remove();
-      clearInterval(interval);
     };
   }, [setWorkerStatus]);
 
-  const isEffectRunning = useRef(false);
+  // Effect to keep re-running the next effect
+  useEffect(() => {
+    // The interval is used to batch store updates when photos are uploaded,
+    // instead of running a store update after each photo upload.
+    // This improves performance significantly specially when backing up large amount of photos
+    const interval = setInterval(() => {
+      setRerunEffect(s => !s);
+    }, 1000);
 
-  const { InvalidatePhotos, InvalidatePhotosByMediaId } = useServerInvalidationContext();
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
 
+  // Effect to treat photo uploaded events
   useEffect(() => {
     if (isEffectRunning.current) {
       return;
@@ -116,6 +130,7 @@ export const UploadWorkerEffects: React.FC<PropsType> = props => {
     }
   }, [dispatch, InvalidatePhotos, rerunEffect]);
 
+  // Effect to start photos upload worker when photos present in queue
   useEffect(() => {
     async function asyncInner() {
       if (queuedPhotosToUpload.size == 0 || currentPhotosUploading.size != 0) {
@@ -149,6 +164,7 @@ export const UploadWorkerEffects: React.FC<PropsType> = props => {
     token,
   ]);
 
+  // Effect that runs after an upload worker finishes
   useEffect(() => {
     if (!workerStatusChanged) {
       return;
@@ -181,6 +197,7 @@ export const UploadWorkerEffects: React.FC<PropsType> = props => {
     showToastError,
   ]);
 
+  // Effect to clear worker data input files when worker not running.
   useEffect(() => {
     if (workerStatus && isWorkerStatusFinished(workerStatus)) {
       ClearWorkerDataInputFiles().catch(console.log);
