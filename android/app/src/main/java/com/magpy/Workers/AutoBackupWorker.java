@@ -24,6 +24,7 @@ import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.bridge.WritableNativeArray;
 import com.magpy.GlobalManagers.HttpManager;
 import com.magpy.GlobalManagers.MySharedPreferences.WorkerStatsPreferences;
 import com.magpy.GlobalManagers.ServerQueriesManager.Common.PhotoData;
@@ -94,10 +95,14 @@ public class AutoBackupWorker extends Worker {
 
             createNotification();
 
-            WritableArray include = Arguments.createArray();
+            WritableArray include = new WritableNativeArray();
             include.pushString("fileSize");
             include.pushString("filename");
             include.pushString("imageSize");
+
+            WritableArray mimeTypes = new WritableNativeArray();
+            mimeTypes.pushString("image/jpeg");
+            mimeTypes.pushString("image/png");
 
             WritableMap result = new GetMediaTask(
                     context,
@@ -105,7 +110,7 @@ public class AutoBackupWorker extends Worker {
                     MAX_GALLERY_PHOTOS_TO_UPLOAD,
                     null,
                     null,
-                    null,
+                    mimeTypes,
                     Definitions.ASSET_TYPE_PHOTOS,
                     0,
                     0,
