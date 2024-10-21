@@ -104,8 +104,14 @@ export default function BackupSettingsScreen() {
     });
   }
 
-  if (isServerReachable && autobackupEnabled && backupWorkerLastExecutionTime) {
-    if (!autoBackupWorkerRunning) {
+  if (autoBackupWorkerRunning) {
+    data[0].data.push({
+      type: 'Label',
+      title: 'Backup Running',
+      icon: <InfoIcon />,
+    });
+  } else {
+    if (isServerReachable && autobackupEnabled && backupWorkerLastExecutionTime) {
       const timeDiffMillis = new Date().getTime() - backupWorkerLastExecutionTime.getTime();
 
       let timeSinceLastWorkerExecution;
@@ -120,12 +126,6 @@ export default function BackupSettingsScreen() {
       data[0].data.push({
         type: 'Label',
         title: 'Backed up: ' + timeSinceLastWorkerExecution,
-        icon: <InfoIcon />,
-      });
-    } else {
-      data[0].data.push({
-        type: 'Label',
-        title: 'Backup Running',
         icon: <InfoIcon />,
       });
     }
