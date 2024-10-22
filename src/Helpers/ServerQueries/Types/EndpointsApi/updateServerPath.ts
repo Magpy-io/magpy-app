@@ -5,6 +5,7 @@ import {
   ErrorPathFolderDoesNotExist,
   ErrorCouldNotGetRequestAddress,
   ErrorAuthorizationFailed,
+  ErrorPathNotAbsolute,
 } from '../ErrorTypes';
 import { TokenAuthentification } from '../Types';
 
@@ -16,7 +17,8 @@ export type ResponseErrorTypes =
   | ErrorAuthorizationFailed
   | ErrorPathFolderDoesNotExist
   | ErrorPathAccessDenied
-  | ErrorCouldNotGetRequestAddress;
+  | ErrorCouldNotGetRequestAddress
+  | ErrorPathNotAbsolute;
 
 export const endpoint = 'updateServerPath';
 

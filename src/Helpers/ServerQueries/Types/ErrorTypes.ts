@@ -22,6 +22,7 @@ export type ErrorInvalidName = 'INVALID_NAME';
 export type ErrorInvalidCredentials = 'INVALID_CREDENTIALS';
 export type ErrorRequestNotFromLoopback = 'REQUEST_NOT_FROM_LOOPBACK';
 export type ErrorFormatNotSupported = 'FORMAT_NOT_SUPPORTED';
+export type ErrorPathNotAbsolute = 'PATH_NOT_ABSOLUTE';
 
 export type ErrorCodes =
   | ErrorBadRequest
@@ -47,7 +48,8 @@ export type ErrorCodes =
   | ErrorInvalidName
   | ErrorInvalidCredentials
   | ErrorRequestNotFromLoopback
-  | ErrorFormatNotSupported;
+  | ErrorFormatNotSupported
+  | ErrorPathNotAbsolute;
 
 export type ErrorsAuthorization =
   | ErrorAuthorizationFailed
