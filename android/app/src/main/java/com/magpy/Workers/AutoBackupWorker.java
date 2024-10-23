@@ -20,7 +20,6 @@ import androidx.work.WorkManager;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
-import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
@@ -32,6 +31,7 @@ import com.magpy.GlobalManagers.ServerQueriesManager.Common.PhotoData;
 import com.magpy.GlobalManagers.ServerQueriesManager.Common.ResponseNotOkException;
 import com.magpy.GlobalManagers.ServerQueriesManager.GetPhotos;
 import com.magpy.GlobalManagers.ServerQueriesManager.PhotoUploader;
+import com.magpy.GlobalManagers.ServerQueriesManager.WhoAmI;
 import com.magpy.NativeModules.AutoBackup.AutoBackupWorkerManager;
 import com.magpy.NativeModules.MediaManagement.Utils.Definitions;
 import com.magpy.NativeModules.MediaManagement.Utils.GetMediaTask;
@@ -43,7 +43,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 
 public class AutoBackupWorker extends Worker {
     final int NOTIFICATION_ID = 1002;
@@ -66,6 +65,7 @@ public class AutoBackupWorker extends Worker {
     protected String deviceId;
 
     NotificationCompat.Builder notificationBuilder;
+    NotificationManager notificationManager;
 
     public AutoBackupWorker(
             @NonNull Context context,
@@ -93,8 +93,17 @@ public class AutoBackupWorker extends Worker {
             }
 
             Context context = getApplicationContext();
-
             createNotification();
+
+            boolean shouldContinue = WaitForServerReachable();
+
+            if(!shouldContinue){
+                return Result.failure();
+            }
+
+            // Sleep to allow for notification update
+            sleep(1000);
+            setupNotificationForProgress();
 
             WritableArray include = new WritableNativeArray();
             include.pushString("fileSize");
@@ -207,6 +216,37 @@ public class AutoBackupWorker extends Worker {
         return ids;
     }
 
+    private boolean WaitForServerReachable() throws InterruptedException {
+        WhoAmI whoAmIRequest = new WhoAmI(url, serverToken);
+        long timeToSleepMillis = 60 * 1000;
+
+        try{
+            whoAmIRequest.Send();
+            return true;
+        }catch (ResponseNotOkException e){
+            return false;
+        }catch (HttpManager.ServerUnreachable ignored){
+            // do nothing, just continue
+        }
+
+        // Sleep to allow notification update
+        sleep(1000);
+        setupNotificationForWaiting();
+
+        while (true){
+            try{
+                whoAmIRequest.Send();
+                return true;
+            }catch (ResponseNotOkException e){
+                return false;
+            }catch (HttpManager.ServerUnreachable ignored){
+                // do nothing just keep trying
+            }
+
+            sleep(timeToSleepMillis);
+        }
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.O)
     public List<PhotoData> getPhotosDataFromGetMediaIfNotInServer(WritableMap result, boolean[] photosExist, int numberOfPhotosToReturn) {
         ReadableArray edges = result.getArray("edges");
@@ -241,7 +281,7 @@ public class AutoBackupWorker extends Worker {
                 NotificationManager.IMPORTANCE_MIN
         );
 
-        getApplicationContext().getSystemService(NotificationManager.class).createNotificationChannel(channel);
+        notificationManager.createNotificationChannel(channel);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
@@ -250,12 +290,13 @@ public class AutoBackupWorker extends Worker {
         PendingIntent cancelIntent = WorkManager.getInstance(context)
                 .createCancelPendingIntent(getId());
 
+        notificationManager = getApplicationContext().getSystemService(NotificationManager.class);
+
         createChannel();
 
         notificationBuilder = new NotificationCompat.Builder(context, CHANNEL_ID)
-                .setProgress(0, 0, true)
                 .setOnlyAlertOnce(true)
-                .setContentTitle("Backing up your media")
+                .setContentTitle("Starting photos Backup")
                 .setSmallIcon(R.drawable.ic_notification)
                 .setSilent(true)
                 .setOngoing(true)
@@ -268,10 +309,22 @@ public class AutoBackupWorker extends Worker {
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void setupNotificationForWaiting(){
+        notificationBuilder
+                .setContentTitle("Waiting for server connexion");
+        notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
+    }
+
+    private void setupNotificationForProgress(){
+        notificationBuilder
+                .setProgress(0, 0, true)
+                .setContentTitle("Backing up your media");
+        notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
+    }
+
     private void updateNotification(int progress, int total){
         notificationBuilder.setProgress(total, progress, false);
-        getApplicationContext().getSystemService(NotificationManager.class).notify(NOTIFICATION_ID, notificationBuilder.build());
+        notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
     }
 
     private void recordSuccessRunTime(){
