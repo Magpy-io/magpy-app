@@ -34,6 +34,10 @@ function PhotoGalleryHeader(props: PhotoGalleryHeaderProps) {
           />
         )}
       </View>
+
+      <View style={{ position: 'absolute', right: 0 }}>
+        {props.iconRight && <props.iconRight />}
+      </View>
     </View>
   );
 }
