@@ -3,7 +3,6 @@ import { StyleSheet, View } from 'react-native';
 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { MoreIcon } from '~/Components/CommonComponents/Icons';
 import PhotoGalleryHeader from '~/Components/PhotoComponents/PhotoGalleryHeader';
 import RecentPhotos from '~/Components/ServerComponents/RecentPhotos';
 import ServerDetails from '~/Components/ServerComponents/ServerDetails';
@@ -14,12 +13,11 @@ import { spacing } from '~/Styles/spacing';
 export default function ServerScreenTab() {
   console.log('render screen server');
   const styles = useStyles(makeStyles);
-  const optionsButton = () => <MoreIcon onPress={() => {}} iconStyle={styles.iconStyle} />;
   const insets = useSafeAreaInsets();
 
   return (
     <View style={[styles.viewStyle, { paddingTop: insets.top }]}>
-      <PhotoGalleryHeader title="Your server" iconRight={optionsButton} />
+      <PhotoGalleryHeader title="Your server" />
       <ServerDetails />
       <RecentPhotos />
     </View>
