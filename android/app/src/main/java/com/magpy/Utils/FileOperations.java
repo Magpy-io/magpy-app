@@ -5,10 +5,12 @@ import android.net.Uri;
 import android.util.Base64;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -52,6 +54,13 @@ public class FileOperations {
             }
 
             return lines;
+        }
+    }
+
+    public static void writeToFile(File logFile, String content) throws IOException {
+        try(FileWriter fw = new FileWriter(logFile, true))
+        {
+            fw.append(content);
         }
     }
 }
