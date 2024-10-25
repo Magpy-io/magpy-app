@@ -42,7 +42,10 @@ public class Logger {
                 }
             }
 
-            FileOperations.writeToFile(_loggerFile, log + '\n');
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS", Locale.FRANCE);
+            String formattedDate = "[ " + sdf.format(new Date()) + " ]: ";
+
+            FileOperations.writeToFile(_loggerFile, formattedDate + log + '\n');
         }catch(Exception e){
             Log.e("Logger", "Error while logging to file.", e);
         }
