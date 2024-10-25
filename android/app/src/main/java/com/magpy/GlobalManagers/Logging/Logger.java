@@ -22,7 +22,7 @@ public class Logger {
     }
 
     private void setLoggerFile(String loggerBaseName){
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS", Locale.FRANCE);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss-SSS", Locale.FRANCE);
         String formattedDate = sdf.format(new Date());
 
         String _loggerFileName = loggerBaseName + "_" + formattedDate + ".txt";
@@ -42,7 +42,7 @@ public class Logger {
                 }
             }
 
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS", Locale.FRANCE);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss-SSS", Locale.FRANCE);
             String formattedDate = "[ " + sdf.format(new Date()) + " ]: ";
 
             FileOperations.writeToFile(_loggerFile, formattedDate + log + '\n');
