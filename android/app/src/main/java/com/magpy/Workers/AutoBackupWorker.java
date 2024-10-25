@@ -33,6 +33,7 @@ import com.magpy.GlobalManagers.ServerQueriesManager.Common.PhotoData;
 import com.magpy.GlobalManagers.ServerQueriesManager.Common.ResponseNotOkException;
 import com.magpy.GlobalManagers.ServerQueriesManager.GetPhotos;
 import com.magpy.GlobalManagers.ServerQueriesManager.PhotoUploader;
+import com.magpy.GlobalManagers.ServerQueriesManager.WhoAmI;
 import com.magpy.NativeModules.AutoBackup.AutoBackupWorkerManager;
 import com.magpy.NativeModules.MediaManagement.Utils.Definitions;
 import com.magpy.NativeModules.MediaManagement.Utils.GetMediaTask;
@@ -92,42 +93,23 @@ public class AutoBackupWorker extends Worker {
         _logger.Log("Work started.");
         Log.d("AutoBackupWorker", "Work started.");
 
-
         try {
             if (!parseInputData()) {
                 throw new Exception("Error parsing worker input data.");
             }
 
-            Context context = getApplicationContext();
+            boolean isServerReachable = isServerReachable();
 
-            createNotification();
+            if(!isServerReachable){
+                Log.d("AutoBackupWorker", "Server not reachable.");
+                _logger.Log("Server not reachable");
+                return Result.failure();
+            }
 
-            WritableArray include = new WritableNativeArray();
-            include.pushString("fileSize");
-            include.pushString("filename");
-            include.pushString("imageSize");
-
-            WritableArray mimeTypes = new WritableNativeArray();
-            mimeTypes.pushString("image/jpeg");
-            mimeTypes.pushString("image/png");
-
-            WritableMap result = new GetMediaTask(
-                    context,
-                    null,
-                    MAX_GALLERY_PHOTOS_TO_UPLOAD,
-                    null,
-                    null,
-                    mimeTypes,
-                    Definitions.ASSET_TYPE_PHOTOS,
-                    0,
-                    0,
-                    include)
-                    .execute();
+            WritableMap result = getMedia();
 
             treatReturnedMedia(result);
 
-            // Wait time to avoid the worker finishing before the progress is received by the AutoBackupWorkerManager
-            sleep(500);
             Log.d("AutoBackupWorker", "Work finished.");
             _logger.Log("Work finished.");
             recordSuccessRunTime();
@@ -149,6 +131,41 @@ public class AutoBackupWorker extends Worker {
         }
     }
 
+    private boolean isServerReachable(){
+        WhoAmI whoAmIRequest = new WhoAmI(url, serverToken);
+
+        try{
+            whoAmIRequest.Send();
+            return true;
+        } catch(HttpManager.ServerUnreachable | ResponseNotOkException ignored){
+            return false;
+        }
+    }
+
+    private WritableMap getMedia() throws GetMediaTask.RejectionException {
+        WritableArray include = new WritableNativeArray();
+        include.pushString("fileSize");
+        include.pushString("filename");
+        include.pushString("imageSize");
+
+        WritableArray mimeTypes = new WritableNativeArray();
+        mimeTypes.pushString("image/jpeg");
+        mimeTypes.pushString("image/png");
+
+        return new GetMediaTask(
+                getApplicationContext(),
+                null,
+                MAX_GALLERY_PHOTOS_TO_UPLOAD,
+                null,
+                null,
+                mimeTypes,
+                Definitions.ASSET_TYPE_PHOTOS,
+                0,
+                0,
+                include)
+                .execute();
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.Q)
     private void treatReturnedMedia(WritableMap result) throws Exception {
         String[] ids = getIdsFromGetMedia(result);
@@ -166,6 +183,8 @@ public class AutoBackupWorker extends Worker {
             return;
         }
 
+        createNotification();
+
         PhotoUploader photoUploader = new PhotoUploader(
                 getApplicationContext(),
                 url,
@@ -177,8 +196,12 @@ public class AutoBackupWorker extends Worker {
 
             if(isStopped()){
                 Log.d("AutoBackupWorker", "Worker stopped");
+                _logger.Log("Worker stopped");
                 break;
             }
+
+            Log.d("AutoBackupWorker", "Progress " + progress);
+            _logger.Log("Progress " + progress);
 
             updateNotification(progress, missingPhotos.size());
 
@@ -188,11 +211,15 @@ public class AutoBackupWorker extends Worker {
             }
             catch (ResponseNotOkException e){
                 Log.e("AutoBackupWorker", "Failed upload of photo with mediaId: " + photoData.mediaId, e);
+                _logger.Log("Failed upload of photo with mediaId: " + photoData.mediaId);
                 sendProgressPhotoUploadFailed(photoData.mediaId);
             }
 
             progress++;
         }
+
+        // Wait time to avoid the worker finishing before the progress is received by the AutoBackupWorkerManager
+        sleep(500);
     }
 
     public String[] getIdsFromGetMedia(WritableMap result){
