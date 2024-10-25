@@ -27,6 +27,7 @@ import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeArray;
 import com.magpy.GlobalManagers.HttpManager;
+import com.magpy.GlobalManagers.Logging.Logger;
 import com.magpy.GlobalManagers.MySharedPreferences.WorkerStatsPreferences;
 import com.magpy.GlobalManagers.ServerQueriesManager.Common.PhotoData;
 import com.magpy.GlobalManagers.ServerQueriesManager.Common.ResponseNotOkException;
@@ -67,6 +68,8 @@ public class AutoBackupWorker extends Worker {
 
     NotificationCompat.Builder notificationBuilder;
 
+    Logger _logger;
+
     public AutoBackupWorker(
             @NonNull Context context,
             @NonNull WorkerParameters params) {
@@ -85,7 +88,10 @@ public class AutoBackupWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
+        _logger = new Logger(getApplicationContext(), "AutoBackupWorker");
+        _logger.Log("Work started.");
         Log.d("AutoBackupWorker", "Work started.");
+
 
         try {
             if (!parseInputData()) {
@@ -123,15 +129,18 @@ public class AutoBackupWorker extends Worker {
             // Wait time to avoid the worker finishing before the progress is received by the AutoBackupWorkerManager
             sleep(500);
             Log.d("AutoBackupWorker", "Work finished.");
+            _logger.Log("Work finished.");
             recordSuccessRunTime();
             return Result.success();
         }catch(HttpManager.ServerUnreachable e){
             Log.e("AutoBackupWorker", "Server unreachable, Exception thrown: ", e);
+            _logger.Log("Server unreachable");
             recordError(AutoBackupWorkerManager.AutobackupWorkerError.SERVER_NOT_REACHABLE);
             sendProgressError(AutoBackupWorkerManager.AutobackupWorkerError.SERVER_NOT_REACHABLE);
             return Result.failure();
         }catch(Exception e){
             Log.e("AutoBackupWorker", "Exception thrown: ", e);
+            _logger.Log("Exception thrown");
             recordError(AutoBackupWorkerManager.AutobackupWorkerError.UNEXPECTED_ERROR);
             sendProgressError(AutoBackupWorkerManager.AutobackupWorkerError.UNEXPECTED_ERROR);
             return Result.failure();
