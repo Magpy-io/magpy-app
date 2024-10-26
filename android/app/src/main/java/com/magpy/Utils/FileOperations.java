@@ -3,6 +3,7 @@ package com.magpy.Utils;
 import android.content.Context;
 import android.net.Uri;
 import android.util.Base64;
+import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -61,6 +62,14 @@ public class FileOperations {
         try(FileWriter fw = new FileWriter(logFile, true))
         {
             fw.append(content);
+        }
+    }
+
+    public static void createFolder(File folder) throws IOException {
+        if (!folder.exists()) {
+            if (!folder.mkdirs()) {
+                throw new IOException("Failed to create folder");
+            }
         }
     }
 }

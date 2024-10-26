@@ -40,12 +40,7 @@ public class Logger {
         try {
             File folder = _loggerFile.getParentFile();
 
-            if (!folder.exists()) {
-                if (!folder.mkdirs()) {
-                    Log.e("Logger", "Failed to create logs folder.");
-                    return;
-                }
-            }
+            FileOperations.createFolder(folder);
 
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss-SSS", Locale.FRANCE);
             String formattedDate = "[ " + sdf.format(new Date()) + " ]: ";
