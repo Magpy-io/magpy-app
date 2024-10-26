@@ -8022,6 +8022,7 @@ __metadata:
     react-native-udp: "https://github.com/issamBenelgada/react-native-udp.git#commit=163b757ced1458d3e0165d656c455c760e276a1d"
     react-native-vector-icons: ^10.0.3
     react-native-version-info: ^1.1.1
+    react-native-zip-archive: ^7.0.1
     react-redux: ^9.1.0
     react-test-renderer: ^18.3.1
     replace-in-file: ^7.2.0
@@ -9804,6 +9805,16 @@ __metadata:
   peerDependencies:
     react-native: ">= 0.60.2"
   checksum: ad9c05066f790980a1c4def49e1d6d3f4b63d570f611a09a4834ac48907c8e145461cdd014f8d809ac8c5a50aba996a025912ecf7d760001c3740d19181c193c
+  languageName: node
+  linkType: hard
+
+"react-native-zip-archive@npm:^7.0.1":
+  version: 7.0.1
+  resolution: "react-native-zip-archive@npm:7.0.1"
+  peerDependencies:
+    react: ">=16.8.6"
+    react-native: ">=0.60.0"
+  checksum: 2f7747d2ed903102e0d097921d1a019311f0c23c9ceb15304c39d699fba380e60b70cb1474b1fb516d114514af2a3c8a88ee5690f83d0a92d87500d095ba2b39
   languageName: node
   linkType: hard
 

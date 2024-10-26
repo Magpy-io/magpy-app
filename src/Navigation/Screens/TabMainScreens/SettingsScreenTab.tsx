@@ -3,6 +3,7 @@ import { StyleSheet, View } from 'react-native';
 
 import RNFS from 'react-native-fs';
 import Share from 'react-native-share';
+import { zip } from 'react-native-zip-archive';
 
 import {
   AccountIcon,
@@ -105,15 +106,13 @@ export default function SettingsScreenTab() {
       title: 'Button',
       onPress: () => {
         async function f() {
-          const r = await RNFS.readDir(RNFS.ExternalDirectoryPath + '/logs');
-          const content1 = await RNFS.readFile(r[0].path);
-          const content2 = await RNFS.readFile(r[1].path);
+          const sourcePath = RNFS.ExternalDirectoryPath + '/logs';
+          const targetPath = RNFS.CachesDirectoryPath + '/logs.zip';
 
-          await RNFS.write(RNFS.CachesDirectoryPath + '/logs_2.txt', content1);
-          await RNFS.write(RNFS.CachesDirectoryPath + '/logs_2.txt', content2);
+          const path = await zip(sourcePath, targetPath);
 
           const shareResponse = await Share.open({
-            url: 'file://' + RNFS.CachesDirectoryPath + '/logs_2.txt',
+            url: 'file://' + path,
           });
           console.log(shareResponse);
         }
