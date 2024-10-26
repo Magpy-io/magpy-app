@@ -8014,6 +8014,7 @@ __metadata:
     react-native-safe-area-context: 4.10.5
     react-native-screens: ^3.34.0
     react-native-section-list-get-item-layout: "https://github.com/issamBenelgada/rn-section-list-get-item-layout.git#commit=21af950984be03715d86f141accf5d8985952c63"
+    react-native-share: ^11.0.4
     react-native-svg: ^15.6.0
     react-native-svg-transformer: ^1.3.0
     react-native-tab-view: ^3.5.2
@@ -8021,6 +8022,7 @@ __metadata:
     react-native-udp: "https://github.com/issamBenelgada/react-native-udp.git#commit=163b757ced1458d3e0165d656c455c760e276a1d"
     react-native-vector-icons: ^10.0.3
     react-native-version-info: ^1.1.1
+    react-native-zip-archive: ^7.0.1
     react-redux: ^9.1.0
     react-test-renderer: ^18.3.1
     replace-in-file: ^7.2.0
@@ -9704,6 +9706,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-native-share@npm:^11.0.4":
+  version: 11.0.4
+  resolution: "react-native-share@npm:11.0.4"
+  checksum: ac8d7c54d813c7d6688bfb8075de9eb1aac430dc20b16eeb14f511a5cd651609f03390f35c332a63403ce6e66eb7f5e9d53da61f01d115d079b85340a6f39e2c
+  languageName: node
+  linkType: hard
+
 "react-native-size-matters@npm:^0.4.0":
   version: 0.4.2
   resolution: "react-native-size-matters@npm:0.4.2"
@@ -9796,6 +9805,16 @@ __metadata:
   peerDependencies:
     react-native: ">= 0.60.2"
   checksum: ad9c05066f790980a1c4def49e1d6d3f4b63d570f611a09a4834ac48907c8e145461cdd014f8d809ac8c5a50aba996a025912ecf7d760001c3740d19181c193c
+  languageName: node
+  linkType: hard
+
+"react-native-zip-archive@npm:^7.0.1":
+  version: 7.0.1
+  resolution: "react-native-zip-archive@npm:7.0.1"
+  peerDependencies:
+    react: ">=16.8.6"
+    react-native: ">=0.60.0"
+  checksum: 2f7747d2ed903102e0d097921d1a019311f0c23c9ceb15304c39d699fba380e60b70cb1474b1fb516d114514af2a3c8a88ee5690f83d0a92d87500d095ba2b39
   languageName: node
   linkType: hard
 
