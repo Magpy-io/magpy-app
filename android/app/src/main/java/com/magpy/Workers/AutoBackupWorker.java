@@ -27,11 +27,14 @@ import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeArray;
 import com.magpy.GlobalManagers.HttpManager;
+import com.magpy.GlobalManagers.Logging.Logger;
+import com.magpy.GlobalManagers.Logging.LoggerBuilder;
 import com.magpy.GlobalManagers.MySharedPreferences.WorkerStatsPreferences;
 import com.magpy.GlobalManagers.ServerQueriesManager.Common.PhotoData;
 import com.magpy.GlobalManagers.ServerQueriesManager.Common.ResponseNotOkException;
 import com.magpy.GlobalManagers.ServerQueriesManager.GetPhotos;
 import com.magpy.GlobalManagers.ServerQueriesManager.PhotoUploader;
+import com.magpy.GlobalManagers.ServerQueriesManager.WhoAmI;
 import com.magpy.NativeModules.AutoBackup.AutoBackupWorkerManager;
 import com.magpy.NativeModules.MediaManagement.Utils.Definitions;
 import com.magpy.NativeModules.MediaManagement.Utils.GetMediaTask;
@@ -67,6 +70,8 @@ public class AutoBackupWorker extends Worker {
 
     NotificationCompat.Builder notificationBuilder;
 
+    Logger _logger;
+
     public AutoBackupWorker(
             @NonNull Context context,
             @NonNull WorkerParameters params) {
@@ -85,6 +90,11 @@ public class AutoBackupWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
+        _logger = new LoggerBuilder(getApplicationContext())
+                .SetLogPath("AutoBackupWorker")
+                .Build();
+
+        _logger.Log("Work started.");
         Log.d("AutoBackupWorker", "Work started.");
 
         try {
@@ -92,52 +102,73 @@ public class AutoBackupWorker extends Worker {
                 throw new Exception("Error parsing worker input data.");
             }
 
-            Context context = getApplicationContext();
+            boolean isServerReachable = isServerReachable();
 
-            createNotification();
+            if(!isServerReachable){
+                Log.d("AutoBackupWorker", "Server not reachable.");
+                _logger.Log("Server not reachable");
+                return Result.failure();
+            }
 
-            WritableArray include = new WritableNativeArray();
-            include.pushString("fileSize");
-            include.pushString("filename");
-            include.pushString("imageSize");
-
-            WritableArray mimeTypes = new WritableNativeArray();
-            mimeTypes.pushString("image/jpeg");
-            mimeTypes.pushString("image/png");
-
-            WritableMap result = new GetMediaTask(
-                    context,
-                    null,
-                    MAX_GALLERY_PHOTOS_TO_UPLOAD,
-                    null,
-                    null,
-                    mimeTypes,
-                    Definitions.ASSET_TYPE_PHOTOS,
-                    0,
-                    0,
-                    include)
-                    .execute();
+            _logger.Log("Getting device media");
+            WritableMap result = getMedia();
 
             treatReturnedMedia(result);
 
-            // Wait time to avoid the worker finishing before the progress is received by the AutoBackupWorkerManager
-            sleep(500);
             Log.d("AutoBackupWorker", "Work finished.");
+            _logger.Log("Work finished.");
             recordSuccessRunTime();
             return Result.success();
         }catch(HttpManager.ServerUnreachable e){
             Log.e("AutoBackupWorker", "Server unreachable, Exception thrown: ", e);
+            _logger.Log("Error: Server unreachable", e);
             recordError(AutoBackupWorkerManager.AutobackupWorkerError.SERVER_NOT_REACHABLE);
             sendProgressError(AutoBackupWorkerManager.AutobackupWorkerError.SERVER_NOT_REACHABLE);
             return Result.failure();
         }catch(Exception e){
             Log.e("AutoBackupWorker", "Exception thrown: ", e);
+            _logger.Log("Error: Exception thrown", e);
             recordError(AutoBackupWorkerManager.AutobackupWorkerError.UNEXPECTED_ERROR);
             sendProgressError(AutoBackupWorkerManager.AutobackupWorkerError.UNEXPECTED_ERROR);
             return Result.failure();
         }finally {
             getApplicationContext().getSystemService(NotificationManager.class).cancel(NOTIFICATION_ID);
         }
+    }
+
+    private boolean isServerReachable(){
+        WhoAmI whoAmIRequest = new WhoAmI(url, serverToken);
+
+        try{
+            whoAmIRequest.Send();
+            return true;
+        } catch(HttpManager.ServerUnreachable | ResponseNotOkException ignored){
+            return false;
+        }
+    }
+
+    private WritableMap getMedia() throws GetMediaTask.RejectionException {
+        WritableArray include = new WritableNativeArray();
+        include.pushString("fileSize");
+        include.pushString("filename");
+        include.pushString("imageSize");
+
+        WritableArray mimeTypes = new WritableNativeArray();
+        mimeTypes.pushString("image/jpeg");
+        mimeTypes.pushString("image/png");
+
+        return new GetMediaTask(
+                getApplicationContext(),
+                null,
+                MAX_GALLERY_PHOTOS_TO_UPLOAD,
+                null,
+                null,
+                mimeTypes,
+                Definitions.ASSET_TYPE_PHOTOS,
+                0,
+                0,
+                include)
+                .execute();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
@@ -149,13 +180,18 @@ public class AutoBackupWorker extends Worker {
                 serverToken,
                 deviceId);
 
+        _logger.Log("Sending request to check if photos exist in server");
         boolean[] photosExist = getPhotos.getPhotosExistByIdBatched(ids);
 
         List<PhotoData> missingPhotos = getPhotosDataFromGetMediaIfNotInServer(result, photosExist, MAX_MISSING_PHOTOS_TO_UPLOAD);
 
         if(missingPhotos.isEmpty()){
+            _logger.Log("All photos exist in server");
             return;
         }
+
+        _logger.Log(missingPhotos.size() + " photos are missing from server, starting notification.");
+        createNotification();
 
         PhotoUploader photoUploader = new PhotoUploader(
                 getApplicationContext(),
@@ -168,8 +204,12 @@ public class AutoBackupWorker extends Worker {
 
             if(isStopped()){
                 Log.d("AutoBackupWorker", "Worker stopped");
+                _logger.Log("Worker stopped");
                 break;
             }
+
+            Log.d("AutoBackupWorker", "Progress " + progress);
+            _logger.Log("Progress " + progress);
 
             updateNotification(progress, missingPhotos.size());
 
@@ -179,11 +219,15 @@ public class AutoBackupWorker extends Worker {
             }
             catch (ResponseNotOkException e){
                 Log.e("AutoBackupWorker", "Failed upload of photo with mediaId: " + photoData.mediaId, e);
+                _logger.Log("Failed upload of photo with mediaId: " + photoData.mediaId);
                 sendProgressPhotoUploadFailed(photoData.mediaId);
             }
 
             progress++;
         }
+
+        // Wait time to avoid the worker finishing before the progress is received by the AutoBackupWorkerManager
+        sleep(500);
     }
 
     public String[] getIdsFromGetMedia(WritableMap result){
