@@ -110,6 +110,7 @@ public class AutoBackupWorker extends Worker {
                 return Result.failure();
             }
 
+            _logger.Log("Getting device media");
             WritableMap result = getMedia();
 
             treatReturnedMedia(result);
@@ -179,14 +180,17 @@ public class AutoBackupWorker extends Worker {
                 serverToken,
                 deviceId);
 
+        _logger.Log("Sending request to check if photos exist in server");
         boolean[] photosExist = getPhotos.getPhotosExistByIdBatched(ids);
 
         List<PhotoData> missingPhotos = getPhotosDataFromGetMediaIfNotInServer(result, photosExist, MAX_MISSING_PHOTOS_TO_UPLOAD);
 
         if(missingPhotos.isEmpty()){
+            _logger.Log("All photos exist in server");
             return;
         }
 
+        _logger.Log(missingPhotos.size() + " photos are missing from server, starting notification.");
         createNotification();
 
         PhotoUploader photoUploader = new PhotoUploader(
