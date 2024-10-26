@@ -44,7 +44,7 @@ public class AutoBackupWorkerManager {
                 .build();
 
         PeriodicWorkRequest uploadRequest =
-                new PeriodicWorkRequest.Builder(AutoBackupWorker.class, 15, TimeUnit.MINUTES)
+                new PeriodicWorkRequest.Builder(AutoBackupWorker.class, 60, TimeUnit.MINUTES)
                         .setInputData(
                                 new Data.Builder()
                                         .putString(AutoBackupWorker.DATA_KEY_URL, url)
