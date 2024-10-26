@@ -116,13 +116,13 @@ public class AutoBackupWorker extends Worker {
             return Result.success();
         }catch(HttpManager.ServerUnreachable e){
             Log.e("AutoBackupWorker", "Server unreachable, Exception thrown: ", e);
-            _logger.Log("Error: Server unreachable");
+            _logger.Log("Error: Server unreachable", e);
             recordError(AutoBackupWorkerManager.AutobackupWorkerError.SERVER_NOT_REACHABLE);
             sendProgressError(AutoBackupWorkerManager.AutobackupWorkerError.SERVER_NOT_REACHABLE);
             return Result.failure();
         }catch(Exception e){
             Log.e("AutoBackupWorker", "Exception thrown: ", e);
-            _logger.Log("Error: Exception thrown");
+            _logger.Log("Error: Exception thrown", e);
             recordError(AutoBackupWorkerManager.AutobackupWorkerError.UNEXPECTED_ERROR);
             sendProgressError(AutoBackupWorkerManager.AutobackupWorkerError.UNEXPECTED_ERROR);
             return Result.failure();

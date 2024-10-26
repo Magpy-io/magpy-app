@@ -6,7 +6,6 @@ import android.util.Log;
 import com.magpy.Utils.FileOperations;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -49,5 +48,9 @@ public class Logger {
         }catch(Exception e){
             Log.e("Logger", "Error while logging to file.", e);
         }
+    }
+
+    public void Log(String log, Throwable e){
+        Log(log + '\n' +e.getMessage());
     }
 }
