@@ -28,6 +28,7 @@ import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeArray;
 import com.magpy.GlobalManagers.HttpManager;
 import com.magpy.GlobalManagers.Logging.Logger;
+import com.magpy.GlobalManagers.Logging.LoggerBuilder;
 import com.magpy.GlobalManagers.MySharedPreferences.WorkerStatsPreferences;
 import com.magpy.GlobalManagers.ServerQueriesManager.Common.PhotoData;
 import com.magpy.GlobalManagers.ServerQueriesManager.Common.ResponseNotOkException;
@@ -89,7 +90,10 @@ public class AutoBackupWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
-        _logger = new Logger(getApplicationContext(), "AutoBackupWorker");
+        _logger = new LoggerBuilder(getApplicationContext())
+                .SetLogPath("AutoBackupWorker")
+                .Build();
+
         _logger.Log("Work started.");
         Log.d("AutoBackupWorker", "Work started.");
 

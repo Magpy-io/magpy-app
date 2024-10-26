@@ -11,11 +11,15 @@ import java.util.Date;
 import java.util.Locale;
 
 public class Logger {
-    private static final String LOGS_FOLDER_NAME = "logs";
+    public static final String LOGS_FOLDER_NAME = "logs";
+    public static final String LOGGER_DEFAULT_BASE_NAME = "log";
+
     private File _loggerFile;
     private final Context _context;
+    private final String _logPath;
 
-    public Logger(Context context, String loggerBaseName){
+    public Logger(Context context, String loggerBaseName, String logPath){
+        _logPath = logPath;
         _context = context;
         setLoggerFile(loggerBaseName);
     }
@@ -27,6 +31,8 @@ public class Logger {
         String _loggerFileName = loggerBaseName + "_" + formattedDate + ".txt";
 
         File logsFolder = new File(_context.getExternalFilesDir(null), LOGS_FOLDER_NAME);
+        logsFolder = new File(logsFolder, _logPath);
+
         _loggerFile = new File(logsFolder, _loggerFileName);
     }
 
