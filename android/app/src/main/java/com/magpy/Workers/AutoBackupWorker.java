@@ -20,7 +20,6 @@ import androidx.work.WorkManager;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
-import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
@@ -46,7 +45,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 
 public class AutoBackupWorker extends Worker {
     final int NOTIFICATION_ID = 1002;
@@ -145,6 +143,14 @@ public class AutoBackupWorker extends Worker {
         } catch(HttpManager.ServerUnreachable | ResponseNotOkException ignored){
             return false;
         }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.S)
+    @Override
+    public void onStopped() {
+        super.onStopped();
+        Log.d("AutoBackupWorker", "OnStopped called, stop reason: " + getStopReason());
+        _logger.Log("OnStopped called, stop reason: " + getStopReason());
     }
 
     private WritableMap getMedia() throws GetMediaTask.RejectionException {
