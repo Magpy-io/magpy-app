@@ -20,18 +20,20 @@ import androidx.work.WorkManager;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
-import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeArray;
 import com.magpy.GlobalManagers.HttpManager;
+import com.magpy.GlobalManagers.Logging.Logger;
+import com.magpy.GlobalManagers.Logging.LoggerBuilder;
 import com.magpy.GlobalManagers.MySharedPreferences.WorkerStatsPreferences;
 import com.magpy.GlobalManagers.ServerQueriesManager.Common.PhotoData;
 import com.magpy.GlobalManagers.ServerQueriesManager.Common.ResponseNotOkException;
 import com.magpy.GlobalManagers.ServerQueriesManager.GetPhotos;
 import com.magpy.GlobalManagers.ServerQueriesManager.PhotoUploader;
+import com.magpy.GlobalManagers.ServerQueriesManager.WhoAmI;
 import com.magpy.NativeModules.AutoBackup.AutoBackupWorkerManager;
 import com.magpy.NativeModules.MediaManagement.Utils.Definitions;
 import com.magpy.NativeModules.MediaManagement.Utils.GetMediaTask;
@@ -43,7 +45,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 
 public class AutoBackupWorker extends Worker {
     final int NOTIFICATION_ID = 1002;
@@ -67,6 +68,8 @@ public class AutoBackupWorker extends Worker {
 
     NotificationCompat.Builder notificationBuilder;
 
+    Logger _logger;
+
     public AutoBackupWorker(
             @NonNull Context context,
             @NonNull WorkerParameters params) {
@@ -81,10 +84,15 @@ public class AutoBackupWorker extends Worker {
         return url != null && serverToken != null && deviceId != null;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.Q)
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @NonNull
     @Override
     public Result doWork() {
+        _logger = new LoggerBuilder(getApplicationContext())
+                .setLogPath("AutoBackupWorker")
+                .Build();
+
+        _logger.Log("Work started.");
         Log.d("AutoBackupWorker", "Work started.");
 
         try {
@@ -92,46 +100,38 @@ public class AutoBackupWorker extends Worker {
                 throw new Exception("Error parsing worker input data.");
             }
 
-            Context context = getApplicationContext();
+            boolean isServerReachable = isServerReachable();
 
-            createNotification();
+            if(!isServerReachable){
+                Log.d("AutoBackupWorker", "Server not reachable.");
+                _logger.Log("Server not reachable");
+                sendProgressError(AutoBackupWorkerManager.AutobackupWorkerError.SERVER_NOT_REACHABLE);
+                return Result.failure();
+            }
 
-            WritableArray include = new WritableNativeArray();
-            include.pushString("fileSize");
-            include.pushString("filename");
-            include.pushString("imageSize");
+            _logger.Log("Getting device media");
+            WritableMap result = getMedia();
 
-            WritableArray mimeTypes = new WritableNativeArray();
-            mimeTypes.pushString("image/jpeg");
-            mimeTypes.pushString("image/png");
+            boolean finished = treatReturnedMedia(result);
+            if(!finished){
+                Log.d("AutoBackupWorker", "Worker is stopped");
+                _logger.Log("Worker is stopped");
+                return Result.failure();
+            }
 
-            WritableMap result = new GetMediaTask(
-                    context,
-                    null,
-                    MAX_GALLERY_PHOTOS_TO_UPLOAD,
-                    null,
-                    null,
-                    mimeTypes,
-                    Definitions.ASSET_TYPE_PHOTOS,
-                    0,
-                    0,
-                    include)
-                    .execute();
-
-            treatReturnedMedia(result);
-
-            // Wait time to avoid the worker finishing before the progress is received by the AutoBackupWorkerManager
-            sleep(500);
             Log.d("AutoBackupWorker", "Work finished.");
+            _logger.Log("Work finished.");
             recordSuccessRunTime();
             return Result.success();
         }catch(HttpManager.ServerUnreachable e){
             Log.e("AutoBackupWorker", "Server unreachable, Exception thrown: ", e);
+            _logger.Log("Error: Server unreachable", e);
             recordError(AutoBackupWorkerManager.AutobackupWorkerError.SERVER_NOT_REACHABLE);
             sendProgressError(AutoBackupWorkerManager.AutobackupWorkerError.SERVER_NOT_REACHABLE);
             return Result.failure();
         }catch(Exception e){
             Log.e("AutoBackupWorker", "Exception thrown: ", e);
+            _logger.Log("Error: Exception thrown", e);
             recordError(AutoBackupWorkerManager.AutobackupWorkerError.UNEXPECTED_ERROR);
             sendProgressError(AutoBackupWorkerManager.AutobackupWorkerError.UNEXPECTED_ERROR);
             return Result.failure();
@@ -140,8 +140,58 @@ public class AutoBackupWorker extends Worker {
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.Q)
-    private void treatReturnedMedia(WritableMap result) throws Exception {
+    private boolean isServerReachable(){
+        WhoAmI whoAmIRequest = new WhoAmI(url, serverToken);
+
+        try{
+            whoAmIRequest.Send();
+            return true;
+        } catch(HttpManager.ServerUnreachable | ResponseNotOkException ignored){
+            return false;
+        }
+    }
+
+
+    @Override
+    public void onStopped() {
+        super.onStopped();
+
+        int stopReason = 0;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            stopReason = getStopReason();
+        }
+
+        Log.d("AutoBackupWorker", "OnStopped called, stop reason: " + stopReason);
+        _logger.Log("OnStopped called, stop reason: " + stopReason);
+    }
+
+    private WritableMap getMedia() throws GetMediaTask.RejectionException {
+        WritableArray include = new WritableNativeArray();
+        include.pushString("fileSize");
+        include.pushString("filename");
+        include.pushString("imageSize");
+
+        WritableArray mimeTypes = new WritableNativeArray();
+        mimeTypes.pushString("image/jpeg");
+        mimeTypes.pushString("image/png");
+
+        return new GetMediaTask(
+                getApplicationContext(),
+                null,
+                MAX_GALLERY_PHOTOS_TO_UPLOAD,
+                null,
+                null,
+                mimeTypes,
+                Definitions.ASSET_TYPE_PHOTOS,
+                0,
+                0,
+                include)
+                .execute();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private boolean treatReturnedMedia(WritableMap result) throws Exception {
         String[] ids = getIdsFromGetMedia(result);
 
         GetPhotos getPhotos = new GetPhotos(
@@ -149,13 +199,22 @@ public class AutoBackupWorker extends Worker {
                 serverToken,
                 deviceId);
 
+        _logger.Log("Sending request to check if photos exist in server");
         boolean[] photosExist = getPhotos.getPhotosExistByIdBatched(ids);
 
         List<PhotoData> missingPhotos = getPhotosDataFromGetMediaIfNotInServer(result, photosExist, MAX_MISSING_PHOTOS_TO_UPLOAD);
 
         if(missingPhotos.isEmpty()){
-            return;
+            _logger.Log("All photos exist in server");
+            return true;
         }
+
+        if(isStopped()){
+            return false;
+        }
+
+        _logger.Log(missingPhotos.size() + " photos are missing from server, starting notification.");
+        createNotification();
 
         PhotoUploader photoUploader = new PhotoUploader(
                 getApplicationContext(),
@@ -167,9 +226,13 @@ public class AutoBackupWorker extends Worker {
         for (PhotoData photoData:missingPhotos) {
 
             if(isStopped()){
-                Log.d("AutoBackupWorker", "Worker stopped");
-                break;
+                // Wait time to avoid the worker finishing before the progress is received by the AutoBackupWorkerManager
+                sleep(500);
+                return false;
             }
+
+            Log.d("AutoBackupWorker", "Progress " + progress);
+            _logger.Log("Progress " + progress);
 
             updateNotification(progress, missingPhotos.size());
 
@@ -179,11 +242,16 @@ public class AutoBackupWorker extends Worker {
             }
             catch (ResponseNotOkException e){
                 Log.e("AutoBackupWorker", "Failed upload of photo with mediaId: " + photoData.mediaId, e);
+                _logger.Log("Failed upload of photo with mediaId: " + photoData.mediaId);
                 sendProgressPhotoUploadFailed(photoData.mediaId);
             }
 
             progress++;
         }
+
+        // Wait time to avoid the worker finishing before the progress is received by the AutoBackupWorkerManager
+        sleep(500);
+        return true;
     }
 
     public String[] getIdsFromGetMedia(WritableMap result){
@@ -244,7 +312,7 @@ public class AutoBackupWorker extends Worker {
         getApplicationContext().getSystemService(NotificationManager.class).createNotificationChannel(channel);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.Q)
+    @RequiresApi(api = Build.VERSION_CODES.O)
     private void createNotification(){
         Context context = getApplicationContext();
         PendingIntent cancelIntent = WorkManager.getInstance(context)
@@ -262,7 +330,11 @@ public class AutoBackupWorker extends Worker {
                 .addAction(android.R.drawable.ic_delete, "Cancel", cancelIntent);
 
         try {
-            setForegroundAsync(new ForegroundInfo(NOTIFICATION_ID, notificationBuilder.build(), FOREGROUND_SERVICE_TYPE_DATA_SYNC)).get();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                setForegroundAsync(new ForegroundInfo(NOTIFICATION_ID, notificationBuilder.build(), FOREGROUND_SERVICE_TYPE_DATA_SYNC)).get();
+            }else{
+                setForegroundAsync(new ForegroundInfo(NOTIFICATION_ID, notificationBuilder.build())).get();
+            }
         } catch (ExecutionException | InterruptedException e) {
             throw new RuntimeException(e);
         }

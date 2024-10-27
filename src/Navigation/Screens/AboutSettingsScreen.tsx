@@ -6,6 +6,7 @@ import SettingsPageComponent, {
 } from '~/Components/SettingsComponents/SettingsPageComponent';
 import { privacyPolicyUrl, websiteUrl } from '~/Config/config';
 import { BuildVersionProvider, IBuildVersionProvider } from '~/Helpers/GetBuildVersion';
+import { ShareLogsFolder } from '~/Helpers/Logging/ShareLogs';
 
 export default function AboutSettingsScreen() {
   const buildVersionProvider: IBuildVersionProvider = new BuildVersionProvider();
@@ -29,6 +30,13 @@ export default function AboutSettingsScreen() {
           },
         },
         { type: 'Label', title: 'Version ' + buildVersionProvider.getVersionName() },
+        {
+          type: 'Label',
+          title: 'Send logs',
+          onPress: () => {
+            ShareLogsFolder().catch(console.log);
+          },
+        },
       ],
     },
   ];

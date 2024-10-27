@@ -9,6 +9,7 @@ import {
   useBackupWorkerContext,
   useBackupWorkerContextFunctions,
 } from '~/Context/Contexts/BackupWorkerContext';
+import { useMainContext, useMainContextFunctions } from '~/Context/Contexts/MainContext';
 import { usePermissionsContext } from '~/Context/Contexts/PermissionsContext';
 import { useServerContext } from '~/Context/Contexts/ServerContext';
 import { useServerInvalidationContext } from '~/Context/Contexts/ServerInvalidationContext';
@@ -16,48 +17,75 @@ import { notOnServerGalleryPhotosSelector } from '~/Context/ReduxStore/Slices/Ph
 import { useAppSelector } from '~/Context/ReduxStore/Store';
 import { parseMillisecondsIntoReadableTime } from '~/Helpers/DateFunctions/DateFormatting';
 import { useDebouncedDelayed } from '~/Hooks/useDebouncedDelayed';
+import { useToast } from '~/Hooks/useToast';
 import { useLastAutobackupExecutionTime } from '~/NativeModules/AutoBackupModule/';
 
 export default function BackupSettingsScreen() {
   const { StartAutoBackup, StopAutoBackup } = useBackupWorkerContextFunctions();
   const { autobackupEnabled, autoBackupWorkerRunning } = useBackupWorkerContext();
-  const { isServerReachable } = useServerContext();
+  const { isServerReachable, hasServer } = useServerContext();
 
   const backupWorkerLastExecutionTime = useLastAutobackupExecutionTime();
 
   const { notificationsPermissionStatus, askNotificationsPermission } =
     usePermissionsContext();
 
+  const { neverAskForNotificationPermissionAgain } = useMainContext();
+  const { setNeverAskForNotificationPermissionAgain } = useMainContextFunctions();
+
   const { displayPopupMessage } = usePopupMessageModal();
 
   const { isRefreshing } = useServerInvalidationContext();
+  const { showToastError } = useToast();
 
   const notBackedupPhotos = useAppSelector(notOnServerGalleryPhotosSelector);
   const notBackedupPhotosCount = notBackedupPhotos.length;
 
   const StartAutoBackupAsync = useCallback(async () => {
-    if (notificationsPermissionStatus == 'PENDING') {
-      const onDismissed = async () => {
-        await askNotificationsPermission();
-        await StartAutoBackup(true);
-      };
-
+    if (
+      notificationsPermissionStatus == 'PENDING' &&
+      !neverAskForNotificationPermissionAgain
+    ) {
       displayPopupMessage({
         title: 'Notification Permission Needed',
+        cancel: 'Never ask again',
         content:
           'Allow Magpy to display notifications. This will be used to display the progress of the backing up of your photos.',
-        onDismissed: () => {
-          onDismissed().catch(console.log);
+        onDismissed: userAction => {
+          if (userAction == 'Cancel') {
+            setNeverAskForNotificationPermissionAgain(true);
+          }
+
+          const AskNotificationPermissionPromise = new Promise((res, rej) => {
+            if (userAction == 'Ok') {
+              askNotificationsPermission().then(res).catch(rej);
+            } else {
+              res(null);
+            }
+          });
+
+          AskNotificationPermissionPromise.then(() => {
+            return StartAutoBackup(true);
+          }).catch(err => {
+            showToastError('Failed to start photos backup.');
+            console.log(err);
+          });
         },
       });
     } else {
-      await StartAutoBackup(true);
+      await StartAutoBackup(true).catch(err => {
+        showToastError('Failed to start photos backup.');
+        console.log(err);
+      });
     }
   }, [
     StartAutoBackup,
     askNotificationsPermission,
     displayPopupMessage,
     notificationsPermissionStatus,
+    neverAskForNotificationPermissionAgain,
+    setNeverAskForNotificationPermissionAgain,
+    showToastError,
   ]);
 
   const onBackupPressAsync = useCallback(
@@ -90,7 +118,7 @@ export default function BackupSettingsScreen() {
           },
           icon: <UploadIcon />,
           initialState: autobackupEnabled,
-          disabled: !isServerReachable,
+          disabled: !isServerReachable && !autobackupEnabled,
         },
       ],
     },
@@ -111,7 +139,7 @@ export default function BackupSettingsScreen() {
       icon: <InfoIcon />,
     });
   } else {
-    if (isServerReachable && autobackupEnabled && backupWorkerLastExecutionTime) {
+    if (hasServer && autobackupEnabled && backupWorkerLastExecutionTime) {
       const timeDiffMillis = new Date().getTime() - backupWorkerLastExecutionTime.getTime();
 
       let timeSinceLastWorkerExecution;
@@ -144,7 +172,8 @@ export default function BackupSettingsScreen() {
     !isRefreshing &&
     autobackupEnabledDebounced &&
     !autoBackupWorkerRunningDebounced &&
-    notBackedupPhotosCount != 0
+    notBackedupPhotosCount != 0 &&
+    autobackupEnabled
   ) {
     data[0].data.push({
       type: 'Button',

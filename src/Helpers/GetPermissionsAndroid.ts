@@ -5,7 +5,7 @@ export async function hasAndroidPermissionReadMedia() {
     throw new Error('Only use hasAndroidPermission on Android, Platform.OS == ' + Platform.OS);
   }
 
-  if (Platform.Version > 31) {
+  if (Platform.Version >= 33) {
     const imagesPermission = await hasAndroidAnyPermission(
       PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
     );
@@ -28,7 +28,7 @@ export async function askAndroidPermissionReadMedia() {
     throw new Error('Only use hasAndroidPermission on Android, Platform.OS == ' + Platform.OS);
   }
 
-  if (Platform.Version > 31) {
+  if (Platform.Version >= 33) {
     const result = await PermissionsAndroid.requestMultiple([
       PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
       PermissionsAndroid.PERMISSIONS.READ_MEDIA_VIDEO,
@@ -54,13 +54,19 @@ export async function hasAndroidPermissionNotifications() {
   if (Platform.OS !== 'android') {
     throw new Error('Only use hasAndroidPermission on Android, Platform.OS == ' + Platform.OS);
   }
-
+  if (Platform.Version < 33) {
+    return true;
+  }
   return await hasAndroidAnyPermission(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
 }
 
 export async function askAndroidPermissionNotifications() {
   if (Platform.OS !== 'android') {
     throw new Error('Only use hasAndroidPermission on Android, Platform.OS == ' + Platform.OS);
+  }
+
+  if (Platform.Version < 33) {
+    return true;
   }
 
   const result = await PermissionsAndroid.request(

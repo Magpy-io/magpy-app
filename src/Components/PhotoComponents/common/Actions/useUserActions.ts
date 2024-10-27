@@ -54,7 +54,12 @@ export function useUserActions() {
         return;
       }
 
-      UploadPhotos(mediaIds);
+      try {
+        UploadPhotos(mediaIds);
+      } catch (err) {
+        showToastError('Failed to start photo upload.');
+        console.log(err);
+      }
     },
     [
       UploadPhotos,

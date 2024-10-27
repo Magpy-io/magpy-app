@@ -138,7 +138,6 @@ public class AutoBackupModule extends ReactContextBaseJavaModule {
         });
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.S)
     @ReactMethod
     public void GetWorkerInfo(Promise mPromise){
         AutoBackupWorkerManager autoBackupWorkerManager = new AutoBackupWorkerManager(getReactApplicationContext());
@@ -154,7 +153,13 @@ public class AutoBackupModule extends ReactContextBaseJavaModule {
                 workInfoObject.putString("state", WorkerStateParser.ParseWorkerState(workInfo.getState()));
                 workInfoObject.putDouble("nextScheduleMillis", workInfo.getState() == WorkInfo.State.ENQUEUED ? workInfo.getNextScheduleTimeMillis() : -1);
                 workInfoObject.putDouble("repeatIntervalMillis", workInfo.getPeriodicityInfo() != null ? workInfo.getPeriodicityInfo().getRepeatIntervalMillis() : -1);
-                workInfoObject.putDouble("stopReason", workInfo.getStopReason());
+
+                int stopReason = 0;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    stopReason = workInfo.getStopReason();
+                }
+
+                workInfoObject.putDouble("stopReason", stopReason);
 
                 mPromise.resolve(workInfoObject);
             }
