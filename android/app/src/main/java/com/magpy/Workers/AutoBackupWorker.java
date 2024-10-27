@@ -196,6 +196,12 @@ public class AutoBackupWorker extends Worker {
             return;
         }
 
+        if(isStopped()){
+            Log.d("AutoBackupWorker", "Worker is stopped");
+            _logger.Log("Worker is stopped");
+            return;
+        }
+
         _logger.Log(missingPhotos.size() + " photos are missing from server, starting notification.");
         createNotification();
 
@@ -209,8 +215,8 @@ public class AutoBackupWorker extends Worker {
         for (PhotoData photoData:missingPhotos) {
 
             if(isStopped()){
-                Log.d("AutoBackupWorker", "Worker stopped");
-                _logger.Log("Worker stopped");
+                Log.d("AutoBackupWorker", "Worker is stopped");
+                _logger.Log("Worker is stopped");
                 break;
             }
 
