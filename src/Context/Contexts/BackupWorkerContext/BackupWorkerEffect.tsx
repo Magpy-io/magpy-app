@@ -1,6 +1,7 @@
 import React, { ReactNode, useEffect, useMemo } from 'react';
 
 import { useHasValueChanged } from '~/Hooks/useHasValueChanged';
+import { useServerQueries } from '~/Hooks/useServerQueries';
 import { useToast } from '~/Hooks/useToast';
 import { AutoBackupModule, AutoBackupModuleEvents } from '~/NativeModules/AutoBackupModule';
 
@@ -30,6 +31,8 @@ export const BackupWorkerEffect: React.FC<PropsType> = props => {
 
   const serverInfoChanged = useHasValueChanged(serverInfo, null);
   const hasServerReachableChanged = useHasValueChanged(isServerReachable, false);
+
+  const { WhoAmIPost } = useServerQueries();
 
   // This effect will update the server network data of worker
   // whenever the server network data changes or the reachable status goes from false to true
@@ -80,12 +83,15 @@ export const BackupWorkerEffect: React.FC<PropsType> = props => {
       } else {
         showToastError('Autobackup failed, unexpected error');
       }
+
+      // Check if server is still reachable
+      WhoAmIPost({}).catch(console.log);
     });
 
     return () => {
       sub.remove();
     };
-  }, [showToastError]);
+  }, [showToastError, WhoAmIPost]);
 
   return props.children;
 };

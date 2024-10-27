@@ -9,6 +9,7 @@ import {
   GetPhotosByMediaId,
   GetServerInfo,
   UpdatePhotoMediaId,
+  WhoAmI,
 } from '~/Helpers/ServerQueries';
 import { ErrorServerUnreachable } from '~/Helpers/ServerQueries/ExceptionsManager';
 import { ErrorCodes } from '~/Helpers/ServerQueries/Types/ErrorTypes';
@@ -56,6 +57,7 @@ export function useServerQueries() {
       GetPhotoPartByIdPost: transformFunction(GetPhotoPartById.Post),
       UpdatePhotoMediaIdPost: transformFunction(UpdatePhotoMediaId.Post),
       DeletePhotosByIdPost: transformFunction(DeletePhotosById.Post),
+      WhoAmIPost: transformFunction(WhoAmI.Post),
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setServerNotReachable]);
