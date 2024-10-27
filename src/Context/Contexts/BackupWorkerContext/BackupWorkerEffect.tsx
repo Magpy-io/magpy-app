@@ -1,5 +1,6 @@
-import React, { ReactNode, useEffect, useMemo, useRef } from 'react';
+import React, { ReactNode, useEffect, useMemo } from 'react';
 
+import { useHasValueChanged } from '~/Hooks/useHasValueChanged';
 import { useToast } from '~/Hooks/useToast';
 import { AutoBackupModule, AutoBackupModuleEvents } from '~/NativeModules/AutoBackupModule';
 
@@ -27,8 +28,8 @@ export const BackupWorkerEffect: React.FC<PropsType> = props => {
     return { serverPath, token };
   }, [serverPath, token]);
 
-  const lastServerInfoRef = useRef(serverInfo);
-  const lastIsServerReachable = useRef(isServerReachable);
+  const serverInfoChanged = useHasValueChanged(serverInfo, null);
+  const hasServerReachableChanged = useHasValueChanged(isServerReachable, false);
 
   // This effect will update the server network data of worker
   // whenever the server network data changes or the reachable status goes from false to true
@@ -36,14 +37,18 @@ export const BackupWorkerEffect: React.FC<PropsType> = props => {
     if (
       isServerReachable &&
       autobackupEnabled &&
-      (lastServerInfoRef.current !== serverInfo ||
-        lastIsServerReachable.current !== isServerReachable)
+      (serverInfoChanged || hasServerReachableChanged)
     ) {
       StartAutoBackup().catch(console.log);
     }
-    lastServerInfoRef.current = serverInfo;
-    lastIsServerReachable.current = isServerReachable;
-  }, [StartAutoBackup, autobackupEnabled, isServerReachable, serverInfo]);
+  }, [
+    StartAutoBackup,
+    autobackupEnabled,
+    isServerReachable,
+    serverInfo,
+    serverInfoChanged,
+    hasServerReachableChanged,
+  ]);
 
   useEffect(() => {
     const subscriptionWorkerStatus = AutoBackupModuleEvents.subscribeOnWorkerStatusChanged(
