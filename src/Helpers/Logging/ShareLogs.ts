@@ -4,7 +4,7 @@ import { zip } from 'react-native-zip-archive';
 
 export async function ShareLogsFolder() {
   const sourcePath = RNFS.ExternalDirectoryPath + '/logs';
-  const targetPath = RNFS.CachesDirectoryPath + '/logs.zip';
+  const targetPath = RNFS.ExternalCachesDirectoryPath + '/logs.zip';
 
   const path = await zip(sourcePath, targetPath);
 
