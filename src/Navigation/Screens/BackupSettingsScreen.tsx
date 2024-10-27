@@ -21,7 +21,7 @@ import { useLastAutobackupExecutionTime } from '~/NativeModules/AutoBackupModule
 export default function BackupSettingsScreen() {
   const { StartAutoBackup, StopAutoBackup } = useBackupWorkerContextFunctions();
   const { autobackupEnabled, autoBackupWorkerRunning } = useBackupWorkerContext();
-  const { isServerReachable } = useServerContext();
+  const { isServerReachable, hasServer } = useServerContext();
 
   const backupWorkerLastExecutionTime = useLastAutobackupExecutionTime();
 
@@ -90,7 +90,7 @@ export default function BackupSettingsScreen() {
           },
           icon: <UploadIcon />,
           initialState: autobackupEnabled,
-          disabled: !isServerReachable,
+          disabled: !isServerReachable && !autobackupEnabled,
         },
       ],
     },
@@ -111,7 +111,7 @@ export default function BackupSettingsScreen() {
       icon: <InfoIcon />,
     });
   } else {
-    if (isServerReachable && autobackupEnabled && backupWorkerLastExecutionTime) {
+    if (hasServer && autobackupEnabled && backupWorkerLastExecutionTime) {
       const timeDiffMillis = new Date().getTime() - backupWorkerLastExecutionTime.getTime();
 
       let timeSinceLastWorkerExecution;
@@ -144,7 +144,8 @@ export default function BackupSettingsScreen() {
     !isRefreshing &&
     autobackupEnabledDebounced &&
     !autoBackupWorkerRunningDebounced &&
-    notBackedupPhotosCount != 0
+    notBackedupPhotosCount != 0 &&
+    autobackupEnabled
   ) {
     data[0].data.push({
       type: 'Button',
