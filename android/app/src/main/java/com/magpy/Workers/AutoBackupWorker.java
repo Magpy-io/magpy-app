@@ -89,7 +89,7 @@ public class AutoBackupWorker extends Worker {
     @Override
     public Result doWork() {
         _logger = new LoggerBuilder(getApplicationContext())
-                .SetLogPath("AutoBackupWorker")
+                .setLogPath("AutoBackupWorker")
                 .Build();
 
         _logger.Log("Work started.");

@@ -13,12 +13,12 @@ public class LoggerBuilder {
         _context = context;
     }
 
-    public LoggerBuilder SetLoggerBaseName(String loggerBaseName){
+    public LoggerBuilder setLoggerBaseName(String loggerBaseName){
         _loggerBaseName = loggerBaseName;
         return this;
     }
 
-    public LoggerBuilder SetLogPath(String logPath){
+    public LoggerBuilder setLogPath(String logPath){
         _logPath = logPath;
         return this;
     }
