@@ -1,10 +1,6 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import RNFS from 'react-native-fs';
-import Share from 'react-native-share';
-import { zip } from 'react-native-zip-archive';
-
 import {
   AccountIcon,
   InfoIcon,
@@ -98,25 +94,6 @@ export default function SettingsScreenTab() {
       title: 'Debug menu',
       onPress: () => {
         navigate('Debug');
-      },
-    });
-
-    data[0].data.push({
-      type: 'Button',
-      title: 'Button',
-      onPress: () => {
-        async function f() {
-          const sourcePath = RNFS.ExternalDirectoryPath + '/logs';
-          const targetPath = RNFS.CachesDirectoryPath + '/logs.zip';
-
-          const path = await zip(sourcePath, targetPath);
-
-          const shareResponse = await Share.open({
-            url: 'file://' + path,
-          });
-          console.log(shareResponse);
-        }
-        f().catch(console.log);
       },
     });
   }
