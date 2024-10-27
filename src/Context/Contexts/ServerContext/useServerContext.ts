@@ -103,11 +103,14 @@ export function useServerContext() {
     serverPath = formatAddressHttp(serverNetwork.currentIp, serverNetwork.currentPort);
   }
 
+  const hasServer = !!serverNetwork;
+
   return {
     isServerReachable,
     findingServer,
     token,
     serverNetwork,
+    hasServer,
     error,
     serverNetworkSelecting,
     serverPath,

@@ -9,11 +9,11 @@ import { useBackupWorkerContextInner } from './BackupWorkerContext';
 export function useBackupWorkerContextFunctions() {
   const { setWorkerStatus } = useBackupWorkerContextInner();
 
-  const { isServerReachable, serverPath, token } = useServerContext();
+  const { hasServer, serverPath, token } = useServerContext();
 
   const StartAutoBackup = useCallback(
     async (restartWorker?: boolean) => {
-      if (isServerReachable) {
+      if (hasServer) {
         await AutoBackupModule.StartBackupWorker({
           url: serverPath ?? '',
           deviceId: uniqueDeviceId,
@@ -31,7 +31,7 @@ export function useBackupWorkerContextFunctions() {
         throw new Error('Error while starting autobackup worker');
       }
     },
-    [isServerReachable, serverPath, token],
+    [hasServer, serverPath, token],
   );
 
   const StopAutoBackup = useCallback(async () => {
