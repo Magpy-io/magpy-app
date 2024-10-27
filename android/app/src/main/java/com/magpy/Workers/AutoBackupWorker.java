@@ -105,13 +105,19 @@ public class AutoBackupWorker extends Worker {
             if(!isServerReachable){
                 Log.d("AutoBackupWorker", "Server not reachable.");
                 _logger.Log("Server not reachable");
+                sendProgressError(AutoBackupWorkerManager.AutobackupWorkerError.SERVER_NOT_REACHABLE);
                 return Result.failure();
             }
 
             _logger.Log("Getting device media");
             WritableMap result = getMedia();
 
-            treatReturnedMedia(result);
+            boolean finished = treatReturnedMedia(result);
+            if(!finished){
+                Log.d("AutoBackupWorker", "Worker is stopped");
+                _logger.Log("Worker is stopped");
+                return Result.failure();
+            }
 
             Log.d("AutoBackupWorker", "Work finished.");
             _logger.Log("Work finished.");
@@ -178,7 +184,7 @@ public class AutoBackupWorker extends Worker {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
-    private void treatReturnedMedia(WritableMap result) throws Exception {
+    private boolean treatReturnedMedia(WritableMap result) throws Exception {
         String[] ids = getIdsFromGetMedia(result);
 
         GetPhotos getPhotos = new GetPhotos(
@@ -193,13 +199,11 @@ public class AutoBackupWorker extends Worker {
 
         if(missingPhotos.isEmpty()){
             _logger.Log("All photos exist in server");
-            return;
+            return true;
         }
 
         if(isStopped()){
-            Log.d("AutoBackupWorker", "Worker is stopped");
-            _logger.Log("Worker is stopped");
-            return;
+            return false;
         }
 
         _logger.Log(missingPhotos.size() + " photos are missing from server, starting notification.");
@@ -215,9 +219,9 @@ public class AutoBackupWorker extends Worker {
         for (PhotoData photoData:missingPhotos) {
 
             if(isStopped()){
-                Log.d("AutoBackupWorker", "Worker is stopped");
-                _logger.Log("Worker is stopped");
-                break;
+                // Wait time to avoid the worker finishing before the progress is received by the AutoBackupWorkerManager
+                sleep(500);
+                return false;
             }
 
             Log.d("AutoBackupWorker", "Progress " + progress);
@@ -240,6 +244,7 @@ public class AutoBackupWorker extends Worker {
 
         // Wait time to avoid the worker finishing before the progress is received by the AutoBackupWorkerManager
         sleep(500);
+        return true;
     }
 
     public String[] getIdsFromGetMedia(WritableMap result){
