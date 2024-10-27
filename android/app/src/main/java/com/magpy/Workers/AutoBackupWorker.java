@@ -84,7 +84,7 @@ public class AutoBackupWorker extends Worker {
         return url != null && serverToken != null && deviceId != null;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.Q)
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @NonNull
     @Override
     public Result doWork() {
@@ -151,12 +151,19 @@ public class AutoBackupWorker extends Worker {
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.S)
+
     @Override
     public void onStopped() {
         super.onStopped();
-        Log.d("AutoBackupWorker", "OnStopped called, stop reason: " + getStopReason());
-        _logger.Log("OnStopped called, stop reason: " + getStopReason());
+
+        int stopReason = 0;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            stopReason = getStopReason();
+        }
+
+        Log.d("AutoBackupWorker", "OnStopped called, stop reason: " + stopReason);
+        _logger.Log("OnStopped called, stop reason: " + stopReason);
     }
 
     private WritableMap getMedia() throws GetMediaTask.RejectionException {
@@ -183,7 +190,7 @@ public class AutoBackupWorker extends Worker {
                 .execute();
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.Q)
+    @RequiresApi(api = Build.VERSION_CODES.O)
     private boolean treatReturnedMedia(WritableMap result) throws Exception {
         String[] ids = getIdsFromGetMedia(result);
 
@@ -305,7 +312,7 @@ public class AutoBackupWorker extends Worker {
         getApplicationContext().getSystemService(NotificationManager.class).createNotificationChannel(channel);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.Q)
+    @RequiresApi(api = Build.VERSION_CODES.O)
     private void createNotification(){
         Context context = getApplicationContext();
         PendingIntent cancelIntent = WorkManager.getInstance(context)
@@ -323,7 +330,11 @@ public class AutoBackupWorker extends Worker {
                 .addAction(android.R.drawable.ic_delete, "Cancel", cancelIntent);
 
         try {
-            setForegroundAsync(new ForegroundInfo(NOTIFICATION_ID, notificationBuilder.build(), FOREGROUND_SERVICE_TYPE_DATA_SYNC)).get();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                setForegroundAsync(new ForegroundInfo(NOTIFICATION_ID, notificationBuilder.build(), FOREGROUND_SERVICE_TYPE_DATA_SYNC)).get();
+            }else{
+                setForegroundAsync(new ForegroundInfo(NOTIFICATION_ID, notificationBuilder.build())).get();
+            }
         } catch (ExecutionException | InterruptedException e) {
             throw new RuntimeException(e);
         }

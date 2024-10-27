@@ -35,6 +35,7 @@ import com.magpy.Utils.MediaParser;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 public class UploadWorker extends Worker {
@@ -67,7 +68,7 @@ public class UploadWorker extends Worker {
         super(context, params);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.Q)
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @NonNull
     @Override
     public Result doWork() {
@@ -191,7 +192,7 @@ public class UploadWorker extends Worker {
         getApplicationContext().getSystemService(NotificationManager.class).createNotificationChannel(channel);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.Q)
+    @RequiresApi(api = Build.VERSION_CODES.O)
     private void createNotification(){
         Context context = getApplicationContext();
 
@@ -209,7 +210,15 @@ public class UploadWorker extends Worker {
                 .setSilent(true)
                 .addAction(android.R.drawable.ic_delete, "Cancel", cancelIntent);
 
-        setForegroundAsync(new ForegroundInfo(NOTIFICATION_ID, notificationBuilder.build(), FOREGROUND_SERVICE_TYPE_DATA_SYNC));
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                setForegroundAsync(new ForegroundInfo(NOTIFICATION_ID, notificationBuilder.build(), FOREGROUND_SERVICE_TYPE_DATA_SYNC)).get();
+            }else{
+                setForegroundAsync(new ForegroundInfo(NOTIFICATION_ID, notificationBuilder.build())).get();
+            }
+        } catch (ExecutionException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
