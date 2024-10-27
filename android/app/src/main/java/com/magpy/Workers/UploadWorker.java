@@ -85,7 +85,9 @@ public class UploadWorker extends Worker {
 
             Context context = getApplicationContext();
 
-            createNotification();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                setForeground();
+            }
 
             PhotoUploader photoUploader = new PhotoUploader(
                     getApplicationContext(),
@@ -193,7 +195,24 @@ public class UploadWorker extends Worker {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    private void createNotification(){
+    @NonNull
+    @Override
+    public ForegroundInfo getForegroundInfo() {
+        return createNotification();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void setForeground(){
+        ForegroundInfo foregroundInfo = createNotification();
+        try {
+            setForegroundAsync(foregroundInfo).get();
+        } catch (ExecutionException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private ForegroundInfo createNotification(){
         Context context = getApplicationContext();
 
         PendingIntent cancelIntent = WorkManager.getInstance(context)
@@ -210,14 +229,10 @@ public class UploadWorker extends Worker {
                 .setSilent(true)
                 .addAction(android.R.drawable.ic_delete, "Cancel", cancelIntent);
 
-        try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                setForegroundAsync(new ForegroundInfo(NOTIFICATION_ID, notificationBuilder.build(), FOREGROUND_SERVICE_TYPE_DATA_SYNC)).get();
-            }else{
-                setForegroundAsync(new ForegroundInfo(NOTIFICATION_ID, notificationBuilder.build())).get();
-            }
-        } catch (ExecutionException | InterruptedException e) {
-            throw new RuntimeException(e);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            return new ForegroundInfo(NOTIFICATION_ID, notificationBuilder.build(), FOREGROUND_SERVICE_TYPE_DATA_SYNC);
+        }else{
+            return new ForegroundInfo(NOTIFICATION_ID, notificationBuilder.build());
         }
     }
 
