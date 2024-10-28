@@ -214,7 +214,15 @@ public class AutoBackupWorker extends Worker {
         }
 
         _logger.Log(missingPhotos.size() + " photos are missing from server, starting notification.");
-        createNotification();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            try{
+                setForeground();
+            }catch(Exception e){
+                Log.e("AutoBackupWorker", "Error starting foreground service.", e);
+                _logger.Log("Error starting foreground service.", e);
+            }
+        }
 
         PhotoUploader photoUploader = new PhotoUploader(
                 getApplicationContext(),
@@ -313,7 +321,24 @@ public class AutoBackupWorker extends Worker {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    private void createNotification(){
+    @NonNull
+    @Override
+    public ForegroundInfo getForegroundInfo() {
+        return createNotification();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void setForeground(){
+        ForegroundInfo foregroundInfo = createNotification();
+        try {
+            setForegroundAsync(foregroundInfo).get();
+        } catch (ExecutionException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private ForegroundInfo createNotification(){
         Context context = getApplicationContext();
         PendingIntent cancelIntent = WorkManager.getInstance(context)
                 .createCancelPendingIntent(getId());
@@ -329,19 +354,18 @@ public class AutoBackupWorker extends Worker {
                 .setOngoing(true)
                 .addAction(android.R.drawable.ic_delete, "Cancel", cancelIntent);
 
-        try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                setForegroundAsync(new ForegroundInfo(NOTIFICATION_ID, notificationBuilder.build(), FOREGROUND_SERVICE_TYPE_DATA_SYNC)).get();
-            }else{
-                setForegroundAsync(new ForegroundInfo(NOTIFICATION_ID, notificationBuilder.build())).get();
-            }
-        } catch (ExecutionException | InterruptedException e) {
-            throw new RuntimeException(e);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            return new ForegroundInfo(NOTIFICATION_ID, notificationBuilder.build(), FOREGROUND_SERVICE_TYPE_DATA_SYNC);
+        }else{
+            return new ForegroundInfo(NOTIFICATION_ID, notificationBuilder.build());
         }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void updateNotification(int progress, int total){
+        if(notificationBuilder == null){
+            return;
+        }
         notificationBuilder.setProgress(total, progress, false);
         getApplicationContext().getSystemService(NotificationManager.class).notify(NOTIFICATION_ID, notificationBuilder.build());
     }
