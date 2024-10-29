@@ -3,6 +3,8 @@ import { consoleTransport, fileAsyncTransport, logger } from 'react-native-logs'
 
 import { LOGS_FOLDER_PATH } from './ShareLogs';
 
+const LOGS_FOLDER_NAME = 'ReactNative';
+
 export const LOG = createLogger();
 
 function createLogger() {
@@ -19,7 +21,7 @@ function createLogger() {
       FS: RNFS,
       fileName: 'log_{date-today}.txt',
       fileNameDateType: 'iso',
-      filePath: LOGS_FOLDER_PATH,
+      filePath: LOGS_FOLDER_PATH + '/' + LOGS_FOLDER_NAME,
     },
     dateFormat: 'iso',
   });
