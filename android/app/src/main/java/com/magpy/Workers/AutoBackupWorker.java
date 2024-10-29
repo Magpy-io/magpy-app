@@ -106,7 +106,7 @@ public class AutoBackupWorker extends Worker {
             boolean isServerReachable = isServerReachable();
 
             if(!isServerReachable){
-                _logger.Log("Server not reachable");
+                _logger.Log("Failed to connect with server.");
                 sendProgressError(AutoBackupWorkerManager.AutobackupWorkerError.SERVER_NOT_REACHABLE);
                 return Result.failure();
             }
@@ -144,7 +144,11 @@ public class AutoBackupWorker extends Worker {
         try{
             whoAmIRequest.Send();
             return true;
-        } catch(HttpManager.ServerUnreachable | ResponseNotOkException ignored){
+        } catch(HttpManager.ServerUnreachable ignored){
+            _logger.Log("Server not reachable");
+            return false;
+        } catch (ResponseNotOkException e){
+            _logger.Log("Server responded not ok.", e);
             return false;
         }
     }
