@@ -9,6 +9,7 @@ import ViewWithGap from '~/Components/CommonComponents/ViewWithGap';
 import LoginTextInput from '~/Components/LoginComponents/LoginTextInput';
 import { PasswordInput } from '~/Components/LoginComponents/PasswordInput';
 import { useServerContextFunctions } from '~/Context/Contexts/ServerContext';
+import { LOG } from '~/Helpers/Logging/Logger';
 import { ClaimServerLocal, GetTokenLocal, TokenManager } from '~/Helpers/ServerQueries';
 import { ErrorServerUnreachable } from '~/Helpers/ServerQueries/ExceptionsManager';
 import { useToast } from '~/Hooks/useToast';
@@ -37,11 +38,11 @@ export function ClaimServerForm() {
           setCurrentSelectingServerReachable(token);
           navigate('Tabs');
         } else {
-          console.log(loginRet.message);
+          LOG.error(loginRet.message);
           showToastError('Unexpected error while connecting to server');
         }
       } else {
-        console.log(ret.message);
+        LOG.error(ret.message);
         if (ret.errorCode == 'SERVER_ALREADY_CLAIMED') {
           showToastError('Server already claimed by another user.');
         } else {
@@ -49,7 +50,7 @@ export function ClaimServerForm() {
         }
       }
     } catch (err) {
-      console.log(err);
+      LOG.error(err);
       if (err instanceof ErrorServerUnreachable) {
         showToastError('Server unreachable');
       } else {
@@ -84,8 +85,6 @@ export function ClaimServerForm() {
           <PrimaryButtonExtraWide
             title="Claim server"
             onPress={() => {
-              console.log(values);
-              console.log(errors);
               handleSubmit();
             }}
           />

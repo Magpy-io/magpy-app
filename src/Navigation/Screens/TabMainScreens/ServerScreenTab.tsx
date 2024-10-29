@@ -11,7 +11,6 @@ import { colorsType } from '~/Styles/colors';
 import { spacing } from '~/Styles/spacing';
 
 export default function ServerScreenTab() {
-  console.log('render screen server');
   const styles = useStyles(makeStyles);
   const insets = useSafeAreaInsets();
 

@@ -6,7 +6,6 @@ import FastImage from 'react-native-fast-image';
 import { borderRadius } from '~/Styles/spacing';
 
 const ImageForGrid = ({ uri }: { uri: string | undefined }) => {
-  //console.log('ImageFOrGrid render', uri);
   return uri ? (
     <FastImage
       source={{ uri: uri }}

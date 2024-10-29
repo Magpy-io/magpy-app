@@ -8,6 +8,7 @@ import {
 } from '~/Context/ReduxStore/Slices/Photos/Selectors';
 import { useAppDispatch, useAppSelector } from '~/Context/ReduxStore/Store';
 import { addPhotoToDevice } from '~/Helpers/GalleryFunctions/Functions';
+import { LOG } from '~/Helpers/Logging/Logger';
 import { useGetPhotoWithProgress, useServerQueries } from '~/Hooks/useServerQueries';
 import { useToast } from '~/Hooks/useToast';
 
@@ -64,8 +65,6 @@ export const PhotosDownloadingEffects: React.FC<PropsType> = props => {
           return;
         }
 
-        console.log('Downloading  photo', photoDownloading.serverId);
-
         const resultDownload = await getPhotoWithProgress(
           photoDownloading.serverId,
           (p: number, t: number) => {
@@ -83,7 +82,6 @@ export const PhotosDownloadingEffects: React.FC<PropsType> = props => {
           throw new Error('Error downloading photo, ' + JSON.stringify(resultDownload));
         }
 
-        console.log('photo downloaded');
         const photoServer = resultDownload.data.photo;
 
         const localPhoto = await addPhotoToDevice({
@@ -116,7 +114,7 @@ export const PhotosDownloadingEffects: React.FC<PropsType> = props => {
 
     innerAsync().catch(err => {
       showToastError('Error while downloading photo.');
-      console.log(err);
+      LOG.error(err);
     });
   }, [
     photosDownloadingDispatch,

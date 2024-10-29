@@ -7,6 +7,7 @@ import {
   photoCompressedExistsInCache,
   photoThumbnailExistsInCache,
 } from '~/Helpers/GalleryFunctions/Functions';
+import { LOG } from '~/Helpers/Logging/Logger';
 import { useServerQueries } from '~/Hooks/useServerQueries';
 import { useToast } from '~/Hooks/useToast';
 
@@ -35,7 +36,7 @@ export function useServerPhotoUri(
       }
     }
 
-    innerAsync().catch(console.log);
+    innerAsync().catch(LOG.error);
   }, [serverPhoto, photoUriNeeded, photoExistsInCache]);
 
   useEffect(() => {
@@ -62,7 +63,7 @@ export function useServerPhotoUri(
 
     innerAsync().catch(err => {
       showToastError('Error fetching photo from server.');
-      console.log(err);
+      LOG.error(err);
     });
   }, [
     photoUriNeeded,

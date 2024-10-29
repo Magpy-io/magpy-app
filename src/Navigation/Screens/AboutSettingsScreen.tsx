@@ -6,6 +6,7 @@ import SettingsPageComponent, {
 } from '~/Components/SettingsComponents/SettingsPageComponent';
 import { privacyPolicyUrl, websiteUrl } from '~/Config/config';
 import { BuildVersionProvider, IBuildVersionProvider } from '~/Helpers/GetBuildVersion';
+import { LOG } from '~/Helpers/Logging/Logger';
 import { ShareLogsFolder } from '~/Helpers/Logging/ShareLogs';
 
 export default function AboutSettingsScreen() {
@@ -19,14 +20,14 @@ export default function AboutSettingsScreen() {
           type: 'Label',
           title: 'Magpy website',
           onPress: () => {
-            Linking.openURL(websiteUrl).catch(console.log);
+            Linking.openURL(websiteUrl).catch(LOG.error);
           },
         },
         {
           type: 'Label',
           title: 'Privacy Policy',
           onPress: () => {
-            Linking.openURL(privacyPolicyUrl).catch(console.log);
+            Linking.openURL(privacyPolicyUrl).catch(LOG.error);
           },
         },
         { type: 'Label', title: 'Version ' + buildVersionProvider.getVersionName() },
@@ -34,7 +35,7 @@ export default function AboutSettingsScreen() {
           type: 'Label',
           title: 'Send logs',
           onPress: () => {
-            ShareLogsFolder().catch(console.log);
+            ShareLogsFolder().catch(LOG.error);
           },
         },
       ],

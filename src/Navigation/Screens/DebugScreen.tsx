@@ -7,6 +7,7 @@ import {
   formatDateTime,
   parseMillisecondsIntoReadableTime,
 } from '~/Helpers/DateFunctions/DateFormatting';
+import { LOG } from '~/Helpers/Logging/Logger';
 import { useStyles } from '~/Hooks/useStyles';
 import { AutoBackupModule } from '~/NativeModules/AutoBackupModule';
 import { colorsType } from '~/Styles/colors';
@@ -103,14 +104,14 @@ export default function DebugScreen() {
   };
 
   useEffect(() => {
-    console.log('Started debug interval');
+    LOG.debug('Started debug interval');
 
     const handler = setInterval(() => {
-      refreshData().catch(console.log);
+      refreshData().catch(LOG.error);
     }, 1000);
 
     return () => {
-      console.log('Stopped debug interval');
+      LOG.debug('Stopped debug interval');
       clearInterval(handler);
     };
   }, []);
@@ -124,7 +125,7 @@ export default function DebugScreen() {
         }}
         refreshing={false}
         onRefresh={() => {
-          refreshData().catch(console.log);
+          refreshData().catch(LOG.error);
         }}></FlatList>
     </View>
   );

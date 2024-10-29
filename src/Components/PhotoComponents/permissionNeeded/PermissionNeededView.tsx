@@ -4,6 +4,7 @@ import { Linking, StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-elements';
 
 import { PrimaryButton } from '~/Components/CommonComponents/Buttons';
+import { LOG } from '~/Helpers/Logging/Logger';
 import { useStyles } from '~/Hooks/useStyles';
 import { useTabNavigationContextFunctions } from '~/Navigation/TabNavigation/TabNavigationContext';
 import { colorsType } from '~/Styles/colors';
@@ -26,7 +27,7 @@ export default function PermissionNeededView() {
         title={'Go to settings'}
         buttonStyle={{ marginTop: spacing.spacing_m }}
         onPress={() => {
-          Linking.openSettings().catch(console.log);
+          Linking.openSettings().catch(LOG.error);
         }}
       />
     </View>

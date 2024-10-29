@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { StyleSheet, View } from 'react-native';
 
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
+import { LOG } from '~/Helpers/Logging/Logger';
 import { useIsFullScreen } from '~/Hooks/useIsFullScreen';
 import { useTimeLastChanged } from '~/Hooks/useTimeLastChanged';
 import { FullScreenModule } from '~/NativeModules/FullScreenModule';
@@ -52,7 +53,7 @@ const PhotoSliderController = React.forwardRef<PhotoSliderComponentRefType, Prop
         }
       };
 
-      onPressAsync().catch(console.log);
+      onPressAsync().catch(LOG.error);
     }, [isFullScreen, timeSinceLastChange]);
 
     const backPressAction = useCallback(() => {

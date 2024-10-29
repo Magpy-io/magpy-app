@@ -34,7 +34,6 @@ export default function FilterModal({ visible, onRequestClose }: FilterModalProp
 
   useEffect(() => {
     if (lastVisibleRef.current !== visible) {
-      console.log('setFilters');
       setFilters(storeFilters);
     }
     lastVisibleRef.current = visible;

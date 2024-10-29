@@ -1,6 +1,7 @@
 import React, { ReactNode, useEffect } from 'react';
 
 import { GetMyServerInfo } from '~/Helpers/BackendQueries';
+import { LOG } from '~/Helpers/Logging/Logger';
 
 import { useAuthContext } from '../AuthContext';
 import { useServerClaimContextSetters } from './ServerClaimContext';
@@ -16,23 +17,21 @@ export const ServerClaimEffects: React.FC<PropsType> = props => {
 
   useEffect(() => {
     async function GetServer() {
-      console.log('Getting claimed server');
       try {
         const serverInfo = await GetMyServerInfo.Post();
-        console.log(serverInfo);
+
         if (serverInfo.ok) {
           setServer(serverInfo.data.server);
         } else {
           setServer(null);
-          console.log(serverInfo);
+          LOG.error('Error: GetMyServerInfo backend request not ok', serverInfo);
         }
       } catch (e) {
-        console.log('Error: GetMyServerInfo backend request failed');
-        console.log(e);
+        LOG.error('Error: GetMyServerInfo backend request failed', e);
       }
     }
     if (!loading && token) {
-      GetServer().catch(console.log);
+      GetServer().catch(LOG.error);
     }
   }, [loading, setServer, token]);
 

@@ -4,6 +4,8 @@ import { isIP, isPort } from 'validator';
 
 import { serverDiscoveryPort } from '~/Config/config';
 
+import { LOG } from './Logging/Logger';
+
 export type DiscoveryResponse = {
   domain: 'magpy-discovery';
   type: 'response';
@@ -36,10 +38,10 @@ export class ServerDiscovery {
   }
 
   async launchDiscovery(onServerDiscovered: (response: Server) => void) {
-    console.log('Discovery started');
-
     if (this.state != 'stopped') {
-      console.log('Discovery already running');
+      LOG.error(
+        'Error: Discovery already running, Cannot start new discovery while a discovery is still running.',
+      );
       throw new Error('Cannot start new discovery while a discovery is still running.');
     }
 
@@ -48,20 +50,19 @@ export class ServerDiscovery {
     try {
       this.socket = dgram.createSocket({ type: 'udp4' });
 
-      this.socket.on('error', e => console.log('ServerDiscovery error:', e));
+      this.socket.on('error', e => LOG.error('ServerDiscovery error:', e));
 
       this.setOnServerDiscovered(onServerDiscovered);
 
       await this.bindSocket();
 
-      console.log('Discovery socket binded, listening started');
       if (!this.socket) {
-        console.log('Discovery listening aborted');
+        LOG.error('Discovery listening aborted');
         return;
       }
 
       const address = this.socket.address();
-      console.log('Discovery UDP socket listening on ' + address.address + ':' + address.port);
+      LOG.info('Discovery UDP socket listening on ' + address.address + ':' + address.port);
 
       // Should call setBroadcast on socket but I'm not doing it because I'm using a forked version
       // of the react-native-udp package and changed it to setBroadcast by default on socket bind
@@ -81,9 +82,10 @@ export class ServerDiscovery {
   }
 
   stop() {
-    console.log('Discovery stop Called');
     if (this.state == 'starting') {
-      console.log('Discovery is stating up, cannot stop yet');
+      LOG.error(
+        'Error: Discovery is stating up, cannot stop yet, Cannot stop discovery while starting up discovery.',
+      );
       throw new Error('Cannot stop discovery while starting up discovery.');
     }
 
@@ -129,23 +131,16 @@ export class ServerDiscovery {
       this.socket.on(
         'message',
         (message: Buffer, remote: { address: string; port: string }) => {
-          console.log(
-            'Discovery response received from :',
-            remote.address,
-            '. Message: ',
-            message.toString(),
-          );
-
           let response: DiscoveryResponse;
           try {
             response = JSON.parse(message.toString()) as DiscoveryResponse;
           } catch (e) {
-            console.log('Invalid discovery response.');
+            LOG.error('Invalid discovery response.');
             return;
           }
 
           if (response.domain != 'magpy-discovery' || response.type != 'response') {
-            console.log('Invalid discovery response.');
+            LOG.error('Invalid discovery response.');
             return;
           }
 
@@ -154,16 +149,14 @@ export class ServerDiscovery {
             !isPort(response.port) ||
             !(typeof response.name === 'string')
           ) {
-            console.log('Invalid discovery response.');
+            LOG.error('Invalid discovery response.');
             return;
           }
 
           const remoteIp = remote.address;
 
           if (remoteIp != response.ip) {
-            console.log(
-              'Discovery message, response IP is different than response socket ip.',
-            );
+            LOG.warn('Discovery message, response IP is different than response socket ip.');
           }
 
           fun({ name: response.name, ip: remoteIp, port: response.port });

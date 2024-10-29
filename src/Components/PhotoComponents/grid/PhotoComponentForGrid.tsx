@@ -23,7 +23,6 @@ type PropsType = {
 
 function PhotoComponentForGrid(props: PropsType) {
   const { photo, isSelecting, isSelected, onPress, onLongPress } = props;
-  //console.log('Render photo for grid');
   const { colors } = useTheme();
 
   const localPhoto = useAppSelector(photoLocalSelector(photo.mediaId));

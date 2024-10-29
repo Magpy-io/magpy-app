@@ -9,6 +9,7 @@ import ViewWithGap from '~/Components/CommonComponents/ViewWithGap';
 import LoginTextInput from '~/Components/LoginComponents/LoginTextInput';
 import { PasswordInput } from '~/Components/LoginComponents/PasswordInput';
 import { useServerContextFunctions } from '~/Context/Contexts/ServerContext';
+import { LOG } from '~/Helpers/Logging/Logger';
 import { GetTokenLocal, TokenManager } from '~/Helpers/ServerQueries';
 import { ErrorServerUnreachable } from '~/Helpers/ServerQueries/ExceptionsManager';
 import { useStyles } from '~/Hooks/useStyles';
@@ -38,7 +39,7 @@ export function LoginServerForm() {
         setCurrentSelectingServerReachable(token);
         navigate('Tabs');
       } else {
-        console.log(loginRet);
+        LOG.error(loginRet);
 
         if (loginRet.errorCode == 'INVALID_CREDENTIALS') {
           showToastError('Invalid username or password');
@@ -49,7 +50,7 @@ export function LoginServerForm() {
         }
       }
     } catch (err) {
-      console.log('Login Error', err);
+      LOG.error('Login Error', err);
       if (err instanceof ErrorServerUnreachable) {
         showToastError('Server unreachable');
       } else {

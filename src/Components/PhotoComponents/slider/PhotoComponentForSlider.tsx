@@ -30,8 +30,6 @@ type PropsType = {
 };
 
 function PhotoComponentForSlider(props: PropsType) {
-  //console.log('render photo for slider');
-
   const { colors } = useTheme();
   const localPhoto = useAppSelector(photoLocalSelector(props.photo.mediaId));
   const serverPhoto = useAppSelector(photoServerSelector(props.photo.serverId));

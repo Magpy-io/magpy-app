@@ -8,6 +8,7 @@ import { useServerContext } from '~/Context/Contexts/ServerContext';
 import { useUploadWorkerContext } from '~/Context/Contexts/UploadWorkerContext';
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { usePhotosFunctionsStore } from '~/Context/ReduxStore/Slices/Photos/PhotosFunctions';
+import { LOG } from '~/Helpers/Logging/Logger';
 import { useStyles } from '~/Hooks/useStyles';
 import { useToast } from '~/Hooks/useToast';
 import { colorsType } from '~/Styles/colors';
@@ -102,7 +103,7 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
       UploadPhotosAction(selectedLocalOnlyPhotos);
     } catch (err) {
       showToastError('Failed to start photo upload.');
-      console.log(err);
+      LOG.error(err);
     }
   }, [CheckServerReachable, UploadPhotosAction, selectedLocalOnlyPhotos, showToastError]);
 
@@ -114,7 +115,7 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
       StartPhotosDownload(selectedServerOnlyPhotosIds);
     } catch (err) {
       showToastError('Failed to start photo download.');
-      console.log(err);
+      LOG.error(err);
     }
   }, [CheckServerReachable, StartPhotosDownload, selectedServerOnlyPhotosIds, showToastError]);
 
@@ -145,7 +146,7 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
               if ((err as { code: string })?.code != 'ERROR_USER_REJECTED') {
                 showToastError('Failed to delete photos.');
               }
-              console.log(err);
+              LOG.error(err);
             })
             .finally(() => {
               hideLoadingScreen();
@@ -188,7 +189,7 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
             .then(() => clearSelection?.())
             .catch(err => {
               showToastError('Failed to delete photos.');
-              console.log(err);
+              LOG.error(err);
             })
             .finally(() => {
               hideLoadingScreen();
@@ -214,7 +215,7 @@ function ToolBarPhotos({ selectedGalleryPhotos, clearSelection }: ToolBarProps) 
         if ((err as { code: string })?.code != 'ERROR_USER_REJECTED') {
           showToastError('Failed to delete photos.');
         }
-        console.log(err);
+        LOG.error(err);
       });
   }, [DeletePhotosLocal, clearSelection, selectedLocalPhotosIds, showToastError]);
 

@@ -1,5 +1,6 @@
 import React, { ReactNode, useEffect } from 'react';
 
+import { LOG } from '~/Helpers/Logging/Logger';
 import { useToast } from '~/Hooks/useToast';
 
 import { useServerInvalidationContextInner } from './ServerInvalidationContext';
@@ -72,7 +73,7 @@ export const ServerInvalidationEffects: React.FC<PropsType> = props => {
 
     innerAsync().catch(err => {
       showToastError('Failed fetching photos from server.');
-      console.log(err);
+      LOG.error(err);
     });
   }, [
     RefreshServerPhotosRequest,

@@ -1,5 +1,6 @@
 import { GroupType } from '~/Context/ReduxStore/Slices/GalleryOptions/GalleryOptions';
 import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
+import { LOG } from '~/Helpers/Logging/Logger';
 
 import { SectionDateFactory } from './SectionDate/SectionDateFactory';
 import { SectionTypePhotoGrid } from './usePhotosGrouped';
@@ -10,7 +11,7 @@ export function getSectionIndex(
 ) {
   const sectionIndex = sections.findIndex(e => e.sectionData.includesDate(currentPhoto.date));
   if (sectionIndex < 0) {
-    console.log('getSectionIndex: section not found');
+    LOG.warn('getSectionIndex: section not found');
   }
   return sectionIndex;
 }
@@ -26,7 +27,7 @@ export function getIndexInSectionList(
   const itemIndex = sections[sectionIndex].data.findIndex(e => e.key === currentPhoto.key);
 
   if (itemIndex < 0) {
-    console.log('getIndexInSectionList: item not found in section');
+    LOG.warn('getIndexInSectionList: item not found in section');
   }
 
   return {

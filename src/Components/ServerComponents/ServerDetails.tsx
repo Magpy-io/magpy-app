@@ -18,6 +18,7 @@ import {
   useServerContextFunctions,
 } from '~/Context/Contexts/ServerContext';
 import { usePhotosFunctionsStore } from '~/Context/ReduxStore/Slices/Photos/PhotosFunctions';
+import { LOG } from '~/Helpers/Logging/Logger';
 import { useStyles } from '~/Hooks/useStyles';
 import { useMainStackNavigation } from '~/Navigation/Navigators/MainStackNavigator';
 import { colorsType } from '~/Styles/colors';
@@ -70,9 +71,9 @@ export default function ServerDetails() {
   const OnReconnectPress = useCallback(() => {
     if (error == 'SERVER_NOT_REACHABLE') {
       if (isUsingLocalAccount) {
-        FindServerLocal().catch(console.log);
+        FindServerLocal().catch(LOG.error);
       } else {
-        FindServerRemote().catch(console.log);
+        FindServerRemote().catch(LOG.error);
       }
     } else {
       navigate('ServerSelect');
@@ -126,7 +127,7 @@ export default function ServerDetails() {
           title={'Forget Server'}
           buttonStyle={{ marginTop: spacing.spacing_xxs }}
           onPress={() => {
-            OnForgetServerPress().catch(console.log);
+            OnForgetServerPress().catch(LOG.error);
           }}
         />
       )}

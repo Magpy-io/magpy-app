@@ -10,6 +10,7 @@ import {
   deletePhotosFromDevice,
 } from '~/Helpers/GalleryFunctions/Functions';
 import { GalleryGetPhotos } from '~/Helpers/GalleryFunctions/GetGalleryPhotos';
+import { LOG } from '~/Helpers/Logging/Logger';
 import { useDeletePhotosByIdBatched } from '~/Hooks/useServerQueries';
 import { useToast } from '~/Hooks/useToast';
 
@@ -79,8 +80,8 @@ export function usePhotosFunctionsStore() {
       const deletedIds = ret.data.deletedIds;
 
       for (const serverId of deletedIds) {
-        await deletePhotoThumbnailFromCache(serverId).catch(console.log);
-        await deletePhotoCompressedFromCache(serverId).catch(console.log);
+        await deletePhotoThumbnailFromCache(serverId).catch(LOG.error);
+        await deletePhotoCompressedFromCache(serverId).catch(LOG.error);
       }
 
       // Update store for photos we know have been deleted
@@ -132,7 +133,7 @@ export function usePhotosStoreEffect() {
     }
     innerEffect().catch(err => {
       showToastError('Failed to get photos from device.');
-      console.log(err);
+      LOG.error(err);
     });
   }, [RefreshLocalPhotos, mediaPermissionStatus, showToastError]);
 
@@ -143,7 +144,7 @@ export function usePhotosStoreEffect() {
       }
     } catch (err) {
       showToastError('Failed to fetch photos from server.');
-      console.log(err);
+      LOG.error(err);
     }
   }, [RefreshServerPhotos, showToastError, serverNetwork, isServerReachable]);
 }

@@ -19,8 +19,6 @@ export function useLocalAccountContextFunctions() {
       throw new Error('Error while getting server info, ' + JSON.stringify(ret));
     }
 
-    console.log(ret);
-
     const serverName = ret.data.serverName;
     const username = ret.data.ownerLocal?.name;
 

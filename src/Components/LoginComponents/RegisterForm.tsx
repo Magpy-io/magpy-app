@@ -12,6 +12,7 @@ import { PasswordInput } from '~/Components/LoginComponents/PasswordInput';
 import { useAuthContextFunctions } from '~/Context/Contexts/AuthContext';
 import { useMainContext } from '~/Context/Contexts/MainContext';
 import { Login, Register } from '~/Helpers/BackendQueries';
+import { LOG } from '~/Helpers/Logging/Logger';
 import { ErrorServerUnreachable } from '~/Helpers/ServerQueries/ExceptionsManager';
 import { useToast } from '~/Hooks/useToast';
 import { useMainStackNavigation } from '~/Navigation/Navigators/MainStackNavigator';
@@ -51,7 +52,6 @@ export default function RegisterForm() {
           email: values.email,
           password: values.password,
         });
-        console.log('login result', loginRet);
 
         let authentificated = false;
 
@@ -71,7 +71,7 @@ export default function RegisterForm() {
           showToastError('Unexpected error while registering your account.');
         }
       } else {
-        console.log('Register error', ret);
+        LOG.error('Register error', ret);
 
         if (
           ret.errorCode == 'INVALID_EMAIL' ||
@@ -86,7 +86,7 @@ export default function RegisterForm() {
         }
       }
     } catch (err) {
-      console.log('Register Error', err);
+      LOG.error('Register Error', err);
 
       if (err instanceof ErrorServerUnreachable) {
         showToastError('Server unreachable');

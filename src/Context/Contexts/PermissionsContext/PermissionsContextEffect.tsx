@@ -5,6 +5,7 @@ import {
   hasAndroidPermissionNotifications,
   hasAndroidPermissionReadMedia,
 } from '~/Helpers/GetPermissionsAndroid';
+import { LOG } from '~/Helpers/Logging/Logger';
 
 import {
   usePermissionsContextInner,
@@ -30,7 +31,7 @@ export const PermissionsContextEffect: React.FC<PropsType> = props => {
       setNotificationsPermissionStatus(hasPermissionNotifications ? 'GRANTED' : 'PENDING');
     }
 
-    innerAsync().catch(console.log);
+    innerAsync().catch(LOG.error);
   }, [setMediaPermissionStatus, setNotificationsPermissionStatus]);
 
   // Update the media permission if user leaves and comes back to the app
@@ -44,7 +45,7 @@ export const PermissionsContextEffect: React.FC<PropsType> = props => {
         .then(hasPermission => {
           setMediaPermissionStatus(hasPermission ? 'GRANTED' : 'REJECTED');
         })
-        .catch(console.log);
+        .catch(LOG.error);
     });
 
     return () => {

@@ -5,13 +5,14 @@ import { PhotoGalleryContextProvider } from '~/Components/PhotoComponents/PhotoG
 import { PhotosToBackupCard } from '~/Components/PhotoComponents/common/PhotosToBackupCard';
 import PermissionNeededView from '~/Components/PhotoComponents/permissionNeeded/PermissionNeededView';
 import { usePermissionsContext } from '~/Context/Contexts/PermissionsContext';
+import { LOG } from '~/Helpers/Logging/Logger';
 
 export default function HomeScreenTab() {
   const { mediaPermissionStatus, askMediaPermission } = usePermissionsContext();
 
   useEffect(() => {
     if (mediaPermissionStatus == 'PENDING') {
-      askMediaPermission().catch(console.log);
+      askMediaPermission().catch(LOG.error);
     }
   }, [askMediaPermission, mediaPermissionStatus]);
 

@@ -4,6 +4,7 @@ import { uniqueDeviceId } from '~/Config/config';
 import { ParseApiPhoto } from '~/Context/ReduxStore/Slices/Photos/Functions';
 import { addPhotosFromLocalToServer } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { useAppDispatch } from '~/Context/ReduxStore/Store';
+import { LOG } from '~/Helpers/Logging/Logger';
 import { APIPhoto } from '~/Helpers/ServerQueries/Types';
 import { useHasValueChanged } from '~/Hooks/useHasValueChanged';
 import { useToast } from '~/Hooks/useToast';
@@ -73,7 +74,7 @@ export const UploadWorkerEffects: React.FC<PropsType> = props => {
       .then(workerRunning => {
         setWorkerStatus(workerRunning ? 'WORKER_RUNNING' : 'WORKER_SUCCESS');
       })
-      .catch(console.log);
+      .catch(LOG.error);
 
     return () => {
       subscriptionWorkerStatus.remove();
@@ -153,7 +154,7 @@ export const UploadWorkerEffects: React.FC<PropsType> = props => {
     asyncInner().catch(err => {
       setCurrentPhotosUploading(new Set());
       showToastError('Photos upload failed.');
-      console.log(err);
+      LOG.error(err);
     });
   }, [
     queuedPhotosToUpload,
@@ -202,7 +203,7 @@ export const UploadWorkerEffects: React.FC<PropsType> = props => {
   // Effect to clear worker data input files when worker not running.
   useEffect(() => {
     if (workerStatus && isWorkerStatusFinished(workerStatus)) {
-      ClearWorkerDataInputFiles().catch(console.log);
+      ClearWorkerDataInputFiles().catch(LOG.error);
     }
   }, [workerStatus]);
 
@@ -210,7 +211,7 @@ export const UploadWorkerEffects: React.FC<PropsType> = props => {
   useEffect(() => {
     const subscriptionPhotoUploadFailed = UploadMediaEvents.subscribeOnPhotoUploadFailed(
       ({ mediaId }) => {
-        console.log('photo upload failed for mediaId', mediaId);
+        LOG.error('photo upload failed for mediaId', mediaId);
         setErrorOccurred(true);
       },
     );

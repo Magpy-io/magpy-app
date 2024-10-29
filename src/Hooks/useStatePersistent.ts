@@ -2,6 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import { LOG } from '~/Helpers/Logging/Logger';
+
 type SetStateType<T> = React.Dispatch<React.SetStateAction<T>>;
 
 /** Only use with serializable values*/
@@ -30,14 +32,14 @@ export function useStatePersistent<T>(
   useEffect(() => {
     loadValue()
       .then(() => setLoaded(true))
-      .catch(console.log);
+      .catch(LOG.error);
   }, [loadValue]);
 
   useEffect(() => {
     if (!isLoaded) {
       return;
     }
-    AsyncStorage.setItem(keyNameFull, JSON.stringify(value)).catch(console.log);
+    AsyncStorage.setItem(keyNameFull, JSON.stringify(value)).catch(LOG.error);
   }, [keyNameFull, value, isLoaded]);
 
   return [value, isLoaded, setValue, clearValue];

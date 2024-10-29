@@ -9,6 +9,7 @@ import KeyboardDismissingView from '~/Components/CommonComponents/KeyboardDismis
 import TextInputComponent from '~/Components/CommonComponents/TextInputComponent';
 import { defaultServerPort } from '~/Config/config';
 import { useTheme } from '~/Context/Contexts/ThemeContext';
+import { LOG } from '~/Helpers/Logging/Logger';
 import { useServerSelectionFunction } from '~/Hooks/useServerSelectionFunction';
 import { useStatePersistent } from '~/Hooks/useStatePersistent';
 import { useStyles } from '~/Hooks/useStyles';
@@ -107,7 +108,7 @@ export default function ServerManualAddressScreen() {
               }
               Keyboard.dismiss();
 
-              SelectServer({ ip: ipTextInput, port: portTextInput }).catch(console.log);
+              SelectServer({ ip: ipTextInput, port: portTextInput }).catch(LOG.error);
             }}
           />
         </View>
