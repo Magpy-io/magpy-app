@@ -62,7 +62,7 @@ export class ServerDiscovery {
       }
 
       const address = this.socket.address();
-      LOG.info('Discovery UDP socket listening on ' + address.address + ':' + address.port);
+      LOG.debug('Discovery UDP socket listening on ' + address.address + ':' + address.port);
 
       // Should call setBroadcast on socket but I'm not doing it because I'm using a forked version
       // of the react-native-udp package and changed it to setBroadcast by default on socket bind

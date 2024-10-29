@@ -27,17 +27,17 @@ function createLogger() {
 
   return logger.createLogger({
     levels: {
-      info: 0,
-      debug: 1,
+      debug: 0,
+      info: 1,
       warn: 2,
       error: 3,
     },
-    severity: __DEV__ ? 'info' : 'debug',
+    severity: __DEV__ ? 'debug' : 'info',
     transport: __DEV__ ? consoleTransport : fileAsyncTransport,
     transportOptions: {
       colors: {
-        info: 'default',
-        debug: 'blueBright',
+        debug: 'default',
+        info: 'blueBright',
         warn: 'yellowBright',
         error: 'redBright',
       },
