@@ -1,5 +1,6 @@
 import React, { ReactNode, useEffect, useMemo } from 'react';
 
+import { LOG } from '~/Helpers/Logging/Logger';
 import { useHasValueChanged } from '~/Hooks/useHasValueChanged';
 import { useServerQueries } from '~/Hooks/useServerQueries';
 import { useToast } from '~/Hooks/useToast';
@@ -42,7 +43,7 @@ export const BackupWorkerEffect: React.FC<PropsType> = props => {
       autobackupEnabled &&
       (serverInfoChanged || hasServerReachableChanged)
     ) {
-      StartAutoBackup().catch(console.log);
+      StartAutoBackup().catch(LOG.error);
     }
   }, [
     StartAutoBackup,
@@ -69,7 +70,7 @@ export const BackupWorkerEffect: React.FC<PropsType> = props => {
           setWorkerStatus(workerInfo.state);
         }
       })
-      .catch(console.log);
+      .catch(LOG.error);
 
     return () => {
       subscriptionWorkerStatus.remove();
@@ -85,7 +86,7 @@ export const BackupWorkerEffect: React.FC<PropsType> = props => {
       }
 
       // Check if server is still reachable
-      WhoAmIPost({}).catch(console.log);
+      WhoAmIPost({}).catch(LOG.error);
     });
 
     return () => {

@@ -6,6 +6,7 @@ import { PhotoGalleryType } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { usePhotosFunctionsStore } from '~/Context/ReduxStore/Slices/Photos/PhotosFunctions';
 import { photosGalleryFilteredSelector } from '~/Context/ReduxStore/Slices/Photos/Selectors';
 import { RootState, useAppSelector } from '~/Context/ReduxStore/Store';
+import { LOG } from '~/Helpers/Logging/Logger';
 import { useToast } from '~/Hooks/useToast';
 import { TabBarPadding } from '~/Navigation/TabNavigation/TabBar';
 import { useTabNavigationContextFunctions } from '~/Navigation/TabNavigation/TabNavigationContext';
@@ -71,7 +72,7 @@ const PhotoGridController = forwardRef<PhotoGridComponentRefType, PropsType>(
     const findPhotoIndex = useCallback((item: PhotoGalleryType) => {
       const index = photosRef.current.findIndex(photo => photo.key == item.key);
       if (index < 0) {
-        console.log('PhotoGridController: findPhotoIndex did not found index for photo');
+        LOG.warn('PhotoGridController: findPhotoIndex did not found index for photo');
         return 0;
       }
       return index;
@@ -120,7 +121,7 @@ const PhotoGridController = forwardRef<PhotoGridComponentRefType, PropsType>(
     const onRefresh = useCallback(() => {
       RefreshAllPhotos(5000).catch(err => {
         showToastError('Error refreshing photos.');
-        console.log(err);
+        LOG.error(err);
       });
     }, [RefreshAllPhotos, showToastError]);
 

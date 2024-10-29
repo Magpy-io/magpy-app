@@ -23,7 +23,7 @@ export class DateFilter implements Filter {
   filter(photos: PhotoGalleryType[]) {
     const fromDateTimestamp = Date.parse(this.fromDate);
     const toDateTimestamp = Date.parse(this.toDate);
-    console.log('filter photos by date', this.fromDate, this.toDate);
+
     return photos.filter(photo => {
       const timestamp = Date.parse(photo.date);
       if (timestamp >= fromDateTimestamp && timestamp <= toDateTimestamp) {

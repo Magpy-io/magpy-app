@@ -4,6 +4,7 @@ import { usePopupMessageModal } from '~/Components/CommonComponents/PopupMessage
 import { useMainContext, useMainContextFunctions } from '~/Context/Contexts/MainContext';
 import { usePermissionsContext } from '~/Context/Contexts/PermissionsContext';
 import { usePhotosFunctionsStore } from '~/Context/ReduxStore/Slices/Photos/PhotosFunctions';
+import { LOG } from '~/Helpers/Logging/Logger';
 import { useToast } from '~/Hooks/useToast';
 
 export function useUserActions() {
@@ -47,7 +48,7 @@ export function useUserActions() {
               UploadPhotos(mediaIds);
             }).catch(err => {
               showToastError('Failed to start photo upload.');
-              console.log(err);
+              LOG.error(err);
             });
           },
         });
@@ -58,7 +59,7 @@ export function useUserActions() {
         UploadPhotos(mediaIds);
       } catch (err) {
         showToastError('Failed to start photo upload.');
-        console.log(err);
+        LOG.error(err);
       }
     },
     [

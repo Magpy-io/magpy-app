@@ -13,6 +13,7 @@ import { PasswordInput } from '~/Components/LoginComponents/PasswordInput';
 import { useAuthContextFunctions } from '~/Context/Contexts/AuthContext';
 import { useMainContext } from '~/Context/Contexts/MainContext';
 import { Login } from '~/Helpers/BackendQueries';
+import { LOG } from '~/Helpers/Logging/Logger';
 import { ErrorServerUnreachable } from '~/Helpers/ServerQueries/ExceptionsManager';
 import { useStyles } from '~/Hooks/useStyles';
 import { useToast } from '~/Hooks/useToast';
@@ -53,7 +54,7 @@ export default function LoginForm() {
           }
         }
       } else {
-        console.log(loginRet);
+        LOG.error(loginRet);
 
         if (loginRet.errorCode == 'INVALID_CREDENTIALS') {
           showToastError('Invalid email or password');
@@ -62,7 +63,7 @@ export default function LoginForm() {
         }
       }
     } catch (err) {
-      console.log('Login Error', err);
+      LOG.error('Login Error', err);
 
       if (err instanceof ErrorServerUnreachable) {
         showToastError('Server unreachable');

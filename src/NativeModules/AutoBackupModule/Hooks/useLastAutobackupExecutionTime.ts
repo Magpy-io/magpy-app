@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 
+import { LOG } from '~/Helpers/Logging/Logger';
+
 import { AutoBackupModule } from '../AutoBackupModule';
 
 export function useLastAutobackupExecutionTime() {
@@ -14,7 +16,7 @@ export function useLastAutobackupExecutionTime() {
           setTime(new Date(workerStats.lastSuccessRunTime));
         }
       })
-      .catch(console.log);
+      .catch(LOG.error);
   }
 
   useEffect(() => {

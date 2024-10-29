@@ -16,9 +16,7 @@ export function useAuthContextFunctions() {
 
   const authenticate = async function () {
     const token = TokenManager.GetUserToken();
-    console.log('Authenticate, getToken', token);
     const ret = await WhoAmI.Post();
-    console.log('Authenticate, whoAmI', ret);
 
     if (ret.ok) {
       setToken(token);

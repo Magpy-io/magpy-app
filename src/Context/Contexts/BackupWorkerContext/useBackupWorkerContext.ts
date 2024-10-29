@@ -24,7 +24,6 @@ export function useBackupWorkerContextFunctions() {
         const isStarted = await AutoBackupModule.IsWorkerAlive();
 
         if (isStarted) {
-          console.log('worker started');
           return;
         }
 
@@ -40,7 +39,6 @@ export function useBackupWorkerContextFunctions() {
     const isStarted = await AutoBackupModule.IsWorkerAlive();
 
     if (!isStarted) {
-      console.log('worker stopped');
       setWorkerStatus('WORKER_CANCELED');
       return;
     }

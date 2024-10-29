@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 
 import { DeleteMyServer, GetMyServerInfo } from '~/Helpers/BackendQueries';
+import { LOG } from '~/Helpers/Logging/Logger';
 import { ClaimServer } from '~/Helpers/ServerQueries';
 import { ErrorServerUnreachable } from '~/Helpers/ServerQueries/ExceptionsManager';
 import { formatAddressHttp } from '~/Helpers/Utilities';
@@ -36,10 +37,10 @@ export function useServerClaimFunctions() {
           { userToken: token },
           { path: formatAddressHttp(ip, port) },
         );
-        console.log('Claim Server ret with token', token, ret);
+
         if (ret.ok) {
           const serverInfo = await GetMyServerInfo.Post();
-          console.log('Server Info', serverInfo);
+
           if (serverInfo.ok) {
             setServer(serverInfo.data.server);
             return { claimed: true };
@@ -54,7 +55,7 @@ export function useServerClaimFunctions() {
           return { claimed: false, error: 'UNEXPECTED_ERROR' };
         }
       } catch (err) {
-        console.log('Claim Server Error', err);
+        LOG.error('Claim Server Error', err);
         if (err instanceof ErrorServerUnreachable) {
           return { claimed: false, error: 'SERVER_UNREACHABLE' };
         } else {
@@ -76,7 +77,7 @@ export function useServerClaimFunctions() {
       setServer(null);
       return true;
     } else {
-      console.log('Error while deleting own server', JSON.stringify(ret));
+      LOG.error('Error while deleting own server', ret);
       return false;
     }
   }, [setServer, token]);

@@ -1,5 +1,6 @@
 import { useCallback, useRef } from 'react';
 
+import { LOG } from '~/Helpers/Logging/Logger';
 import { ServerDiscovery } from '~/Helpers/ServerDiscovery';
 
 import {
@@ -61,7 +62,7 @@ export function useLocalServersFunctions() {
           serverDiscovery.stop();
         }, 3000);
       })
-      .catch(console.log);
+      .catch(LOG.error);
   }, [setLocalServers, setIsScanning]);
 
   const searchAsync = useCallback(async () => {

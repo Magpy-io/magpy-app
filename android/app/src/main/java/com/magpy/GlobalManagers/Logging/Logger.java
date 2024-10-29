@@ -1,7 +1,13 @@
 package com.magpy.GlobalManagers.Logging;
 
+import static com.magpy.Utils.VersionManager.GetAndroidApiVersion;
+import static com.magpy.Utils.VersionManager.GetPackageInfo;
+
 import android.content.Context;
+import android.content.pm.PackageInfo;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
 
 import com.magpy.Utils.FileOperations;
 
@@ -14,13 +20,18 @@ public class Logger {
     public static final String LOGS_FOLDER_NAME = "logs";
     public static final String LOGGER_DEFAULT_BASE_NAME = "log";
 
+    public boolean ShouldLogConsole;
+
     private File _loggerFile;
+    private final String _loggerBaseName;
     private final Context _context;
     private final String _logPath;
 
-    public Logger(Context context, String loggerBaseName, String logPath){
+    public Logger(Context context, String loggerBaseName, String logPath, boolean shouldLogConsole){
         _logPath = logPath;
         _context = context;
+        ShouldLogConsole = shouldLogConsole;
+        _loggerBaseName = loggerBaseName;
         setLoggerFile(loggerBaseName);
     }
 
@@ -37,6 +48,13 @@ public class Logger {
     }
 
     public void Log(String log){
+
+        try {
+            Log.d(_loggerBaseName, log);
+        }catch(Exception e){
+            Log.e("Logger", "Error while logging to console.", e);
+        }
+
         try {
             File folder = _loggerFile.getParentFile();
 
@@ -51,7 +69,21 @@ public class Logger {
         }
     }
 
-    public void Log(String log, Throwable e){
-        Log(log + '\n' +e.getMessage());
+    public void Log(String log, @NonNull Throwable e){
+        Log(log + '\n' + e.getMessage());
+    }
+
+    public void LogVersion(){
+        int ApiVersion = GetAndroidApiVersion();
+        PackageInfo packageInfo = GetPackageInfo(_context);
+
+        Log("Android API: " + ApiVersion);
+
+        if(packageInfo != null){
+            Log("Package version: " + packageInfo.versionName);
+            Log("Package version number: " + packageInfo.versionCode);
+        }else{
+            Log("Could not retrieve package version.");
+        }
     }
 }

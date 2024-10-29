@@ -16,6 +16,7 @@ import { useServerInvalidationContext } from '~/Context/Contexts/ServerInvalidat
 import { notOnServerGalleryPhotosSelector } from '~/Context/ReduxStore/Slices/Photos/Selectors';
 import { useAppSelector } from '~/Context/ReduxStore/Store';
 import { parseMillisecondsIntoReadableTime } from '~/Helpers/DateFunctions/DateFormatting';
+import { LOG } from '~/Helpers/Logging/Logger';
 import { useDebouncedDelayed } from '~/Hooks/useDebouncedDelayed';
 import { useToast } from '~/Hooks/useToast';
 import { useLastAutobackupExecutionTime } from '~/NativeModules/AutoBackupModule/';
@@ -68,14 +69,14 @@ export default function BackupSettingsScreen() {
             return StartAutoBackup(true);
           }).catch(err => {
             showToastError('Failed to start photos backup.');
-            console.log(err);
+            LOG.error(err);
           });
         },
       });
     } else {
       await StartAutoBackup(true).catch(err => {
         showToastError('Failed to start photos backup.');
-        console.log(err);
+        LOG.error(err);
       });
     }
   }, [
@@ -114,7 +115,7 @@ export default function BackupSettingsScreen() {
           type: 'Switch',
           title: 'Automatic backup enabled',
           onPress: autoBackupEnabled => {
-            onBackupPressAsync(autoBackupEnabled).catch(console.log);
+            onBackupPressAsync(autoBackupEnabled).catch(LOG.error);
           },
           icon: <UploadIcon />,
           initialState: autobackupEnabled,
@@ -180,7 +181,7 @@ export default function BackupSettingsScreen() {
       align: 'right',
       title: 'Backup now',
       onPress: () => {
-        StartAutoBackupAsync().catch(console.log);
+        StartAutoBackupAsync().catch(LOG.error);
       },
     });
   }

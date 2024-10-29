@@ -1,3 +1,5 @@
+import { LOG } from './Logging/Logger';
+
 /**
  * Clamps number between 0 and max
  *
@@ -24,12 +26,12 @@ export function memoDebugger(a: any, b: any) {
   for (const p in a) {
     if (p in a) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      console.log(p, ':', a[p] === b[p]);
+      LOG.debug(p, ':', a[p] === b[p]);
     }
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     equal = equal && a[p] == b[p];
   }
-  console.log('props are same :', equal);
+  LOG.debug('props are same :', equal);
   return equal;
 }
 

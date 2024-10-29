@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 
+import { LOG } from '~/Helpers/Logging/Logger';
 import { GetToken, TokenManager, WhoAmI } from '~/Helpers/ServerQueries';
 import { ErrorServerUnreachable } from '~/Helpers/ServerQueries/ExceptionsManager';
 import { formatAddressHttp } from '~/Helpers/Utilities';
@@ -22,8 +23,6 @@ export function useFindServerFunctions() {
     if (!serverNetwork || !serverToken || isServerReachable) {
       return;
     }
-
-    console.log('Finding Server Local');
 
     setFindingServer(true);
     const ret = await TryServerLocalAccount(
@@ -60,7 +59,6 @@ export function useFindServerFunctions() {
     if (loading || !backendToken || !claimedServer || isServerReachable) {
       return;
     }
-    console.log('Finding Server Remote');
 
     let savedServerResponded: boolean = false;
 
@@ -68,7 +66,7 @@ export function useFindServerFunctions() {
     let serverResponded: { responded: boolean; token: string } | null = null;
     let serverErrorToSet: ConnectingToServerError = 'SERVER_NOT_REACHABLE';
     // Start search for local mdns servers
-    const serversPromise = searchAsync().catch(console.log);
+    const serversPromise = searchAsync().catch(LOG.error);
 
     // Try saved server if present
     if (serverNetwork?.currentIp && serverNetwork.currentPort) {
@@ -145,10 +143,10 @@ export function useFindServerFunctions() {
           }, true);
 
           if (!allErrorsNoResponse) {
-            console.log(error);
+            LOG.error(error);
           }
         } else {
-          console.log(error);
+          LOG.error(error);
         }
       }
 
@@ -213,17 +211,15 @@ async function TryServerLocalAccount(
   token: string,
 ): Promise<{ responded: boolean; tokenOk: boolean }> {
   try {
-    console.log('trying ', ip, port);
     TokenManager.SetUserToken(token);
     const res = await WhoAmI.Post({}, { path: formatAddressHttp(ip, port) });
-    console.log(res);
+
     if (res.ok) {
-      console.log('Server found');
       return { responded: true, tokenOk: true };
     }
     return { responded: true, tokenOk: false };
   } catch (e) {
-    console.log('Error: TryServer', e);
+    LOG.error('Error: TryServerLocalAccount', e);
     if (e instanceof ErrorServerUnreachable) {
       return { responded: false, tokenOk: false };
     }
@@ -237,20 +233,18 @@ async function TryServerRemote(
   token: string,
 ): Promise<{ responded: boolean; token: string }> {
   try {
-    console.log('trying ', ip, port);
     const res = await GetToken.Post(
       { userToken: token },
       { path: formatAddressHttp(ip, port) },
     );
-    console.log(res);
+
     if (res.ok) {
-      console.log('Server found');
       return { responded: true, token: TokenManager.GetUserToken() };
     }
 
     return { responded: true, token: '' };
   } catch (e) {
-    console.log('Error: TryServer', e);
+    LOG.error('Error: TryServerRemote', e);
     if (e instanceof ErrorServerUnreachable) {
       return { responded: false, token: '' };
     }

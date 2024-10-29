@@ -6,7 +6,6 @@ import { PhotoGalleryContextProvider } from '~/Components/PhotoComponents/PhotoG
 import { useMainStackNavigation } from '../Navigators/MainStackNavigator';
 
 export default function ServerGalleryScreen() {
-  console.log('render server gallery screen');
   const { goBack } = useMainStackNavigation();
 
   return (

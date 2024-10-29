@@ -1,6 +1,7 @@
 import React, { ReactNode, useEffect, useState } from 'react';
 
 import { TokenManager } from '~/Helpers/BackendQueries';
+import { LOG } from '~/Helpers/Logging/Logger';
 
 import { useMainContext } from '../MainContext';
 import { useAuthContext, useAuthContextFunctions } from './useAuthContext';
@@ -39,7 +40,7 @@ export const AuthEffects: React.FC<PropsType> = props => {
 
       retrieveToken()
         .then(() => setLoading(false))
-        .catch(console.log);
+        .catch(LOG.error);
     }
   }, [
     setLoading,

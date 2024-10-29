@@ -1,5 +1,7 @@
 import React, { ReactNode, useEffect } from 'react';
 
+import { LOG } from '~/Helpers/Logging/Logger';
+
 import { useMainContext } from '../MainContext';
 import { useFindServerFunctions } from './useFindServerFunctions';
 
@@ -14,9 +16,9 @@ export const ServerEffects: React.FC<PropsType> = props => {
 
   useEffect(() => {
     if (isUsingLocalAccount) {
-      FindServerLocal().catch(console.log);
+      FindServerLocal().catch(LOG.error);
     } else {
-      FindServerRemote().catch(console.log);
+      FindServerRemote().catch(LOG.error);
     }
   }, [FindServerLocal, FindServerRemote, isUsingLocalAccount]);
 

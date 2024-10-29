@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 
+import { LOG } from '~/Helpers/Logging/Logger';
 import { SetPath } from '~/Helpers/ServerQueries';
 import { formatAddressHttp } from '~/Helpers/Utilities';
 
@@ -41,7 +42,7 @@ export function useServerContextFunctions() {
   const setCurrentSelectingServerReachable = useCallback(
     (token: string) => {
       if (!serverNetworkSelecting) {
-        console.log(
+        LOG.error(
           'Error setCurrentServerReachable: no serverNetworkSelecting to set as reachable.',
         );
         return;

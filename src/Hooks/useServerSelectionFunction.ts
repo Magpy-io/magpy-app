@@ -4,6 +4,7 @@ import { useAuthContext } from '~/Context/Contexts/AuthContext';
 import { useMainContext } from '~/Context/Contexts/MainContext';
 import { useServerClaimFunctions } from '~/Context/Contexts/ServerClaimContext';
 import { useServerContext, useServerContextFunctions } from '~/Context/Contexts/ServerContext';
+import { LOG } from '~/Helpers/Logging/Logger';
 import { GetToken, IsClaimed, TokenManager, WhoAmI } from '~/Helpers/ServerQueries';
 import { ErrorServerUnreachable } from '~/Helpers/ServerQueries/ExceptionsManager';
 import { formatAddressHttp } from '~/Helpers/Utilities';
@@ -59,7 +60,7 @@ export function useServerSelectionFunction() {
             }
           }
         } catch (err) {
-          console.log(err);
+          LOG.error(err);
           if (err instanceof ErrorServerUnreachable) {
             showToastError('Server unreachable');
           } else {

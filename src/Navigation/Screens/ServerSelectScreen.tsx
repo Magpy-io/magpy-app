@@ -9,6 +9,7 @@ import {
   useLocalServersFunctions,
 } from '~/Context/Contexts/LocalServersContext';
 import { useTheme } from '~/Context/Contexts/ThemeContext';
+import { LOG } from '~/Helpers/Logging/Logger';
 import { useServerSelectionFunction } from '~/Hooks/useServerSelectionFunction';
 import { useStyles } from '~/Hooks/useStyles';
 import { colorsType } from '~/Styles/colors';
@@ -27,7 +28,6 @@ export default function ServerSelectScreen() {
   const { SelectServer } = useServerSelectionFunction();
 
   useEffect(() => {
-    console.log('Refresh local servers');
     refreshData();
   }, [refreshData]);
 
@@ -40,7 +40,7 @@ export default function ServerSelectScreen() {
         refreshData={refreshData}
         header={<Header isScanning={isScanning} />}
         onSelectServer={server => {
-          SelectServer(server).catch(e => console.log(e));
+          SelectServer(server).catch(LOG.error);
         }}
       />
 
