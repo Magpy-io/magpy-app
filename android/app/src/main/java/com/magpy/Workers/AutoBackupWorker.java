@@ -92,11 +92,11 @@ public class AutoBackupWorker extends Worker {
     public Result doWork() {
         _logger = new LoggerBuilder(getApplicationContext())
                 .setLogPath("AutoBackupWorker")
+                .setShouldLogConsole(true)
                 .Build();
 
         _logger.Log("Work started.");
         _logger.LogVersion();
-        Log.d("AutoBackupWorker", "Work started.");
 
         try {
             if (!parseInputData()) {
@@ -106,7 +106,6 @@ public class AutoBackupWorker extends Worker {
             boolean isServerReachable = isServerReachable();
 
             if(!isServerReachable){
-                Log.d("AutoBackupWorker", "Server not reachable.");
                 _logger.Log("Server not reachable");
                 sendProgressError(AutoBackupWorkerManager.AutobackupWorkerError.SERVER_NOT_REACHABLE);
                 return Result.failure();
@@ -117,23 +116,19 @@ public class AutoBackupWorker extends Worker {
 
             boolean finished = treatReturnedMedia(result);
             if(!finished){
-                Log.d("AutoBackupWorker", "Worker is stopped");
                 _logger.Log("Worker is stopped");
                 return Result.failure();
             }
 
-            Log.d("AutoBackupWorker", "Work finished.");
             _logger.Log("Work finished.");
             recordSuccessRunTime();
             return Result.success();
         }catch(HttpManager.ServerUnreachable e){
-            Log.e("AutoBackupWorker", "Server unreachable, Exception thrown: ", e);
             _logger.Log("Error: Server unreachable", e);
             recordError(AutoBackupWorkerManager.AutobackupWorkerError.SERVER_NOT_REACHABLE);
             sendProgressError(AutoBackupWorkerManager.AutobackupWorkerError.SERVER_NOT_REACHABLE);
             return Result.failure();
         }catch(Exception e){
-            Log.e("AutoBackupWorker", "Exception thrown: ", e);
             _logger.Log("Error: Exception thrown", e);
             recordError(AutoBackupWorkerManager.AutobackupWorkerError.UNEXPECTED_ERROR);
             sendProgressError(AutoBackupWorkerManager.AutobackupWorkerError.UNEXPECTED_ERROR);
@@ -165,7 +160,6 @@ public class AutoBackupWorker extends Worker {
             stopReason = getStopReason();
         }
 
-        Log.d("AutoBackupWorker", "OnStopped called, stop reason: " + stopReason);
         _logger.Log("OnStopped called, stop reason: " + stopReason);
     }
 
@@ -222,7 +216,6 @@ public class AutoBackupWorker extends Worker {
             try{
                 setForeground();
             }catch(Exception e){
-                Log.e("AutoBackupWorker", "Error starting foreground service.", e);
                 _logger.Log("Error starting foreground service.", e);
             }
         }
@@ -242,7 +235,6 @@ public class AutoBackupWorker extends Worker {
                 return false;
             }
 
-            Log.d("AutoBackupWorker", "Progress " + progress);
             _logger.Log("Progress " + progress);
 
             updateNotification(progress, missingPhotos.size());
@@ -252,7 +244,6 @@ public class AutoBackupWorker extends Worker {
                 sendProgressPhotoUploaded(photoData.mediaId, photoUploaded);
             }
             catch (ResponseNotOkException e){
-                Log.e("AutoBackupWorker", "Failed upload of photo with mediaId: " + photoData.mediaId, e);
                 _logger.Log("Failed upload of photo with mediaId: " + photoData.mediaId);
                 sendProgressPhotoUploadFailed(photoData.mediaId);
             }
@@ -380,7 +371,7 @@ public class AutoBackupWorker extends Worker {
             WorkerStatsPreferences workerStatsPreferences = new WorkerStatsPreferences(getApplicationContext());
             workerStatsPreferences.SetLastSuccessRunTime(currentTime.getTime());
         }catch (Exception e){
-            Log.e("AutoBackupWorker", e.toString());
+            _logger.Log("Error recording success run time", e);
         }
     }
 
@@ -391,7 +382,7 @@ public class AutoBackupWorker extends Worker {
             WorkerStatsPreferences workerStatsPreferences = new WorkerStatsPreferences(getApplicationContext());
             workerStatsPreferences.SetLastError(currentTime.getTime(), error);
         }catch (Exception e){
-            Log.e("AutoBackupWorker", e.toString());
+            _logger.Log("Error recording error", e);
         }
     }
 
@@ -404,7 +395,7 @@ public class AutoBackupWorker extends Worker {
             // Wait time to avoid the worker finishing before the progress is received by the WorkerManager
             sleep(500);
         }catch(Exception e){
-            Log.e("AutoBackupWorker", e.toString());
+            _logger.Log("Error sending progress error", e);
         }
     }
 
@@ -416,7 +407,7 @@ public class AutoBackupWorker extends Worker {
         try{
             setProgressAsync(progressData).get();
         }catch(Exception e){
-            Log.e("AutoBackupWorker", e.toString());
+            _logger.Log("Error sending progress photo uploaded", e);
         }
     }
 
@@ -427,7 +418,7 @@ public class AutoBackupWorker extends Worker {
         try{
             setProgressAsync(progressData).get();
         }catch(Exception e){
-            Log.e("AutoBackupWorker", e.toString());
+            _logger.Log("Error sending progress photo upload failed", e);
         }
     }
 }
