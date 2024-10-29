@@ -3,7 +3,7 @@ import RNFS from 'react-native-fs';
 import { PhotoLocalType } from '~/Context/ReduxStore/Slices/Photos/Photos';
 import { MediaManagementModule } from '~/NativeModules/MediaManagementModule';
 
-import { CheckFolderExists, ClearFolderContent, DeleteFile } from '../FileSystemFunctions';
+import { ClearFolderContent, DeleteFile } from '../FileSystemFunctions';
 import { parsePhotoIdentifierToPhotoLocalType } from './GetGalleryPhotos';
 
 export async function deletePhotosFromDevice(mediaIds: string[]) {
@@ -113,7 +113,7 @@ export async function clearCache() {
 }
 
 async function CheckPhotosCacheFolderExists() {
-  await CheckFolderExists(PhotosCacheFolder());
+  await RNFS.mkdir(PhotosCacheFolder());
 }
 
 function PhotosCacheFolder() {

@@ -13,14 +13,6 @@ export async function ClearFolderContent(folderPath: string) {
   }
 }
 
-export async function CheckFolderExists(folderPath: string) {
-  const exists = await RNFS.exists(folderPath);
-
-  if (!exists) {
-    await RNFS.mkdir(folderPath);
-  }
-}
-
 export async function DeleteFile(filePath: string) {
   const exists = await RNFS.exists(filePath);
 
