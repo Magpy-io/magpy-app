@@ -8,6 +8,8 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.util.Log;
 
@@ -93,6 +95,7 @@ public class AutoBackupWorker extends Worker {
                 .Build();
 
         _logger.Log("Work started.");
+        _logger.LogVersion();
         Log.d("AutoBackupWorker", "Work started.");
 
         try {

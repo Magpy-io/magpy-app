@@ -1,9 +1,14 @@
 package com.magpy.GlobalManagers.Logging;
 
+import static com.magpy.Utils.VersionManager.GetAndroidApiVersion;
+import static com.magpy.Utils.VersionManager.GetPackageInfo;
+
 import android.content.Context;
+import android.content.pm.PackageInfo;
 import android.util.Log;
 
 import com.magpy.Utils.FileOperations;
+import com.magpy.Utils.VersionManager;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -53,5 +58,19 @@ public class Logger {
 
     public void Log(String log, Throwable e){
         Log(log + '\n' +e.getMessage());
+    }
+
+    public void LogVersion(){
+        int ApiVersion = GetAndroidApiVersion();
+        PackageInfo packageInfo = GetPackageInfo(_context);
+
+        Log("Android API: " + ApiVersion);
+
+        if(packageInfo != null){
+            Log("Package version: " + packageInfo.versionName);
+            Log("Package version number: " + packageInfo.versionCode);
+        }else{
+            Log("Could not retrieve package version.");
+        }
     }
 }
