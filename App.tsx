@@ -17,7 +17,7 @@ import { LOG } from '~/Helpers/Logging/Logger';
 import Navigation from '~/Navigation/Navigation';
 
 function App(): React.JSX.Element {
-  LOG.info('App starting');
+  LOG.debug('App starting');
   ConfigModules();
   return (
     <Provider store={store}>
