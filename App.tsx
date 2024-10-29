@@ -13,9 +13,11 @@ import { ThemeContextProvider } from '~/Context/Contexts/ThemeContext';
 import { GlobalContexts } from '~/Context/GlobalContexts';
 import { GlobalEffects } from '~/Context/GlobalEffects';
 import { store } from '~/Context/ReduxStore/Store';
+import { LOG } from '~/Helpers/Logging/Logger';
 import Navigation from '~/Navigation/Navigation';
 
 function App(): React.JSX.Element {
+  LOG.info('App starting');
   ConfigModules();
   return (
     <Provider store={store}>

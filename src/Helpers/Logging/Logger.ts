@@ -4,19 +4,20 @@ import { consoleTransport, fileAsyncTransport, logger } from 'react-native-logs'
 import { LOGS_FOLDER_PATH } from './ShareLogs';
 
 const LOGS_FOLDER_NAME = 'ReactNative';
+const RN_LOGS_FOLDER_PATH = LOGS_FOLDER_PATH + '/' + LOGS_FOLDER_NAME;
 
 export const LOG = createLogger();
 
 function createLogger() {
-  const log = logger.createLogger({
+  return logger.createLogger({
     levels: {
       info: 0,
       debug: 1,
       warn: 2,
       error: 3,
     },
-    severity: 'debug',
-    transport: [consoleTransport, fileAsyncTransport],
+    severity: __DEV__ ? 'info' : 'debug',
+    transport: __DEV__ ? [consoleTransport, fileAsyncTransport] : fileAsyncTransport,
     transportOptions: {
       colors: {
         info: 'default',
@@ -28,10 +29,8 @@ function createLogger() {
       FS: RNFS,
       fileName: 'log_{date-today}.txt',
       fileNameDateType: 'iso',
-      filePath: LOGS_FOLDER_PATH + '/' + LOGS_FOLDER_NAME,
+      filePath: RN_LOGS_FOLDER_PATH,
     },
     dateFormat: 'iso',
   });
-
-  return log;
 }
