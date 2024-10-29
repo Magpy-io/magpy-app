@@ -9,11 +9,18 @@ export const LOG = createLogger();
 
 function createLogger() {
   const log = logger.createLogger({
+    levels: {
+      info: 0,
+      debug: 1,
+      warn: 2,
+      error: 3,
+    },
+    severity: 'debug',
     transport: [consoleTransport, fileAsyncTransport],
     transportOptions: {
       colors: {
-        debug: 'blueBright',
         info: 'default',
+        debug: 'blueBright',
         warn: 'yellowBright',
         error: 'redBright',
       },
