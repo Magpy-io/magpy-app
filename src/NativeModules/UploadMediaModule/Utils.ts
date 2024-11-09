@@ -22,7 +22,7 @@ export async function writeWorkerDataInput(photosIds: string[]) {
 }
 
 async function MakeDirWorkerDataInputFolder() {
-  await RNFS.exists(getWorkerDataInputFolderPath());
+  await RNFS.mkdir(getWorkerDataInputFolderPath());
 }
 
 export async function ClearWorkerDataInputFiles() {
