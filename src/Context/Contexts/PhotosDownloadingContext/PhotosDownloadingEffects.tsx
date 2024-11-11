@@ -84,6 +84,10 @@ export const PhotosDownloadingEffects: React.FC<PropsType> = props => {
 
         const photoServer = resultDownload.data.photo;
 
+        if (!photoServer.image64) {
+          throw new Error('Error downloading photo, photo not found on disk');
+        }
+
         const localPhoto = await addPhotoToDevice({
           fileName: photoServer.meta.name,
           id: photoServer.id,
