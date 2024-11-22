@@ -30,7 +30,6 @@ export function useServerPhotoUri(
       if (serverPhoto && photoUriNeeded) {
         const photoUri = await photoExistsInCache(serverPhoto.id);
         if (photoUri) {
-          console.log('Checking image from cache', photoVariation, serverPhoto.id);
           setServerPhotoUri(photoUri);
         }
         setCacheChecked(true);
@@ -38,12 +37,11 @@ export function useServerPhotoUri(
     }
 
     innerAsync().catch(LOG.error);
-  }, [serverPhoto, photoUriNeeded, photoExistsInCache, photoVariation]);
+  }, [serverPhoto, photoUriNeeded, photoExistsInCache]);
 
   useEffect(() => {
     async function innerAsync() {
       if (serverPhoto && photoUriNeeded && !serverPhotoUri && cacheChecked) {
-        console.log(photoVariation, serverPhoto.id);
         const res = await GetPhotosByIdPost({
           ids: [serverPhoto.id],
           photoType: photoVariation,
