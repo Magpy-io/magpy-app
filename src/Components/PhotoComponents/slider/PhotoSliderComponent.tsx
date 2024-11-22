@@ -36,27 +36,23 @@ const PhotoSliderComponent = React.forwardRef(function PhotoSliderComponent(
 
   const photosLen = photos.length;
 
-  useImperativeHandle(
-    ref,
-    () => {
-      return {
-        scrollToIndex(params) {
-          if (photosLen <= 0) {
-            return;
-          }
-          const indexClamped = clamp(params.index, photosLen - 1);
+  useImperativeHandle(ref, () => {
+    return {
+      scrollToIndex(params) {
+        if (photosLen <= 0) {
+          return;
+        }
+        const indexClamped = clamp(params.index, photosLen - 1);
 
-          onIndexChanged?.(indexClamped);
+        onIndexChanged?.(indexClamped);
 
-          flatlistRef.current?.scrollToIndex({
-            index: indexClamped,
-            animated: false,
-          });
-        },
-      };
-    },
-    [onIndexChanged, photosLen],
-  );
+        flatlistRef.current?.scrollToIndex({
+          index: indexClamped,
+          animated: false,
+        });
+      },
+    };
+  }, [onIndexChanged, photosLen]);
 
   const renderItem = useCallback(
     ({ item }: { item: PhotoGalleryType }) => (
@@ -86,7 +82,8 @@ const PhotoSliderComponent = React.forwardRef(function PhotoSliderComponent(
       ref={flatlistRef}
       data={photos}
       renderItem={renderItem}
-      initialNumToRender={10}
+      windowSize={3}
+      initialNumToRender={1}
       onViewableItemsChanged={onViewableItemsChangedCallBack}
       viewabilityConfig={{
         itemVisiblePercentThreshold: 90,
