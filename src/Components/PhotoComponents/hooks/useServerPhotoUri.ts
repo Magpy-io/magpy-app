@@ -11,6 +11,9 @@ import { LOG } from '~/Helpers/Logging/Logger';
 import { useServerQueries } from '~/Hooks/useServerQueries';
 import { useToast } from '~/Hooks/useToast';
 
+const serverPhotosThumbnailUri = new Map<string, string>();
+const serverPhotosCompressedUri = new Map<string, string>();
+
 export function useServerPhotoUri(
   serverPhoto: PhotoServerType | undefined,
   photoUriNeeded: boolean,
@@ -28,20 +31,51 @@ export function useServerPhotoUri(
   useEffect(() => {
     async function innerAsync() {
       if (serverPhoto && photoUriNeeded) {
-        const photoThumbnailUri = await photoExistsInCache(serverPhoto.id);
-        if (photoThumbnailUri) {
-          setServerPhotoUri(photoThumbnailUri);
+        if (photoVariation == 'thumbnail') {
+          const serverPhotoUriCached = serverPhotosThumbnailUri.get(serverPhoto.id);
+
+          if (serverPhotoUriCached) {
+            setServerPhotoUri(serverPhotoUriCached);
+            setCacheChecked(true);
+            return;
+          }
+        }
+
+        if (photoVariation == 'compressed') {
+          console.log('Checking image from local Map', photoVariation, serverPhoto.id);
+          const serverPhotoUriCached = serverPhotosCompressedUri.get(serverPhoto.id);
+
+          if (serverPhotoUriCached) {
+            setServerPhotoUri(serverPhotoUriCached);
+            setCacheChecked(true);
+            return;
+          }
+        }
+
+        const photoUri = await photoExistsInCache(serverPhoto.id);
+        if (photoUri) {
+          console.log('Checking image from cache', photoVariation, serverPhoto.id);
+          setServerPhotoUri(photoUri);
+
+          if (photoVariation == 'thumbnail') {
+            serverPhotosThumbnailUri.set(serverPhoto.id, photoUri);
+          }
+
+          if (photoVariation == 'compressed') {
+            serverPhotosCompressedUri.set(serverPhoto.id, photoUri);
+          }
         }
         setCacheChecked(true);
       }
     }
 
     innerAsync().catch(LOG.error);
-  }, [serverPhoto, photoUriNeeded, photoExistsInCache]);
+  }, [serverPhoto, photoUriNeeded, photoExistsInCache, photoVariation]);
 
   useEffect(() => {
     async function innerAsync() {
       if (serverPhoto && photoUriNeeded && !serverPhotoUri && cacheChecked) {
+        console.log(photoVariation, serverPhoto.id);
         const res = await GetPhotosByIdPost({
           ids: [serverPhoto.id],
           photoType: photoVariation,
