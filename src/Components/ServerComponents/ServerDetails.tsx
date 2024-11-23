@@ -20,6 +20,8 @@ import {
 import { usePhotosFunctionsStore } from '~/Context/ReduxStore/Slices/Photos/PhotosFunctions';
 import { LOG } from '~/Helpers/Logging/Logger';
 import { useStyles } from '~/Hooks/useStyles';
+import { AutoBackupModule } from '~/NativeModules/AutoBackupModule';
+import { UploadMediaModule } from '~/NativeModules/UploadMediaModule';
 import { useMainStackNavigation } from '~/Navigation/Navigators/MainStackNavigator';
 import { colorsType } from '~/Styles/colors';
 import { spacing } from '~/Styles/spacing';
@@ -88,6 +90,9 @@ export default function ServerDetails() {
     }
     forgetServer();
     ClearServerPhotos();
+
+    await UploadMediaModule.StopWorker();
+    await AutoBackupModule.StopWorker();
   }, [
     ClearServerPhotos,
     forgetServer,

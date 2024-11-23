@@ -8,6 +8,7 @@ import { LOG } from '~/Helpers/Logging/Logger';
 import { APIPhoto } from '~/Helpers/ServerQueries/Types';
 import { useHasValueChanged } from '~/Hooks/useHasValueChanged';
 import { useToast } from '~/Hooks/useToast';
+import { useValueRef } from '~/Hooks/useValueRef';
 import {
   ClearWorkerDataInputFiles,
   UploadMediaEvents,
@@ -30,10 +31,12 @@ export const UploadWorkerEffects: React.FC<PropsType> = props => {
 
   const dispatch = useAppDispatch();
 
-  const { serverPath, token } = useServerContext();
+  const { serverPath, token, isServerReachable } = useServerContext();
   const [rerunEffect, setRerunEffect] = useState(false);
 
   const isEffectRunning = useRef(false);
+
+  const isServerReachableRef = useValueRef(isServerReachable);
 
   const { InvalidatePhotos, InvalidatePhotosByMediaId } = useServerInvalidationContext();
 
@@ -101,6 +104,10 @@ export const UploadWorkerEffects: React.FC<PropsType> = props => {
       return;
     }
 
+    if (!isServerReachableRef.current) {
+      return;
+    }
+
     try {
       isEffectRunning.current = true;
 
@@ -131,7 +138,7 @@ export const UploadWorkerEffects: React.FC<PropsType> = props => {
     } finally {
       isEffectRunning.current = false;
     }
-  }, [dispatch, InvalidatePhotos, rerunEffect]);
+  }, [dispatch, InvalidatePhotos, rerunEffect, isServerReachableRef]);
 
   // Effect to start photos upload worker when photos present in queue
   useEffect(() => {
@@ -179,6 +186,10 @@ export const UploadWorkerEffects: React.FC<PropsType> = props => {
 
     // On worker finished
 
+    if (!isServerReachableRef.current) {
+      return;
+    }
+
     // Invalidate current photos uploading
     if (currentPhotosUploading.size != 0) {
       InvalidatePhotosByMediaId({
@@ -198,6 +209,7 @@ export const UploadWorkerEffects: React.FC<PropsType> = props => {
     workerStatus,
     workerStatusChanged,
     showToastError,
+    isServerReachableRef,
   ]);
 
   // Effect to clear worker data input files when worker not running.

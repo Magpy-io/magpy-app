@@ -57,9 +57,9 @@ export function useServerContextFunctions() {
   );
 
   const forgetServer = useCallback(() => {
-    setIsServerReachable(false);
     setServerNetwork(null);
     setToken(null);
+    setIsServerReachable(false);
     setError(null);
     clearAddressForServerApi();
   }, [setError, setIsServerReachable, setServerNetwork, setToken]);
