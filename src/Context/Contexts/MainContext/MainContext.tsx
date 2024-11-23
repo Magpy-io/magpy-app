@@ -16,7 +16,7 @@ export type MainContextDataType = {
 
 const initialState: MainContextDataType = {
   isNewUserState: StatePersistentDefaultValue(true),
-  isUsingLocalAccountState: StatePersistentDefaultValue(false),
+  isUsingLocalAccountState: StatePersistentDefaultValue(true),
   neverAskForNotificationPermissionAgainState: StatePersistentDefaultValue(false),
 };
 
