@@ -78,6 +78,7 @@ public class UploadWorker extends Worker {
     public Result doWork() {
         _logger = new LoggerBuilder(getApplicationContext())
                 .setLogPath("UploadWorker")
+                .setLoggerBaseName("UploadWorker")
                 .setShouldLogConsole(true)
                 .Build();
 
@@ -277,6 +278,11 @@ public class UploadWorker extends Worker {
     }
 
     private void sendProgressPhotoUploaded(String mediaId, String photoUploaded){
+        if(isStopped()){
+            _logger.Log("Work stopped, not sending progress info");
+            return;
+        }
+
         Data progressData = new Data.Builder()
                 .putString(UPLOADED_PHOTO_MEDIA_ID, mediaId)
                 .putString(UPLOADED_PHOTO_STRING, photoUploaded)
@@ -289,6 +295,11 @@ public class UploadWorker extends Worker {
     }
 
     private void sendProgressPhotoUploadFailed(String mediaId){
+        if(isStopped()){
+            _logger.Log("Work stopped, not sending progress info");
+            return;
+        }
+
         Data progressData = new Data.Builder()
                 .putString(UPLOAD_FAIL_PHOTO_MEDIA_ID, mediaId)
                 .build();

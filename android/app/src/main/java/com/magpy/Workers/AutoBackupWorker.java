@@ -92,6 +92,7 @@ public class AutoBackupWorker extends Worker {
     public Result doWork() {
         _logger = new LoggerBuilder(getApplicationContext())
                 .setLogPath("AutoBackupWorker")
+                .setLoggerBaseName("AutoBackupWorker")
                 .setShouldLogConsole(true)
                 .Build();
 
@@ -230,8 +231,9 @@ public class AutoBackupWorker extends Worker {
                 serverToken,
                 deviceId);
 
-        int progress = 0;
+        int progress = -1;
         for (PhotoData photoData:missingPhotos) {
+            progress++;
 
             if(isStopped()){
                 // Wait time to avoid the worker finishing before the progress is received by the AutoBackupWorkerManager
@@ -251,8 +253,6 @@ public class AutoBackupWorker extends Worker {
                 _logger.Log("Failed upload of photo with mediaId: " + photoData.mediaId);
                 sendProgressPhotoUploadFailed(photoData.mediaId);
             }
-
-            progress++;
         }
 
         // Wait time to avoid the worker finishing before the progress is received by the AutoBackupWorkerManager
@@ -391,6 +391,11 @@ public class AutoBackupWorker extends Worker {
     }
 
     private void sendProgressError(AutoBackupWorkerManager.AutobackupWorkerError error){
+        if(isStopped()){
+            _logger.Log("Work stopped, not sending progress info");
+            return;
+        }
+
         Data progressData = new Data.Builder()
                 .putString(WORKER_ERROR, error.name())
                 .build();
@@ -404,6 +409,11 @@ public class AutoBackupWorker extends Worker {
     }
 
     private void sendProgressPhotoUploaded(String mediaId, String photoUploaded){
+        if(isStopped()){
+            _logger.Log("Work stopped, not sending progress info");
+            return;
+        }
+
         Data progressData = new Data.Builder()
                 .putString(UPLOADED_PHOTO_MEDIA_ID, mediaId)
                 .putString(UPLOADED_PHOTO_STRING, photoUploaded)
@@ -416,6 +426,11 @@ public class AutoBackupWorker extends Worker {
     }
 
     private void sendProgressPhotoUploadFailed(String mediaId){
+        if(isStopped()){
+            _logger.Log("Work stopped, not sending progress info");
+            return;
+        }
+
         Data progressData = new Data.Builder()
                 .putString(UPLOAD_FAIL_PHOTO_MEDIA_ID, mediaId)
                 .build();
