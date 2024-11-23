@@ -112,6 +112,8 @@ public class UploadWorker extends Worker {
 
             for (int i=0; i<photosIds.length; i++) {
 
+                _logger.Log("Progress " + i);
+
                 if(isStopped()){
                     _logger.Log("Work stopped");
                     break;
