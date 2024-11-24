@@ -24,6 +24,8 @@ import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
+import com.magpy.GlobalManagers.Logging.Logger;
+import com.magpy.GlobalManagers.Logging.LoggerBuilder;
 import com.magpy.GlobalManagers.ServerQueriesManager.Common.PhotoData;
 import com.magpy.GlobalManagers.ServerQueriesManager.Common.ResponseNotOkException;
 import com.magpy.GlobalManagers.ServerQueriesManager.PhotoUploader;
@@ -62,6 +64,8 @@ public class UploadWorker extends Worker {
 
     NotificationCompat.Builder notificationBuilder;
 
+    Logger _logger;
+
     public UploadWorker(
             @NonNull Context context,
             @NonNull WorkerParameters params) {
@@ -72,7 +76,13 @@ public class UploadWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
-        Log.d("UploadWorker", "Work started.");
+        _logger = new LoggerBuilder(getApplicationContext())
+                .setLogPath("UploadWorker")
+                .setLoggerBaseName("UploadWorker")
+                .setShouldLogConsole(true)
+                .Build();
+
+        _logger.Log("Work started.");
 
         try{
             if(!parseInputData()) {
@@ -102,8 +112,10 @@ public class UploadWorker extends Worker {
 
             for (int i=0; i<photosIds.length; i++) {
 
+                _logger.Log("Progress " + i);
+
                 if(isStopped()){
-                    Log.d("UploadWorker", "Work stopped");
+                    _logger.Log("Work stopped");
                     break;
                 }
 
@@ -126,7 +138,7 @@ public class UploadWorker extends Worker {
                 PhotoData photoData = parseResult(result);
 
                 if(photoData == null){
-                    Log.d("UploadWorker", "PhotoData not found for photo with mediaId: " + mediaId);
+                    _logger.Log("PhotoData not found for photo with mediaId: " + mediaId);
                     continue;
                 }
 
@@ -135,7 +147,7 @@ public class UploadWorker extends Worker {
                     sendProgressPhotoUploaded(mediaId, photoUploaded);
                 }
                 catch (ResponseNotOkException e){
-                    Log.e("UploadWorker", "Failed upload of photo with mediaId: " + mediaId, e);
+                    _logger.Log("Failed upload of photo with mediaId: " + mediaId, e);
                     sendProgressPhotoUploadFailed(mediaId);
                 }
             }
@@ -143,10 +155,10 @@ public class UploadWorker extends Worker {
             // Wait time to avoid the worker finishing before the progress is received by the UploadWorkerManager
             sleep(500);
 
-            Log.d("UploadWorker", "Work finished.");
+            _logger.Log("Work finished.");
             return Result.success();
         }catch(Exception e){
-            Log.e("UploadWorker", "Exception thrown: ", e);
+            _logger.Log("Exception thrown: ", e);
             return Result.failure();
         }finally {
             getApplicationContext().getSystemService(NotificationManager.class).cancel(NOTIFICATION_ID);
@@ -166,7 +178,7 @@ public class UploadWorker extends Worker {
         }
 
         if(edges.size() > 1){
-            Log.i("UploadWorker", "Found more than on result for a mediaId");
+            _logger.Log("Warning: Found more than one result for a mediaId");
         }
 
         ReadableMap item = edges.getMap(0);
@@ -262,11 +274,17 @@ public class UploadWorker extends Worker {
             return true;
         }
         catch(Exception e){
+            _logger.Log("Failed to parse photo ids input file.", e);
             return false;
         }
     }
 
     private void sendProgressPhotoUploaded(String mediaId, String photoUploaded){
+        if(isStopped()){
+            _logger.Log("Work stopped, not sending progress info");
+            return;
+        }
+
         Data progressData = new Data.Builder()
                 .putString(UPLOADED_PHOTO_MEDIA_ID, mediaId)
                 .putString(UPLOADED_PHOTO_STRING, photoUploaded)
@@ -274,18 +292,23 @@ public class UploadWorker extends Worker {
         try{
             setProgressAsync(progressData).get();
         }catch(Exception e){
-            Log.e("UploadWorker", e.toString());
+            _logger.Log("Error sending progress photo uploaded", e);
         }
     }
 
     private void sendProgressPhotoUploadFailed(String mediaId){
+        if(isStopped()){
+            _logger.Log("Work stopped, not sending progress info");
+            return;
+        }
+
         Data progressData = new Data.Builder()
                 .putString(UPLOAD_FAIL_PHOTO_MEDIA_ID, mediaId)
                 .build();
         try{
             setProgressAsync(progressData).get();
         }catch(Exception e){
-            Log.e("UploadWorker", e.toString());
+            _logger.Log("Error sending progress photo upload failed", e);
         }
     }
 }

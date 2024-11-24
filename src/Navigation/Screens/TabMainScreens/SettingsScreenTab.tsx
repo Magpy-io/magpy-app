@@ -2,7 +2,6 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import {
-  AccountIcon,
   InfoIcon,
   LogoutIcon,
   PreferencesIcon,
@@ -50,14 +49,6 @@ export default function SettingsScreenTab() {
             navigate('BackupSettings');
           },
           icon: <UploadIcon />,
-        },
-        {
-          type: 'Navigation',
-          title: 'Account settings',
-          onPress: () => {
-            navigate('AccountSettings');
-          },
-          icon: <AccountIcon />,
         },
         {
           type: 'Navigation',

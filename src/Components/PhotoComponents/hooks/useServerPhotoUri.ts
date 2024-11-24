@@ -28,9 +28,9 @@ export function useServerPhotoUri(
   useEffect(() => {
     async function innerAsync() {
       if (serverPhoto && photoUriNeeded) {
-        const photoThumbnailUri = await photoExistsInCache(serverPhoto.id);
-        if (photoThumbnailUri) {
-          setServerPhotoUri(photoThumbnailUri);
+        const photoUri = await photoExistsInCache(serverPhoto.id);
+        if (photoUri) {
+          setServerPhotoUri(photoUri);
         }
         setCacheChecked(true);
       }
