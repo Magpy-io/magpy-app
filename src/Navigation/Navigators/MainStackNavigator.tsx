@@ -18,6 +18,7 @@ import ServerGalleryScreen from '../Screens/ServerGalleryScreen';
 import ServerLoginScreen from '../Screens/ServerLoginScreen';
 import ServerManualAddressScreen from '../Screens/ServerManualAddressScreen';
 import ServerSelectScreen from '../Screens/ServerSelectScreen';
+import { WelcomeScreen } from '../Screens/WelcomeScreen';
 import { TabStackNavigator, TabStackParamList } from './TabStackNavigator';
 
 export type MainStackParamList = {
@@ -34,6 +35,7 @@ export type MainStackParamList = {
   PreferencesSettings: undefined;
   AboutSettings: undefined;
   Debug: undefined;
+  Welcome: undefined;
 };
 
 const Stack = createNativeStackNavigator<MainStackParamList>();
@@ -65,6 +67,7 @@ export function MainStackNavigator({ initialScreen }: propsType) {
       <Stack.Screen name="PreferencesSettings" component={PreferencesSettingsScreen} />
       <Stack.Screen name="AboutSettings" component={AboutSettingsScreen} />
       <Stack.Screen name="Debug" component={DebugScreen} />
+      <Stack.Screen name="Welcome" component={WelcomeScreen} />
     </Stack.Navigator>
   );
 }
