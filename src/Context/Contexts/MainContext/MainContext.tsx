@@ -28,7 +28,7 @@ type PropsType = {
 
 export const MainContextProvider: React.FC<PropsType> = props => {
   const isNewUserState = useStatePersistent(true, 'IS_NEW_USER');
-  const isUsingLocalAccountState = useStatePersistent(false, 'IS_USING_LOCAL_ACCOUNT');
+  const isUsingLocalAccountState = useStatePersistent(true, 'IS_USING_LOCAL_ACCOUNT');
   const neverAskForNotificationPermissionAgainState = useStatePersistent(
     false,
     'NEVER_ASK_FOR_NOTIFICATION_PERMISSION_AGAIN',
