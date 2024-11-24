@@ -7,7 +7,7 @@ import { MainStackNavigator } from './Navigators/MainStackNavigator';
 import SplashScreen from './Screens/SplashScreen';
 
 export const Root = () => {
-  const { token, loading } = useAuthContext();
+  const { loading } = useAuthContext();
 
   const { isNewUser, isUsingLocalAccount, isContextLoaded } = useMainContext();
 
@@ -20,11 +20,7 @@ export const Root = () => {
   }
 
   if (isNewUser) {
-    return <MainStackNavigator initialScreen="Login" />;
-  }
-
-  if (!isUsingLocalAccount && !token) {
-    return <MainStackNavigator initialScreen="Login" />;
+    return <MainStackNavigator initialScreen="Welcome" />;
   }
 
   return <MainStackNavigator initialScreen="Tabs" />;
